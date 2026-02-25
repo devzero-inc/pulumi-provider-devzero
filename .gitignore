@@ -1,0 +1,28 @@
+# Binaries
+bin/
+dist/
+pulumi-resource-devzero
+
+# Go
+*.test
+*.out
+vendor/
+
+# SDK generated outputs (checked in after gen)
+# sdk/nodejs/node_modules/
+# sdk/python/build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Pulumi
+*.yaml.bak
+Pulumi.*.yaml
+
