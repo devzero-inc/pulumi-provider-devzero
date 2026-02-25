@@ -26,3 +26,5 @@ Thumbs.db
 *.yaml.bak
 Pulumi.*.yaml
 
+#some docs 
+docs/plans
