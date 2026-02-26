@@ -1,0 +1,1216 @@
+syntax = "proto3";
+
+package api.v1;
+
+import "google/protobuf/timestamp.proto";
+import "api/v1/common.proto";
+import "api/v1/instance.proto";
+import "google/type/money.proto";
+
+option go_package = "github.com/devzero-inc/services/dakr/gen/api/v1;gen";
+option java_multiple_files = true;
+option java_package = "gen.api.v1";
+
+// Requests
+
+// GetNodeRequest is used to fetch a node in a specific cluster.
+message GetNodeRequest {
+  string team_id = 1; // Unique identifier for the team.
+  string cluster_id = 2; // Unique identifier for the cluster.
+  optional string node_id = 3; // Unique identifier for the node. 
+  optional string node_uid = 4; // alternatively -> Unique identifier for the node. !!!should be oneof
+  bool with_details = 11; // Optional flag to include additional resource details 
+  bool with_metadata = 12; // Optional flag to include metadata 
+
+  optional google.protobuf.Timestamp start_time = 21;
+  optional google.protobuf.Timestamp end_time = 22;
+}
+
+// GetWorkloadPodHistoryRequest is used to fetch historical pods for a workload.
+message GetWorkloadPodHistoryRequest {
+  string team_id = 1;
+  string cluster_id = 2;
+  string workload_kind = 3;
+  string workload_uid = 4;
+  optional google.protobuf.Timestamp start_time = 5;
+  optional google.protobuf.Timestamp end_time = 6;
+}
+
+// GetClusterMetadataRequest request for metadata
+message GetClusterMetadataRequest {
+  string team_id = 1; // Unique identifier for the team.
+}
+
+// GetNodeGroupRequest is used to fetch node group for a specific cluster.
+message GetNodeGroupRequest {
+  string team_id = 1; // Unique identifier for the team.
+  string cluster_id = 2; // Unique identifier for the cluster.
+  string node_group_name = 3; // Identifier for node group.
+
+  bool show_deleted = 11;
+
+  optional google.protobuf.Timestamp start_time = 21;
+  optional google.protobuf.Timestamp end_time = 22;
+}
+
+// GetWorkloadsRequest is used to fetch workloads for a specific cluster.
+message GetWorkloadsRequest {
+  string team_id = 1; // Unique identifier for the team.
+  string cluster_id = 2; // Unique identifier for the cluster.
+  
+  // By default we do not show deleted workloads, change to true if you want to return deleted workloads
+  bool show_deleted = 12 [deprecated = true]; // Prefer filters.status instead
+
+  optional google.protobuf.Timestamp start_time = 21;
+  optional google.protobuf.Timestamp end_time = 22;
+
+  // Optional filter for node groups
+  repeated string node_group_names = 25 [deprecated = true]; // Prefer filters.status instead
+
+  optional WorkloadFilters filters = 31; // Optional advanced filters; when set, overrides show_deleted behavior via filters.status
+}
+
+// GetResourcesRequest is uset to fetch resources from db.
+message GetResourcesRequest {
+  string team_id = 1; // Unique identifier for the team.
+  optional string cluster_id = 2; // Unique identifier for the cluster.
+  K8sObjectKind kind = 3; // Type of object to get.
+  optional string search = 4; // Search term to filter resources by name
+  
+  Pagination pagination = 11; // Pagination parameters
+}
+
+// GetPodsRequest is used to fetch Pod resources from db.
+message GetPodsRequest {
+  string team_id = 1; // Unique identifier for the team.
+  optional string cluster_id = 2; // Unique identifier for the cluster.
+  optional string search = 4; // Search term to filter pods by name
+
+  Pagination pagination = 11; // Pagination parameters
+
+  repeated string node_group_names = 25; // Optional filter for node groups
+  repeated string node_ids = 26; // Optional filter for specific node IDs
+  // Note: When both node_group_names and node_ids are provided, they are combined with AND logic (intersection)
+
+  google.protobuf.Timestamp start_time = 27; // Start time for metrics query
+  google.protobuf.Timestamp end_time = 28; // End time for metrics query
+}
+
+// GetPodsResponse is the response for getting pod resources.
+message GetPodsResponse {
+  repeated WorkloadItem workload_items = 1; // List of pods.
+  Pagination pagination = 2; // Pagination information
+}
+
+// GetWorkloadRequest is used to fetch details of a specific workload in a cluster.
+message GetWorkloadRequest {
+  string team_id = 1; // Unique identifier for the team.
+  string cluster_id = 2; // Unique identifier for the cluster.
+  string kind = 3; // Kind of the workload (e.g., Deployment, StatefulSet).
+  string uid = 4; // Unique identifier for the workload.
+
+  bool include_deleted = 11;
+  bool with_details = 12; // Optional flag to include additional resource details 
+  bool with_metadata = 13; // Optional flag to include metadata 
+
+  optional google.protobuf.Timestamp start_time = 21;
+  optional google.protobuf.Timestamp end_time = 22;
+}
+
+// GetClustersRequest is used to fetch clusters for a specific team.
+message GetClustersRequest {
+  string team_id = 1; // Unique identifier for the team.
+
+  optional google.protobuf.Timestamp start_time = 11;
+  optional google.protobuf.Timestamp end_time = 12;
+  optional int32 bucket_size = 13;
+
+  repeated string node_group_names = 14; // Optional filter for node groups
+}
+
+// ListClustersRequest is used to fetch clusters for a specific team with pagination.
+// Deprecated: Use GetClustersRequest instead.
+message ListClustersRequest {
+  option deprecated = true;
+  string team_id = 1; // Unique identifier for the team.
+  optional string search = 2; // Search term to filter clusters by name or ID
+
+  Pagination pagination = 11; // Pagination parameters
+}
+
+// GetClusterRequest is used to fetch details of a specific cluster for a team.
+message GetClusterRequest {
+  string team_id = 1; // Unique identifier for the team.
+  string cluster_id = 2; // Unique identifier for the cluster.
+
+  optional google.protobuf.Timestamp start_time = 11;
+  optional google.protobuf.Timestamp end_time = 12;
+  optional int32 bucket_size = 13;
+
+  repeated string node_group_names = 14; // Optional filter for node groups
+}
+
+// DeleteClusterRequest is used to delete a cluster and all its resources.
+message DeleteClusterRequest {
+  string team_id = 1; // Unique identifier for the team.
+  string cluster_id = 2; // Unique identifier for the cluster.
+}
+
+// DeleteClusterResponse is the response for a delete cluster request.
+message DeleteClusterResponse {}
+
+// UpdateClusterRequest is used to update the configuration of an existing cluster.
+// only certain fields can be updated, such as name
+message UpdateClusterRequest {
+  string team_id = 1; // Unique identifier for the team.
+  string cluster_id = 2; // Unique identifier for the cluster.
+  string cluster_name = 3; // Updated cluster details.
+  double cpu_cost_per_hour = 4; // Estimated CPU cost per hour for one vcpu.
+  double memory_cost_per_hour = 5; // Estimated memory cost per hour for one GiB of memory.
+  double gpu_cost_per_hour = 6; // Estimate GPU cost per hour for one GPU.
+}
+
+// UpdateClusterResponse is the response for an update cluster request.
+message UpdateClusterResponse {
+  Cluster cluster = 1; // Updated cluster details.
+}
+
+
+// GetResourcesResponse is the response for getting k8s resources.
+message GetResourcesResponse {
+  repeated WorkloadItem workload_items = 1; // Return list of resources requested
+  Pagination pagination = 2; // Pagination information
+}
+
+// CreateClusterRequest is used to create a new cluster.
+message CreateClusterRequest {
+  string team_id = 1; // Unique identifier for the team.
+  string cluster_name = 2; // Name of the new cluster.
+}
+
+// CreateClusterResponse is the response for a create cluster request.
+message CreateClusterResponse {
+  Cluster cluster = 1; // Details of the created cluster.
+  string token = 2; // Token for the new cluster.
+}
+
+// ResetClusterTokenRequest is used to reset the token for a cluster.
+message ResetClusterTokenRequest {
+  string team_id = 1; // Unique identifier for the team.
+  string cluster_id = 2; // Unique identifier for the cluster.
+}
+
+// ResetClusterTokenResponse is the response for a reset cluster token request.
+message ResetClusterTokenResponse {
+  string token = 1; // Token for the new cluster.
+}
+
+
+// GetNodeGroupsRequest is used to fetch node groups for a specific cluster.
+message GetNodeGroupsRequest {
+  string team_id = 1; // Unique identifier for the team.
+  string cluster_id = 2; // Unique identifier for the cluster.
+
+  optional google.protobuf.Timestamp start_time = 11;
+  optional google.protobuf.Timestamp end_time = 12;
+  optional int32 bucket_size = 13;
+
+  bool show_deleted = 21;
+}
+
+// GetAllNodeGroupsRequest is used to fetch all node groups for a specific team.
+message GetAllNodeGroupsRequest {
+  string team_id = 1; // Unique identifier for the team.
+}
+
+// GetNodeGroupsResponse contains the list of node groups for a specific cluster.
+message GetNodeGroupsResponse {
+  repeated NodeGroup node_groups = 1; // List of node groups.
+}
+
+// GetAllNodeGroupsResponse contains the list of all node groups for a specific team.
+message GetAllNodeGroupsResponse {
+  map<string, NodeGroup> node_group_map = 1; // Map of clusterId+nodeGroupName to NodeGroup.
+}
+
+message NodeGroupSet {
+  repeated NodeGroup node_groups = 1; // List of node groups.
+}
+
+// GetNodeGroupsUtilizationRequest is used to fetch timeseries utilization data for node groups for a specific cluster.
+message GetNodeGroupsUtilizationRequest {
+  string team_id = 1; // Unique identifier for the team.
+  string cluster_id = 2; // Unique identifier for the cluster.
+
+  optional google.protobuf.Timestamp start_time = 11;
+  optional google.protobuf.Timestamp end_time = 12;
+  optional int32 bucket_size = 13;
+}
+
+// GetNodeGroupsResponse contains the list of node groups for a specific cluster.
+message GetNodeGroupsUtilizationResponse {
+  message ListNodeGroupMetrics {
+    repeated NodeGroupMetric node_group_metrics = 1;
+  }
+  map<string, ListNodeGroupMetrics> node_group_to_util_metrics = 1;
+  map<string, ListNodeGroupMetrics> instance_type_to_util_metrics = 6;
+  map<string, ListNodeGroupMetrics> reservation_type_to_util_metrics = 11;
+  map<string, ListNodeGroupMetrics> logical_az_to_util_metrics = 16;
+}
+
+message NodeGroupMetric {
+  int32 node_count = 1;
+  int32 max_concurrent_node_count = 2;
+
+  int64 capacity_cpu = 11; // millicores
+  int64 capacity_memory = 12; // bytes
+  int64 capacity_gpu_vram = 13; // bytes
+  int64 capacity_gpu_devices = 14; // number
+  
+  int64 aggr_cpu_req = 21; // millicores
+  int64 aggr_memory_req = 22; // bytes
+  int64 aggr_gpu_req = 23; // number
+
+  float util_cpu_avg_usage = 31; // millicores
+  float util_memory_avg_usage = 32; // bytes
+  float util_gpu_vram_avg_usage = 33; // bytes
+  float util_gpu_device = 34; // pct
+
+  google.type.Money hourly_cost = 50; // average hourly cost within the time bucket
+  google.type.Money hourly_cpu_cost = 51; // cost for cpu
+  google.type.Money hourly_memory_cost = 52; // cost for memory
+  google.type.Money hourly_gpu_cost = 53; // cost for gpu
+
+  google.protobuf.Timestamp bucket_time = 41;
+}
+
+// GetNodeGroupResponse contains node group for a specific cluster.
+message GetNodeGroupResponse {
+  NodeGroup node_group = 1; // Node Group
+}
+
+// GetClusterResponse contains details of a specific cluster for a team.
+message GetClusterResponse {
+  Cluster cluster = 1; // Details of the cluster.
+}
+
+// GetClustersResponse contains the list of clusters and aggregated metrics for a team.
+message GetClustersResponse {
+  repeated Cluster clusters = 1; // List of clusters.
+  ResourceMetrics resource_metrics = 2; // Aggregated resource metrics across clusters.
+  CostInfo cost_info = 3; // Aggregated cost information across clusters.
+  NodeInfo node_info = 4; // Aggregated node information across clusters.
+  repeated CostDataPoint cost_data_points = 5; // Time-series cost data points.
+  repeated ResourceDataPoint resource_data_points = 6; // Time-series resource utilization data points.
+  // TODO: add GPU bits.
+}
+
+// ListClustersResponse contains the paginated list of clusters for a team.
+// Deprecated: Use GetClustersResponse instead.
+message ListClustersResponse {
+  option deprecated = true;
+  repeated Cluster clusters = 1; // List of clusters.
+  Pagination pagination = 2; // Pagination information.
+}
+
+// GetNodeResponse contains details and metrics for a specific node in a cluster.
+message GetNodeResponse {
+  Node node = 1; // Details of the node.
+  ResourceMetrics resource_metrics = 2; // Resource metrics for the node.
+  CostInfo cost_info = 3; // Cost details for the node.
+  repeated CostDataPoint cost_data_points = 4; // Time-series cost data points for the node.
+  repeated ResourceDataPoint resource_data_points = 5; // Time-series resource metrics for the node.
+}
+
+// GetWorkloadsResponse contains a list of workloads and aggregated metrics for a cluster.
+message GetWorkloadsResponse {
+  repeated WorkloadItem workload_items = 1; // List of workload hierarchy items.
+  CostInfo cost_info = 2; // Aggregated cost information for workloads.
+  ResourceMetrics resource_metrics = 3; // Aggregated resource metrics for workloads.
+  ResourceSummary resource_summary = 4; // Summary of resource counts and pod statuses.
+}
+
+// GetWorkloadResponse contains details and metrics for a specific workload in a cluster.
+message GetWorkloadResponse {
+  WorkloadItem workload_item = 1; // Details of the workload hierarchy.
+  CostInfo cost_info = 2; // Aggregated cost information for the workload.
+  ResourceMetrics resource_metrics = 3; // Aggregated resource metrics for the workload.
+  ResourceSummary resource_summary = 4; // Summary of resource counts and pod statuses for the workload.
+  repeated CostDataPoint cost_data_points = 5; // Time-series cost data points for the workload.
+  repeated ResourceDataPoint resource_data_points = 6; // Time-series resource metrics for the workload.
+}
+
+// Request to get forecasted workloads
+message GetForecastWorkloadsRequest {
+  string team_id = 1;
+  string cluster_id = 2;
+  bool show_deleted = 12;
+
+  optional google.protobuf.Timestamp start_time = 21;
+  optional google.protobuf.Timestamp end_time = 22;
+}
+
+// Response to forecast workloads request
+message GetForecastWorkloadsResponse {
+  repeated WorkloadItem workload_items = 1; // List of workload hierarchy items.
+  CostInfo cost_info = 2; // Aggregated cost information for workloads.
+  repeated ForecastResourceMetrics resource_metrics = 3; // List of forecasted resource metrics for the workload.
+  ResourceSummary resource_summary = 4; // Summary of resource counts and pod statuses.
+}
+
+// Request to get forecast for a specific workload
+message GetForecastWorkloadRequest {
+  string team_id = 1; // Unique identifier for the team.
+  string cluster_id = 2; // Unique identifier for the cluster.
+  string kind = 3; // Kind of the workload (e.g., Deployment, StatefulSet).
+  string uid = 4; // Unique identifier for the workload.
+
+  bool include_deleted = 11;
+
+  optional google.protobuf.Timestamp start_time = 21;
+  optional google.protobuf.Timestamp end_time = 22;
+}
+
+// Response containing forecasted metrics for a specific workload
+message GetForecastWorkloadResponse {
+  WorkloadItem workload_item = 1; // Details of the workload hierarchy.
+  CostInfo cost_info = 2; // Aggregated cost information for the workload.
+  repeated ForecastResourceMetrics resource_metrics = 3; // List of forecasted resource metrics for the workload.
+  ResourceSummary resource_summary = 4; // Summary of resource counts and pod statuses for the workload.
+  repeated CostDataPoint cost_data_points = 5; // Time-series cost data points for the workload.
+  repeated ResourceDataPoint resource_data_points = 6; // Time-series resource metrics for the workload.
+}
+
+// GetClusterMetadataResponse 
+message GetClusterMetadataResponse {
+  repeated Cluster clusters = 1; // List of clusters.
+}
+
+message ClusterElement {
+  string cluster_id = 1;
+  string element = 5;
+}
+
+message GetAllNamespacesRequest {
+  string team_id = 1;
+  repeated string cluster_ids = 5;
+
+  int64 start_time = 11;
+  int64 stop_time = 12;
+}
+
+message GetAllNamespacesResponse {
+  repeated ClusterElement cluster_id_with_namespaces = 1;
+}
+
+// SearchNamespacesByClusterRequest searches namespaces by name within a single cluster.
+message SearchNamespacesByClusterRequest {
+  string team_id = 1;
+  string cluster_id = 2;
+  string search = 3;
+}
+
+// SearchNamespacesByClusterResponse returns the matching namespace names.
+message SearchNamespacesByClusterResponse {
+  repeated string namespaces = 1;
+}
+
+message GetAllWorkloadNamesRequest {
+  string team_id = 1;
+  repeated string cluster_ids = 5;
+  repeated string namespaces = 6;
+  repeated K8sObjectKind kinds = 7;
+  repeated string workload_labels = 8; // each element is "key=val" 
+  repeated string node_group_names = 9;
+  
+  int64 start_time = 11; 
+  int64 stop_time = 12; 
+
+  bool include_deleted = 21;
+}
+
+message GetAllWorkloadNamesResponse {
+  repeated ClusterElement cluster_id_with_workload_name = 1;
+}
+
+message GetAllWorkloadLabelsRequest {
+  string team_id = 1;
+  repeated string cluster_ids = 5;
+  repeated string namespaces = 6;
+  repeated K8sObjectKind kinds = 7;
+  repeated string workload_names = 8;
+  repeated string node_group_names = 9;
+  
+  int64 start_time = 11; 
+  int64 stop_time = 12; 
+}
+
+message GetAllWorkloadLabelsResponse {
+  repeated ClusterElement cluster_id_with_labels = 1;
+}
+
+message GetAllNodeGroupNamesRequest {
+  string team_id = 1;
+  repeated string cluster_ids = 5;
+  
+  int64 start_time = 11; 
+  int64 stop_time = 12; 
+
+  bool include_deleted = 21;
+}
+
+message GetAllNodeGroupNamesResponse {
+  repeated ClusterElement cluster_id_with_node_group_names = 1;
+}
+
+// Cluster represents a Kubernetes cluster with metadata, metrics, and cost information.
+message Cluster {
+  string id = 1; // Unique identifier for the cluster.
+  string name = 2; // Name of the cluster.
+  string team_id = 3; // Identifier of the team owning the cluster.
+  string cloud_provider_id = 4; // Identifier of the cloud provider.
+  string region_id = 5; // Identifier of the region.
+  string cloud_provider = 6; // Name of the cloud provider.
+  string region = 7; // Name of the region.
+  int64 created_at = 8; // Creation time as a Unix timestamp.
+  int64 updated_at = 9; // Last update time as a Unix timestamp.
+  ResourceMetrics resource_metrics = 10; // Aggregated resource metrics for the cluster.
+  CostInfo cost_info = 11; // Aggregated cost information for the cluster.
+  NodeInfo node_info = 12; // Aggregated node information for the cluster.
+  repeated CostDataPoint cost_data_points = 13; // Time-series cost data points for the cluster.
+  repeated ResourceDataPoint resource_data_points = 14; // Time-series resource metrics for the cluster.
+  Node most_expensive_node = 15; // Node with highest cost.
+  Node least_expensive_node = 16; // Node with lowest cost.
+  Node most_underutilized_node = 17; // Node with lowest resource utilization.
+  Container most_underutilized_container = 18; // Container with lowest resource utilization.
+  double cpu_cost_per_hour = 19; // Price per vcpu per hour.
+  double memory_cost_per_hour = 20; // Pricer per GiB per hour.
+  bool has_been_updated = 21; // If cluster has been updated by users.
+  string custom_name = 22; // Custom name for the cluster.
+  string display_name = 23; // Display name for the cluster.
+  bool is_price_available = 24; // Check if we can calculate pricing for cluster automatically
+  double gpu_cost_per_hour = 25; // Pricer per GPU per hour.
+  optional bool is_disconnected = 40;
+  OperatorInfo zxp_info = 50;
+  OperatorInfo zxp_helm_info = 51;
+  OperatorInfo dakr_op_info = 60;
+  OperatorInfo node_op_info = 61;
+  OperatorInfo security_op_info = 62;
+  OperatorInfo network_op_info = 63;
+  double impact_score = 70; // Optimization impact score for cluster
+  double underutilization = 81; // Percentage of how much is cluster underutilized that is using combined numbers of cpu, memory and GPU
+  repeated string tags = 91; // Tags for the cluster
+  bool has_argo_workloads = 101; // Whether any workload on this cluster is managed by Argo CD
+}
+
+message OperatorInfo {
+  string version = 1;
+  string commit = 11;
+  string date = 21;
+}
+
+// Container represents a Kubernetes container with identification and resource metrics.
+message Container {
+  string id = 1; // Unique identifier for the container.
+  string name = 2; // Name of the container.
+  ResourceMetrics resource_metrics = 3; // Resource utilization metrics for the container.
+}
+
+message GetLatestOperatorVersionRequest {}
+
+message GetLatestOperatorVersionResponse {
+  OperatorInfo zxp_info = 1;
+  OperatorInfo zxp_helm_info = 2;
+  OperatorInfo zxp_netmon_info = 3;
+  OperatorInfo zxp_netmon_helm_info = 4;
+  OperatorInfo dakr_op_info = 11;
+  OperatorInfo dakr_op_helm_info = 12;
+
+  OperatorInfo node_op_info_aws = 21;
+  OperatorInfo node_op_info_azure = 22;
+  OperatorInfo node_op_info_gcp = 23;
+  OperatorInfo node_op_info_oci = 24;
+
+  OperatorInfo security_op_info = 31;
+  OperatorInfo security_op_helm_info = 32;
+}
+
+message GalaxyGetClusterPerspectiveRequest {
+  string team_id = 1;
+  repeated string cluster_ids = 2; // (optional) restrict to specific clusters
+  GalaxyPOVClusterGroupBy group_by = 3; // group response
+  PerspectiveDatapointOpts datapoint_opts = 4; // time range / resolution config
+}
+
+message GalaxyGetClusterPerspectiveResponse {
+  repeated GalaxyClusterGroup groupings = 1;
+}
+
+message GalaxyClusterGroup {
+  string group_key = 1; // e.g., "us-west-2", "AWS", "v1.27", etc.
+  // TODO (debo) might want to change cluster_ids to just cluster (same as GetClusters etc)
+  repeated string cluster_ids = 2; // IDs of clusters in this group 
+  CostInfo cost_info = 3; // aggregated cost for this group
+  ResourceMetrics resource_metrics = 4; // aggregated resource metrics
+  NodeInfo node_info = 5; // (optional) node counts (on-demand, spot, etc)
+}
+
+message GalaxyGetNodePerspectiveRequest {
+  string team_id = 1;
+  repeated string cluster_ids = 2; // (optional) restrict to specific clusters
+  GalaxyPOVNodeGroupBy group_by = 3; // how to group nodes
+  PerspectiveDatapointOpts datapoint_opts = 4; // time range / resolution
+}
+
+message GalaxyGetNodePerspectiveResponse {
+  repeated GalaxyNodeGroup groupings = 1;
+}
+
+message GalaxyNodeGroup {
+  string group_key = 1; // e.g., "spot", "n1-standard-4", "g5.xlarge", etc.
+  // TODO (debo) might want to change node_ids to just node (same as GetNodeGroups etc)
+  repeated string node_ids = 2; // nodes that belong to this group
+  // TODO (debo) might want to change cluster_ids to just cluster (same as GetClusters etc)
+  repeated string cluster_ids = 3; // clusters that contain these nodes
+  CostInfo cost_info = 4;
+  ResourceMetrics resource_metrics = 5;
+  NodeInfo node_info = 6;
+}
+
+message GalaxyGetWorkloadPerspectiveRequest {
+  string team_id = 1;
+  repeated string cluster_ids = 2; // (optional) filter by cluster(s)
+  GalaxyPOVWorkloadGroupBy group_by = 3; // grouping type (e.g., namespace, cost, etc)
+  PerspectiveDatapointOpts datapoint_opts = 4; // time range / resolution
+}
+
+message GalaxyGetWorkloadPerspectiveResponse {
+  repeated GalaxyWorkloadGroup groupings = 1;
+  map<string, Cluster> clusters = 2; // cluster_id -> cluster details for all clusters referenced in groupings
+  map<string, WorkloadItem> workloads = 3; // workload_uid -> workload details for all workloads referenced in groupings
+}
+
+message GalaxyWorkloadGroup {
+  string group_key = 1; // e.g., "namespace-a", "Deployment", "high-priority"
+  // TODO (debo) might want to change workload_uids to just workload (same as GetWorkloads etc)
+  repeated string workload_uids = 2; // workload UIDs in this group
+  // TODO (debo) might want to change cluster_ids to just cluster (same as GetClusters etc)
+  repeated string cluster_ids = 3; // clusters these workloads belong to
+  CostInfo cost_info = 4;
+  ResourceMetrics resource_metrics = 5;
+  ResourceSummary resource_summary = 6; // (optional) aggregated resource kind/status info
+}
+
+
+enum GalaxyPOVClusterGroupBy {
+  GALAXY_POV_CLUSTER_GROUP_BY_UNSPECIFIED = 0;
+  GALAXY_POV_CLUSTER_GROUP_BY_REGION = 1;
+  GALAXY_POV_CLUSTER_GROUP_BY_PROVIDER = 2;
+  GALAXY_POV_CLUSTER_GROUP_BY_PCT_OPTIMIZED = 3;
+  GALAXY_POV_CLUSTER_GROUP_BY_COST_PER_HOUR = 4;
+  GALAXY_POV_CLUSTER_GROUP_BY_K8S_VERSION = 5;
+  GALAXY_POV_CLUSTER_GROUP_BY_ZXPORTER_VERSION = 6;
+}
+
+enum GalaxyPOVNodeGroupBy {
+  GALAXY_POV_NODE_GROUP_BY_UNSPECIFIED = 0;
+  GALAXY_POV_NODE_GROUP_BY_TAINT = 1;
+  GALAXY_POV_NODE_GROUP_BY_ARCH = 2;
+  GALAXY_POV_NODE_GROUP_BY_CAPACITY_TYPE = 3; // on-demand, spot, etc.
+  GALAXY_POV_NODE_GROUP_BY_GPU_MODEL = 4;
+  GALAXY_POV_NODE_GROUP_BY_CONTAINER_RUNTIME = 5;
+  GALAXY_POV_NODE_GROUP_BY_CLUSTER = 6;
+  GALAXY_POV_NODE_GROUP_BY_REGION = 7;
+  GALAXY_POV_NODE_GROUP_BY_AVAILABILITY_ZONE = 8;
+  GALAXY_POV_NODE_GROUP_BY_PCT_OPTIMIZED = 9;
+  GALAXY_POV_NODE_GROUP_BY_COST_PER_HOUR = 10;
+  GALAXY_POV_NODE_GROUP_BY_NODE_GROUP = 11;
+  GALAXY_POV_NODE_GROUP_BY_INSTANCE_TYPE = 12;
+}
+
+enum GalaxyPOVWorkloadGroupBy {
+  GALAXY_POV_WORKLOAD_GROUP_BY_UNSPECIFIED = 0;
+  GALAXY_POV_WORKLOAD_GROUP_BY_K8S_TYPE = 1;
+  GALAXY_POV_WORKLOAD_GROUP_BY_CLUSTER = 2;
+  GALAXY_POV_WORKLOAD_GROUP_BY_PCT_OPTIMIZED = 3;
+  GALAXY_POV_WORKLOAD_GROUP_BY_COST_PER_HOUR = 4;
+  GALAXY_POV_WORKLOAD_GROUP_BY_GPU_MODEL = 5;
+  GALAXY_POV_WORKLOAD_GROUP_BY_NAMESPACE = 6;
+  GALAXY_POV_WORKLOAD_GROUP_BY_AFFINITY = 7;
+  GALAXY_POV_WORKLOAD_GROUP_BY_NODE_SELECTOR = 8;
+  GALAXY_POV_WORKLOAD_GROUP_BY_LABEL = 9;
+  GALAXY_POV_WORKLOAD_GROUP_BY_TOLERATIONS = 10;
+  GALAXY_POV_WORKLOAD_GROUP_BY_PRIORITY_CLASS = 11;
+  GALAXY_POV_WORKLOAD_GROUP_BY_SERVICE_ACCOUNT = 12;
+  GALAXY_POV_WORKLOAD_GROUP_BY_RESTART_POLICY = 13;
+  GALAXY_POV_WORKLOAD_GROUP_BY_RUNTIME_CLASS = 14;
+}
+
+message PerspectiveDatapointOpts {
+  int64 time_start = 1;
+  int64 time_stop = 2;
+  int64 num_datapoints_in_time_period = 3;
+}
+
+// Request for listing audit logs
+message ListAuditLogsRequest {
+  string team_id = 1;
+
+  repeated string cluster_id = 2;
+  repeated string node_id = 3;
+  repeated string workload_id = 4;
+  repeated K8sObjectKind workload_type = 5;
+  repeated string recommendation_policy_id = 6;
+  repeated string recommendation_id = 7;
+  repeated string originating_user_id = 8;
+  optional string email_contains = 9;
+  repeated string event = 10;
+
+  google.protobuf.Timestamp start_time = 11;
+  google.protobuf.Timestamp end_time = 12;
+
+  Pagination pagination = 21;
+
+  repeated string audit_log_ids = 31;
+}
+
+// Response for listing audit logs
+message ListAuditLogsResponse {
+  repeated AuditLogEntry logs = 1;
+
+  Pagination pagination = 21;
+}
+
+// Request for fetching all audit log originators.
+message ListAuditLogOriginatorsRequest {
+  string team_id = 1;
+
+  repeated string cluster_id = 2;
+  repeated string node_id = 3;
+  repeated string workload_id = 4;
+  repeated K8sObjectKind workload_type = 5;
+  repeated string recommendation_policy_id = 6;
+  repeated string recommendation_id = 7;
+  repeated string originating_user_id = 8;
+  optional string email_contains = 9;
+  repeated string event = 10;
+
+  google.protobuf.Timestamp start_time = 11;
+  google.protobuf.Timestamp end_time = 12;
+}
+
+// Response for fetching all audit log originators.
+message ListAuditLogOriginatorsResponse {
+  repeated string email_addresses = 1;
+}
+
+// SendWorkloadEmailRequest is used to send an email w/ csv data.
+message SendWorkloadEmailRequest {
+  string team_id = 1; 
+  string cluster_id = 2; 
+  int64 start_time = 11; 
+  int64 stop_time = 12; 
+  repeated string to = 21;
+}
+
+// SendWorkloadEmailResponse...
+message SendWorkloadEmailResponse {
+  string message = 1;
+}
+
+// SendWeeklySummaryEmailRequest is used to send a weekly summary email.
+message SendWeeklySummaryEmailRequest {
+  SendWeeklySummaryEmailRequestData request = 1; // Request data wrapper.
+}
+
+// SendWeeklySummaryEmailRequestData contains the actual request data.
+message SendWeeklySummaryEmailRequestData {
+  string team_id = 1; // Unique identifier for the team.
+  repeated string recipients = 2; // List of email recipients. If empty, will use team members.
+}
+
+// SendWeeklySummaryEmailResponse contains the result of sending a weekly summary email.
+message SendWeeklySummaryEmailResponse {
+  string message = 1; // Status message about the email sending operation.
+}
+
+// GetClustersNodeInfoRequest is used to fetch aggregated node information across clusters.
+message GetClustersNodeInfoRequest {
+  string team_id = 1; // Unique identifier for the team.
+  repeated string cluster_ids = 2; // Optional list of cluster IDs to filter by. If empty, returns info for all clusters.
+  
+  optional google.protobuf.Timestamp start_time = 11;
+  optional google.protobuf.Timestamp end_time = 12;
+
+  bool exclude_most_exp_node = 41;
+  bool exclude_least_exp_node = 42;
+  bool exclude_most_underutil_node = 43;
+}
+
+// GetClustersNodeInfoResponse contains aggregated node information across clusters.
+message GetClustersNodeInfoResponse {
+  NodeInfo node_info = 1; // Aggregated node information across all clusters.
+  Node most_expensive_node = 2; // The most expensive node across all clusters.
+  Node least_expensive_node = 3; // The least expensive node across all clusters.
+  Node most_underutilized_node = 4; // The most underutilized node across all clusters.
+}
+
+message SearchK8sResourcesRequest {
+  string team_id = 1; // Unique identifier for the team.
+  string cluster_id = 2; // Unique identifier for the cluster.
+  string search_query = 3; // Search term to match against name, uid, and namespace.
+  bool include_deleted = 4; // Include soft-deleted resources in results.
+}
+
+message SearchK8sResourcesResponse {
+  repeated K8sSearchResult results = 1; // List of matching resources.
+}
+
+message K8sSearchResult {
+  string uid = 1; // Unique identifier of the resource.
+  string name = 2; // Name of the resource.
+  string kind = 3; // Kind of the resource (e.g., Deployment, StatefulSet).
+  string matched_field = 4; // Field that matched the search query (name, uid, or namespace).
+  string namespace = 5; // Namespace of the resource.
+}
+
+message SearchK8sWorkloadsRequest {
+  string team_id = 1; // Unique identifier for the team.
+  repeated string cluster_ids = 2; // Unique identifier for the cluster.
+  string search_query = 3; // Search term to match against name, uid, and namespace.
+}
+
+message SearchK8sWorkloadsResponse {
+  repeated K8sWorkloadSearchResult results = 1; // List of matching workloads.
+}
+
+message K8sWorkloadSearchResult {
+  string kind = 1; // Kind of the workload (e.g., Deployment, StatefulSet).
+  string name = 2; // Name of the workload.
+}
+
+message MetadataForWorkloadsRequest {
+  string team_id = 1;
+  string cluster_id = 2;
+  map<string, K8sObjectKind> workload_uid_to_kind = 6;
+  bool include_deleted = 11;
+}
+
+message MetadataForWorkloadsResponse {
+  map<string, WorkloadMetadata> workload_uid_to_metadata = 1;
+}
+
+message AddClusterTagsRequest {
+  string team_id = 1;
+  string cluster_id = 2;
+  repeated string tags = 3;
+}
+
+message AddClusterTagsResponse {
+  Cluster cluster = 1;
+}
+
+message RemoveClusterTagsRequest {
+  string team_id = 1;
+  string cluster_id = 2;
+  repeated string tags = 3;
+}
+
+message RemoveClusterTagsResponse {
+  Cluster cluster = 1;
+}
+
+message ListTagsRequest {
+  string team_id = 1;
+}
+
+message TagSummary {
+  string tag = 1;
+  repeated string cluster_ids = 2;
+}
+
+message ListTagsResponse {
+  repeated TagSummary tags = 1;
+}
+
+message WorkloadMetadata {
+  map<string, NodeMetadata> pod_uid_to_node_metadata = 1;
+  map<string, PodMetadata> pod_uid_to_pod_metadata = 2;
+  string label = 6;
+  string annotation = 7;
+  string spec = 8;
+  string status = 9;
+  string metadata = 10;
+  K8sObjectKind kind = 11;
+}
+
+message PodMetadata {
+  string name = 1;
+
+  string label = 6;
+  string annotation = 7;
+  string spec = 8;
+  string status = 9;
+  string metadata = 10;
+}
+
+message NodeMetadata {
+  string node_name = 1;
+  string node_group_name = 2;
+  string node_group_type = 3;
+  string cloud_inst_type_name = 4;
+
+  string label = 6;
+  string annotation = 7;
+  string spec = 8;
+  string status = 9;
+  string metadata = 10;
+}
+
+// GetRelatedResourcesRequest is used to fetch relations for a specific kind
+message GetRelatedResourcesRequest {
+  string team_id = 1; // Unique identifier for the team.
+  string cluster_id = 2; // Unique identifier for the cluster.
+  K8sObjectKind kind = 3; // Type of object to get.
+  string uid = 4; // Unique identifier for the workload.
+  optional string karpenterKind = 5; // used for karpenter deployments
+}
+
+
+  
+message GetWorkloadPodHistoryResponse {
+    string workload_uid = 1;
+    repeated ReplicaSetHistory replica_sets = 2; // Populated if workload is Deployment or ArgoRollout
+    repeated PodHistory direct_pods = 3; // Populated if workload directly owns pods (e.g. StatefulSet, DaemonSet)
+    repeated JobHistory jobs = 4; // Populated if workload is CronJob
+}
+
+message JobHistory {
+    string uid = 1;
+    string name = 2;
+    string status = 3; // active, succeeded, failed
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp deleted_at = 5;
+    repeated PodHistory pods = 6;
+}
+
+message ReplicaSetHistory {
+    string uid = 1;
+    string name = 2;
+    google.protobuf.Timestamp created_at = 3;
+    google.protobuf.Timestamp deleted_at = 4;
+    string revision = 5; // from adjustments/annotations if available
+    repeated PodHistory pods = 6;
+}
+
+message PodHistory {
+    string uid = 1;
+    string name = 2;
+    string namespace = 3;
+    string phase = 4;
+    string node_name = 5;
+    google.protobuf.Timestamp created_at = 6;
+    google.protobuf.Timestamp deleted_at = 7;
+}
+
+message GetRelatedResourcesResponse {
+  repeated K8sRelatedResource relations = 1; // List of resource relations.
+  repeated K8sResourceNode nodes = 2; // List of unique nodes (resources) in the graph.
+  repeated K8sResourceEdge edges = 3; // List of edges for the graph.
+}
+
+// K8sRelatedResource represents a relationship between two Kubernetes resources
+message K8sRelatedResource {
+  string source_kind = 1; // Kind of the source resource (e.g., Deployment, ReplicaSet).
+  string source_uid = 2; // UID of the source resource.
+  string source_name = 3; // Name of the source resource.
+  string target_kind = 4; // Kind of the target resource (e.g., ReplicaSet, Pod).
+  string target_uid = 5; // UID of the target resource.
+  string target_name = 6; // Name of the target resource.
+  string relationship_type = 7; // Type of relationship (e.g., owns, controls, selects).
+}
+
+// K8sResourceNode represents a node in the resource graph
+message K8sResourceNode {
+  string id = 1; // Unique identifier (UID) of the resource.
+  string kind = 2; // Kind of the resource (e.g., Deployment, ReplicaSet, Pod).
+  string name = 3; // Name of the resource.
+}
+
+// K8sResourceEdge represents an edge in the resource graph
+message K8sResourceEdge {
+  string id = 1; // Unique identifier for the edge.
+  string source = 2; // UID of the source resource.
+  string target = 3; // UID of the target resource.
+  string label = 4; // Label for the edge (relationship type).
+}
+
+// GetClusterTypeRequest is used to determine the cluster type based on kubelet version
+message GetClusterTypeRequest {
+  string team_id = 1; // Unique identifier for the team.
+  string cluster_id = 2; // Unique identifier for the cluster.
+}
+
+// GetClusterTypeResponse returns the determined cluster type
+message GetClusterTypeResponse {
+  ClusterType cluster_type = 1; // Detected cluster type
+  string kubelet_version = 2; // The raw kubelet version string
+}
+
+// ClusterType represents different Kubernetes distribution types
+enum ClusterType {
+  CLUSTER_TYPE_UNSPECIFIED = 0;
+  CLUSTER_TYPE_K3S = 1; // K3s cluster
+  CLUSTER_TYPE_RKE2 = 2; // RKE2 cluster
+  CLUSTER_TYPE_CONTAINERD = 3; // Standard containerd-based cluster (default)
+}
+
+// Defines the K8SService RPC methods for Kubernetes cluster management and monitoring.
+service K8SService {
+  // GetWorkloadsStats retrieves stats for workloads in a specific cluster.
+  rpc GetWorkloadsStats(GetWorkloadsStatsRequest) returns (GetWorkloadsStatsResponse);
+
+  // GetClusters retrieves all clusters for a team.
+  rpc GetClusters(GetClustersRequest) returns (GetClustersResponse);
+
+  // ListClusters retrieves clusters for a team with pagination.
+  // Deprecated: Use GetClusters instead.
+  rpc ListClusters(ListClustersRequest) returns (ListClustersResponse) {
+    option deprecated = true;
+  };
+
+  // GetCluster retrieves detailed information for a specific cluster.
+  rpc GetCluster(GetClusterRequest) returns (GetClusterResponse);
+
+  // GetClusterMetadata retrieves metadata information for clusters in a team.
+  rpc GetClusterMetadata(GetClusterMetadataRequest) returns (GetClusterMetadataResponse);
+
+  // GetAllNamespaces returns a list of all namespaces for a teamID; if cluster list is empty, returns all.
+  rpc GetAllNamespaces(GetAllNamespacesRequest) returns (GetAllNamespacesResponse);
+
+  // SearchNamespacesByCluster searches namespaces by name within a single cluster.
+  rpc SearchNamespacesByCluster(SearchNamespacesByClusterRequest) returns (SearchNamespacesByClusterResponse);
+
+  // GetAllWorkloadNames returns a list of all workload names for a team ID; if cluster list is empty, returns all.
+  rpc GetAllWorkloadNames(GetAllWorkloadNamesRequest) returns (GetAllWorkloadNamesResponse);
+
+  // GetAllWorkloadLabels returns all workload labels for a team ID; if cluster list is empty, returns all.
+  rpc GetAllWorkloadLabels(GetAllWorkloadLabelsRequest) returns (GetAllWorkloadLabelsResponse);
+
+  // GetAllNodeGroupNames retrieves list of node group names by cluster
+  rpc GetAllNodeGroupNames(GetAllNodeGroupNamesRequest) returns (GetAllNodeGroupNamesResponse);
+
+  rpc MetadataForWorkloads(MetadataForWorkloadsRequest) returns (MetadataForWorkloadsResponse);
+
+  // GetNodeGroups retrieves all node groups for a specific cluster.
+  rpc GetNodeGroups(GetNodeGroupsRequest) returns (GetNodeGroupsResponse);
+
+  // GetAllNodeGroups retrieves all node groups for all clusters in a team.
+  rpc GetAllNodeGroups(GetAllNodeGroupsRequest) returns (GetAllNodeGroupsResponse);
+
+  // GetNodeGroupsUtilization retrieves utilization data for node groups in a specific cluster.
+  rpc GetNodeGroupsUtilization(GetNodeGroupsUtilizationRequest) returns (GetNodeGroupsUtilizationResponse);
+
+  // GetNodeGroup retrieves node group for a specific cluster.
+  rpc GetNodeGroup(GetNodeGroupRequest) returns (GetNodeGroupResponse);
+
+  // GetNode retrieves detailed information for a specific node.
+  rpc GetNode(GetNodeRequest) returns (GetNodeResponse);
+
+  // GetWorkloads retrieves all workloads for a specific cluster.
+  rpc GetWorkloads(GetWorkloadsRequest) returns (GetWorkloadsResponse);
+
+  // GetWorkload retrieves detailed information for a specific workload.
+  rpc GetWorkload(GetWorkloadRequest) returns (GetWorkloadResponse);
+
+  // GetForecastWorkloads retrieves all workloads for a specific cluster.
+  rpc GetForecastWorkloads(GetForecastWorkloadsRequest) returns (GetForecastWorkloadsResponse) {
+    option deprecated = true;
+  }
+
+  // GetForecastWorkload retrieves detailed information for a specific workload.
+  rpc GetForecastWorkload(GetForecastWorkloadRequest) returns (GetForecastWorkloadResponse) {
+    option deprecated = true;
+  }
+
+
+  // GetResources retrivers specific resource and their details from db, simulating informer.
+  rpc GetResources(GetResourcesRequest) returns (GetResourcesResponse);
+
+  // GetPods retrieves Pod resources and their details from db.
+  rpc GetPods(GetPodsRequest) returns (GetPodsResponse);
+
+  rpc GetLatestOperatorVersion(GetLatestOperatorVersionRequest) returns (GetLatestOperatorVersionResponse);
+
+  rpc GalaxyGetClusterPerspective(GalaxyGetClusterPerspectiveRequest) returns (GalaxyGetClusterPerspectiveResponse);
+
+  rpc GalaxyGetNodePerspective(GalaxyGetNodePerspectiveRequest) returns (GalaxyGetNodePerspectiveResponse);
+
+  rpc GalaxyGetWorkloadPerspective(GalaxyGetWorkloadPerspectiveRequest) returns (GalaxyGetWorkloadPerspectiveResponse);
+
+  rpc ListAuditLogs(ListAuditLogsRequest) returns (ListAuditLogsResponse);
+  rpc ListAuditLogOriginators(ListAuditLogOriginatorsRequest) returns (ListAuditLogOriginatorsResponse);
+
+  rpc SendWorkloadEmail(SendWorkloadEmailRequest) returns (SendWorkloadEmailResponse);
+
+  rpc SendWeeklySummaryEmail(SendWeeklySummaryEmailRequest) returns (SendWeeklySummaryEmailResponse);
+
+  rpc GetClustersNodeInfo(GetClustersNodeInfoRequest) returns (GetClustersNodeInfoResponse);
+
+  // SearchK8sResources searches across all k8s resource types for a specific cluster.
+  rpc SearchK8sResources(SearchK8sResourcesRequest) returns (SearchK8sResourcesResponse);
+
+  // SearchK8sWorkloads searches across all k8s workload types returning only kind and name.
+  rpc SearchK8sWorkloads(SearchK8sWorkloadsRequest) returns (SearchK8sWorkloadsResponse);
+
+  // GetClusterType determines the cluster type based on kubelet version
+  rpc GetClusterType(GetClusterTypeRequest) returns (GetClusterTypeResponse);
+  // GetDeploymentRelations retrieves all relations for a specific deployment.
+  rpc GetRelationsForKind(GetRelatedResourcesRequest) returns (GetRelatedResourcesResponse);
+
+  // LookupNodeInstance retrieves instance information for a node, including both dynamic cache lookup and cached instance data
+  rpc LookupNodeInstance(LookupNodeInstanceRequest) returns (LookupNodeInstanceResponse);
+
+  // GetWorkloadPodHistory retrieves historical pods for a workload.
+  rpc GetWorkloadPodHistory(GetWorkloadPodHistoryRequest) returns (GetWorkloadPodHistoryResponse);
+
+  // AddClusterTags adds tags to a cluster.
+  rpc AddClusterTags(AddClusterTagsRequest) returns (AddClusterTagsResponse);
+
+  // RemoveClusterTags removes tags from a cluster.
+  rpc RemoveClusterTags(RemoveClusterTagsRequest) returns (RemoveClusterTagsResponse);
+
+  // ListTags lists all tags for a team.
+  rpc ListTags(ListTagsRequest) returns (ListTagsResponse);
+}
+
+// ClusterMutationService manages mutating cluster resources.
+service ClusterMutationService {
+  // CreateCluster creates a new cluster.
+  rpc CreateCluster(CreateClusterRequest) returns (CreateClusterResponse);
+
+  // DeleteCluster deletes a cluster and all its resources.
+  // This operation is irreversible and should be used with caution.
+  rpc DeleteCluster(DeleteClusterRequest) returns (DeleteClusterResponse);
+
+  // UpdateCluster updates the configuration of an existing cluster.
+  rpc UpdateCluster(UpdateClusterRequest) returns (UpdateClusterResponse);
+
+  // ResetClusterToken resets the token for a cluster.
+  rpc ResetClusterToken(ResetClusterTokenRequest) returns (ResetClusterTokenResponse);
+}
+
+service UtilizationService {
+  rpc DailyUtilization(DailyUtilizationRequest) returns (DailyUtilizationResponse);
+  rpc DailyUtilizationInstanceType(DailyUtilizationInstanceTypeRequest) returns (DailyUtilizationInstanceTypeResponse);
+  rpc DailyUtilizationNodeType(DailyUtilizationNodeTypeRequest) returns (DailyUtilizationNodeTypeResponse);
+}
+
+message GetWorkloadsStatsRequest {
+  string team_id = 1; // Unique identifier for the team.
+  string cluster_id = 2; // Unique identifier for the cluster.
+  optional google.protobuf.Timestamp start_time = 21;
+  optional google.protobuf.Timestamp end_time = 22;
+}
+message GetWorkloadsStatsResponse {
+  int32 total = 1;
+  int32 optimized = 2;
+  int32 unoptimized = 3;
+  int32 without_requests = 4;
+  int32 optimized_percentage = 5;
+}
+
+message DailyUtilizationRequest {
+  string team_id = 1;
+  repeated string cluster_ids = 2;
+
+  google.protobuf.Timestamp start_time = 21;
+  google.protobuf.Timestamp end_time = 22;
+}
+
+message DailyUtilizationResponse {
+  message Datapoints {
+    repeated Datapoint datapoints = 1;
+  }
+
+  message Datapoint {
+    int64 timestamp = 1; // Unix timestamp (seconds since epoch).
+    
+    int32 value = 6; // some value
+  }
+
+  map<string, Datapoints> cluster_id_to_daily_total_core_minutes = 1;
+  map<string, Cluster> cluster_id_to_meta = 11; // for easier lookups
+  int32 total_core_minutes_in_period = 21;
+}
+
+message DailyUtilizationInstanceTypeRequest {
+  string team_id = 1;
+  repeated string cluster_ids = 2;
+
+  google.protobuf.Timestamp start_time = 21;
+  google.protobuf.Timestamp end_time = 22;
+}
+
+message DailyUtilizationInstanceTypeResponse {
+  message Datapoints {
+    repeated Datapoint datapoints = 1;
+  }
+
+  message Datapoint {
+    int64 timestamp = 1; // Unix timestamp (seconds since epoch).
+    
+    map<string, int32> instance_type_to_daily_total_core_minutes = 11;
+  }
+
+  map<string, Datapoints> cluster_id_to_datapoints = 1;
+  map<string, Cluster> cluster_id_to_meta = 11;
+}
+
+message DailyUtilizationNodeTypeRequest {
+  string team_id = 1;
+  repeated string cluster_ids = 2;
+
+  google.protobuf.Timestamp start_time = 21;
+  google.protobuf.Timestamp end_time = 22;
+}
+
+message DailyUtilizationNodeTypeResponse {
+  message Datapoints {
+    repeated Datapoint datapoints = 1;
+  }
+
+  message Datapoint {
+    int64 timestamp = 1; // Unix timestamp (seconds since epoch).
+
+    map<string, int32> node_type_to_daily_total_core_minutes = 11;
+  }
+
+  map<string, Datapoints> cluster_id_to_datapoints = 1;
+  map<string, Cluster> cluster_id_to_meta = 11;
+}
+
+// LookupNodeInstanceRequest is used to debug and inspect instance lookup for a node
+message LookupNodeInstanceRequest {
+  string team_id = 1; // Unique identifier for the team.
+  string cluster_id = 2; // Unique identifier for the cluster.
+  string node_id = 3; // Unique identifier for the node.
+}
+
+// InstanceLookupParams contains the parameters used to lookup an instance from cache
+message InstanceLookupParams {
+  int64 cloud_provider_id = 1; // Cloud provider ID used in lookup
+  int64 region_id = 2; // Region ID used in lookup
+  string availability_zone = 3; // Availability zone name used in lookup
+  string instance_type = 4; // Instance type name used in lookup
+  int64 operating_system_id = 5; // Operating system ID used in lookup
+}
+
+// LookupNodeInstanceResponse contains the results of instance lookup for a node
+message LookupNodeInstanceResponse {
+  Instance dynamic_instance = 1; // Instance retrieved dynamically from cache using node attributes
+  Instance cached_instance = 2; // Instance retrieved from node.InstanceID if available
+  InstanceLookupParams lookup_params = 3; // Parameters used to lookup the dynamic instance
+  bool dynamic_instance_found = 4; // Whether dynamic instance lookup succeeded
+  bool cached_instance_found = 5; // Whether cached instance lookup succeeded
+}

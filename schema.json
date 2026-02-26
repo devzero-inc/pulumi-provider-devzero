@@ -1,0 +1,93 @@
+{
+    "name": "devzero",
+    "displayName": "DevZero",
+    "description": "A Pulumi provider for managing DevZero infrastructure resources.",
+    "keywords": [
+        "pulumi",
+        "devzero",
+        "category/cloud"
+    ],
+    "homepage": "https://www.devzero.io",
+    "license": "Apache-2.0",
+    "repository": "https://github.com/devzero-inc/pulumi-provider-devzero",
+    "pluginDownloadURL": "github://api.github.com/devzero-inc",
+    "publisher": "DevZero",
+    "language": {
+        "csharp": {
+            "packageReferences": {
+                "Pulumi": "3.*"
+            },
+            "rootNamespace": "DevZero"
+        },
+        "go": {
+            "generateResourceContainerTypes": true,
+            "importBasePath": "github.com/devzero-inc/pulumi-provider-devzero/sdk/go/devzero"
+        },
+        "nodejs": {
+            "packageName": "@devzero/pulumi-devzero",
+            "dependencies": {
+                "@pulumi/pulumi": "^3.0.0"
+            },
+            "devDependencies": {
+                "typescript": "^4.0.0"
+            }
+        },
+        "python": {
+            "packageName": "pulumi_devzero",
+            "requires": {
+                "pulumi": ">=3.0.0,<4.0.0"
+            }
+        }
+    },
+    "config": {
+        "variables": {
+            "token": {
+                "type": "string",
+                "description": "The DevZero API token for authentication.",
+                "secret": true
+            },
+            "teamId": {
+                "type": "string",
+                "description": "The DevZero team ID."
+            },
+            "url": {
+                "type": "string",
+                "description": "The DevZero API base URL. Defaults to https://dakr.devzero.io.",
+                "default": "https://dakr.devzero.io"
+            }
+        },
+        "required": ["token", "teamId"]
+    },
+    "provider": {
+        "description": "The DevZero Pulumi provider.",
+        "inputProperties": {
+            "token": {
+                "type": "string",
+                "description": "The DevZero API token.",
+                "secret": true,
+                "defaultInfo": {
+                    "environment": ["DEVZERO_TOKEN"]
+                }
+            },
+            "teamId": {
+                "type": "string",
+                "description": "The DevZero team ID.",
+                "defaultInfo": {
+                    "environment": ["DEVZERO_TEAM_ID"]
+                }
+            },
+            "url": {
+                "type": "string",
+                "description": "The DevZero API base URL.",
+                "default": "https://dakr.devzero.io",
+                "defaultInfo": {
+                    "environment": ["DEVZERO_URL"]
+                }
+            }
+        },
+        "requiredInputs": ["token", "teamId"]
+    },
+    "types": {},
+    "resources": {},
+    "functions": {}
+}
