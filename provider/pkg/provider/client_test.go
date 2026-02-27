@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+
+	"github.com/devzero-inc/pulumi-provider-devzero/provider/pkg/clientset"
 )
 
 // --- authInterceptor ---
@@ -126,7 +128,7 @@ func TestRetryInterceptor_RespectsContextCancellation(t *testing.T) {
 		t.Fatal("expected error from context cancellation")
 	}
 	if calls >= 5 {
-		t.Errorf("expected early exit due to context, got %d calls", calls)
+		t.Errorf("expected early exit, got %d calls", calls)
 	}
 }
 
@@ -172,25 +174,20 @@ func TestNewClientSet_NotNil(t *testing.T) {
 	}
 }
 
-func TestGetClientSet_NilBeforeConfigure(t *testing.T) {
-	// Reset to simulate fresh state.
-	prev := activeClientSet
-	activeClientSet = nil
-	defer func() { activeClientSet = prev }()
+// --- clientset.Get/Set ---
 
-	if GetClientSet() != nil {
-		t.Error("expected nil before Configure is called")
+func TestClientsetGetSet(t *testing.T) {
+	prev := clientset.Get()
+	defer clientset.Set(prev)
+
+	clientset.Set(nil)
+	if clientset.Get() != nil {
+		t.Error("expected nil")
 	}
-}
-
-func TestGetClientSet_SetAfterNewClientSet(t *testing.T) {
-	prev := activeClientSet
-	defer func() { activeClientSet = prev }()
 
 	cs := NewClientSet("tok", "team1", "https://dakr.devzero.io")
-	activeClientSet = cs
-
-	if GetClientSet() != cs {
-		t.Error("GetClientSet should return the set ClientSet")
+	clientset.Set(cs)
+	if clientset.Get() != cs {
+		t.Error("Get should return the set ClientSet")
 	}
 }

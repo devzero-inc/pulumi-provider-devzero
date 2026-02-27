@@ -10,25 +10,8 @@ import (
 	"connectrpc.com/connect"
 
 	apiv1connect "github.com/devzero-inc/pulumi-provider-devzero/internal/gen/api/v1/apiv1connect"
+	"github.com/devzero-inc/pulumi-provider-devzero/provider/pkg/clientset"
 )
-
-// ClientSet holds the three Connect service clients used by all resources.
-type ClientSet struct {
-	TeamID                string
-	ClusterMutationClient apiv1connect.ClusterMutationServiceClient
-	K8SClient             apiv1connect.K8SServiceClient
-	RecommendationClient  apiv1connect.K8SRecommendationServiceClient
-}
-
-// activeClientSet is the package-level singleton initialized during ProviderConfig.Configure.
-// Resources call GetClientSet() to obtain it.
-var activeClientSet *ClientSet
-
-// GetClientSet returns the initialized ClientSet.
-// Returns nil if ProviderConfig.Configure has not been called yet.
-func GetClientSet() *ClientSet {
-	return activeClientSet
-}
 
 // newHTTPClient returns an *http.Client with production-ready timeouts and connection pooling.
 func newHTTPClient() *http.Client {
@@ -61,8 +44,6 @@ func authInterceptor(token string) connect.UnaryInterceptorFunc {
 
 // retryInterceptor returns a Connect interceptor that retries transient errors
 // (CodeUnavailable, CodeDeadlineExceeded) with exponential backoff.
-// maxAttempts is the total number of attempts (including the first).
-// initialDelay is the sleep duration before the second attempt; it doubles each retry.
 func retryInterceptor(maxAttempts int, initialDelay time.Duration) connect.UnaryInterceptorFunc {
 	return func(next connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
@@ -72,12 +53,10 @@ func retryInterceptor(maxAttempts int, initialDelay time.Duration) connect.Unary
 				if err == nil {
 					return resp, nil
 				}
-				// Only retry on transient error codes.
 				code := connect.CodeOf(err)
 				if code != connect.CodeUnavailable && code != connect.CodeDeadlineExceeded {
 					return nil, err
 				}
-				// Last attempt — return the error without sleeping.
 				if attempt == maxAttempts-1 {
 					return nil, err
 				}
@@ -88,15 +67,13 @@ func retryInterceptor(maxAttempts int, initialDelay time.Duration) connect.Unary
 					return nil, ctx.Err()
 				}
 			}
-			// Unreachable, but required by the compiler.
 			return nil, nil
 		}
 	}
 }
 
-// NewClientSet constructs a ClientSet from validated provider credentials.
-// Called once during ProviderConfig.Configure; result stored in activeClientSet.
-func NewClientSet(token, teamID, baseURL string) *ClientSet {
+// NewClientSet constructs a *clientset.ClientSet from validated provider credentials.
+func NewClientSet(token, teamID, baseURL string) *clientset.ClientSet {
 	httpClient := newHTTPClient()
 	opts := []connect.ClientOption{
 		connect.WithGRPC(),
@@ -106,7 +83,7 @@ func NewClientSet(token, teamID, baseURL string) *ClientSet {
 		),
 	}
 
-	return &ClientSet{
+	return &clientset.ClientSet{
 		TeamID: teamID,
 		ClusterMutationClient: apiv1connect.NewClusterMutationServiceClient(
 			httpClient, baseURL, opts...,

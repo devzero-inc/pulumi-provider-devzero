@@ -7,6 +7,9 @@ import (
 
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
+
+	"github.com/devzero-inc/pulumi-provider-devzero/provider/pkg/clientset"
+	"github.com/devzero-inc/pulumi-provider-devzero/provider/pkg/resources"
 )
 
 const defaultURL = "https://dakr.devzero.io"
@@ -31,7 +34,8 @@ func (c *ProviderConfig) Annotate(a infer.Annotator) {
 }
 
 // Configure is called by the Pulumi framework after all config values are
-// resolved. It applies env-var fallbacks and validates required fields.
+// resolved. It applies env-var fallbacks, validates required fields, and
+// initializes the package-level ClientSet.
 func (c *ProviderConfig) Configure(_ context.Context) error {
 	if c.Token == "" {
 		c.Token = os.Getenv("DEVZERO_TOKEN")
@@ -53,29 +57,17 @@ func (c *ProviderConfig) Configure(_ context.Context) error {
 		return errors.New("devzero: 'teamId' is required (set devzero:teamId or DEVZERO_TEAM_ID)")
 	}
 
-	activeClientSet = NewClientSet(c.Token, c.TeamID, c.URL)
+	clientset.Set(NewClientSet(c.Token, c.TeamID, c.URL))
 	return nil
 }
 
-// Client is a DevZero API client stub (HTTP transport added later).
-type Client struct {
-	Token  string
-	TeamID string
-	URL    string
-}
-
-// NewClient builds a Client from validated provider configuration.
-func NewClient(cfg ProviderConfig) *Client {
-	return &Client{
-		Token:  cfg.Token,
-		TeamID: cfg.TeamID,
-		URL:    cfg.URL,
-	}
-}
-
 // New constructs and returns the Pulumi DevZero provider.
+// Resources are registered in infer.Options.Resources.
 func New() p.Provider {
 	return infer.Provider(infer.Options{
 		Config: infer.Config(&ProviderConfig{}),
+		Resources: []infer.InferredResource{
+			infer.Resource[*resources.Cluster, resources.ClusterArgs, resources.ClusterState](&resources.Cluster{}),
+		},
 	})
 }
