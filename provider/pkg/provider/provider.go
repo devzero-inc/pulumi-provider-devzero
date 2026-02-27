@@ -68,6 +68,7 @@ func New() p.Provider {
 		Config: infer.Config(&ProviderConfig{}),
 		Resources: []infer.InferredResource{
 			infer.Resource[*resources.Cluster, resources.ClusterArgs, resources.ClusterState](&resources.Cluster{}),
+			infer.Resource[*resources.WorkloadPolicy, resources.WorkloadPolicyArgs, resources.WorkloadPolicyState](&resources.WorkloadPolicy{}),
 		},
 	})
 }
