@@ -71,6 +71,7 @@ func New() p.Provider {
 			infer.Resource[*resources.WorkloadPolicy, resources.WorkloadPolicyArgs, resources.WorkloadPolicyState](&resources.WorkloadPolicy{}),
 			infer.Resource[*resources.WorkloadPolicyTarget, resources.WorkloadPolicyTargetArgs, resources.WorkloadPolicyTargetState](&resources.WorkloadPolicyTarget{}),
 			infer.Resource[*resources.NodePolicy, resources.NodePolicyArgs, resources.NodePolicyState](&resources.NodePolicy{}),
+			infer.Resource[*resources.NodePolicyTarget, resources.NodePolicyTargetArgs, resources.NodePolicyTargetState](&resources.NodePolicyTarget{}),
 		},
 	})
 }
