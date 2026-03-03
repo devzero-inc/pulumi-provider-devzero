@@ -2,6 +2,10 @@ PROJECT      := github.com/devzero-inc/pulumi-provider-devzero
 PROVIDER     := pulumi-resource-devzero
 WORKING_DIR  := $(shell pwd)
 GOPATH       := $(shell go env GOPATH)
+SCHEMA_FILE  := schema.json
+SDK_NODEJS   := sdk/nodejs
+SDK_PYTHON   := sdk/python
+SDK_GO       := sdk/go
 
 # Proto sync settings — override with: make proto SERVICES_DIR=/path/to/services
 SERVICES_DIR ?= ../services
@@ -88,6 +92,40 @@ install: build
 	cp bin/$(PROVIDER) $(GOPATH)/bin/$(PROVIDER)
 
 # -----------------------------------------------------------------------
+# Schema & SDK generation
+# Requires Pulumi CLI: brew install pulumi
+# -----------------------------------------------------------------------
+
+.PHONY: gen-schema
+gen-schema: build
+	@echo "Extracting schema from provider binary..."
+	pulumi package get-schema ./bin/$(PROVIDER) > /tmp/devzero-generated.json
+	@echo "Merging resources+types into $(SCHEMA_FILE)..."
+	python3 -c "\
+import json; \
+gen=json.load(open('/tmp/devzero-generated.json')); \
+ex=json.load(open('$(SCHEMA_FILE)')); \
+ex['resources']=gen.get('resources',{}); \
+ex['types']=gen.get('types',{}); \
+json.dump(ex, open('$(SCHEMA_FILE)','w'), indent=4); \
+print(f'Merged: {len(ex[\"resources\"])} resources, {len(ex[\"types\"])} types')"
+	@echo "Applying enum patches..."
+	python3 scripts/patch-schema-enums.py
+
+.PHONY: gen-sdk
+gen-sdk: gen-schema
+	@echo "Generating TypeScript SDK..."
+	pulumi package gen-sdk --language nodejs --out sdk $(SCHEMA_FILE)
+	@echo "Generating Python SDK..."
+	pulumi package gen-sdk --language python --out sdk $(SCHEMA_FILE)
+	@echo "Generating Go SDK..."
+	pulumi package gen-sdk --language go     --out sdk $(SCHEMA_FILE)
+	@echo "All SDKs generated."
+
+.PHONY: sdk
+sdk: gen-sdk
+
+# -----------------------------------------------------------------------
 # Test
 # -----------------------------------------------------------------------
 
@@ -109,4 +147,4 @@ tidy:
 
 .PHONY: clean
 clean:
-	rm -rf bin/
+	rm -rf bin/ sdk/

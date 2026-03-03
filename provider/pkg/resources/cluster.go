@@ -19,7 +19,7 @@ type ClusterArgs struct {
 // ClusterState is the full persisted state: user inputs plus computed fields.
 type ClusterState struct {
 	ClusterArgs
-	Token string `pulumi:"token,secret"`
+	Token string `pulumi:"token" provider:"secret"`
 }
 
 // Annotate provides descriptions for SDK documentation and marks secret fields.

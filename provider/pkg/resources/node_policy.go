@@ -18,12 +18,27 @@ type TaintArgs struct {
 	Effect string `pulumi:"effect"`
 }
 
+// Annotate provides SDK documentation for TaintArgs fields.
+func (t *TaintArgs) Annotate(a infer.Annotator) {
+	a.Describe(&t.Key, "Taint key to apply to provisioned nodes.")
+	a.Describe(&t.Value, "Taint value associated with the key.")
+	a.Describe(&t.Effect, "Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'.")
+}
+
 // DisruptionBudgetArgs represents a single disruption budget entry.
 type DisruptionBudgetArgs struct {
 	Reasons  []string `pulumi:"reasons,optional"`
 	Nodes    string   `pulumi:"nodes,optional"`
 	Schedule string   `pulumi:"schedule,optional"`
 	Duration string   `pulumi:"duration,optional"`
+}
+
+// Annotate provides SDK documentation for DisruptionBudgetArgs fields.
+func (d *DisruptionBudgetArgs) Annotate(a infer.Annotator) {
+	a.Describe(&d.Reasons, "Disruption reasons this budget applies to (e.g. 'Underutilized', 'Empty', 'Drifted').")
+	a.Describe(&d.Nodes, "Maximum nodes that may be disrupted, as an absolute count or percentage (e.g. '10%').")
+	a.Describe(&d.Schedule, "Cron schedule during which this budget is active (5-field format).")
+	a.Describe(&d.Duration, "Duration the budget window stays active (e.g. '1h', '30m').")
 }
 
 // DisruptionPolicyArgs configures how Karpenter disrupts nodes.
@@ -36,16 +51,38 @@ type DisruptionPolicyArgs struct {
 	Budgets                       []DisruptionBudgetArgs `pulumi:"budgets,optional"`
 }
 
+// Annotate provides SDK documentation for DisruptionPolicyArgs fields.
+func (d *DisruptionPolicyArgs) Annotate(a infer.Annotator) {
+	a.Describe(&d.ConsolidateAfter, "Duration to wait after a node becomes empty before consolidating (e.g. '30s').")
+	a.Describe(&d.ConsolidationPolicy, "When to consolidate nodes. One of: 'WhenEmpty', 'WhenUnderutilized'.")
+	a.Describe(&d.ExpireAfter, "Duration after which provisioned nodes are replaced regardless of load (e.g. '720h').")
+	a.Describe(&d.TtlSecondsAfterEmpty, "Seconds before an empty node is terminated (deprecated; prefer ConsolidateAfter).")
+	a.Describe(&d.TerminationGracePeriodSeconds, "Grace period in seconds before forcefully terminating a draining node.")
+	a.Describe(&d.Budgets, "Disruption budgets limiting how many nodes can be disrupted at once.")
+}
+
 // ResourceLimitsArgs sets resource limits on the node pool.
 type ResourceLimitsArgs struct {
 	Cpu    string `pulumi:"cpu,optional"`
 	Memory string `pulumi:"memory,optional"`
 }
 
+// Annotate provides SDK documentation for ResourceLimitsArgs fields.
+func (r *ResourceLimitsArgs) Annotate(a infer.Annotator) {
+	a.Describe(&r.Cpu, "Maximum total CPU that may be provisioned (e.g. '1000' for 1000 vCPUs).")
+	a.Describe(&r.Memory, "Maximum total memory that may be provisioned (e.g. '1000Gi').")
+}
+
 // SubnetSelectorTermArgs selects subnets by tag or ID.
 type SubnetSelectorTermArgs struct {
 	Tags map[string]string `pulumi:"tags,optional"`
 	Id   string            `pulumi:"id,optional"`
+}
+
+// Annotate provides SDK documentation for SubnetSelectorTermArgs fields.
+func (s *SubnetSelectorTermArgs) Annotate(a infer.Annotator) {
+	a.Describe(&s.Tags, "Map of AWS tags used to select subnets.")
+	a.Describe(&s.Id, "Explicit AWS subnet ID.")
 }
 
 // SecurityGroupSelectorTermArgs selects security groups.
@@ -55,11 +92,25 @@ type SecurityGroupSelectorTermArgs struct {
 	Name string            `pulumi:"name,optional"`
 }
 
+// Annotate provides SDK documentation for SecurityGroupSelectorTermArgs fields.
+func (s *SecurityGroupSelectorTermArgs) Annotate(a infer.Annotator) {
+	a.Describe(&s.Tags, "Map of AWS tags used to select security groups.")
+	a.Describe(&s.Id, "Explicit AWS security group ID.")
+	a.Describe(&s.Name, "Security group name filter.")
+}
+
 // CapacityReservationSelectorTermArgs selects capacity reservations.
 type CapacityReservationSelectorTermArgs struct {
 	Tags    map[string]string `pulumi:"tags,optional"`
 	Id      string            `pulumi:"id,optional"`
 	OwnerId string            `pulumi:"ownerId,optional"`
+}
+
+// Annotate provides SDK documentation for CapacityReservationSelectorTermArgs fields.
+func (c *CapacityReservationSelectorTermArgs) Annotate(a infer.Annotator) {
+	a.Describe(&c.Tags, "Map of AWS tags used to select capacity reservations.")
+	a.Describe(&c.Id, "Explicit capacity reservation ID.")
+	a.Describe(&c.OwnerId, "AWS account ID that owns the capacity reservation.")
 }
 
 // AMISelectorTermArgs selects AMIs for AWS nodes.
@@ -70,6 +121,16 @@ type AMISelectorTermArgs struct {
 	Name         string            `pulumi:"name,optional"`
 	Owner        string            `pulumi:"owner,optional"`
 	SsmParameter string            `pulumi:"ssmParameter,optional"`
+}
+
+// Annotate provides SDK documentation for AMISelectorTermArgs fields.
+func (a *AMISelectorTermArgs) Annotate(ann infer.Annotator) {
+	ann.Describe(&a.Alias, "Well-known alias for the AMI family (e.g. 'al2@latest').")
+	ann.Describe(&a.Tags, "Map of AWS tags used to select AMIs.")
+	ann.Describe(&a.Id, "Explicit AMI ID.")
+	ann.Describe(&a.Name, "AMI name filter (supports wildcards).")
+	ann.Describe(&a.Owner, "AWS account ID or alias that owns the AMI.")
+	ann.Describe(&a.SsmParameter, "SSM parameter path that stores the AMI ID.")
 }
 
 // BlockDeviceArgs configures an EBS block device.
@@ -85,11 +146,31 @@ type BlockDeviceArgs struct {
 	VolumeType               *string `pulumi:"volumeType,optional"`
 }
 
+// Annotate provides SDK documentation for BlockDeviceArgs fields.
+func (b *BlockDeviceArgs) Annotate(a infer.Annotator) {
+	a.Describe(&b.DeleteOnTermination, "Whether to delete the EBS volume when the instance terminates.")
+	a.Describe(&b.Encrypted, "Whether to encrypt the EBS volume.")
+	a.Describe(&b.Iops, "IOPS to provision for io1/io2 volume types.")
+	a.Describe(&b.KmsKeyId, "KMS key ID or ARN used to encrypt the volume.")
+	a.Describe(&b.SnapshotId, "EBS snapshot ID to restore the volume from.")
+	a.Describe(&b.Throughput, "Throughput in MiB/s for gp3 volumes.")
+	a.Describe(&b.VolumeInitializationRate, "Rate in MiB/s for initializing volumes from snapshots.")
+	a.Describe(&b.VolumeSize, "Volume size (e.g. '20Gi').")
+	a.Describe(&b.VolumeType, "EBS volume type (e.g. 'gp3', 'io1', 'st1').")
+}
+
 // BlockDeviceMappingArgs maps an EBS block device to a device name.
 type BlockDeviceMappingArgs struct {
 	DeviceName *string          `pulumi:"deviceName,optional"`
 	Ebs        *BlockDeviceArgs `pulumi:"ebs,optional"`
 	RootVolume *bool            `pulumi:"rootVolume,optional"`
+}
+
+// Annotate provides SDK documentation for BlockDeviceMappingArgs fields.
+func (b *BlockDeviceMappingArgs) Annotate(a infer.Annotator) {
+	a.Describe(&b.DeviceName, "Device name to map the volume to (e.g. '/dev/xvda').")
+	a.Describe(&b.Ebs, "EBS volume configuration for this device.")
+	a.Describe(&b.RootVolume, "Whether this mapping is for the root volume.")
 }
 
 // KubeletConfigurationArgs configures kubelet on AWS nodes.
@@ -108,12 +189,36 @@ type KubeletConfigurationArgs struct {
 	CpuCfsQuota                 *bool             `pulumi:"cpuCfsQuota,optional"`
 }
 
+// Annotate provides SDK documentation for KubeletConfigurationArgs fields.
+func (k *KubeletConfigurationArgs) Annotate(a infer.Annotator) {
+	a.Describe(&k.ClusterDns, "List of DNS server IP addresses used by kubelet.")
+	a.Describe(&k.MaxPods, "Maximum number of pods per node.")
+	a.Describe(&k.PodsPerCore, "Maximum pods per CPU core (multiplied by core count for max pods).")
+	a.Describe(&k.SystemReserved, "Resources reserved for OS system daemons (e.g. {'cpu': '100m'}).")
+	a.Describe(&k.KubeReserved, "Resources reserved for Kubernetes system components.")
+	a.Describe(&k.EvictionHard, "Hard eviction thresholds that trigger immediate pod eviction.")
+	a.Describe(&k.EvictionSoft, "Soft eviction thresholds that trigger eviction after a grace period.")
+	a.Describe(&k.EvictionSoftGracePeriod, "Grace period for each soft eviction threshold.")
+	a.Describe(&k.EvictionMaxPodGracePeriod, "Maximum grace period in seconds when evicting pods.")
+	a.Describe(&k.ImageGcHighThresholdPercent, "Disk usage percentage that triggers image garbage collection.")
+	a.Describe(&k.ImageGcLowThresholdPercent, "Disk usage percentage below which image GC stops freeing space.")
+	a.Describe(&k.CpuCfsQuota, "Whether to enforce CPU CFS quota limits for containers.")
+}
+
 // MetadataOptionsArgs configures EC2 instance metadata options.
 type MetadataOptionsArgs struct {
 	HttpEndpoint            string `pulumi:"httpEndpoint,optional"`
 	HttpProtocolIpv6        string `pulumi:"httpProtocolIpv6,optional"`
 	HttpPutResponseHopLimit int    `pulumi:"httpPutResponseHopLimit,optional"`
 	HttpTokens              string `pulumi:"httpTokens,optional"`
+}
+
+// Annotate provides SDK documentation for MetadataOptionsArgs fields.
+func (m *MetadataOptionsArgs) Annotate(a infer.Annotator) {
+	a.Describe(&m.HttpEndpoint, "Enable or disable the instance metadata endpoint. One of: 'enabled', 'disabled'.")
+	a.Describe(&m.HttpProtocolIpv6, "Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'.")
+	a.Describe(&m.HttpPutResponseHopLimit, "HTTP PUT response hop limit for metadata requests (1-64).")
+	a.Describe(&m.HttpTokens, "Whether to require IMDSv2 tokens. One of: 'optional', 'required'.")
 }
 
 // AWSNodeClassSpecArgs holds AWS-specific node class configuration.
@@ -136,6 +241,26 @@ type AWSNodeClassSpecArgs struct {
 	Context                          *string                               `pulumi:"context,optional"`
 }
 
+// Annotate provides SDK documentation for AWSNodeClassSpecArgs fields.
+func (a *AWSNodeClassSpecArgs) Annotate(ann infer.Annotator) {
+	ann.Describe(&a.SubnetSelectorTerms, "Selectors for the subnets nodes will be launched into.")
+	ann.Describe(&a.SecurityGroupSelectorTerms, "Selectors for security groups attached to nodes.")
+	ann.Describe(&a.CapacityReservationSelectorTerms, "Selectors for EC2 capacity reservations to prioritize.")
+	ann.Describe(&a.AssociatePublicIpAddress, "Whether to assign a public IP address to provisioned nodes.")
+	ann.Describe(&a.AmiSelectorTerms, "Selectors for the AMIs used to launch nodes.")
+	ann.Describe(&a.AmiFamily, "AMI family shorthand (e.g. 'AL2', 'Bottlerocket', 'Windows2022').")
+	ann.Describe(&a.UserData, "Custom user data script injected into the node launch template.")
+	ann.Describe(&a.Role, "IAM role name assigned to nodes.")
+	ann.Describe(&a.InstanceProfile, "IAM instance profile name (use instead of Role when profile already exists).")
+	ann.Describe(&a.Tags, "AWS tags applied to all resources created by this node class.")
+	ann.Describe(&a.Kubelet, "Kubelet configuration overrides for AWS nodes.")
+	ann.Describe(&a.BlockDeviceMappings, "EBS block device mappings for nodes.")
+	ann.Describe(&a.InstanceStorePolicy, "Policy for handling instance store volumes. One of: 'RAID0'.")
+	ann.Describe(&a.DetailedMonitoring, "Enable detailed CloudWatch monitoring for instances.")
+	ann.Describe(&a.MetadataOptions, "EC2 instance metadata (IMDS) options.")
+	ann.Describe(&a.Context, "EC2 launch template context ARN.")
+}
+
 // AzureKubeletConfigurationArgs configures kubelet on Azure nodes.
 type AzureKubeletConfigurationArgs struct {
 	CpuManagerPolicy            *string  `pulumi:"cpuManagerPolicy,optional"`
@@ -150,6 +275,20 @@ type AzureKubeletConfigurationArgs struct {
 	PodPidsLimit                *int     `pulumi:"podPidsLimit,optional"`
 }
 
+// Annotate provides SDK documentation for AzureKubeletConfigurationArgs fields.
+func (a *AzureKubeletConfigurationArgs) Annotate(ann infer.Annotator) {
+	ann.Describe(&a.CpuManagerPolicy, "CPU manager policy. One of: 'none', 'static'.")
+	ann.Describe(&a.CpuCfsQuota, "Whether to enforce CPU CFS quota for containers.")
+	ann.Describe(&a.CpuCfsQuotaPeriod, "CPU CFS quota period (e.g. '100ms').")
+	ann.Describe(&a.ImageGcHighThresholdPercent, "Disk usage percentage triggering image GC.")
+	ann.Describe(&a.ImageGcLowThresholdPercent, "Disk usage percentage below which image GC stops.")
+	ann.Describe(&a.TopologyManagerPolicy, "Topology manager policy for NUMA-aware scheduling.")
+	ann.Describe(&a.AllowedUnsafeSysctls, "Unsafe sysctl patterns that are allowed (e.g. 'net.ipv4.*').")
+	ann.Describe(&a.ContainerLogMaxSize, "Maximum container log file size before rotation (e.g. '10Mi').")
+	ann.Describe(&a.ContainerLogMaxFiles, "Maximum number of container log files to retain.")
+	ann.Describe(&a.PodPidsLimit, "Maximum number of process IDs per pod.")
+}
+
 // AzureNodeClassSpecArgs holds Azure-specific node class configuration.
 type AzureNodeClassSpecArgs struct {
 	VnetSubnetId string                         `pulumi:"vnetSubnetId,optional"`
@@ -161,10 +300,27 @@ type AzureNodeClassSpecArgs struct {
 	MaxPods      *int                           `pulumi:"maxPods,optional"`
 }
 
+// Annotate provides SDK documentation for AzureNodeClassSpecArgs fields.
+func (a *AzureNodeClassSpecArgs) Annotate(ann infer.Annotator) {
+	ann.Describe(&a.VnetSubnetId, "Azure VNet subnet resource ID for node networking.")
+	ann.Describe(&a.OsDiskSizeGb, "OS disk size in GB.")
+	ann.Describe(&a.ImageFamily, "Azure node image family (e.g. 'AzureLinux', 'Ubuntu2204').")
+	ann.Describe(&a.FipsMode, "FIPS compliance mode. One of: 'Enabled', 'Disabled'.")
+	ann.Describe(&a.Tags, "Azure tags applied to all resources created by this node class.")
+	ann.Describe(&a.Kubelet, "Kubelet configuration overrides for Azure nodes.")
+	ann.Describe(&a.MaxPods, "Maximum pods per node (overrides AKS default).")
+}
+
 // RawKarpenterSpecArgs provides raw YAML for a custom Karpenter node pool / node class.
 type RawKarpenterSpecArgs struct {
 	NodepoolYaml  string `pulumi:"nodepoolYaml,optional"`
 	NodeclassYaml string `pulumi:"nodeclassYaml,optional"`
+}
+
+// Annotate provides SDK documentation for RawKarpenterSpecArgs fields.
+func (r *RawKarpenterSpecArgs) Annotate(a infer.Annotator) {
+	a.Describe(&r.NodepoolYaml, "Raw YAML for a complete Karpenter NodePool resource (escape hatch).")
+	a.Describe(&r.NodeclassYaml, "Raw YAML for a complete Karpenter NodeClass resource (escape hatch).")
 }
 
 // NodePolicyArgs are the user-configurable inputs for a NodePolicy resource.

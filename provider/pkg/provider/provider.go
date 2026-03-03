@@ -17,7 +17,7 @@ const defaultURL = "https://dakr.devzero.io"
 // ProviderConfig is the provider-level configuration.
 // Token is marked secret so it is encrypted at rest in Pulumi state.
 type ProviderConfig struct {
-	Token  string `pulumi:"token,secret"`
+	Token  string `pulumi:"token" provider:"secret"`
 	TeamID string `pulumi:"teamId"`
 	URL    string `pulumi:"url,optional"`
 }

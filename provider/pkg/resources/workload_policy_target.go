@@ -18,6 +18,12 @@ type NamePatternArgs struct {
 	Flags   *string `pulumi:"flags,optional"`
 }
 
+// Annotate provides SDK documentation for NamePatternArgs fields.
+func (n *NamePatternArgs) Annotate(a infer.Annotator) {
+	a.Describe(&n.Pattern, "Regular expression pattern to match workload names.")
+	a.Describe(&n.Flags, "Optional regex flags (e.g. 'i' for case-insensitive).")
+}
+
 // LabelSelectorRequirementArgs is a single match expression in a label selector.
 type LabelSelectorRequirementArgs struct {
 	Key      string   `pulumi:"key,optional"`
@@ -25,10 +31,23 @@ type LabelSelectorRequirementArgs struct {
 	Values   []string `pulumi:"values,optional"`
 }
 
+// Annotate provides SDK documentation for LabelSelectorRequirementArgs fields.
+func (l *LabelSelectorRequirementArgs) Annotate(a infer.Annotator) {
+	a.Describe(&l.Key, "The label key that the selector applies to.")
+	a.Describe(&l.Operator, "Operator relating the key and values. One of: 'In', 'NotIn', 'Exists', 'DoesNotExist'.")
+	a.Describe(&l.Values, "Array of string values. Required for 'In' and 'NotIn' operators.")
+}
+
 // LabelSelectorArgs selects objects by labels (matchLabels and/or matchExpressions).
 type LabelSelectorArgs struct {
 	MatchLabels      map[string]string              `pulumi:"matchLabels,optional"`
 	MatchExpressions []LabelSelectorRequirementArgs `pulumi:"matchExpressions,optional"`
+}
+
+// Annotate provides SDK documentation for LabelSelectorArgs fields.
+func (l *LabelSelectorArgs) Annotate(a infer.Annotator) {
+	a.Describe(&l.MatchLabels, "Map of label key-value pairs that must all match exactly.")
+	a.Describe(&l.MatchExpressions, "List of label selector requirements joined by AND.")
 }
 
 // WorkloadPolicyTargetArgs are the user-configurable inputs for a WorkloadPolicyTarget resource.

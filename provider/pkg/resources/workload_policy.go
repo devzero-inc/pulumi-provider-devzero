@@ -25,6 +25,20 @@ type VerticalScalingArgs struct {
 	MinDataPoints           *int     `pulumi:"minDataPoints,optional"`
 }
 
+// Annotate provides SDK documentation for VerticalScalingArgs fields.
+func (v *VerticalScalingArgs) Annotate(a infer.Annotator) {
+	a.Describe(&v.Enabled, "Enable vertical scaling for this resource type.")
+	a.Describe(&v.MinRequest, "Minimum resource request in millicores (CPU) or bytes (memory/GPU).")
+	a.Describe(&v.MaxRequest, "Maximum resource request in millicores (CPU) or bytes (memory/GPU).")
+	a.Describe(&v.OverheadMultiplier, "Multiplier applied on top of the recommendation to add headroom.")
+	a.Describe(&v.TargetPercentile, "Percentile of usage data used as the recommendation target (e.g. 0.95).")
+	a.Describe(&v.MaxScaleUpPercent, "Maximum percentage increase allowed in a single recommendation cycle.")
+	a.Describe(&v.MaxScaleDownPercent, "Maximum percentage decrease allowed in a single recommendation cycle.")
+	a.Describe(&v.LimitsAdjustmentEnabled, "Whether to also adjust resource limits alongside requests.")
+	a.Describe(&v.LimitMultiplier, "Multiplier applied to the request to derive the resource limit.")
+	a.Describe(&v.MinDataPoints, "Minimum number of data points required before a recommendation is emitted.")
+}
+
 // HorizontalScalingArgs configures horizontal (replica) scaling.
 type HorizontalScalingArgs struct {
 	Enabled                 bool     `pulumi:"enabled,optional"`
@@ -34,6 +48,17 @@ type HorizontalScalingArgs struct {
 	PrimaryMetric           *string  `pulumi:"primaryMetric,optional"`
 	MinDataPoints           *int     `pulumi:"minDataPoints,optional"`
 	MaxReplicaChangePercent *float64 `pulumi:"maxReplicaChangePercent,optional"`
+}
+
+// Annotate provides SDK documentation for HorizontalScalingArgs fields.
+func (h *HorizontalScalingArgs) Annotate(a infer.Annotator) {
+	a.Describe(&h.Enabled, "Enable horizontal (replica) scaling.")
+	a.Describe(&h.MinReplicas, "Minimum number of replicas to maintain.")
+	a.Describe(&h.MaxReplicas, "Maximum number of replicas to scale up to.")
+	a.Describe(&h.TargetUtilization, "Target utilization ratio (0-1) for the primary metric.")
+	a.Describe(&h.PrimaryMetric, "Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'.")
+	a.Describe(&h.MinDataPoints, "Minimum data points required before a recommendation is emitted.")
+	a.Describe(&h.MaxReplicaChangePercent, "Maximum percentage change in replica count per recommendation cycle.")
 }
 
 // WorkloadPolicyArgs are the user-configurable inputs for a WorkloadPolicy resource.
