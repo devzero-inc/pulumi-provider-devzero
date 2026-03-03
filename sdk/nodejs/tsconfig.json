@@ -1,0 +1,31 @@
+{
+    "compilerOptions": {
+        "outDir": "bin",
+        "target": "ES2020",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "declaration": true,
+        "sourceMap": true,
+        "stripInternal": true,
+        "experimentalDecorators": true,
+        "noFallthroughCasesInSwitch": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true
+    },
+    "files": [
+        "config/index.ts",
+        "config/vars.ts",
+        "index.ts",
+        "provider.ts",
+        "resources/cluster.ts",
+        "resources/index.ts",
+        "resources/nodePolicy.ts",
+        "resources/nodePolicyTarget.ts",
+        "resources/workloadPolicy.ts",
+        "resources/workloadPolicyTarget.ts",
+        "types/index.ts",
+        "types/input.ts",
+        "types/output.ts",
+        "utilities.ts"
+    ]
+}
