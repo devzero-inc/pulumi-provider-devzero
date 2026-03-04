@@ -1,0 +1,3 @@
+name: devzero-example-go
+runtime: go
+description: Example DevZero infrastructure using Go SDK

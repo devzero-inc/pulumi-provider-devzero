@@ -1,0 +1,16 @@
+{
+  "name": "devzero-example-typescript",
+  "version": "1.0.0",
+  "main": "bin/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@pulumi/pulumi": "^3.0.0",
+    "@devzero/pulumi-devzero": "file:../../sdk/nodejs"
+  },
+  "devDependencies": {
+    "typescript": "^4.0.0",
+    "@types/node": "^18.0.0"
+  }
+}
