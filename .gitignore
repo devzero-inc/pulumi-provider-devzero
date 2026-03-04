@@ -1,7 +1,7 @@
 # Binaries
 bin/
 dist/
-pulumi-resource-devzero
+/pulumi-resource-devzero
 
 # Go
 *.test
