@@ -37,7 +37,7 @@ class _ExportableConfig(types.ModuleType):
     @_builtins.property
     def url(self) -> str:
         """
-        The DevZero API base URL. Defaults to https://dakr.devzero.dev.
+        The DevZero API base URL. Defaults to https://dakr.devzero.dev
         """
         return __config__.get('url') or 'https://dakr.devzero.dev'
 

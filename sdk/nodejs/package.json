@@ -1,16 +1,14 @@
 {
     "name": "@devzero/pulumi-devzero",
-    "version": "0.1.0",
+    "version": "${VERSION}",
     "keywords": [
         "pulumi",
         "devzero",
         "category/cloud"
     ],
-    "homepage": "https://www.dakr.devzero.dev",
+    "homepage": "https://dakr.devzero.dev",
     "repository": "https://github.com/devzero-inc/pulumi-provider-devzero",
     "license": "Apache-2.0",
-    "main": "bin/index.js",
-    "types": "bin/index.d.ts",
     "scripts": {
         "build": "tsc"
     },
