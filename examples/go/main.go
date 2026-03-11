@@ -7,9 +7,9 @@ import (
 
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
-		// Create a Cluster named "prod-cluster".
-		cluster, err := resources.NewCluster(ctx, "prod-cluster", &resources.ClusterArgs{
-			Name: pulumi.String("prod-cluster"),
+		// Create a Cluster named "pulumi-test-cluster".
+		cluster, err := resources.NewCluster(ctx, "pulumi-test-cluster", &resources.ClusterArgs{
+			Name: pulumi.String("pulumi-test-cluster"),
 		})
 		if err != nil {
 			return err
@@ -41,9 +41,9 @@ func main() {
 		// Create a WorkloadPolicyTarget linking the policy to the cluster for Deployments.
 		// ClusterIds references the Pulumi resource ID of the cluster.
 		// PolicyId references the Pulumi resource ID of the policy.
-		_, err = resources.NewWorkloadPolicyTarget(ctx, "prod-cluster-deployments-target", &resources.WorkloadPolicyTargetArgs{
-			Name:        pulumi.String("prod-cluster-deployments-target"),
-			Description: pulumi.StringPtr("Apply cpu-scaling-policy to all Deployments in prod-cluster"),
+		_, err = resources.NewWorkloadPolicyTarget(ctx, "pulumi-test-cluster-deployments-target", &resources.WorkloadPolicyTargetArgs{
+			Name:        pulumi.String("pulumi-test-cluster-deployments-target"),
+			Description: pulumi.StringPtr("Apply cpu-scaling-policy to all Deployments in pulumi-test-cluster"),
 			PolicyId:    policy.ID(),
 			ClusterIds:  pulumi.StringArray{cluster.ID()},
 			KindFilter:  pulumi.StringArray{pulumi.String("Deployment")},

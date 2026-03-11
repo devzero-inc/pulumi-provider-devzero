@@ -28,3 +28,4 @@ Pulumi.*.yaml
 
 #some docs 
 docs/plans
+examples/

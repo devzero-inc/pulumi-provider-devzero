@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+
 	"github.com/devzero-inc/pulumi-provider-devzero/sdk/go/devzero/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -35,7 +36,7 @@ func NewProvider(ctx *pulumi.Context,
 		}
 	}
 	if args.Url == nil {
-		if d := internal.GetEnvOrDefault("https://dakr.devzero.io", nil, "DEVZERO_URL"); d != nil {
+		if d := internal.GetEnvOrDefault("https://dakr.devzero.dev", nil, "DEVZERO_URL"); d != nil {
 			args.Url = pulumi.StringPtr(d.(string))
 		}
 	}

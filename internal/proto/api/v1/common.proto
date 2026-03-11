@@ -46,7 +46,8 @@ enum K8sObjectKind {
     K8S_OBJECT_KIND_CLUSTER_ROLE = 32;
     K8S_OBJECT_KIND_CLUSTER_ROLE_BINDING = 33;
     K8S_OBJECT_KIND_NETWORK_POLICY = 34;
-    K8S_OBJECT_KIND_CLUSTER = 35;
+    // CloudNativePG Cluster CRD (postgresql.cnpg.io/v1). Cluster is the Schema for the PostgreSQL API. Not the Kubernetes infrastructure cluster.
+    K8S_OBJECT_KIND_CNPG_CLUSTER = 35;
     K8S_OBJECT_KIND_SPARK_APPLICATION = 36;
     K8S_OBJECT_KIND_SCHEDULED_SPARK_APPLICATION = 37;
 }
@@ -59,7 +60,7 @@ message AuditLogEntry {
 
   string node_id = 4;
   string workload_id = 5;
-  K8sObjectKind workload_type = 6; // only going to be deployment, replicaset, statefulset, daemonset, job, cronjob, pod
+  K8sObjectKind workload_type = 6; // e.g. deployment, replicaset, statefulset, daemonset, job, cronjob, pod, rollout, notebook, volcano job, spark application, CNPG cluster
 
   string recommendation_policy_id = 7;
   string recommendation_id = 8;

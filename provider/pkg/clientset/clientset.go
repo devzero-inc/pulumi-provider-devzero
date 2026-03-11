@@ -7,6 +7,7 @@ import (
 // ClientSet holds the three Connect service clients used by all resources.
 type ClientSet struct {
 	TeamID                string
+	Token                 string
 	ClusterMutationClient apiv1connect.ClusterMutationServiceClient
 	K8SClient             apiv1connect.K8SServiceClient
 	RecommendationClient  apiv1connect.K8SRecommendationServiceClient

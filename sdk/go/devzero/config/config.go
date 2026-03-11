@@ -21,13 +21,13 @@ func GetToken(ctx *pulumi.Context) string {
 	return config.Get(ctx, "devzero:token")
 }
 
-// The DevZero API base URL. Defaults to https://dakr.devzero.io.
+// The DevZero API base URL. Defaults to https://dakr.devzero.dev.
 func GetUrl(ctx *pulumi.Context) string {
 	v, err := config.Try(ctx, "devzero:url")
 	if err == nil {
 		return v
 	}
 	var value string
-	value = "https://dakr.devzero.io"
+	value = "https://dakr.devzero.dev"
 	return value
 }

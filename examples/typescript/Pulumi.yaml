@@ -1,3 +1,7 @@
 name: devzero-example-typescript
 runtime: nodejs
 description: Example DevZero infrastructure using TypeScript SDK
+plugins:
+  providers:
+    - name: devzero
+      path: ../../bin

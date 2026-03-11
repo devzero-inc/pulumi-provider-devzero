@@ -156,7 +156,7 @@ func TestRetryInterceptor_RetriesOnDeadlineExceeded(t *testing.T) {
 // --- NewClientSet ---
 
 func TestNewClientSet_NotNil(t *testing.T) {
-	cs := NewClientSet("tok", "team1", "https://dakr.devzero.io")
+	cs := NewClientSet("tok", "team1", "https://dakr.devzero.dev")
 	if cs == nil {
 		t.Fatal("expected non-nil ClientSet")
 	}
@@ -185,7 +185,7 @@ func TestClientsetGetSet(t *testing.T) {
 		t.Error("expected nil")
 	}
 
-	cs := NewClientSet("tok", "team1", "https://dakr.devzero.io")
+	cs := NewClientSet("tok", "team1", "https://dakr.devzero.dev")
 	clientset.Set(cs)
 	if clientset.Get() != cs {
 		t.Error("Get should return the set ClientSet")

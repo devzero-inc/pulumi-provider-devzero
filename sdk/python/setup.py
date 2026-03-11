@@ -25,7 +25,7 @@ setup(name='pulumi_devzero',
       long_description=readme(),
       long_description_content_type='text/markdown',
       keywords='pulumi devzero category/cloud',
-      url='https://www.devzero.io',
+      url='https://www.dakr.devzero.dev',
       project_urls={
           'Repository': 'https://github.com/devzero-inc/pulumi-provider-devzero'
       },

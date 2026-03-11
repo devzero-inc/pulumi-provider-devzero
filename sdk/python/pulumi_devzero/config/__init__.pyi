@@ -26,6 +26,6 @@ The DevZero API token for authentication.
 
 url: str
 """
-The DevZero API base URL. Defaults to https://dakr.devzero.io.
+The DevZero API base URL. Defaults to https://dakr.devzero.dev.
 """
 

@@ -85,6 +85,7 @@ func NewClientSet(token, teamID, baseURL string) *clientset.ClientSet {
 
 	return &clientset.ClientSet{
 		TeamID: teamID,
+		Token:  token,
 		ClusterMutationClient: apiv1connect.NewClusterMutationServiceClient(
 			httpClient, baseURL, opts...,
 		),

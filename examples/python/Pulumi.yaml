@@ -1,3 +1,7 @@
 name: devzero-example-python
 runtime: python
 description: Example DevZero infrastructure using Python SDK
+plugins:
+  providers:
+    - name: devzero
+      path: ../../bin

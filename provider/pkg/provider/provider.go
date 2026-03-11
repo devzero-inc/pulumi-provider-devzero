@@ -12,7 +12,9 @@ import (
 	"github.com/devzero-inc/pulumi-provider-devzero/provider/pkg/resources"
 )
 
-const defaultURL = "https://dakr.devzero.io"
+// const defaultURL = "https://dakr.devzero.io"
+
+const defaultURL = "http://dakr.devzero.dev"
 
 // ProviderConfig is the provider-level configuration.
 // Token is marked secret so it is encrypted at rest in Pulumi state.
@@ -27,7 +29,7 @@ type ProviderConfig struct {
 func (c *ProviderConfig) Annotate(a infer.Annotator) {
 	a.Describe(&c.Token, "DevZero API token. Can also be supplied via DEVZERO_TOKEN.")
 	a.Describe(&c.TeamID, "DevZero team ID. Can also be supplied via DEVZERO_TEAM_ID.")
-	a.Describe(&c.URL, "DevZero API base URL. Defaults to https://dakr.devzero.io.")
+	a.Describe(&c.URL, "DevZero API base URL. Defaults to https://dakr.devzero.dev.")
 	a.SetDefault(&c.Token, "", "DEVZERO_TOKEN")
 	a.SetDefault(&c.TeamID, "", "DEVZERO_TEAM_ID")
 	a.SetDefault(&c.URL, defaultURL, "DEVZERO_URL")

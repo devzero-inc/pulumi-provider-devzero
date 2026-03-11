@@ -36,7 +36,7 @@ class ProviderArgs:
             token = _utilities.get_env('DEVZERO_TOKEN')
         pulumi.set(__self__, "token", token)
         if url is None:
-            url = (_utilities.get_env('DEVZERO_URL') or 'https://dakr.devzero.io')
+            url = (_utilities.get_env('DEVZERO_URL') or 'https://dakr.devzero.dev')
         if url is not None:
             pulumi.set(__self__, "url", url)
 
@@ -145,7 +145,7 @@ class Provider(pulumi.ProviderResource):
                 raise TypeError("Missing required property 'token'")
             __props__.__dict__["token"] = None if token is None else pulumi.Output.secret(token)
             if url is None:
-                url = (_utilities.get_env('DEVZERO_URL') or 'https://dakr.devzero.io')
+                url = (_utilities.get_env('DEVZERO_URL') or 'https://dakr.devzero.dev')
             __props__.__dict__["url"] = url
         super(Provider, __self__).__init__(
             'devzero',

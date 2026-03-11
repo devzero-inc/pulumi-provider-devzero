@@ -55,6 +55,9 @@ const (
 	// K8SServiceSearchNamespacesByClusterProcedure is the fully-qualified name of the K8SService's
 	// SearchNamespacesByCluster RPC.
 	K8SServiceSearchNamespacesByClusterProcedure = "/api.v1.K8SService/SearchNamespacesByCluster"
+	// K8SServiceListNamespacesByClusterProcedure is the fully-qualified name of the K8SService's
+	// ListNamespacesByCluster RPC.
+	K8SServiceListNamespacesByClusterProcedure = "/api.v1.K8SService/ListNamespacesByCluster"
 	// K8SServiceGetAllWorkloadNamesProcedure is the fully-qualified name of the K8SService's
 	// GetAllWorkloadNames RPC.
 	K8SServiceGetAllWorkloadNamesProcedure = "/api.v1.K8SService/GetAllWorkloadNames"
@@ -189,6 +192,8 @@ type K8SServiceClient interface {
 	GetAllNamespaces(context.Context, *connect.Request[v1.GetAllNamespacesRequest]) (*connect.Response[v1.GetAllNamespacesResponse], error)
 	// SearchNamespacesByCluster searches namespaces by name within a single cluster.
 	SearchNamespacesByCluster(context.Context, *connect.Request[v1.SearchNamespacesByClusterRequest]) (*connect.Response[v1.SearchNamespacesByClusterResponse], error)
+	// ListNamespacesByCluster lists namespaces (id and name) within a single cluster.
+	ListNamespacesByCluster(context.Context, *connect.Request[v1.ListNamespacesByClusterRequest]) (*connect.Response[v1.ListNamespacesByClusterResponse], error)
 	// GetAllWorkloadNames returns a list of all workload names for a team ID; if cluster list is empty, returns all.
 	GetAllWorkloadNames(context.Context, *connect.Request[v1.GetAllWorkloadNamesRequest]) (*connect.Response[v1.GetAllWorkloadNamesResponse], error)
 	// GetAllWorkloadLabels returns all workload labels for a team ID; if cluster list is empty, returns all.
@@ -294,6 +299,11 @@ func NewK8SServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 		searchNamespacesByCluster: connect.NewClient[v1.SearchNamespacesByClusterRequest, v1.SearchNamespacesByClusterResponse](
 			httpClient,
 			baseURL+K8SServiceSearchNamespacesByClusterProcedure,
+			opts...,
+		),
+		listNamespacesByCluster: connect.NewClient[v1.ListNamespacesByClusterRequest, v1.ListNamespacesByClusterResponse](
+			httpClient,
+			baseURL+K8SServiceListNamespacesByClusterProcedure,
 			opts...,
 		),
 		getAllWorkloadNames: connect.NewClient[v1.GetAllWorkloadNamesRequest, v1.GetAllWorkloadNamesResponse](
@@ -473,6 +483,7 @@ type k8SServiceClient struct {
 	getClusterMetadata           *connect.Client[v1.GetClusterMetadataRequest, v1.GetClusterMetadataResponse]
 	getAllNamespaces             *connect.Client[v1.GetAllNamespacesRequest, v1.GetAllNamespacesResponse]
 	searchNamespacesByCluster    *connect.Client[v1.SearchNamespacesByClusterRequest, v1.SearchNamespacesByClusterResponse]
+	listNamespacesByCluster      *connect.Client[v1.ListNamespacesByClusterRequest, v1.ListNamespacesByClusterResponse]
 	getAllWorkloadNames          *connect.Client[v1.GetAllWorkloadNamesRequest, v1.GetAllWorkloadNamesResponse]
 	getAllWorkloadLabels         *connect.Client[v1.GetAllWorkloadLabelsRequest, v1.GetAllWorkloadLabelsResponse]
 	getAllNodeGroupNames         *connect.Client[v1.GetAllNodeGroupNamesRequest, v1.GetAllNodeGroupNamesResponse]
@@ -543,6 +554,11 @@ func (c *k8SServiceClient) GetAllNamespaces(ctx context.Context, req *connect.Re
 // SearchNamespacesByCluster calls api.v1.K8SService.SearchNamespacesByCluster.
 func (c *k8SServiceClient) SearchNamespacesByCluster(ctx context.Context, req *connect.Request[v1.SearchNamespacesByClusterRequest]) (*connect.Response[v1.SearchNamespacesByClusterResponse], error) {
 	return c.searchNamespacesByCluster.CallUnary(ctx, req)
+}
+
+// ListNamespacesByCluster calls api.v1.K8SService.ListNamespacesByCluster.
+func (c *k8SServiceClient) ListNamespacesByCluster(ctx context.Context, req *connect.Request[v1.ListNamespacesByClusterRequest]) (*connect.Response[v1.ListNamespacesByClusterResponse], error) {
+	return c.listNamespacesByCluster.CallUnary(ctx, req)
 }
 
 // GetAllWorkloadNames calls api.v1.K8SService.GetAllWorkloadNames.
@@ -733,6 +749,8 @@ type K8SServiceHandler interface {
 	GetAllNamespaces(context.Context, *connect.Request[v1.GetAllNamespacesRequest]) (*connect.Response[v1.GetAllNamespacesResponse], error)
 	// SearchNamespacesByCluster searches namespaces by name within a single cluster.
 	SearchNamespacesByCluster(context.Context, *connect.Request[v1.SearchNamespacesByClusterRequest]) (*connect.Response[v1.SearchNamespacesByClusterResponse], error)
+	// ListNamespacesByCluster lists namespaces (id and name) within a single cluster.
+	ListNamespacesByCluster(context.Context, *connect.Request[v1.ListNamespacesByClusterRequest]) (*connect.Response[v1.ListNamespacesByClusterResponse], error)
 	// GetAllWorkloadNames returns a list of all workload names for a team ID; if cluster list is empty, returns all.
 	GetAllWorkloadNames(context.Context, *connect.Request[v1.GetAllWorkloadNamesRequest]) (*connect.Response[v1.GetAllWorkloadNamesResponse], error)
 	// GetAllWorkloadLabels returns all workload labels for a team ID; if cluster list is empty, returns all.
@@ -834,6 +852,11 @@ func NewK8SServiceHandler(svc K8SServiceHandler, opts ...connect.HandlerOption) 
 	k8SServiceSearchNamespacesByClusterHandler := connect.NewUnaryHandler(
 		K8SServiceSearchNamespacesByClusterProcedure,
 		svc.SearchNamespacesByCluster,
+		opts...,
+	)
+	k8SServiceListNamespacesByClusterHandler := connect.NewUnaryHandler(
+		K8SServiceListNamespacesByClusterProcedure,
+		svc.ListNamespacesByCluster,
 		opts...,
 	)
 	k8SServiceGetAllWorkloadNamesHandler := connect.NewUnaryHandler(
@@ -1017,6 +1040,8 @@ func NewK8SServiceHandler(svc K8SServiceHandler, opts ...connect.HandlerOption) 
 			k8SServiceGetAllNamespacesHandler.ServeHTTP(w, r)
 		case K8SServiceSearchNamespacesByClusterProcedure:
 			k8SServiceSearchNamespacesByClusterHandler.ServeHTTP(w, r)
+		case K8SServiceListNamespacesByClusterProcedure:
+			k8SServiceListNamespacesByClusterHandler.ServeHTTP(w, r)
 		case K8SServiceGetAllWorkloadNamesProcedure:
 			k8SServiceGetAllWorkloadNamesHandler.ServeHTTP(w, r)
 		case K8SServiceGetAllWorkloadLabelsProcedure:
@@ -1118,6 +1143,10 @@ func (UnimplementedK8SServiceHandler) GetAllNamespaces(context.Context, *connect
 
 func (UnimplementedK8SServiceHandler) SearchNamespacesByCluster(context.Context, *connect.Request[v1.SearchNamespacesByClusterRequest]) (*connect.Response[v1.SearchNamespacesByClusterResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8SService.SearchNamespacesByCluster is not implemented"))
+}
+
+func (UnimplementedK8SServiceHandler) ListNamespacesByCluster(context.Context, *connect.Request[v1.ListNamespacesByClusterRequest]) (*connect.Response[v1.ListNamespacesByClusterResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8SService.ListNamespacesByCluster is not implemented"))
 }
 
 func (UnimplementedK8SServiceHandler) GetAllWorkloadNames(context.Context, *connect.Request[v1.GetAllWorkloadNamesRequest]) (*connect.Response[v1.GetAllWorkloadNamesResponse], error) {

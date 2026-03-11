@@ -1,3 +1,10 @@
 name: devzero-example-go
-runtime: go
+runtime:
+  name: go
+  options:
+    binary: ./devzero-example
 description: Example DevZero infrastructure using Go SDK
+plugins:
+  providers:
+    - name: devzero
+      path: ../../bin

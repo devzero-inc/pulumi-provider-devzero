@@ -415,6 +415,23 @@ message SearchNamespacesByClusterResponse {
   repeated string namespaces = 1;
 }
 
+// ListNamespacesByClusterRequest lists namespaces within a single cluster.
+message ListNamespacesByClusterRequest {
+  string team_id = 1;
+  string cluster_id = 2;
+}
+
+// ListNamespacesByClusterResponse returns namespace id and name pairs.
+message ListNamespacesByClusterResponse {
+  repeated NamespaceItem namespaces = 1;
+}
+
+// NamespaceItem represents a namespace with its id and name.
+message NamespaceItem {
+  string id = 1;
+  string name = 2;
+}
+
 message GetAllWorkloadNamesRequest {
   string team_id = 1;
   repeated string cluster_ids = 5;
@@ -990,6 +1007,9 @@ service K8SService {
 
   // SearchNamespacesByCluster searches namespaces by name within a single cluster.
   rpc SearchNamespacesByCluster(SearchNamespacesByClusterRequest) returns (SearchNamespacesByClusterResponse);
+
+  // ListNamespacesByCluster lists namespaces (id and name) within a single cluster.
+  rpc ListNamespacesByCluster(ListNamespacesByClusterRequest) returns (ListNamespacesByClusterResponse);
 
   // GetAllWorkloadNames returns a list of all workload names for a team ID; if cluster list is empty, returns all.
   rpc GetAllWorkloadNames(GetAllWorkloadNamesRequest) returns (GetAllWorkloadNamesResponse);

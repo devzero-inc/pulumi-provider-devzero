@@ -170,6 +170,8 @@ message GetRecommendationsRequest {
     string cluster_id = 1;
     string team_id = 2;
     repeated string exclude_statuses = 3;
+    repeated string namespaces = 4;
+    bool include_deleted_policies = 5;
 
     optional google.protobuf.Timestamp start_time = 16;
     optional google.protobuf.Timestamp end_time = 17;
@@ -1635,6 +1637,8 @@ message WorkloadRecommendationPolicy {
     // when the max-observed-to-recommendation ratio exceeds the threshold.
     bool enable_pmax_protection = 100;
     optional float pmax_ratio_threshold = 101; // default: 3.0
+
+    optional google.protobuf.Timestamp deleted_at = 102;
 }
 
 message GetPolicyRecommendedDefaultsRequest {
@@ -2006,10 +2010,12 @@ message NodePolicy {
   repeated Taint taints = 52;
   DisruptionPolicy disruption = 53;
   ResourceLimits limits = 54;
+  repeated Taint startup_taints = 55;
 
   optional string taints_tip = 57;
   optional string disruptions_tip = 58;
   optional string limits_tip = 59;
+  optional string startup_taints_tip = 60;
 
   string master_override_role_name = 61;
 

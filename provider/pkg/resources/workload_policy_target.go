@@ -102,7 +102,10 @@ func (w *WorkloadPolicyTarget) Create(ctx context.Context, req infer.CreateReque
 		return infer.CreateResponse[WorkloadPolicyTargetState]{}, fmt.Errorf("devzero: provider not configured (ClientSet is nil)")
 	}
 
-	resp, err := cs.RecommendationClient.CreateWorkloadPolicyTarget(ctx, connect.NewRequest(targetArgsToCreateRequest(cs.TeamID, req.Inputs)))
+	connReq := connect.NewRequest(targetArgsToCreateRequest(cs.TeamID, req.Inputs))
+	connReq.Header().Set("Authorization", "Bearer "+cs.Token)
+
+	resp, err := cs.RecommendationClient.CreateWorkloadPolicyTarget(ctx, connReq)
 	if err != nil {
 		return infer.CreateResponse[WorkloadPolicyTargetState]{}, fmt.Errorf("CreateWorkloadPolicyTarget: %w", err)
 	}
@@ -123,10 +126,13 @@ func (w *WorkloadPolicyTarget) Read(ctx context.Context, req infer.ReadRequest[W
 			fmt.Errorf("devzero: provider not configured (ClientSet is nil)")
 	}
 
-	resp, err := cs.RecommendationClient.GetWorkloadPolicyTarget(ctx, connect.NewRequest(&apiv1.GetWorkloadPolicyTargetRequest{
+	getReq := connect.NewRequest(&apiv1.GetWorkloadPolicyTargetRequest{
 		TeamId:   cs.TeamID,
 		TargetId: req.ID,
-	}))
+	})
+	getReq.Header().Set("Authorization", "Bearer "+cs.Token)
+
+	resp, err := cs.RecommendationClient.GetWorkloadPolicyTarget(ctx, getReq)
 	if err != nil {
 		return infer.ReadResponse[WorkloadPolicyTargetArgs, WorkloadPolicyTargetState]{ID: req.ID, Inputs: req.Inputs, State: req.State},
 			fmt.Errorf("GetWorkloadPolicyTarget: %w", err)
@@ -154,7 +160,10 @@ func (w *WorkloadPolicyTarget) Update(ctx context.Context, req infer.UpdateReque
 		return infer.UpdateResponse[WorkloadPolicyTargetState]{}, fmt.Errorf("devzero: provider not configured (ClientSet is nil)")
 	}
 
-	resp, err := cs.RecommendationClient.UpdateWorkloadPolicyTarget(ctx, connect.NewRequest(targetArgsToUpdateRequest(cs.TeamID, req.ID, req.Inputs)))
+	updateReq := connect.NewRequest(targetArgsToUpdateRequest(cs.TeamID, req.ID, req.Inputs))
+	updateReq.Header().Set("Authorization", "Bearer "+cs.Token)
+
+	resp, err := cs.RecommendationClient.UpdateWorkloadPolicyTarget(ctx, updateReq)
 	if err != nil {
 		return infer.UpdateResponse[WorkloadPolicyTargetState]{}, fmt.Errorf("UpdateWorkloadPolicyTarget: %w", err)
 	}
@@ -173,10 +182,13 @@ func (w *WorkloadPolicyTarget) Delete(ctx context.Context, req infer.DeleteReque
 		return infer.DeleteResponse{}, fmt.Errorf("devzero: provider not configured (ClientSet is nil)")
 	}
 
-	_, err := cs.RecommendationClient.DeleteWorkloadPolicyTarget(ctx, connect.NewRequest(&apiv1.DeleteWorkloadPolicyTargetRequest{
+	deleteReq := connect.NewRequest(&apiv1.DeleteWorkloadPolicyTargetRequest{
 		TeamId:    cs.TeamID,
 		TargetIds: []string{req.ID},
-	}))
+	})
+	deleteReq.Header().Set("Authorization", "Bearer "+cs.Token)
+
+	_, err := cs.RecommendationClient.DeleteWorkloadPolicyTarget(ctx, deleteReq)
 	if err != nil {
 		return infer.DeleteResponse{}, fmt.Errorf("DeleteWorkloadPolicyTarget: %w", err)
 	}
@@ -187,16 +199,16 @@ func (w *WorkloadPolicyTarget) Delete(ctx context.Context, req infer.DeleteReque
 
 func targetArgsToCreateRequest(teamID string, a WorkloadPolicyTargetArgs) *apiv1.CreateWorkloadPolicyTargetRequest {
 	r := &apiv1.CreateWorkloadPolicyTargetRequest{
-		TeamId:         teamID,
-		PolicyId:       a.PolicyId,
-		Name:           a.Name,
-		Priority:       int32(a.Priority),
-		Enabled:        a.Enabled,
-		ClusterIds:     a.ClusterIds,
-		WorkloadNames:  a.WorkloadNames,
-		NodeGroupNames: a.NodeGroupNames,
-		KindFilter:     kindFilterToProto(a.KindFilter),
-		NamePattern:    namePatternToProto(a.NamePattern),
+		TeamId:            teamID,
+		PolicyId:          a.PolicyId,
+		Name:              a.Name,
+		Priority:          int32(a.Priority),
+		Enabled:           a.Enabled,
+		ClusterIds:        a.ClusterIds,
+		WorkloadNames:     a.WorkloadNames,
+		NodeGroupNames:    a.NodeGroupNames,
+		KindFilter:        kindFilterToProto(a.KindFilter),
+		NamePattern:       namePatternToProto(a.NamePattern),
 		NamespaceSelector: labelSelectorToProto(a.NamespaceSelector),
 		WorkloadSelector:  labelSelectorToProto(a.WorkloadSelector),
 	}
@@ -209,17 +221,17 @@ func targetArgsToCreateRequest(teamID string, a WorkloadPolicyTargetArgs) *apiv1
 func targetArgsToUpdateRequest(teamID, targetID string, a WorkloadPolicyTargetArgs) *apiv1.UpdateWorkloadPolicyTargetRequest {
 	policyID := a.PolicyId
 	r := &apiv1.UpdateWorkloadPolicyTargetRequest{
-		TeamId:         teamID,
-		TargetId:       targetID,
-		PolicyId:       &policyID,
-		Name:           a.Name,
-		Priority:       int32(a.Priority),
-		Enabled:        a.Enabled,
-		ClusterIds:     a.ClusterIds,
-		WorkloadNames:  a.WorkloadNames,
-		NodeGroupNames: a.NodeGroupNames,
-		KindFilter:     kindFilterToProto(a.KindFilter),
-		NamePattern:    namePatternToProto(a.NamePattern),
+		TeamId:            teamID,
+		TargetId:          targetID,
+		PolicyId:          &policyID,
+		Name:              a.Name,
+		Priority:          int32(a.Priority),
+		Enabled:           a.Enabled,
+		ClusterIds:        a.ClusterIds,
+		WorkloadNames:     a.WorkloadNames,
+		NodeGroupNames:    a.NodeGroupNames,
+		KindFilter:        kindFilterToProto(a.KindFilter),
+		NamePattern:       namePatternToProto(a.NamePattern),
 		NamespaceSelector: labelSelectorToProto(a.NamespaceSelector),
 		WorkloadSelector:  labelSelectorToProto(a.WorkloadSelector),
 	}

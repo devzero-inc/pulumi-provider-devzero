@@ -42,7 +42,7 @@ export class Provider extends pulumi.ProviderResource {
             }
             resourceInputs["teamId"] = (args?.teamId) ?? utilities.getEnv("DEVZERO_TEAM_ID");
             resourceInputs["token"] = (args?.token ? pulumi.secret(args.token) : undefined) ?? utilities.getEnv("DEVZERO_TOKEN");
-            resourceInputs["url"] = (args?.url) ?? (utilities.getEnv("DEVZERO_URL") || "https://dakr.devzero.io");
+            resourceInputs["url"] = (args?.url) ?? (utilities.getEnv("DEVZERO_URL") || "https://dakr.devzero.dev");
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(Provider.__pulumiType, name, resourceInputs, opts);
