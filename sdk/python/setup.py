@@ -11,11 +11,13 @@ from subprocess import check_call
 
 VERSION = "0.0.0"
 def readme():
-    try:
-        with open('README.md', encoding='utf-8') as f:
-            return f.read()
-    except FileNotFoundError:
-        return "devzero Pulumi Package - Development Version"
+    for path in ['README.md', 'pulumi_devzero/README.md']:
+        try:
+            with open(path, encoding='utf-8') as f:
+                return f.read()
+        except FileNotFoundError:
+            continue
+    return "devzero Pulumi Package - Development Version"
 
 
 setup(name='pulumi_devzero',
