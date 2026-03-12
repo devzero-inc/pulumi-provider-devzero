@@ -10,7 +10,7 @@ const cluster = new resources.Cluster("prod-cluster-typescript", {
 // The input type for cpuVerticalScaling is inputs.resources.VerticalScalingArgsArgs,
 // accessed via types.inputs.resources.VerticalScalingArgsArgs at runtime but passed inline.
 const policy = new resources.WorkloadPolicy("cpu-scaling-policy-ts", {
-    name: "cpu-scaling-policy-ts-v26",
+    name: "cpu-scaling-policy-ts-v40",
     description: "Policy with CPU vertical scaling enabled",
     cpuVerticalScaling: {
         enabled: true,

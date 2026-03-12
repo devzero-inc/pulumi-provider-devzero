@@ -6,7 +6,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@devzero/pulumi-devzero": "^0.0.10",
+    "@devzero/pulumi-devzero": "^0.0.12",
     "@pulumi/pulumi": "^3.0.0"
   },
   "devDependencies": {
