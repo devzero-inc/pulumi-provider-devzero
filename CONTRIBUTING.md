@@ -80,6 +80,55 @@ make sdk
 
 This runs `gen-schema` first, then generates SDKs for all supported languages under `sdk/`.
 
+## Release & CI Pipeline
+
+The release process is fully automated via two GitHub Actions workflows:
+
+### How it works
+
+```
+you change provider code / schema.json
+        ↓
+gen-sdk.yml triggers (on push to main)
+        ↓
+runs make build → make gen-sdk
+        ↓
+auto-commits "chore: regenerate SDKs from updated schema" back to main
+        ↓
+sdk/nodejs/ and sdk/python/ are always up to date in the repo
+        ↓
+git tag v0.0.3 && git push origin v0.0.3
+        ↓
+release.yml picks up those committed SDKs, stamps version, publishes
+```
+
+### Workflows
+
+| Workflow | Trigger | What it does |
+|---|---|---|
+| `gen-sdk.yml` | Push to `main` (provider/schema changes) | Rebuilds provider, regenerates all SDKs, auto-commits them back |
+| `release.yml` | Push of a `v*.*.*` tag | Builds binaries for all platforms, publishes npm + PyPI, creates GitHub release |
+
+### Cutting a release
+
+```bash
+git tag v0.0.3
+git push origin v0.0.3
+```
+
+That's it. The pipeline handles everything — binary builds, npm publish, PyPI publish, and GitHub release with checksums.
+
+### Required secrets
+
+Before the first release, a maintainer must add these secrets in **GitHub → Settings → Secrets and variables → Actions**:
+
+| Secret | Where to get it |
+|---|---|
+| `NPM_TOKEN` | npmjs.com → Account Settings → Access Tokens → Automation token |
+| `PYPI_TOKEN` | pypi.org → Account Settings → API tokens |
+
+A `release` environment must also exist in **GitHub → Settings → Environments**.
+
 ## Proto Sync (Core Maintainers Only)
 
 > **This target is reserved for core maintainers.** Do not run `make proto` unless you are a core maintainer with access to the internal `services` repository.
