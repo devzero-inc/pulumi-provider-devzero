@@ -29,7 +29,7 @@ setup(name='pulumi_devzero',
       project_urls={
           'Repository': 'https://github.com/devzero-inc/pulumi-provider-devzero'
       },
-      license='Apache-2.0',
+      license='MIT',
       packages=find_packages(),
       package_data={
           'pulumi_devzero': [
