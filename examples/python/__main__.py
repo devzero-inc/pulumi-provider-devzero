@@ -2,7 +2,7 @@
 Example DevZero infrastructure using the Python SDK.
 
 Creates:
-  - A Cluster named "prod-cluster"
+  - A Cluster named "prod-cluster-python"
   - A WorkloadPolicy with CPU vertical scaling enabled
   - A WorkloadPolicyTarget linking the policy to the cluster for Deployments
 """
@@ -20,9 +20,9 @@ from pulumi_devzero.resources import (
 
 # Create a cluster
 cluster = Cluster(
-    "prod-cluster",
+    "prod-cluster-python",
     args=ClusterArgs(
-        name="prod-cluster",
+        name="prod-cluster-python",
     ),
 )
 
@@ -30,7 +30,7 @@ cluster = Cluster(
 policy = WorkloadPolicy(
     "cpu-scaling-policy",
     args=WorkloadPolicyArgs(
-        name="cpu-scaling-policy",
+        name="cpu-scaling-policy-py-1",
         description="Workload policy with CPU vertical scaling for production cluster",
         cpu_vertical_scaling=VerticalScalingArgsArgs(
             enabled=True,
@@ -40,9 +40,9 @@ policy = WorkloadPolicy(
 
 # Create a workload policy target linking the policy to the cluster for Deployments
 target = WorkloadPolicyTarget(
-    "prod-cluster-deployments-target",
+    "prod-cluster-python-deployments-target",
     args=WorkloadPolicyTargetArgs(
-        name="prod-cluster-deployments-target",
+        name="prod-cluster-python-deployments-target",
         policy_id=policy.id,
         cluster_ids=[cluster.id],
         kind_filter=["Deployment"],
