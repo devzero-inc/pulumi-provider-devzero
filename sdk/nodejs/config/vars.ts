@@ -30,12 +30,12 @@ Object.defineProperty(exports, "token", {
 });
 
 /**
- * The DevZero API base URL. Defaults to https://dakr.devzero.dev
+ * The DevZero API base URL. Defaults to https://dakr.devzero.io
  */
 export declare const url: string;
 Object.defineProperty(exports, "url", {
     get() {
-        return __config.get("url") ?? "https://dakr.devzero.dev";
+        return __config.get("url") ?? "https://dakr.devzero.io";
     },
     enumerable: true,
 });

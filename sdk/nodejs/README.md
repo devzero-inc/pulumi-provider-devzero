@@ -47,6 +47,7 @@ Run the following commands in your Pulumi project:
 ```bash
 pulumi config set --secret devzero:token <YOUR_PAT_TOKEN>
 pulumi config set devzero:teamId <TEAM_ID>
+pulumi config set devzero:url https://dakr.devzero.io  # optional, this is the default
 ```
 
 ### Example

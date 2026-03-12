@@ -43,9 +43,9 @@ go get github.com/devzero-inc/pulumi-provider-devzero/sdk/go/devzero
 Set your DevZero API endpoint and credentials via Pulumi config or environment variables:
 
 ```bash
-pulumi config set devzero:endpoint https://api.devzero.io
 pulumi config set --secret devzero:token <YOUR_PAT_TOKEN>
 pulumi config set devzero:teamId <TEAM_ID>
+pulumi config set devzero:url https://dakr.devzero.io  # optional, this is the default
 ```
 
 ## Quick Start

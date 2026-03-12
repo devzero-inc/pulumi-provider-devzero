@@ -35,7 +35,7 @@ func NewProvider(ctx *pulumi.Context,
 		}
 	}
 	if args.Url == nil {
-		if d := internal.GetEnvOrDefault("https://dakr.devzero.dev", nil, "DEVZERO_URL"); d != nil {
+		if d := internal.GetEnvOrDefault("https://dakr.devzero.io", nil, "DEVZERO_URL"); d != nil {
 			args.Url = pulumi.StringPtr(d.(string))
 		}
 	}

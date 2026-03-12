@@ -7,7 +7,7 @@
         "devzero",
         "category/cloud"
     ],
-    "homepage": "https://dakr.devzero.dev",
+    "homepage": "https://dakr.devzero.io",
     "license": "Apache-2.0",
     "repository": "https://github.com/devzero-inc/pulumi-provider-devzero",
     "pluginDownloadURL": "github://api.github.com/devzero-inc",
@@ -52,8 +52,8 @@
             },
             "url": {
                 "type": "string",
-                "description": "The DevZero API base URL. Defaults to https://dakr.devzero.dev",
-                "default": "https://dakr.devzero.dev"
+                "description": "The DevZero API base URL. Defaults to https://dakr.devzero.io",
+                "default": "https://dakr.devzero.io"
             }
         },
         "required": [
@@ -86,7 +86,7 @@
             "url": {
                 "type": "string",
                 "description": "The DevZero API base URL.",
-                "default": "https://dakr.devzero.dev",
+                "default": "https://dakr.devzero.io",
                 "defaultInfo": {
                     "environment": [
                         "DEVZERO_URL"
