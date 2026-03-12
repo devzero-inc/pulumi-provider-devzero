@@ -1,6 +1,6 @@
 {
     "name": "@devzero/pulumi-devzero",
-    "version": "${VERSION}",
+    "version": "0.0.6",
     "keywords": [
         "pulumi",
         "devzero",
@@ -13,7 +13,6 @@
         "build": "tsc"
     },
     "dependencies": {
-        "@devzero/pulumi-devzero": "^0.0.1",
         "@pulumi/pulumi": "^3.0.0"
     },
     "devDependencies": {

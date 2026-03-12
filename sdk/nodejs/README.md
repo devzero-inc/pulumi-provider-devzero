@@ -22,12 +22,41 @@ yarn add @devzero/pulumi-devzero
 
 ## Configuration
 
-Set your DevZero credentials via Pulumi config:
+Before using the DevZero Pulumi provider, configure your credentials using Pulumi config.
+
+### 1. Generate a Personal Access Token (PAT)
+
+Go to the DevZero user settings page to generate your PAT token:
+
+https://www.devzero.io/settings/user-settings/general
+
+Create a **Personal Access Token** and copy it.
+
+### 2. Find your Team ID
+
+You can find your DevZero **Team ID** in the organization settings:
+
+https://www.devzero.io/settings/organization-settings/account
+
+Copy the **Team ID** value from this page.
+
+### 3. Set Pulumi configuration
+
+Run the following commands in your Pulumi project:
 
 ```bash
 pulumi config set --secret devzero:token <YOUR_PAT_TOKEN>
 pulumi config set devzero:teamId <TEAM_ID>
 ```
+
+### Example
+
+```bash
+pulumi config set --secret devzero:token dz_pat_xxxxxxxxxxxxx
+pulumi config set devzero:teamId team_123456789
+```
+
+The `--secret` flag ensures that your token is encrypted in the Pulumi state.
 
 ---
 
