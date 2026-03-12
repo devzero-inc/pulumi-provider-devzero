@@ -1,6 +1,6 @@
 {
     "name": "@devzero/pulumi-devzero",
-    "version": "0.0.6",
+    "version": "0.0.10",
     "keywords": [
         "pulumi",
         "devzero",
@@ -9,6 +9,8 @@
     "homepage": "https://devzero.io",
     "repository": "https://github.com/devzero-inc/pulumi-provider-devzero",
     "license": "MIT",
+    "main": "bin/index.js",
+    "types": "bin/index.d.ts",
     "scripts": {
         "build": "tsc"
     },
