@@ -11,13 +11,11 @@ from subprocess import check_call
 
 VERSION = "0.0.0"
 def readme():
-    for path in ['README.md', 'pulumi_devzero/README.md']:
-        try:
-            with open(path, encoding='utf-8') as f:
-                return f.read()
-        except FileNotFoundError:
-            continue
-    return "devzero Pulumi Package - Development Version"
+    try:
+        with open('README.md', encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        return "devzero Pulumi Package - Development Version"
 
 
 setup(name='pulumi_devzero',
@@ -27,11 +25,11 @@ setup(name='pulumi_devzero',
       long_description=readme(),
       long_description_content_type='text/markdown',
       keywords='pulumi devzero category/cloud',
-      url='https://devzero.io',
+      url='https://dakr.devzero.io',
       project_urls={
           'Repository': 'https://github.com/devzero-inc/pulumi-provider-devzero'
       },
-      license='MIT',
+      license='Apache-2.0',
       packages=find_packages(),
       package_data={
           'pulumi_devzero': [
