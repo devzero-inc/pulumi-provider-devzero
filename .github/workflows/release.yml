@@ -94,7 +94,8 @@ jobs:
 
       - name: Stamp version into package.json
         run: |
-          sed -i "s/\${VERSION}/${{ steps.version.outputs.VERSION }}/g" sdk/nodejs/package.json
+          cd sdk/nodejs
+          npm version ${{ steps.version.outputs.VERSION }} --no-git-tag-version
 
       - name: Install and build
         working-directory: sdk/nodejs

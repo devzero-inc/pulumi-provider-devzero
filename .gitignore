@@ -28,4 +28,5 @@ Pulumi.*.yaml
 
 #some docs 
 docs/plans
-examples/
+examples/python/
+examples/typescript/node_modules/
