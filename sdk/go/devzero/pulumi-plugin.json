@@ -1,5 +1,5 @@
 {
   "resource": true,
   "name": "devzero",
-  "server": "github://api.github.com/devzero-inc"
+  "server": "github://api.github.com/devzero-inc/pulumi-provider-devzero"
 }
