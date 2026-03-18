@@ -20,7 +20,7 @@ func main() {
 		// VerticalScalingArgsArgs value (the concrete input struct) converted via
 		// ToVerticalScalingArgsPtrOutput().
 		policy, err := resources.NewWorkloadPolicy(ctx, "cpu-scaling-policy", &resources.WorkloadPolicyArgs{
-			Name:        pulumi.String("cpu-scaling-policy"),
+			Name:        pulumi.String("cpu-scaling-policy-go"),
 			Description: pulumi.StringPtr("Policy with CPU vertical scaling enabled"),
 			CpuVerticalScaling: resources.VerticalScalingArgsArgs{
 				Enabled:                 pulumi.BoolPtr(true),

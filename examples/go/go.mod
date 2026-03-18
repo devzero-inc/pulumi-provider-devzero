@@ -1,9 +1,9 @@
 module github.com/devzero-inc/pulumi-provider-devzero/examples/go
 
-go 1.25.5
+go 1.24.0
 
 require (
-	github.com/devzero-inc/pulumi-provider-devzero/sdk/go/devzero v0.0.0
+	github.com/devzero-inc/pulumi-provider-devzero/sdk/go/devzero v0.0.17
 	github.com/pulumi/pulumi/sdk/v3 v3.224.0
 )
 
@@ -110,5 +110,3 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/frand v1.4.2 // indirect
 )
-
-replace github.com/devzero-inc/pulumi-provider-devzero/sdk/go/devzero => ../../sdk/go/devzero
