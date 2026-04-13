@@ -19,7 +19,7 @@ type GetClusterIDByNameArgs struct {
 
 // GetClusterIDByNameResult is the output of the GetClusterIdByName function.
 type GetClusterIDByNameResult struct {
-	ID string `pulumi:"id"`
+	ClusterID string `pulumi:"clusterId"`
 }
 
 // Annotate provides descriptions used in SDK documentation.
@@ -30,7 +30,7 @@ func (a *GetClusterIDByNameArgs) Annotate(ann infer.Annotator) {
 
 // Annotate provides descriptions used in SDK documentation.
 func (r *GetClusterIDByNameResult) Annotate(ann infer.Annotator) {
-	ann.Describe(&r.ID, "The ID of the cluster matching the given team and name.")
+	ann.Describe(&r.ClusterID, "The ID of the cluster matching the given team and name.")
 }
 
 // GetClusterIdByName is a Pulumi data source that looks up an existing cluster
@@ -61,6 +61,6 @@ func (f *GetClusterIdByName) Invoke(ctx context.Context, req infer.FunctionReque
 	}
 
 	return infer.FunctionResponse[GetClusterIDByNameResult]{
-		Output: GetClusterIDByNameResult{ID: resp.Msg.Id},
+		Output: GetClusterIDByNameResult{ClusterID: resp.Msg.Id},
 	}, nil
 }

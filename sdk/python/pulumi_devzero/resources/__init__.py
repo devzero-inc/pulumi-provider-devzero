@@ -7,6 +7,7 @@ from .. import _utilities
 import typing
 # Export this package's modules as members:
 from .cluster import *
+from .get_cluster_id_by_name import *
 from .node_policy import *
 from .node_policy_target import *
 from .workload_policy import *

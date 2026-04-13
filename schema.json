@@ -1363,5 +1363,37 @@
             ]
         }
     },
-    "functions": {}
+    "functions": {
+        "devzero:resources:getClusterIdByName": {
+            "inputs": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The cluster name to look up."
+                    },
+                    "teamId": {
+                        "type": "string",
+                        "description": "The team ID to search within."
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "teamId",
+                    "name"
+                ]
+            },
+            "outputs": {
+                "properties": {
+                    "clusterId": {
+                        "description": "The ID of the cluster matching the given team and name.",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "clusterId"
+                ],
+                "type": "object"
+            }
+        }
+    }
 }

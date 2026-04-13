@@ -18,6 +18,7 @@
         "index.ts",
         "provider.ts",
         "resources/cluster.ts",
+        "resources/getClusterIdByName.ts",
         "resources/index.ts",
         "resources/nodePolicy.ts",
         "resources/nodePolicyTarget.ts",

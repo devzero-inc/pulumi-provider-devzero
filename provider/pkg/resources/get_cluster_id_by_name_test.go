@@ -56,8 +56,8 @@ func TestGetClusterIDByName_Success(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if resp.Output.ID != "cluster-abc" {
-		t.Errorf("id: got %q, want %q", resp.Output.ID, "cluster-abc")
+	if resp.Output.ClusterID != "cluster-abc" {
+		t.Errorf("clusterId: got %q, want %q", resp.Output.ClusterID, "cluster-abc")
 	}
 }
 
@@ -80,8 +80,8 @@ func TestGetClusterIDByName_UsesClientSetTeamIDWhenEmpty(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if resp.Output.ID != "cluster-xyz" {
-		t.Errorf("id: got %q, want %q", resp.Output.ID, "cluster-xyz")
+	if resp.Output.ClusterID != "cluster-xyz" {
+		t.Errorf("clusterId: got %q, want %q", resp.Output.ClusterID, "cluster-xyz")
 	}
 }
 
