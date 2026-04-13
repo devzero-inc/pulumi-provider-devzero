@@ -2,9 +2,6 @@ name: Generate SDKs
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
     paths:
       - "provider/pkg/resources/**"
       - "provider/pkg/provider/**"
