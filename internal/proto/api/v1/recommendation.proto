@@ -8,6 +8,7 @@ option java_package = "gen.api.v1";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
+import "google/type/money.proto";
 import "api/v1/common.proto";
 import "api/v1/k8s.proto";
 
@@ -19,7 +20,6 @@ service K8sRecommendationService {
     // Node Group Stats
     rpc GetNodeGroupStats(GetNodeGroupStatsRequest) returns (GetNodeGroupStatsResponse);
     rpc GetLatestNodeGroupRecommendation(GetLatestNodeGroupRecommendationRequest) returns (GetLatestNodeGroupRecommendationResponse) { option deprecated = true; }
-    rpc GetPreviewNodeGroupRecommendation(GetPreviewNodeGroupRecommendationRequest) returns (GetPreviewNodeGroupRecommendationResponse) { option deprecated = true; }
 
     // Workload Stats
     rpc GetLatestWorkloadRecommendation(GetLatestWorkloadRecommendationRequest) returns (GetLatestWorkloadRecommendationResponse);
@@ -121,6 +121,9 @@ service K8sRecommendationService {
     // GenerateNodePoliciesFromKarpenter generates NodePolicy objects from existing Karpenter resources
     // (NodePools and EC2NodeClasses) for a given cluster.
     rpc GenerateNodePoliciesFromKarpenter(GenerateNodePoliciesFromKarpenterRequest) returns (GenerateNodePoliciesFromKarpenterResponse);
+    // GenerateNodePoliciesFromNodeGroups generates NodePolicy objects by inspecting
+    // k8s_nodes metadata for clusters without Karpenter/dzkarp.
+    rpc GenerateNodePoliciesFromNodeGroups(GenerateNodePoliciesFromNodeGroupsRequest) returns (GenerateNodePoliciesFromNodeGroupsResponse);
 
     rpc CreateNodePolicyTargets(CreateNodePolicyTargetsRequest) returns (CreateNodePolicyTargetsResponse);
     rpc ListNodePolicyTargets(ListNodePolicyTargetsRequest) returns (ListNodePolicyTargetsResponse);
@@ -130,6 +133,10 @@ service K8sRecommendationService {
     rpc GetInstanceFamilies(GetInstanceFamiliesRequest) returns (GetInstanceFamiliesResponse);
 
     rpc GetInstanceSizes(GetInstanceSizesRequest) returns (GetInstanceSizesResponse);
+
+    rpc GetInstanceCategories(GetInstanceCategoriesRequest) returns (GetInstanceCategoriesResponse);
+    rpc GetInstanceCPUs(GetInstanceCPUsRequest) returns (GetInstanceCPUsResponse);
+    rpc GetInstanceTypeNames(GetInstanceTypeNamesRequest) returns (GetInstanceTypeNamesResponse);
 
     // PodDisruptionBudget RPCs
     rpc GeneratePodDisruptionBudget(GeneratePodDisruptionBudgetRequest) returns (GeneratePodDisruptionBudgetResponse);
@@ -164,6 +171,25 @@ service K8sRecommendationService {
     // CPU Throttle Events
     rpc ListWorkloadRuleCPUThrottleEvents(ListWorkloadRuleCPUThrottleEventsRequest) returns (ListWorkloadRuleCPUThrottleEventsResponse);
     rpc ListWorkloadCPUThrottleEvents(ListWorkloadCPUThrottleEventsRequest) returns (ListWorkloadCPUThrottleEventsResponse);
+
+    // Cluster-wide optimization removal
+    rpc RemoveClusterOptimizations(RemoveClusterOptimizationsRequest) returns (RemoveClusterOptimizationsResponse);
+
+    // MPA V3: Workload Optimization Policies
+    rpc CreateWorkloadOptimizationPolicy(CreateWorkloadOptimizationPolicyRequest) returns (CreateWorkloadOptimizationPolicyResponse);
+    rpc ListWorkloadOptimizationPolicies(ListWorkloadOptimizationPoliciesRequest) returns (ListWorkloadOptimizationPoliciesResponse);
+    rpc GetWorkloadOptimizationPolicy(GetWorkloadOptimizationPolicyRequest) returns (GetWorkloadOptimizationPolicyResponse);
+    rpc UpdateWorkloadOptimizationPolicy(UpdateWorkloadOptimizationPolicyRequest) returns (UpdateWorkloadOptimizationPolicyResponse);
+    rpc DeleteWorkloadOptimizationPolicy(DeleteWorkloadOptimizationPolicyRequest) returns (DeleteWorkloadOptimizationPolicyResponse);
+
+    // MPA V3: Workload Rules (CRUD)
+    rpc UpsertManualWorkloadRule(UpsertManualWorkloadRuleRequest) returns (UpsertManualWorkloadRuleResponse);
+    rpc GetWorkloadRulesByPolicy(GetWorkloadRulesByPolicyRequest) returns (GetWorkloadRulesByPolicyResponse);
+    rpc ListWorkloadRules(ListWorkloadRulesRequest) returns (ListWorkloadRulesResponse);
+    rpc GetWorkloadRuleByID(GetWorkloadRuleByIDRequest) returns (GetWorkloadRuleByIDResponse);
+    rpc DeleteWorkloadRule(DeleteWorkloadRuleRequest) returns (DeleteWorkloadRuleResponse);
+    rpc GetWorkloadContainerNames(GetWorkloadContainerNamesRequest) returns (GetWorkloadContainerNamesResponse);
+    rpc BatchAutoOptimizeWorkloads(BatchAutoOptimizeWorkloadsRequest) returns (BatchAutoOptimizeWorkloadsResponse);
 }
 
 message GetRecommendationsRequest {
@@ -257,24 +283,6 @@ message GetLatestNodeGroupRecommendationResponse {
     int32 after_node_count = 6;
 }
 
-message GetPreviewNodeGroupRecommendationRequest {
-    string node_group_name = 1;
-    string cluster_id = 2;
-    string team_id = 3;
-    string policy_id = 4;
-}
-
-message GetPreviewNodeGroupRecommendationResponse {
-    string node_group_name = 1;
-    string cluster_id = 2;
-    string team_id = 3;
-    string policy_id = 4;
-
-    repeated string nodes_to_remove = 5;
-
-    int32 before_node_count = 6;
-    int32 after_node_count = 7;
-}
 
 message GetLatestWorkloadRecommendationRequest {
     string cluster_id = 1;
@@ -797,6 +805,17 @@ message DeleteWorkloadPolicyTargetResponse {
     bool success = 1;
 }
 
+message RemoveClusterOptimizationsRequest {
+    string team_id = 1;
+    string cluster_id = 2;
+}
+
+message RemoveClusterOptimizationsResponse {
+    bool success = 1;
+    int64 disabled_targets = 2;
+    int64 deleted_pending_recommendations = 3;
+}
+
 message PreviewWorkloadPolicyTargetMatchesRequest {
     string team_id = 1;
     string cluster_id = 2;
@@ -835,6 +854,18 @@ message GetPreviewWorkloadPolicyTargetRecommendationsRequest {
 
 message GetPreviewWorkloadPolicyTargetRecommendationsResponse {
     repeated WorkloadRecommendation recommendations = 1;
+    repeated WorkloadItem workload_items = 2;
+    // Map from workload UID to aggregated percentile summaries across all containers
+    map<string, WorkloadPercentileSummary> workload_percentiles = 3;
+}
+
+// WorkloadPercentileSummary aggregates percentile metrics across all containers of a workload.
+message WorkloadPercentileSummary {
+    MetricPercentiles cpu_usage = 1;
+    MetricPercentiles memory_usage = 2;
+    MetricPercentiles gpu_usage = 3;
+    MetricPercentiles cpu_request = 4;
+    MetricPercentiles memory_request = 5;
 }
 
 //  NodeGroupPolicyTarget Messages for Targeting
@@ -1027,6 +1058,11 @@ message WorkloadRule {
     repeated ActionTrigger action_triggers = 30;
     optional int64 startup_period_seconds = 31;
     optional string cron_schedule = 32;
+    optional int32 cooldown_minutes = 33;
+    repeated WorkloadDetectionTrigger detection_triggers = 34;
+    repeated string scheduler_plugins = 35;
+    optional string defragmentation_schedule = 36;
+    bool live_migration_enabled = 37;
 
     // PolicyID is the UUID of the policy that generated this rule
     optional string policy_id = 40;
@@ -1038,6 +1074,20 @@ message WorkloadRule {
 
     // Workload classification (dominance + burstiness)
     WorkloadClassification classification = 61;
+
+    // Whether the rule evaluator should create recommendations that use
+    // in-place pod vertical scaling instead of triggering pod restarts.
+    bool use_in_place_vertical_scaling = 70;
+
+    // UI display fields (not sent to cluster, only used for listing)
+    string status = 80;                // "active" or "inactive"
+    string sync_status = 81;           // "pending", "synced", or "failed"
+    string current_source = 82;        // "crd", "policy", "auto_optimization", "manual"
+    google.protobuf.Timestamp created_at = 83;
+    google.protobuf.Timestamp updated_at = 84;
+
+    // Per-container resource configurations (VPA). When empty, workload-level rules apply to all containers.
+    repeated ContainerResourceRuleConfig containers = 90;
 }
 
 message ResourceRuleConfig {
@@ -1054,6 +1104,28 @@ message ResourceRuleConfig {
     bool pmax_protection_active = 10;
     int64 pmax_value = 11;
     optional float pmax_ratio = 12;
+
+    // Whether to actively remove limits from workloads.
+    bool limits_removal_enabled = 13;
+}
+
+// Per-container resource config (core subset: enabled + request bounds + limits).
+message ContainerResourceConfig {
+    bool enabled = 1;
+    int64 base_request = 2;
+    optional int64 min_request = 3;
+    optional int64 max_request = 4;
+    optional float limit_multiplier = 5;
+    bool limits_adjustment_enabled = 6;
+    bool limits_removal_enabled = 7;
+}
+
+// Per-container resource rule config with CPU/Memory/GPU.
+message ContainerResourceRuleConfig {
+    string container_name = 1;
+    ContainerResourceConfig cpu_rule = 2;
+    ContainerResourceConfig memory_rule = 3;
+    ContainerResourceConfig gpu_rule = 4;
 }
 
 message HPARuleConfig {
@@ -1110,6 +1182,7 @@ message WorkloadClassification {
 
 message BatchWorkloadRules {
     repeated WorkloadRule rules = 1;
+    repeated string rule_ids_to_delete = 2;  // rule IDs whose CRDs should be deleted from cluster
 }
 
 message WorkloadWithActiveRecommendations {
@@ -1520,6 +1593,10 @@ message VerticalScalingOptimizationTarget {
 
     // default MPA behavior is to recommend not adjusting req if they are not set; this flag overrides that behavior.
     bool adjust_req_even_if_not_set = 41;
+
+    // Whether to actively remove limits from workloads (CPU only for now).
+    // Takes precedence over limits_adjustment_enabled when true.
+    bool limits_removal_enabled = 42;
 }
 
 message HorizontalScalingOptimizationTarget {
@@ -1628,6 +1705,12 @@ message WorkloadRecommendationPolicy {
     // Feature flag: Enable In-Cluster MPA (Fast Reaction) for this policy
     bool enable_incluster_mpa = 97;
 
+    // Feature flag: Enable In-Place Pod Vertical Scaling for this policy.
+    // Requires Kubernetes >= v1.33 on all attached clusters.
+    // When enabled, recommendations resize running pods via the /resize subresource
+    // without triggering rolling restarts.
+    bool enable_in_place_vertical_scaling = 103;
+
     // Policy-driven automation: enable PDB creation for workloads under this policy
     bool pdb_enabled = 98;
 
@@ -1714,6 +1797,26 @@ message NodeGroupRecommendation {
     optional NodeGroupRecommendationPolicy policy = 61;
 }
 
+enum CostPeriod {
+    COST_PERIOD_UNSPECIFIED = 0;
+    COST_PERIOD_MONTH = 1;
+    COST_PERIOD_RUN = 2;
+}
+
+message CostImpact {
+    google.type.Money current_cost_per_month = 1;
+    google.type.Money recommended_cost_per_month = 2;
+    google.type.Money current_cpu_cost_per_month = 3;
+    google.type.Money current_memory_cost_per_month = 4;
+    google.type.Money recommended_cpu_cost_per_month = 5;
+    google.type.Money recommended_memory_cost_per_month = 6;
+    google.type.Money current_gpu_cost_per_month = 7;
+    google.type.Money recommended_gpu_cost_per_month = 8;
+    int32 instance_count = 10;
+    CostPeriod cost_period = 11;
+    optional int32 estimated_runs_per_month = 12;  // CronJobs only
+}
+
 message WorkloadRecommendation {
     string recommendation_id = 1;
     string workload_uid = 2;
@@ -1760,6 +1863,17 @@ message WorkloadRecommendation {
 
     // Error message when status is failed or apply failed.
     optional string error = 83;
+
+    // Backend-computed cost impact (current vs recommended).
+    optional CostImpact cost_impact = 91;
+
+    // Whether this recommendation should be applied using in-place pod vertical scaling.
+    // When true, the operator resizes running pods via the /resize subresource
+    // without triggering rolling restarts (requires k8s >= v1.33).
+    bool use_in_place_vertical_scaling = 92;
+
+    // Impact score (0-1) indicating optimization opportunity. Higher = more waste.
+    double impact_score = 93;
 }
 
 enum LiveMigDeletionPropagation {
@@ -1953,6 +2067,28 @@ message GenerateNodePoliciesFromKarpenterResponse {
     repeated NodePolicy policies = 1;
     // Targets created when persist_policies is true
     repeated NodePolicyTarget targets = 2;
+}
+
+message GenerateNodePoliciesFromNodeGroupsRequest {
+    string team_id = 1;
+    string cluster_id = 2;
+    // When true, the generated policies will be saved to the database
+    // and node policy targets will be created for each policy (with enabled=false).
+    bool persist_policies = 3;
+}
+
+message GenerateNodePoliciesFromNodeGroupsResponse {
+    repeated NodePolicy policies = 1;
+    repeated NodePolicyTarget targets = 2;
+    repeated WorkloadCompatibilityWarning warnings = 3;
+}
+
+message WorkloadCompatibilityWarning {
+    string workload_name = 1;
+    string workload_namespace = 2;
+    string kind = 3;
+    string node_group = 4;
+    string reason = 5;
 }
 
 message ListNodePoliciesRequest {
@@ -2257,6 +2393,46 @@ message InstanceFamily {
 message InstanceSize {
   string name = 1;
   string provider_name = 2;
+}
+
+message InstanceCategory {
+  string key = 1;            // e.g., "c", "D", "n"
+  string label = 2;          // e.g., "Compute Optimized"
+  string provider_name = 3;  // e.g., "AWS", "Azure", "GCP"
+}
+
+message InstanceCPU {
+  int32 vcpu = 1;             // e.g., 2, 4, 8, 16
+  string provider_name = 2;   // e.g., "AWS", "Azure"
+}
+
+message InstanceTypeName {
+  string name = 1;            // e.g., "m5.large", "Standard_D4s_v3"
+  string provider_name = 2;   // e.g., "AWS", "Azure"
+}
+
+message GetInstanceCategoriesRequest {
+  repeated string cloud_providers = 1;
+}
+
+message GetInstanceCategoriesResponse {
+  repeated InstanceCategory instance_categories = 1;
+}
+
+message GetInstanceCPUsRequest {
+  repeated string cloud_providers = 1;
+}
+
+message GetInstanceCPUsResponse {
+  repeated InstanceCPU instance_cpus = 1;
+}
+
+message GetInstanceTypeNamesRequest {
+  repeated string cloud_providers = 1;
+}
+
+message GetInstanceTypeNamesResponse {
+  repeated InstanceTypeName instance_types = 1;
 }
 
 message SubnetSelectorTerm {
@@ -2878,4 +3054,222 @@ message ListWorkloadCPUThrottleEventsRequest {
 message ListWorkloadCPUThrottleEventsResponse {
     repeated WorkloadRuleCPUThrottleEvent events = 1;
     int64 total = 2;
+}
+
+// ============================================================================
+// MPA V3: Workload Optimization Policy messages
+// ============================================================================
+
+message WorkloadOptimizationPolicyProto {
+    string id = 1;
+    string team_id = 2;
+    string name = 3;
+    optional string description = 4;
+    bool enabled = 5;
+    repeated string cluster_ids = 6;
+    repeated string namespace_selector = 7;
+    google.protobuf.Timestamp created_at = 8;
+    google.protobuf.Timestamp updated_at = 9;
+    map<string, string> cluster_names = 10;  // cluster_id → display name
+
+    // Scheduling & Triggers
+    repeated ActionTrigger action_triggers = 11;
+    optional string cron_schedule = 12;
+    optional int32 cooldown_minutes = 13;
+    repeated WorkloadDetectionTrigger detection_triggers = 14;
+
+    // Scheduler Optimization
+    repeated string scheduler_plugins = 15;
+    optional string defragmentation_schedule = 16;
+    bool live_migration_enabled = 17;
+    bool use_in_place_vertical_scaling = 18;
+}
+
+message CreateWorkloadOptimizationPolicyRequest {
+    string team_id = 1;
+    string name = 2;
+    optional string description = 3;
+    bool enabled = 4;
+    repeated string cluster_ids = 5;
+    repeated string namespace_selector = 6;
+
+    // Scheduling & Triggers
+    repeated ActionTrigger action_triggers = 7;
+    optional string cron_schedule = 8;
+    optional int32 cooldown_minutes = 9;
+    repeated WorkloadDetectionTrigger detection_triggers = 10;
+
+    // Scheduler Optimization
+    repeated string scheduler_plugins = 11;
+    optional string defragmentation_schedule = 12;
+    bool live_migration_enabled = 13;
+    bool use_in_place_vertical_scaling = 14;
+}
+
+message CreateWorkloadOptimizationPolicyResponse {
+    WorkloadOptimizationPolicyProto policy = 1;
+}
+
+message ListWorkloadOptimizationPoliciesRequest {
+    string team_id = 1;
+}
+
+message ListWorkloadOptimizationPoliciesResponse {
+    repeated WorkloadOptimizationPolicyProto policies = 1;
+}
+
+message GetWorkloadOptimizationPolicyRequest {
+    string team_id = 1;
+    string policy_id = 2;
+}
+
+message GetWorkloadOptimizationPolicyResponse {
+    WorkloadOptimizationPolicyProto policy = 1;
+}
+
+message UpdateWorkloadOptimizationPolicyRequest {
+    string team_id = 1;
+    string policy_id = 2;
+    optional string name = 3;
+    optional string description = 4;
+    optional bool enabled = 5;
+    repeated string cluster_ids = 6;
+    repeated string namespace_selector = 7;
+
+    // Scheduling & Triggers
+    repeated ActionTrigger action_triggers = 8;
+    optional string cron_schedule = 9;
+    optional int32 cooldown_minutes = 10;
+    repeated WorkloadDetectionTrigger detection_triggers = 11;
+
+    // Scheduler Optimization
+    repeated string scheduler_plugins = 12;
+    optional string defragmentation_schedule = 13;
+    optional bool live_migration_enabled = 14;
+    optional bool use_in_place_vertical_scaling = 15;
+}
+
+message UpdateWorkloadOptimizationPolicyResponse {
+    WorkloadOptimizationPolicyProto policy = 1;
+}
+
+message DeleteWorkloadOptimizationPolicyRequest {
+    string team_id = 1;
+    string policy_id = 2;
+    bool delete_rules = 3;  // if true, delete associated rules; if false, detach (set policy_id=null)
+}
+
+message DeleteWorkloadOptimizationPolicyResponse {}
+
+// ============================================================================
+// MPA V3: Workload Rule listing messages
+// ============================================================================
+
+message GetWorkloadRulesByPolicyRequest {
+    string team_id = 1;
+    string policy_id = 2;
+}
+
+message GetWorkloadRulesByPolicyResponse {
+    repeated WorkloadRule managed_rules = 1;
+    repeated WorkloadRule excluded_rules = 2;
+    map<string, string> cluster_names = 3;
+}
+
+message ListWorkloadRulesRequest {
+    string team_id = 1;
+    optional string cluster_id = 2;
+}
+
+message ListWorkloadRulesResponse {
+    repeated WorkloadRule rules = 1;
+    map<string, string> cluster_names = 2;  // cluster_id → display name
+    map<string, string> policy_names = 3;   // policy_id → policy name
+}
+
+message GetWorkloadRuleByIDRequest {
+    string team_id = 1;
+    string rule_id = 2;
+}
+
+message GetWorkloadRuleByIDResponse {
+    WorkloadRule rule = 1;
+}
+
+message DeleteWorkloadRuleRequest {
+    string team_id = 1;
+    string rule_id = 2;
+}
+
+message DeleteWorkloadRuleResponse {}
+
+message UpsertManualWorkloadRuleRequest {
+    string team_id = 1;
+    string cluster_id = 2;
+    string namespace = 3;
+    string kind = 4;
+    string name = 5;
+    bool auto_generate = 6;
+
+    // Manual fields (only used when auto_generate = false)
+    ResourceRuleConfig cpu_rule = 10;
+    ResourceRuleConfig memory_rule = 11;
+    ResourceRuleConfig gpu_rule = 12;
+    HPARuleConfig hpa_rule = 13;
+    EmergencyResponseConfig emergency_response = 50;
+    repeated ActionTrigger action_triggers = 30;
+    optional int64 startup_period_seconds = 31;
+    optional string cron_schedule = 32;
+    optional int32 cooldown_minutes = 33;
+    repeated WorkloadDetectionTrigger detection_triggers = 34;
+    repeated string scheduler_plugins = 35;
+    optional string defragmentation_schedule = 36;
+    bool live_migration_enabled = 37;
+    bool use_in_place_vertical_scaling = 70;
+
+    // Per-container resource configs (VPA). When empty, workload-level rules apply to all containers.
+    repeated ContainerResourceRuleConfig containers = 90;
+}
+
+message UpsertManualWorkloadRuleResponse {
+    WorkloadRule rule = 1;
+}
+
+message GetWorkloadContainerNamesRequest {
+    string team_id = 1;
+    string cluster_id = 2;
+    string namespace = 3;
+    string kind = 4;
+    string name = 5;
+}
+
+message GetWorkloadContainerNamesResponse {
+    repeated string container_names = 1;
+}
+
+// Batch auto-optimize
+
+message BatchAutoOptimizeWorkload {
+    string namespace = 1;
+    string kind = 2;
+    string name = 3;
+}
+
+message BatchAutoOptimizeWorkloadsRequest {
+    string team_id = 1;
+    string cluster_id = 2;
+    repeated BatchAutoOptimizeWorkload workloads = 3;
+}
+
+message BatchAutoOptimizeWorkloadResult {
+    string namespace = 1;
+    string kind = 2;
+    string name = 3;
+    bool success = 4;
+    string error = 5;
+    WorkloadRule rule = 6;
+}
+
+message BatchAutoOptimizeWorkloadsResponse {
+    repeated BatchAutoOptimizeWorkloadResult results = 1;
 }

@@ -95,5 +95,8 @@ func NewClientSet(token, teamID, baseURL string) *clientset.ClientSet {
 		RecommendationClient: apiv1connect.NewK8SRecommendationServiceClient(
 			httpClient, baseURL, opts...,
 		),
+		ClusterServiceClient: apiv1connect.NewClusterServiceClient(
+			httpClient, baseURL, opts...,
+		),
 	}
 }

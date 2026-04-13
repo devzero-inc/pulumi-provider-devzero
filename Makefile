@@ -18,9 +18,9 @@ TARGET_PROTO_DIR       = internal/proto/api/v1
 TARGET_GEN_PB_DIR      = internal/gen/api/v1
 TARGET_GEN_CONNECT_DIR = internal/gen/api/v1/apiv1connect
 
-PROTO_FILES       = common.proto instance.proto k8s.proto recommendation.proto
-GEN_PB_FILES      = common.pb.go instance.pb.go k8s.pb.go recommendation.pb.go
-GEN_CONNECT_FILES = k8s.connect.go recommendation.connect.go
+PROTO_FILES       = common.proto instance.proto k8s.proto recommendation.proto cluster.proto
+GEN_PB_FILES      = common.pb.go instance.pb.go k8s.pb.go recommendation.pb.go cluster.pb.go cluster_grpc.pb.go
+GEN_CONNECT_FILES = k8s.connect.go recommendation.connect.go cluster.connect.go
 
 OLD_IMPORT = github.com/devzero-inc/services/dakr/gen/api/v1
 NEW_IMPORT = github.com/devzero-inc/pulumi-provider-devzero/internal/gen/api/v1
@@ -107,8 +107,9 @@ gen=json.load(open('/tmp/devzero-generated.json')); \
 ex=json.load(open('$(SCHEMA_FILE)')); \
 ex['resources']=gen.get('resources',{}); \
 ex['types']=gen.get('types',{}); \
+ex['functions']=gen.get('functions',{}); \
 json.dump(ex, open('$(SCHEMA_FILE)','w'), indent=4); \
-print(f'Merged: {len(ex[\"resources\"])} resources, {len(ex[\"types\"])} types')"
+print(f'Merged: {len(ex[\"resources\"])} resources, {len(ex[\"types\"])} types, {len(ex[\"functions\"])} functions')"
 	@echo "Applying enum patches..."
 	python3 scripts/patch-schema-enums.py
 

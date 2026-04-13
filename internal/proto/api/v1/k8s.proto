@@ -340,6 +340,48 @@ message GetWorkloadResponse {
   repeated ResourceDataPoint resource_data_points = 6; // Time-series resource metrics for the workload.
 }
 
+// GetWorkloadContainerPercentilesRequest requests per-container percentile metrics for a workload.
+message GetWorkloadContainerPercentilesRequest {
+  string team_id = 1;
+  string cluster_id = 2;
+  string kind = 3;
+  string uid = 4;
+  optional google.protobuf.Timestamp start_time = 11;
+  optional google.protobuf.Timestamp end_time = 12;
+}
+
+// GetWorkloadContainerPercentilesResponse returns per-container percentile statistics.
+message GetWorkloadContainerPercentilesResponse {
+  repeated ContainerPercentileSummary containers = 1;
+}
+
+// GetWorkloadContainerTimeSeriesRequest requests per-container time-series metrics for a workload.
+message GetWorkloadContainerTimeSeriesRequest {
+  string team_id = 1;
+  string cluster_id = 2;
+  string kind = 3;
+  string uid = 4;
+  optional google.protobuf.Timestamp start_time = 11;
+  optional google.protobuf.Timestamp end_time = 12;
+}
+
+// GetWorkloadContainerTimeSeriesResponse returns per-container time-series data.
+message GetWorkloadContainerTimeSeriesResponse {
+  repeated ContainerTimeSeries containers = 1;
+}
+
+// GetLatestContainerRequestLimitsRequest requests the most recent request/limit values per container.
+message GetLatestContainerRequestLimitsRequest {
+  string team_id = 1;
+  string cluster_id = 2;
+  string uid = 3;
+}
+
+// GetLatestContainerRequestLimitsResponse returns per-container request/limit values.
+message GetLatestContainerRequestLimitsResponse {
+  repeated ContainerRequestLimits containers = 1;
+}
+
 // Request to get forecasted workloads
 message GetForecastWorkloadsRequest {
   string team_id = 1;
@@ -518,6 +560,7 @@ message Cluster {
   double underutilization = 81; // Percentage of how much is cluster underutilized that is using combined numbers of cpu, memory and GPU
   repeated string tags = 91; // Tags for the cluster
   bool has_argo_workloads = 101; // Whether any workload on this cluster is managed by Argo CD
+  string kubernetes_version = 110; // Kubernetes version of the cluster (e.g. "v1.28.3")
 }
 
 message OperatorInfo {
@@ -550,6 +593,9 @@ message GetLatestOperatorVersionResponse {
 
   OperatorInfo security_op_info = 31;
   OperatorInfo security_op_helm_info = 32;
+
+  OperatorInfo trezr_info = 41;
+  OperatorInfo trezr_helm_info = 42;
 }
 
 message GalaxyGetClusterPerspectiveRequest {
@@ -572,27 +618,6 @@ message GalaxyClusterGroup {
   NodeInfo node_info = 5; // (optional) node counts (on-demand, spot, etc)
 }
 
-message GalaxyGetNodePerspectiveRequest {
-  string team_id = 1;
-  repeated string cluster_ids = 2; // (optional) restrict to specific clusters
-  GalaxyPOVNodeGroupBy group_by = 3; // how to group nodes
-  PerspectiveDatapointOpts datapoint_opts = 4; // time range / resolution
-}
-
-message GalaxyGetNodePerspectiveResponse {
-  repeated GalaxyNodeGroup groupings = 1;
-}
-
-message GalaxyNodeGroup {
-  string group_key = 1; // e.g., "spot", "n1-standard-4", "g5.xlarge", etc.
-  // TODO (debo) might want to change node_ids to just node (same as GetNodeGroups etc)
-  repeated string node_ids = 2; // nodes that belong to this group
-  // TODO (debo) might want to change cluster_ids to just cluster (same as GetClusters etc)
-  repeated string cluster_ids = 3; // clusters that contain these nodes
-  CostInfo cost_info = 4;
-  ResourceMetrics resource_metrics = 5;
-  NodeInfo node_info = 6;
-}
 
 message GalaxyGetWorkloadPerspectiveRequest {
   string team_id = 1;
@@ -680,11 +705,13 @@ message ListAuditLogsRequest {
   repeated string recommendation_policy_id = 6;
   repeated string recommendation_id = 7;
   repeated string originating_user_id = 8;
-  optional string email_contains = 9;
+  optional string email_contains = 9 [deprecated = true];
   repeated string event = 10;
 
   google.protobuf.Timestamp start_time = 11;
   google.protobuf.Timestamp end_time = 12;
+
+  repeated string email_matches = 13; // Exact match on originating_user_email (equality with IN clause)
 
   Pagination pagination = 21;
 
@@ -709,11 +736,13 @@ message ListAuditLogOriginatorsRequest {
   repeated string recommendation_policy_id = 6;
   repeated string recommendation_id = 7;
   repeated string originating_user_id = 8;
-  optional string email_contains = 9;
+  optional string email_contains = 9 [deprecated = true];
   repeated string event = 10;
 
   google.protobuf.Timestamp start_time = 11;
   google.protobuf.Timestamp end_time = 12;
+
+  repeated string email_matches = 13; // Exact match on originating_user_email (equality with IN clause)
 }
 
 // Response for fetching all audit log originators.
@@ -1043,6 +1072,18 @@ service K8SService {
   // GetWorkload retrieves detailed information for a specific workload.
   rpc GetWorkload(GetWorkloadRequest) returns (GetWorkloadResponse);
 
+  // GetWorkloadContainerPercentiles retrieves per-container percentile metrics for a workload.
+  //
+  // Note: fs_* and current_* fields in the response are no longer populated.
+  // Prefer GetLatestContainerRequestLimits for progressive loading of request/limit values.
+  rpc GetWorkloadContainerPercentiles(GetWorkloadContainerPercentilesRequest) returns (GetWorkloadContainerPercentilesResponse);
+
+  // GetWorkloadContainerTimeSeries retrieves per-container time-series resource metrics for a workload.
+  rpc GetWorkloadContainerTimeSeries(GetWorkloadContainerTimeSeriesRequest) returns (GetWorkloadContainerTimeSeriesResponse);
+
+  // GetLatestContainerRequestLimits retrieves the most recent request/limit values per container for a workload.
+  rpc GetLatestContainerRequestLimits(GetLatestContainerRequestLimitsRequest) returns (GetLatestContainerRequestLimitsResponse);
+
   // GetForecastWorkloads retrieves all workloads for a specific cluster.
   rpc GetForecastWorkloads(GetForecastWorkloadsRequest) returns (GetForecastWorkloadsResponse) {
     option deprecated = true;
@@ -1064,7 +1105,6 @@ service K8SService {
 
   rpc GalaxyGetClusterPerspective(GalaxyGetClusterPerspectiveRequest) returns (GalaxyGetClusterPerspectiveResponse);
 
-  rpc GalaxyGetNodePerspective(GalaxyGetNodePerspectiveRequest) returns (GalaxyGetNodePerspectiveResponse);
 
   rpc GalaxyGetWorkloadPerspective(GalaxyGetWorkloadPerspectiveRequest) returns (GalaxyGetWorkloadPerspectiveResponse);
 
