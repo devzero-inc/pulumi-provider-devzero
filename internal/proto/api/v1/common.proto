@@ -223,6 +223,73 @@ message ResourceMetrics {
   int32 pod_count = 111; // Number of distinct pods observed in this time bucket.
 }
 
+// MetricPercentiles contains percentile statistics for a single metric.
+message MetricPercentiles {
+  double min = 1;
+  double avg = 2;
+  double max = 3;
+  double p50 = 4;
+  double p95 = 5;
+  double p99 = 6;
+  double p100 = 7;
+  double p10 = 8;
+  double p25 = 9;
+  double p75 = 10;
+  double p90 = 11;
+  double p999 = 12;
+  // Dense percentiles for smooth distribution visualization
+  double p1 = 13;
+  double p5 = 14;
+  double p15 = 15;
+  double p20 = 16;
+  double p30 = 17;
+  double p35 = 18;
+  double p40 = 19;
+  double p45 = 20;
+  double p55 = 21;
+  double p60 = 22;
+  double p65 = 23;
+  double p70 = 24;
+  double p80 = 25;
+  double p85 = 26;
+  double p97 = 27;
+}
+
+// ContainerPercentileSummary contains percentile statistics for a single container.
+message ContainerPercentileSummary {
+  string container_name = 1;
+  MetricPercentiles cpu_usage = 2;
+  MetricPercentiles memory_usage = 3;
+  MetricPercentiles cpu_request = 4;
+  MetricPercentiles memory_request = 5;
+  MetricPercentiles cpu_limit = 6;
+  MetricPercentiles memory_limit = 7;
+  MetricPercentiles gpu_usage = 8;
+  MetricPercentiles gpu_vram_usage = 9;
+
+  // Deprecated: Use GetLatestContainerRequestLimits RPC instead.
+  double current_cpu_request = 10 [deprecated = true];
+  double current_memory_request = 11 [deprecated = true];
+  double current_cpu_limit = 12 [deprecated = true];
+  double current_memory_limit = 13 [deprecated = true];
+
+  MetricPercentiles network_receive_bytes = 14;
+  MetricPercentiles network_transmit_bytes = 15;
+
+  // Deprecated: FS percentiles are now served via GetWorkloadProfiles RPC.
+  MetricPercentiles fs_read_bytes = 16 [deprecated = true];
+  MetricPercentiles fs_write_bytes = 17 [deprecated = true];
+}
+
+// ContainerRequestLimits contains the latest request/limit values for a single container.
+message ContainerRequestLimits {
+  string container_name = 1;
+  double current_cpu_request = 2;
+  double current_memory_request = 3;
+  double current_cpu_limit = 4;
+  double current_memory_limit = 5;
+}
+
 // ForecastResourceMetrics encapsulates Forecasted CPU and memory capacity, usage, and utilization for nodes and containers.
 message ForecastResourceMetrics {
   google.protobuf.Timestamp timestamp = 1; // Forecast timestamp.
@@ -424,6 +491,12 @@ message CostDataPoint {
 message ResourceDataPoint {
   int64 timestamp = 1; // Unix timestamp (seconds since epoch).
   ResourceMetrics resource_metrics = 2; // Resource metrics for the data point.
+}
+
+// ContainerTimeSeries contains time-series resource metrics for a single container.
+message ContainerTimeSeries {
+  string container_name = 1;
+  repeated ResourceDataPoint resource_data_points = 2;
 }
 
 message SavingsData {
@@ -1618,6 +1691,9 @@ message Event {
   string involved_object_namespace = 20;
   string reporting_controller = 21;
   string reporting_instance = 22;
+  map<string, string> annotations = 23;
+  map<string, string> labels = 24;
+  string involved_object_uid = 25;
 
   google.protobuf.Timestamp created_at = 41;
   google.protobuf.Timestamp updated_at = 42;
@@ -1641,8 +1717,31 @@ message EventDatapointInfo {
 message EventDatapoint {
   string utc_time = 1;
   int32 count = 2; // Number of events in this time bucket
-  repeated EventDatapointInfo events = 3; // Details of events in this bucket
+  repeated EventDatapointInfo events = 3; // Details of events in this bucket (deprecated: use normal_count/warning_count)
+  int32 normal_count = 4; // Count of Normal events in this time bucket
+  int32 warning_count = 5; // Count of Warning events in this time bucket
+  int32 critical_count = 6; // Count of events with critical reasons (OOMKilled, CrashLoopBackOff, NodeNotReady, etc.)
 }
+
+message DimensionCount {
+  string value = 1;
+  int32 count = 2;
+  double percentage = 3;
+}
+
+message EventGroup {
+  string reason = 1;
+  string namespace = 2;
+  string workload_name = 3;
+  string workload_kind = 4;
+  string node = 5;
+  int32 count = 6;
+  int32 affected_objects = 7;
+  google.protobuf.Timestamp first_seen = 8;
+  google.protobuf.Timestamp last_seen = 9;
+  string type = 10;
+}
+
 // message InvolvedObject {
 //   string uid = 1;
 //   string kind = 2;
