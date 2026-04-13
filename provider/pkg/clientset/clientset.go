@@ -4,13 +4,14 @@ import (
 	apiv1connect "github.com/devzero-inc/pulumi-provider-devzero/internal/gen/api/v1/apiv1connect"
 )
 
-// ClientSet holds the three Connect service clients used by all resources.
+// ClientSet holds the Connect service clients used by all resources and functions.
 type ClientSet struct {
 	TeamID                string
 	Token                 string
 	ClusterMutationClient apiv1connect.ClusterMutationServiceClient
 	K8SClient             apiv1connect.K8SServiceClient
 	RecommendationClient  apiv1connect.K8SRecommendationServiceClient
+	ClusterServiceClient  apiv1connect.ClusterServiceClient
 }
 
 // active is the package-level singleton set during ProviderConfig.Configure.

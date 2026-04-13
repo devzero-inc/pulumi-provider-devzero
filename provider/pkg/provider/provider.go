@@ -63,6 +63,7 @@ func (c *ProviderConfig) Configure(_ context.Context) error {
 
 // New constructs and returns the Pulumi DevZero provider.
 // Resources are registered in infer.Options.Resources.
+// Functions (data sources) are registered in infer.Options.Functions.
 func New() p.Provider {
 	return infer.Provider(infer.Options{
 		Config: infer.Config(&ProviderConfig{}),
@@ -72,6 +73,9 @@ func New() p.Provider {
 			infer.Resource[*resources.WorkloadPolicyTarget, resources.WorkloadPolicyTargetArgs, resources.WorkloadPolicyTargetState](&resources.WorkloadPolicyTarget{}),
 			infer.Resource[*resources.NodePolicy, resources.NodePolicyArgs, resources.NodePolicyState](&resources.NodePolicy{}),
 			infer.Resource[*resources.NodePolicyTarget, resources.NodePolicyTargetArgs, resources.NodePolicyTargetState](&resources.NodePolicyTarget{}),
+		},
+		Functions: []infer.InferredFunction{
+			infer.Function[*resources.GetClusterIdByName, resources.GetClusterIDByNameArgs, resources.GetClusterIDByNameResult](&resources.GetClusterIdByName{}),
 		},
 	})
 }

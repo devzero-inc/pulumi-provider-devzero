@@ -107,8 +107,9 @@ gen=json.load(open('/tmp/devzero-generated.json')); \
 ex=json.load(open('$(SCHEMA_FILE)')); \
 ex['resources']=gen.get('resources',{}); \
 ex['types']=gen.get('types',{}); \
+ex['functions']=gen.get('functions',{}); \
 json.dump(ex, open('$(SCHEMA_FILE)','w'), indent=4); \
-print(f'Merged: {len(ex[\"resources\"])} resources, {len(ex[\"types\"])} types')"
+print(f'Merged: {len(ex[\"resources\"])} resources, {len(ex[\"types\"])} types, {len(ex[\"functions\"])} functions')"
 	@echo "Applying enum patches..."
 	python3 scripts/patch-schema-enums.py
 
