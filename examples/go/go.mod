@@ -3,7 +3,7 @@ module github.com/devzero-inc/pulumi-provider-devzero/examples/go
 go 1.24.0
 
 require (
-	github.com/devzero-inc/pulumi-provider-devzero/sdk/go/devzero v0.0.17
+	github.com/devzero-inc/pulumi-provider-devzero/sdk/go/devzero v0.1.2
 	github.com/pulumi/pulumi/sdk/v3 v3.224.0
 )
 
