@@ -270,6 +270,104 @@ pulumi up
 
 ---
 
+## Data Sources
+
+### `getClusterIdByName`
+
+Look up an existing cluster by name and return its ID. Use this when a cluster was **registered manually** (not created by Pulumi) and you need its ID to attach policies, inject into `values.yaml`, or pass to a Kubernetes secret.
+
+> **Warning:** If multiple clusters share the same name, only the first active (non-deleted) one is returned. Ensure cluster names are unique within your team to avoid unexpected results.
+
+#### TypeScript
+
+```typescript
+import { resources } from "@devzero/pulumi-devzero";
+
+// Look up a manually registered cluster by name
+const existing = await resources.getClusterIdByName({
+    name: "my-existing-cluster",
+    // teamId is optional — defaults to devzero:teamId from provider config
+});
+
+// Attach a policy to the existing cluster
+const target = new resources.WorkloadPolicyTarget("my-target", {
+    name: "my-target",
+    policyId: policy.id,
+    clusterIds: [existing.clusterId],
+    kindFilter: ["Deployment"],
+    enabled: true,
+});
+
+export const existingClusterId = existing.clusterId;
+```
+
+#### Python
+
+```python
+import pulumi
+import pulumi_devzero as devzero
+
+# Look up a manually registered cluster by name
+existing = devzero.resources.get_cluster_id_by_name(
+    name="my-existing-cluster",
+    # team_id is optional — defaults to devzero:teamId from provider config
+)
+
+# Attach a policy to the existing cluster
+target = devzero.resources.WorkloadPolicyTarget("my-target",
+    name="my-target",
+    policy_id=policy.id,
+    cluster_ids=[existing.cluster_id],
+    kind_filter=["Deployment"],
+    enabled=True,
+)
+
+pulumi.export("existing_cluster_id", existing.cluster_id)
+```
+
+#### Go
+
+```go
+// Look up a manually registered cluster by name
+existing, err := resources.GetClusterIdByName(ctx, &resources.GetClusterIdByNameArgs{
+    Name: "my-existing-cluster",
+    // TeamId is optional — defaults to devzero:teamId from provider config
+})
+if err != nil {
+    return err
+}
+
+// Attach a policy to the existing cluster using its looked-up ID
+_, err = resources.NewWorkloadPolicyTarget(ctx, "my-target", &resources.WorkloadPolicyTargetArgs{
+    Name:       pulumi.String("my-target"),
+    PolicyId:   policy.ID(),
+    ClusterIds: pulumi.StringArray{pulumi.String(existing.ClusterId)},
+    KindFilter: pulumi.StringArray{pulumi.String("Deployment")},
+    Enabled:    pulumi.BoolPtr(true),
+})
+if err != nil {
+    return err
+}
+
+// Or inject the ID into a Kubernetes secret / values.yaml
+ctx.Export("existingClusterId", pulumi.String(existing.ClusterId))
+```
+
+**Inputs:**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | string | yes | Cluster name to look up |
+| `teamId` | string | no | Team to search within. Defaults to `devzero:teamId` from provider config |
+
+**Outputs:**
+
+| Field | Type | Description |
+|---|---|---|
+| `clusterId` | string | UUID of the matching cluster |
+
+---
+
 ## Destroying Resources
 
 To tear down all resources managed by your stack:
