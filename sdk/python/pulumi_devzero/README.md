@@ -241,6 +241,50 @@ node_policy_target = devzero.resources.NodePolicyTarget("my-node-policy-target",
 
 ---
 
+## Data Sources
+
+### `get_cluster_id_by_name`
+
+Look up an existing cluster by name and return its ID. Use this when a cluster was registered manually (not created by Pulumi) and you need its ID to attach policies or inject into `values.yaml` / a Kubernetes secret.
+
+```python
+import pulumi
+import pulumi_devzero as devzero
+
+existing = devzero.resources.get_cluster_id_by_name(
+    name="my-existing-cluster",
+    # team_id is optional — defaults to devzero:teamId from provider config
+)
+
+# Attach a policy to the existing cluster
+target = devzero.resources.WorkloadPolicyTarget("my-target",
+    name="my-target",
+    policy_id=policy.id,
+    cluster_ids=[existing.cluster_id],
+    kind_filter=["Deployment"],
+    enabled=True,
+)
+
+pulumi.export("existing_cluster_id", existing.cluster_id)
+```
+
+**Inputs:**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | `str` | yes | Cluster name to look up |
+| `team_id` | `str` | no | Defaults to `devzero:teamId` from provider config |
+
+**Outputs:**
+
+| Field | Type | Description |
+|---|---|---|
+| `cluster_id` | `str` | UUID of the matching cluster |
+
+> **Warning:** If multiple clusters share the same name, only the first active (non-deleted) one is returned. Ensure cluster names are unique within your team to avoid unexpected results.
+
+---
+
 ## Destroying Resources
 
 ```bash

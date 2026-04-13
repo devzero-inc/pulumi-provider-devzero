@@ -233,6 +233,49 @@ const nodePolicyTarget = new resources.NodePolicyTarget("my-node-policy-target",
 
 ---
 
+## Data Sources
+
+### `getClusterIdByName`
+
+Look up an existing cluster by name and return its ID. Use this when a cluster was registered manually (not created by Pulumi) and you need its ID to attach policies or inject into `values.yaml` / a Kubernetes secret.
+
+```typescript
+import { resources } from "@devzero/pulumi-devzero";
+
+const existing = await resources.getClusterIdByName({
+    name: "my-existing-cluster",
+    // teamId is optional — defaults to devzero:teamId from provider config
+});
+
+// Attach a policy to the existing cluster
+const target = new resources.WorkloadPolicyTarget("my-target", {
+    name: "my-target",
+    policyId: policy.id,
+    clusterIds: [existing.clusterId],
+    kindFilter: ["Deployment"],
+    enabled: true,
+});
+
+export const existingClusterId = existing.clusterId;
+```
+
+**Inputs:**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | `string` | yes | Cluster name to look up |
+| `teamId` | `string` | no | Defaults to `devzero:teamId` from provider config |
+
+**Outputs:**
+
+| Field | Type | Description |
+|---|---|---|
+| `clusterId` | `string` | UUID of the matching cluster |
+
+> **Warning:** If multiple clusters share the same name, only the first active (non-deleted) one is returned. Ensure cluster names are unique within your team to avoid unexpected results.
+
+---
+
 ## Destroying Resources
 
 ```bash
