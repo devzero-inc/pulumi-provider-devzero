@@ -53,7 +53,7 @@ export function getVersion(): string {
 
 /** @internal */
 export function resourceOptsDefaults(): any {
-    return { version: getVersion(), pluginDownloadURL: "github://api.github.com/devzero-inc" };
+    return { version: getVersion(), pluginDownloadURL: "github://api.github.com/devzero-inc/pulumi-provider-devzero" };
 }
 
 /** @internal */

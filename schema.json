@@ -10,7 +10,7 @@
     "homepage": "https://dakr.devzero.io",
     "license": "Apache-2.0",
     "repository": "https://github.com/devzero-inc/pulumi-provider-devzero",
-    "pluginDownloadURL": "github://api.github.com/devzero-inc",
+    "pluginDownloadURL": "github://api.github.com/devzero-inc/pulumi-provider-devzero",
     "publisher": "DevZero",
     "language": {
         "csharp": {
