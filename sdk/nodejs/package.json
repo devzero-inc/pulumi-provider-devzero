@@ -9,8 +9,14 @@
     "homepage": "https://dakr.devzero.io",
     "repository": "https://github.com/devzero-inc/pulumi-provider-devzero",
     "license": "Apache-2.0",
+    "main": "bin/index.js",
+    "types": "bin/index.d.ts",
+    "files": [
+        "bin/",
+        "README.md"
+    ],
     "scripts": {
-        "build": "tsc"
+        "build": "tsc && cp package.json bin/package.json"
     },
     "dependencies": {
         "@pulumi/pulumi": "^3.0.0"
