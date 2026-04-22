@@ -51,7 +51,7 @@ jobs:
           EXT=""
           [ "${{ matrix.os }}" = "windows" ] && EXT=".exe"
           go build -o dist/${PROVIDER}${EXT} \
-            -ldflags "-X main.version=v${{ steps.version.outputs.VERSION }}" \
+            -ldflags "-X main.version=${{ steps.version.outputs.VERSION }}" \
             ./provider/cmd/${PROVIDER}/...
 
       - name: Package binary as tarball
