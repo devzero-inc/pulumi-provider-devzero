@@ -1,0 +1,17 @@
+# .github/workflows/pr.yml
+# Run SDK tests on every PR and on push to main.
+name: PR / Main
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    uses: ./.github/workflows/test-sdks.yml
+    with:
+      fresh_install: false

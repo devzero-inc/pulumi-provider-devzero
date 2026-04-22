@@ -1,0 +1,65 @@
+# .github/workflows/test-sdks.yml
+# Reusable workflow: build each SDK and run downstream consumer smoke tests across a version matrix.
+name: Test SDKs
+
+on:
+  workflow_call:
+    inputs:
+      fresh_install:
+        description: "Drop lockfiles before install to catch upstream dependency drift"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  test-nodejs:
+    name: NodeJS (ts ${{ matrix.typescript }} / node ${{ matrix.node }})
+    runs-on: namespace-profile-dz-generic
+    strategy:
+      fail-fast: false
+      matrix:
+        typescript: ["5.2", "5.6", "5.9"]
+        node: ["18", "20", "22"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: scripts/ci/test-nodejs.sh
+        env:
+          MATRIX_TYPESCRIPT: ${{ matrix.typescript }}
+          FRESH_INSTALL: ${{ inputs.fresh_install }}
+
+  test-python:
+    name: Python (python ${{ matrix.python }})
+    runs-on: namespace-profile-dz-generic
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.9", "3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: scripts/ci/test-python.sh
+        env:
+          FRESH_INSTALL: ${{ inputs.fresh_install }}
+
+  test-go:
+    name: Go (go ${{ matrix.go }})
+    runs-on: namespace-profile-dz-generic
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ["1.22", "1.23"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+      - run: scripts/ci/test-go.sh
+        env:
+          FRESH_INSTALL: ${{ inputs.fresh_install }}
