@@ -7,6 +7,12 @@ SDK_NODEJS   := sdk/nodejs
 SDK_PYTHON   := sdk/python
 SDK_GO       := sdk/go
 
+# VERSION is injected into the provider binary via ldflags. Falls back to
+# the latest git tag (stripped of a leading `v`), or "dev" when no tags exist.
+GIT_TAG      := $(shell git describe --tags --abbrev=0 2>/dev/null)
+VERSION      ?= $(if $(GIT_TAG),$(patsubst v%,%,$(GIT_TAG)),dev)
+LDFLAGS      := -ldflags "-X main.version=$(VERSION)"
+
 # Proto sync settings — override with: make proto SERVICES_DIR=/path/to/services
 SERVICES_DIR ?= ../services
 
@@ -85,7 +91,7 @@ proto:
 .PHONY: build
 build:
 	@mkdir -p bin
-	go build -o bin/$(PROVIDER) ./provider/cmd/$(PROVIDER)/...
+	go build $(LDFLAGS) -o bin/$(PROVIDER) ./provider/cmd/$(PROVIDER)/...
 
 .PHONY: install
 install: build
