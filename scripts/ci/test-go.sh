@@ -34,9 +34,9 @@ module consumer-test
 
 go 1.22
 
-require $MODULE_PATH v0.0.0-00010101000000-000000000000
+require "$MODULE_PATH" v0.0.0-00010101000000-000000000000
 
-replace $MODULE_PATH => $SDK_DIR
+replace "$MODULE_PATH" => "$SDK_DIR"
 EOF
 
 cat > main.go <<EOF

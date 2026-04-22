@@ -15,6 +15,10 @@ echo "==> NodeJS SDK test: typescript=$TS_VERSION fresh_install=$FRESH_INSTALL"
 
 cd "$SDK_DIR"
 
+# Register cleanup before any mutation so an early failure (npm install, tsc, etc.)
+# still restores package.json/package-lock.json for local reruns.
+trap 'rm -rf "${CONSUMER_DIR:-}" "${TARBALL_PATH:-}"; git -C "$REPO_ROOT" checkout -- sdk/nodejs/package.json sdk/nodejs/package-lock.json 2>/dev/null || true' EXIT
+
 # package.json has "${VERSION}" placeholder which npm rejects; stamp a test version.
 jq '.version = "0.0.0-test"' package.json > package.json.tmp
 mv package.json.tmp package.json
@@ -35,7 +39,6 @@ TARBALL_PATH="$SDK_DIR/$TARBALL"
 
 echo "==> Scaffolding consumer project"
 CONSUMER_DIR="$(mktemp -d)"
-trap 'rm -rf "$CONSUMER_DIR"; git -C "$REPO_ROOT" checkout -- sdk/nodejs/package.json sdk/nodejs/package-lock.json 2>/dev/null || true' EXIT
 cd "$CONSUMER_DIR"
 
 cat > package.json <<'PKG'

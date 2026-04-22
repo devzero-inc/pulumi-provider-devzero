@@ -20,9 +20,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        typescript: ["4.9", "5.2", "5.6", "5.9"]
+        typescript: ["5.2", "5.6", "5.9"]
         node: ["18", "20", "22"]
-    continue-on-error: ${{ matrix.typescript == '4.9' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
