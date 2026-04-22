@@ -1,0 +1,17 @@
+# .github/workflows/nightly.yml
+# Daily scheduled run with fresh_install=true to catch upstream dependency drift.
+name: Nightly drift check
+
+on:
+  schedule:
+    - cron: "0 8 * * *"   # 08:00 UTC daily
+  workflow_dispatch:       # allow manual re-run
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    uses: ./.github/workflows/test-sdks.yml
+    with:
+      fresh_install: true
