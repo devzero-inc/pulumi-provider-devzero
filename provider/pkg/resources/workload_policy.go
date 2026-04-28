@@ -23,8 +23,8 @@ type VerticalScalingArgs struct {
 	LimitsAdjustmentEnabled *bool    `pulumi:"limitsAdjustmentEnabled,optional"`
 	LimitMultiplier         *float64 `pulumi:"limitMultiplier,optional"`
 	MinDataPoints           *int     `pulumi:"minDataPoints,optional"`
-	AdjustReqEvenIfNotSet   bool     `pulumi:"adjustReqEvenIfNotSet,optional"`
-	LimitsRemovalEnabled    bool     `pulumi:"limitsRemovalEnabled,optional"`
+	AdjustReqEvenIfNotSet   *bool    `pulumi:"adjustReqEvenIfNotSet,optional"`
+	LimitsRemovalEnabled    *bool    `pulumi:"limitsRemovalEnabled,optional"`
 }
 
 // Annotate provides SDK documentation for VerticalScalingArgs fields.
@@ -39,9 +39,9 @@ func (v *VerticalScalingArgs) Annotate(a infer.Annotator) {
 	a.Describe(&v.LimitsAdjustmentEnabled, "Whether to also adjust resource limits alongside requests.")
 	a.Describe(&v.LimitMultiplier, "Multiplier applied to the request to derive the resource limit.")
 	a.Describe(&v.MinDataPoints, "Minimum number of data points required before a recommendation is emitted.")
-	a.Describe(&v.AdjustReqEvenIfNotSet, "Recommend requests even when the workload has no existing requests set. Default: true.")
-	a.Describe(&v.LimitsRemovalEnabled, "Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Default for CPU: true, for Memory: false.")
-	a.SetDefault(&v.AdjustReqEvenIfNotSet, true)
+	a.Describe(&v.AdjustReqEvenIfNotSet, "Recommend requests even when the workload has no existing requests set. Server/web default: true.")
+	a.Describe(&v.LimitsRemovalEnabled, "Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Web default: true for CPU, false for Memory.")
+
 	a.SetDefault(&v.MinDataPoints, 20)
 	a.SetDefault(&v.MaxScaleUpPercent, 1000.0)
 	a.SetDefault(&v.MaxScaleDownPercent, 1.0)
@@ -93,7 +93,7 @@ type WorkloadPolicyArgs struct {
 	DriftDeltaPercent       *float64               `pulumi:"driftDeltaPercent,optional"`
 	MinVpaWindowDataPoints  *int                   `pulumi:"minVpaWindowDataPoints,optional"`
 	CooldownMinutes         *int                   `pulumi:"cooldownMinutes,optional"`
-	EnablePmaxProtection    bool                   `pulumi:"enablePmaxProtection,optional"`
+	EnablePmaxProtection    *bool                  `pulumi:"enablePmaxProtection,optional"`
 	PmaxRatioThreshold      *float64               `pulumi:"pmaxRatioThreshold,optional"`
 }
 
@@ -117,9 +117,8 @@ func (a *WorkloadPolicyArgs) Annotate(ann infer.Annotator) {
 	ann.Describe(&a.DriftDeltaPercent, "Percentage drift from baseline that triggers VPA refresh.")
 	ann.Describe(&a.MinVpaWindowDataPoints, "Minimum data points in VPA analysis window. Default: 30.")
 	ann.Describe(&a.CooldownMinutes, "Minutes to wait between applying recommendations. Default: 300 (5 h).")
-	ann.Describe(&a.EnablePmaxProtection, "Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Default: true.")
+	ann.Describe(&a.EnablePmaxProtection, "Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true.")
 	ann.Describe(&a.PmaxRatioThreshold, "Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.")
-	ann.SetDefault(&a.EnablePmaxProtection, true)
 	ann.SetDefault(&a.PmaxRatioThreshold, 3.0)
 	ann.SetDefault(&a.LoopbackPeriodSeconds, 86400)
 	ann.SetDefault(&a.MinDataPoints, 15)
@@ -297,7 +296,9 @@ func argsToProto(teamID, policyID string, a WorkloadPolicyArgs) *apiv1.WorkloadR
 		v := int32(*a.CooldownMinutes)
 		p.CooldownMinutes = &v
 	}
-	p.EnablePmaxProtection = a.EnablePmaxProtection
+	if a.EnablePmaxProtection != nil {
+		p.EnablePmaxProtection = *a.EnablePmaxProtection
+	}
 	if a.PmaxRatioThreshold != nil {
 		v := float32(*a.PmaxRatioThreshold)
 		p.PmaxRatioThreshold = &v
@@ -363,7 +364,8 @@ func protoToArgs(p *apiv1.WorkloadRecommendationPolicy) WorkloadPolicyArgs {
 		v := int(*p.CooldownMinutes)
 		a.CooldownMinutes = &v
 	}
-	a.EnablePmaxProtection = p.EnablePmaxProtection
+	v := p.EnablePmaxProtection
+	a.EnablePmaxProtection = &v
 	if p.PmaxRatioThreshold != nil {
 		v := float64(*p.PmaxRatioThreshold)
 		a.PmaxRatioThreshold = &v
@@ -475,8 +477,12 @@ func verticalScalingToProto(v *VerticalScalingArgs) *apiv1.VerticalScalingOptimi
 		x := int32(*v.MinDataPoints)
 		t.MinDataPoints = &x
 	}
-	t.AdjustReqEvenIfNotSet = v.AdjustReqEvenIfNotSet
-	t.LimitsRemovalEnabled = v.LimitsRemovalEnabled
+	if v.AdjustReqEvenIfNotSet != nil {
+		t.AdjustReqEvenIfNotSet = *v.AdjustReqEvenIfNotSet
+	}
+	if v.LimitsRemovalEnabled != nil {
+		t.LimitsRemovalEnabled = *v.LimitsRemovalEnabled
+	}
 	return t
 }
 
@@ -522,8 +528,10 @@ func verticalScalingFromProto(t *apiv1.VerticalScalingOptimizationTarget) *Verti
 		x := int(*t.MinDataPoints)
 		v.MinDataPoints = &x
 	}
-	v.AdjustReqEvenIfNotSet = t.AdjustReqEvenIfNotSet
-	v.LimitsRemovalEnabled = t.LimitsRemovalEnabled
+	adj := t.AdjustReqEvenIfNotSet
+	v.AdjustReqEvenIfNotSet = &adj
+	lre := t.LimitsRemovalEnabled
+	v.LimitsRemovalEnabled = &lre
 	return v
 }
 
