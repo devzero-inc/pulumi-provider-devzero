@@ -38,7 +38,7 @@ export class WorkloadPolicy extends pulumi.CustomResource {
      */
     declare public readonly actionTriggers: pulumi.Output<string[] | undefined>;
     /**
-     * Minutes to wait between applying recommendations.
+     * Minutes to wait between applying recommendations. Default: 300 (5 h).
      */
     declare public readonly cooldownMinutes: pulumi.Output<number | undefined>;
     declare public readonly cpuVerticalScaling: pulumi.Output<outputs.resources.VerticalScalingArgs | undefined>;
@@ -62,6 +62,10 @@ export class WorkloadPolicy extends pulumi.CustomResource {
      * Percentage drift from baseline that triggers VPA refresh.
      */
     declare public readonly driftDeltaPercent: pulumi.Output<number | undefined>;
+    /**
+     * Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true.
+     */
+    declare public readonly enablePmaxProtection: pulumi.Output<boolean | undefined>;
     declare public readonly gpuVerticalScaling: pulumi.Output<outputs.resources.VerticalScalingArgs | undefined>;
     declare public readonly gpuVramVerticalScaling: pulumi.Output<outputs.resources.VerticalScalingArgs | undefined>;
     declare public readonly horizontalScaling: pulumi.Output<outputs.resources.HorizontalScalingArgs | undefined>;
@@ -74,26 +78,30 @@ export class WorkloadPolicy extends pulumi.CustomResource {
      */
     declare public readonly liveMigrationEnabled: pulumi.Output<boolean | undefined>;
     /**
-     * Period in seconds to look back for resource usage data.
+     * Period in seconds to look back for resource usage data. Default: 86400 (24 h).
      */
     declare public readonly loopbackPeriodSeconds: pulumi.Output<number | undefined>;
     declare public readonly memoryVerticalScaling: pulumi.Output<outputs.resources.VerticalScalingArgs | undefined>;
     /**
-     * Global minimum change threshold for applying recommendations.
+     * Global minimum change threshold for applying recommendations. Default: 0.2 (20%).
      */
     declare public readonly minChangePercent: pulumi.Output<number | undefined>;
     /**
-     * Global minimum data points required for recommendations.
+     * Global minimum data points required for recommendations. Default: 15.
      */
     declare public readonly minDataPoints: pulumi.Output<number | undefined>;
     /**
-     * Minimum data points in VPA analysis window.
+     * Minimum data points in VPA analysis window. Default: 30.
      */
     declare public readonly minVpaWindowDataPoints: pulumi.Output<number | undefined>;
     /**
      * Human-friendly name for the policy.
      */
     declare public readonly name: pulumi.Output<string>;
+    /**
+     * Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.
+     */
+    declare public readonly pmaxRatioThreshold: pulumi.Output<number | undefined>;
     /**
      * Kubernetes scheduler plugins to activate.
      */
@@ -122,24 +130,26 @@ export class WorkloadPolicy extends pulumi.CustomResource {
                 throw new Error("Missing required property 'name'");
             }
             resourceInputs["actionTriggers"] = args?.actionTriggers;
-            resourceInputs["cooldownMinutes"] = args?.cooldownMinutes;
-            resourceInputs["cpuVerticalScaling"] = args?.cpuVerticalScaling;
+            resourceInputs["cooldownMinutes"] = (args?.cooldownMinutes) ?? 300;
+            resourceInputs["cpuVerticalScaling"] = args ? (args.cpuVerticalScaling ? pulumi.output(args.cpuVerticalScaling).apply(inputs.resources.verticalScalingArgsArgsProvideDefaults) : undefined) : undefined;
             resourceInputs["cronSchedule"] = args?.cronSchedule;
             resourceInputs["defragmentationSchedule"] = args?.defragmentationSchedule;
             resourceInputs["description"] = args?.description;
             resourceInputs["detectionTriggers"] = args?.detectionTriggers;
             resourceInputs["driftDeltaPercent"] = args?.driftDeltaPercent;
-            resourceInputs["gpuVerticalScaling"] = args?.gpuVerticalScaling;
-            resourceInputs["gpuVramVerticalScaling"] = args?.gpuVramVerticalScaling;
+            resourceInputs["enablePmaxProtection"] = args?.enablePmaxProtection;
+            resourceInputs["gpuVerticalScaling"] = args ? (args.gpuVerticalScaling ? pulumi.output(args.gpuVerticalScaling).apply(inputs.resources.verticalScalingArgsArgsProvideDefaults) : undefined) : undefined;
+            resourceInputs["gpuVramVerticalScaling"] = args ? (args.gpuVramVerticalScaling ? pulumi.output(args.gpuVramVerticalScaling).apply(inputs.resources.verticalScalingArgsArgsProvideDefaults) : undefined) : undefined;
             resourceInputs["horizontalScaling"] = args?.horizontalScaling;
             resourceInputs["hysteresisVsTarget"] = args?.hysteresisVsTarget;
             resourceInputs["liveMigrationEnabled"] = args?.liveMigrationEnabled;
-            resourceInputs["loopbackPeriodSeconds"] = args?.loopbackPeriodSeconds;
-            resourceInputs["memoryVerticalScaling"] = args?.memoryVerticalScaling;
-            resourceInputs["minChangePercent"] = args?.minChangePercent;
-            resourceInputs["minDataPoints"] = args?.minDataPoints;
-            resourceInputs["minVpaWindowDataPoints"] = args?.minVpaWindowDataPoints;
+            resourceInputs["loopbackPeriodSeconds"] = (args?.loopbackPeriodSeconds) ?? 86400;
+            resourceInputs["memoryVerticalScaling"] = args ? (args.memoryVerticalScaling ? pulumi.output(args.memoryVerticalScaling).apply(inputs.resources.verticalScalingArgsArgsProvideDefaults) : undefined) : undefined;
+            resourceInputs["minChangePercent"] = (args?.minChangePercent) ?? 0.2;
+            resourceInputs["minDataPoints"] = (args?.minDataPoints) ?? 15;
+            resourceInputs["minVpaWindowDataPoints"] = (args?.minVpaWindowDataPoints) ?? 30;
             resourceInputs["name"] = args?.name;
+            resourceInputs["pmaxRatioThreshold"] = (args?.pmaxRatioThreshold) ?? 3;
             resourceInputs["schedulerPlugins"] = args?.schedulerPlugins;
             resourceInputs["stabilityCvMax"] = args?.stabilityCvMax;
             resourceInputs["startupPeriodSeconds"] = args?.startupPeriodSeconds;
@@ -152,6 +162,7 @@ export class WorkloadPolicy extends pulumi.CustomResource {
             resourceInputs["description"] = undefined /*out*/;
             resourceInputs["detectionTriggers"] = undefined /*out*/;
             resourceInputs["driftDeltaPercent"] = undefined /*out*/;
+            resourceInputs["enablePmaxProtection"] = undefined /*out*/;
             resourceInputs["gpuVerticalScaling"] = undefined /*out*/;
             resourceInputs["gpuVramVerticalScaling"] = undefined /*out*/;
             resourceInputs["horizontalScaling"] = undefined /*out*/;
@@ -163,6 +174,7 @@ export class WorkloadPolicy extends pulumi.CustomResource {
             resourceInputs["minDataPoints"] = undefined /*out*/;
             resourceInputs["minVpaWindowDataPoints"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
+            resourceInputs["pmaxRatioThreshold"] = undefined /*out*/;
             resourceInputs["schedulerPlugins"] = undefined /*out*/;
             resourceInputs["stabilityCvMax"] = undefined /*out*/;
             resourceInputs["startupPeriodSeconds"] = undefined /*out*/;
@@ -176,26 +188,85 @@ export class WorkloadPolicy extends pulumi.CustomResource {
  * The set of arguments for constructing a WorkloadPolicy resource.
  */
 export interface WorkloadPolicyArgs {
+    /**
+     * Action triggers: 'on_detection' or 'on_schedule'.
+     */
     actionTriggers?: pulumi.Input<pulumi.Input<string>[]>;
+    /**
+     * Minutes to wait between applying recommendations. Default: 300 (5 h).
+     */
     cooldownMinutes?: pulumi.Input<number>;
     cpuVerticalScaling?: pulumi.Input<inputs.resources.VerticalScalingArgsArgs>;
+    /**
+     * Cron expression for scheduled application (5-field format).
+     */
     cronSchedule?: pulumi.Input<string>;
+    /**
+     * Cron expression for background defragmentation.
+     */
     defragmentationSchedule?: pulumi.Input<string>;
+    /**
+     * Free-form description of the policy.
+     */
     description?: pulumi.Input<string>;
+    /**
+     * Detection triggers: 'pod_creation', 'pod_update', or 'pod_reschedule'.
+     */
     detectionTriggers?: pulumi.Input<pulumi.Input<string>[]>;
+    /**
+     * Percentage drift from baseline that triggers VPA refresh.
+     */
     driftDeltaPercent?: pulumi.Input<number>;
+    /**
+     * Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true.
+     */
+    enablePmaxProtection?: pulumi.Input<boolean>;
     gpuVerticalScaling?: pulumi.Input<inputs.resources.VerticalScalingArgsArgs>;
     gpuVramVerticalScaling?: pulumi.Input<inputs.resources.VerticalScalingArgsArgs>;
     horizontalScaling?: pulumi.Input<inputs.resources.HorizontalScalingArgsArgs>;
+    /**
+     * Hysteresis threshold vs target for HPA coordination.
+     */
     hysteresisVsTarget?: pulumi.Input<number>;
+    /**
+     * Allow live migration when applying recommendations.
+     */
     liveMigrationEnabled?: pulumi.Input<boolean>;
+    /**
+     * Period in seconds to look back for resource usage data. Default: 86400 (24 h).
+     */
     loopbackPeriodSeconds?: pulumi.Input<number>;
     memoryVerticalScaling?: pulumi.Input<inputs.resources.VerticalScalingArgsArgs>;
+    /**
+     * Global minimum change threshold for applying recommendations. Default: 0.2 (20%).
+     */
     minChangePercent?: pulumi.Input<number>;
+    /**
+     * Global minimum data points required for recommendations. Default: 15.
+     */
     minDataPoints?: pulumi.Input<number>;
+    /**
+     * Minimum data points in VPA analysis window. Default: 30.
+     */
     minVpaWindowDataPoints?: pulumi.Input<number>;
+    /**
+     * Human-friendly name for the policy.
+     */
     name: pulumi.Input<string>;
+    /**
+     * Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.
+     */
+    pmaxRatioThreshold?: pulumi.Input<number>;
+    /**
+     * Kubernetes scheduler plugins to activate.
+     */
     schedulerPlugins?: pulumi.Input<pulumi.Input<string>[]>;
+    /**
+     * Maximum coefficient of variation for workload to be considered stable.
+     */
     stabilityCvMax?: pulumi.Input<number>;
+    /**
+     * Period in seconds to ignore usage data after workload starts.
+     */
     startupPeriodSeconds?: pulumi.Input<number>;
 }

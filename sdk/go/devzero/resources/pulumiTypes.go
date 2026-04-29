@@ -3830,12 +3830,16 @@ func (o TaintArgsArrayOutput) Index(i pulumi.IntInput) TaintArgsOutput {
 }
 
 type VerticalScalingArgs struct {
+	// Recommend requests even when the workload has no existing requests set. Server/web default: true.
+	AdjustReqEvenIfNotSet *bool `pulumi:"adjustReqEvenIfNotSet"`
 	// Enable vertical scaling for this resource type.
 	Enabled *bool `pulumi:"enabled"`
 	// Multiplier applied to the request to derive the resource limit.
 	LimitMultiplier *float64 `pulumi:"limitMultiplier"`
 	// Whether to also adjust resource limits alongside requests.
 	LimitsAdjustmentEnabled *bool `pulumi:"limitsAdjustmentEnabled"`
+	// Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Web default: true for CPU, false for Memory.
+	LimitsRemovalEnabled *bool `pulumi:"limitsRemovalEnabled"`
 	// Maximum resource request in millicores (CPU) or bytes (memory/GPU).
 	MaxRequest *int `pulumi:"maxRequest"`
 	// Maximum percentage decrease allowed in a single recommendation cycle.
@@ -3852,6 +3856,27 @@ type VerticalScalingArgs struct {
 	TargetPercentile *float64 `pulumi:"targetPercentile"`
 }
 
+// Defaults sets the appropriate defaults for VerticalScalingArgs
+func (val *VerticalScalingArgs) Defaults() *VerticalScalingArgs {
+	if val == nil {
+		return nil
+	}
+	tmp := *val
+	if tmp.MaxScaleDownPercent == nil {
+		maxScaleDownPercent_ := 1.0
+		tmp.MaxScaleDownPercent = &maxScaleDownPercent_
+	}
+	if tmp.MaxScaleUpPercent == nil {
+		maxScaleUpPercent_ := 1000.0
+		tmp.MaxScaleUpPercent = &maxScaleUpPercent_
+	}
+	if tmp.MinDataPoints == nil {
+		minDataPoints_ := 20
+		tmp.MinDataPoints = &minDataPoints_
+	}
+	return &tmp
+}
+
 // VerticalScalingArgsInput is an input type that accepts VerticalScalingArgsArgs and VerticalScalingArgsOutput values.
 // You can construct a concrete instance of `VerticalScalingArgsInput` via:
 //
@@ -3864,12 +3889,16 @@ type VerticalScalingArgsInput interface {
 }
 
 type VerticalScalingArgsArgs struct {
+	// Recommend requests even when the workload has no existing requests set. Server/web default: true.
+	AdjustReqEvenIfNotSet pulumi.BoolPtrInput `pulumi:"adjustReqEvenIfNotSet"`
 	// Enable vertical scaling for this resource type.
 	Enabled pulumi.BoolPtrInput `pulumi:"enabled"`
 	// Multiplier applied to the request to derive the resource limit.
 	LimitMultiplier pulumi.Float64PtrInput `pulumi:"limitMultiplier"`
 	// Whether to also adjust resource limits alongside requests.
 	LimitsAdjustmentEnabled pulumi.BoolPtrInput `pulumi:"limitsAdjustmentEnabled"`
+	// Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Web default: true for CPU, false for Memory.
+	LimitsRemovalEnabled pulumi.BoolPtrInput `pulumi:"limitsRemovalEnabled"`
 	// Maximum resource request in millicores (CPU) or bytes (memory/GPU).
 	MaxRequest pulumi.IntPtrInput `pulumi:"maxRequest"`
 	// Maximum percentage decrease allowed in a single recommendation cycle.
@@ -3886,6 +3915,23 @@ type VerticalScalingArgsArgs struct {
 	TargetPercentile pulumi.Float64PtrInput `pulumi:"targetPercentile"`
 }
 
+// Defaults sets the appropriate defaults for VerticalScalingArgsArgs
+func (val *VerticalScalingArgsArgs) Defaults() *VerticalScalingArgsArgs {
+	if val == nil {
+		return nil
+	}
+	tmp := *val
+	if tmp.MaxScaleDownPercent == nil {
+		tmp.MaxScaleDownPercent = pulumi.Float64Ptr(1.0)
+	}
+	if tmp.MaxScaleUpPercent == nil {
+		tmp.MaxScaleUpPercent = pulumi.Float64Ptr(1000.0)
+	}
+	if tmp.MinDataPoints == nil {
+		tmp.MinDataPoints = pulumi.IntPtr(20)
+	}
+	return &tmp
+}
 func (VerticalScalingArgsArgs) ElementType() reflect.Type {
 	return reflect.TypeOf((*VerticalScalingArgs)(nil)).Elem()
 }
@@ -3963,6 +4009,11 @@ func (o VerticalScalingArgsOutput) ToVerticalScalingArgsPtrOutputWithContext(ctx
 	}).(VerticalScalingArgsPtrOutput)
 }
 
+// Recommend requests even when the workload has no existing requests set. Server/web default: true.
+func (o VerticalScalingArgsOutput) AdjustReqEvenIfNotSet() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v VerticalScalingArgs) *bool { return v.AdjustReqEvenIfNotSet }).(pulumi.BoolPtrOutput)
+}
+
 // Enable vertical scaling for this resource type.
 func (o VerticalScalingArgsOutput) Enabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *bool { return v.Enabled }).(pulumi.BoolPtrOutput)
@@ -3976,6 +4027,11 @@ func (o VerticalScalingArgsOutput) LimitMultiplier() pulumi.Float64PtrOutput {
 // Whether to also adjust resource limits alongside requests.
 func (o VerticalScalingArgsOutput) LimitsAdjustmentEnabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *bool { return v.LimitsAdjustmentEnabled }).(pulumi.BoolPtrOutput)
+}
+
+// Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Web default: true for CPU, false for Memory.
+func (o VerticalScalingArgsOutput) LimitsRemovalEnabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v VerticalScalingArgs) *bool { return v.LimitsRemovalEnabled }).(pulumi.BoolPtrOutput)
 }
 
 // Maximum resource request in millicores (CPU) or bytes (memory/GPU).
@@ -4037,6 +4093,16 @@ func (o VerticalScalingArgsPtrOutput) Elem() VerticalScalingArgsOutput {
 	}).(VerticalScalingArgsOutput)
 }
 
+// Recommend requests even when the workload has no existing requests set. Server/web default: true.
+func (o VerticalScalingArgsPtrOutput) AdjustReqEvenIfNotSet() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *VerticalScalingArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.AdjustReqEvenIfNotSet
+	}).(pulumi.BoolPtrOutput)
+}
+
 // Enable vertical scaling for this resource type.
 func (o VerticalScalingArgsPtrOutput) Enabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *VerticalScalingArgs) *bool {
@@ -4064,6 +4130,16 @@ func (o VerticalScalingArgsPtrOutput) LimitsAdjustmentEnabled() pulumi.BoolPtrOu
 			return nil
 		}
 		return v.LimitsAdjustmentEnabled
+	}).(pulumi.BoolPtrOutput)
+}
+
+// Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Web default: true for CPU, false for Memory.
+func (o VerticalScalingArgsPtrOutput) LimitsRemovalEnabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *VerticalScalingArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.LimitsRemovalEnabled
 	}).(pulumi.BoolPtrOutput)
 }
 

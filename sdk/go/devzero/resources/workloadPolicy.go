@@ -17,7 +17,7 @@ type WorkloadPolicy struct {
 
 	// Action triggers: 'on_detection' or 'on_schedule'.
 	ActionTriggers pulumi.StringArrayOutput `pulumi:"actionTriggers"`
-	// Minutes to wait between applying recommendations.
+	// Minutes to wait between applying recommendations. Default: 300 (5 h).
 	CooldownMinutes    pulumi.IntPtrOutput          `pulumi:"cooldownMinutes"`
 	CpuVerticalScaling VerticalScalingArgsPtrOutput `pulumi:"cpuVerticalScaling"`
 	// Cron expression for scheduled application (5-field format).
@@ -29,7 +29,9 @@ type WorkloadPolicy struct {
 	// Detection triggers: 'pod_creation', 'pod_update', or 'pod_reschedule'.
 	DetectionTriggers pulumi.StringArrayOutput `pulumi:"detectionTriggers"`
 	// Percentage drift from baseline that triggers VPA refresh.
-	DriftDeltaPercent      pulumi.Float64PtrOutput        `pulumi:"driftDeltaPercent"`
+	DriftDeltaPercent pulumi.Float64PtrOutput `pulumi:"driftDeltaPercent"`
+	// Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true.
+	EnablePmaxProtection   pulumi.BoolPtrOutput           `pulumi:"enablePmaxProtection"`
 	GpuVerticalScaling     VerticalScalingArgsPtrOutput   `pulumi:"gpuVerticalScaling"`
 	GpuVramVerticalScaling VerticalScalingArgsPtrOutput   `pulumi:"gpuVramVerticalScaling"`
 	HorizontalScaling      HorizontalScalingArgsPtrOutput `pulumi:"horizontalScaling"`
@@ -37,17 +39,19 @@ type WorkloadPolicy struct {
 	HysteresisVsTarget pulumi.Float64PtrOutput `pulumi:"hysteresisVsTarget"`
 	// Allow live migration when applying recommendations.
 	LiveMigrationEnabled pulumi.BoolPtrOutput `pulumi:"liveMigrationEnabled"`
-	// Period in seconds to look back for resource usage data.
+	// Period in seconds to look back for resource usage data. Default: 86400 (24 h).
 	LoopbackPeriodSeconds pulumi.IntPtrOutput          `pulumi:"loopbackPeriodSeconds"`
 	MemoryVerticalScaling VerticalScalingArgsPtrOutput `pulumi:"memoryVerticalScaling"`
-	// Global minimum change threshold for applying recommendations.
+	// Global minimum change threshold for applying recommendations. Default: 0.2 (20%).
 	MinChangePercent pulumi.Float64PtrOutput `pulumi:"minChangePercent"`
-	// Global minimum data points required for recommendations.
+	// Global minimum data points required for recommendations. Default: 15.
 	MinDataPoints pulumi.IntPtrOutput `pulumi:"minDataPoints"`
-	// Minimum data points in VPA analysis window.
+	// Minimum data points in VPA analysis window. Default: 30.
 	MinVpaWindowDataPoints pulumi.IntPtrOutput `pulumi:"minVpaWindowDataPoints"`
 	// Human-friendly name for the policy.
 	Name pulumi.StringOutput `pulumi:"name"`
+	// Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.
+	PmaxRatioThreshold pulumi.Float64PtrOutput `pulumi:"pmaxRatioThreshold"`
 	// Kubernetes scheduler plugins to activate.
 	SchedulerPlugins pulumi.StringArrayOutput `pulumi:"schedulerPlugins"`
 	// Maximum coefficient of variation for workload to be considered stable.
@@ -65,6 +69,36 @@ func NewWorkloadPolicy(ctx *pulumi.Context,
 
 	if args.Name == nil {
 		return nil, errors.New("invalid value for required argument 'Name'")
+	}
+	if args.CooldownMinutes == nil {
+		args.CooldownMinutes = pulumi.IntPtr(300)
+	}
+	if args.CpuVerticalScaling != nil {
+		args.CpuVerticalScaling = args.CpuVerticalScaling.ToVerticalScalingArgsPtrOutput().ApplyT(func(v *VerticalScalingArgs) *VerticalScalingArgs { return v.Defaults() }).(VerticalScalingArgsPtrOutput)
+	}
+	if args.GpuVerticalScaling != nil {
+		args.GpuVerticalScaling = args.GpuVerticalScaling.ToVerticalScalingArgsPtrOutput().ApplyT(func(v *VerticalScalingArgs) *VerticalScalingArgs { return v.Defaults() }).(VerticalScalingArgsPtrOutput)
+	}
+	if args.GpuVramVerticalScaling != nil {
+		args.GpuVramVerticalScaling = args.GpuVramVerticalScaling.ToVerticalScalingArgsPtrOutput().ApplyT(func(v *VerticalScalingArgs) *VerticalScalingArgs { return v.Defaults() }).(VerticalScalingArgsPtrOutput)
+	}
+	if args.LoopbackPeriodSeconds == nil {
+		args.LoopbackPeriodSeconds = pulumi.IntPtr(86400)
+	}
+	if args.MemoryVerticalScaling != nil {
+		args.MemoryVerticalScaling = args.MemoryVerticalScaling.ToVerticalScalingArgsPtrOutput().ApplyT(func(v *VerticalScalingArgs) *VerticalScalingArgs { return v.Defaults() }).(VerticalScalingArgsPtrOutput)
+	}
+	if args.MinChangePercent == nil {
+		args.MinChangePercent = pulumi.Float64Ptr(0.2)
+	}
+	if args.MinDataPoints == nil {
+		args.MinDataPoints = pulumi.IntPtr(15)
+	}
+	if args.MinVpaWindowDataPoints == nil {
+		args.MinVpaWindowDataPoints = pulumi.IntPtr(30)
+	}
+	if args.PmaxRatioThreshold == nil {
+		args.PmaxRatioThreshold = pulumi.Float64Ptr(3.0)
 	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource WorkloadPolicy
@@ -99,54 +133,96 @@ func (WorkloadPolicyState) ElementType() reflect.Type {
 }
 
 type workloadPolicyArgs struct {
-	ActionTriggers          []string               `pulumi:"actionTriggers"`
-	CooldownMinutes         *int                   `pulumi:"cooldownMinutes"`
-	CpuVerticalScaling      *VerticalScalingArgs   `pulumi:"cpuVerticalScaling"`
-	CronSchedule            *string                `pulumi:"cronSchedule"`
-	DefragmentationSchedule *string                `pulumi:"defragmentationSchedule"`
-	Description             *string                `pulumi:"description"`
-	DetectionTriggers       []string               `pulumi:"detectionTriggers"`
-	DriftDeltaPercent       *float64               `pulumi:"driftDeltaPercent"`
-	GpuVerticalScaling      *VerticalScalingArgs   `pulumi:"gpuVerticalScaling"`
-	GpuVramVerticalScaling  *VerticalScalingArgs   `pulumi:"gpuVramVerticalScaling"`
-	HorizontalScaling       *HorizontalScalingArgs `pulumi:"horizontalScaling"`
-	HysteresisVsTarget      *float64               `pulumi:"hysteresisVsTarget"`
-	LiveMigrationEnabled    *bool                  `pulumi:"liveMigrationEnabled"`
-	LoopbackPeriodSeconds   *int                   `pulumi:"loopbackPeriodSeconds"`
-	MemoryVerticalScaling   *VerticalScalingArgs   `pulumi:"memoryVerticalScaling"`
-	MinChangePercent        *float64               `pulumi:"minChangePercent"`
-	MinDataPoints           *int                   `pulumi:"minDataPoints"`
-	MinVpaWindowDataPoints  *int                   `pulumi:"minVpaWindowDataPoints"`
-	Name                    string                 `pulumi:"name"`
-	SchedulerPlugins        []string               `pulumi:"schedulerPlugins"`
-	StabilityCvMax          *float64               `pulumi:"stabilityCvMax"`
-	StartupPeriodSeconds    *int                   `pulumi:"startupPeriodSeconds"`
+	// Action triggers: 'on_detection' or 'on_schedule'.
+	ActionTriggers []string `pulumi:"actionTriggers"`
+	// Minutes to wait between applying recommendations. Default: 300 (5 h).
+	CooldownMinutes    *int                 `pulumi:"cooldownMinutes"`
+	CpuVerticalScaling *VerticalScalingArgs `pulumi:"cpuVerticalScaling"`
+	// Cron expression for scheduled application (5-field format).
+	CronSchedule *string `pulumi:"cronSchedule"`
+	// Cron expression for background defragmentation.
+	DefragmentationSchedule *string `pulumi:"defragmentationSchedule"`
+	// Free-form description of the policy.
+	Description *string `pulumi:"description"`
+	// Detection triggers: 'pod_creation', 'pod_update', or 'pod_reschedule'.
+	DetectionTriggers []string `pulumi:"detectionTriggers"`
+	// Percentage drift from baseline that triggers VPA refresh.
+	DriftDeltaPercent *float64 `pulumi:"driftDeltaPercent"`
+	// Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true.
+	EnablePmaxProtection   *bool                  `pulumi:"enablePmaxProtection"`
+	GpuVerticalScaling     *VerticalScalingArgs   `pulumi:"gpuVerticalScaling"`
+	GpuVramVerticalScaling *VerticalScalingArgs   `pulumi:"gpuVramVerticalScaling"`
+	HorizontalScaling      *HorizontalScalingArgs `pulumi:"horizontalScaling"`
+	// Hysteresis threshold vs target for HPA coordination.
+	HysteresisVsTarget *float64 `pulumi:"hysteresisVsTarget"`
+	// Allow live migration when applying recommendations.
+	LiveMigrationEnabled *bool `pulumi:"liveMigrationEnabled"`
+	// Period in seconds to look back for resource usage data. Default: 86400 (24 h).
+	LoopbackPeriodSeconds *int                 `pulumi:"loopbackPeriodSeconds"`
+	MemoryVerticalScaling *VerticalScalingArgs `pulumi:"memoryVerticalScaling"`
+	// Global minimum change threshold for applying recommendations. Default: 0.2 (20%).
+	MinChangePercent *float64 `pulumi:"minChangePercent"`
+	// Global minimum data points required for recommendations. Default: 15.
+	MinDataPoints *int `pulumi:"minDataPoints"`
+	// Minimum data points in VPA analysis window. Default: 30.
+	MinVpaWindowDataPoints *int `pulumi:"minVpaWindowDataPoints"`
+	// Human-friendly name for the policy.
+	Name string `pulumi:"name"`
+	// Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.
+	PmaxRatioThreshold *float64 `pulumi:"pmaxRatioThreshold"`
+	// Kubernetes scheduler plugins to activate.
+	SchedulerPlugins []string `pulumi:"schedulerPlugins"`
+	// Maximum coefficient of variation for workload to be considered stable.
+	StabilityCvMax *float64 `pulumi:"stabilityCvMax"`
+	// Period in seconds to ignore usage data after workload starts.
+	StartupPeriodSeconds *int `pulumi:"startupPeriodSeconds"`
 }
 
 // The set of arguments for constructing a WorkloadPolicy resource.
 type WorkloadPolicyArgs struct {
-	ActionTriggers          pulumi.StringArrayInput
-	CooldownMinutes         pulumi.IntPtrInput
-	CpuVerticalScaling      VerticalScalingArgsPtrInput
-	CronSchedule            pulumi.StringPtrInput
+	// Action triggers: 'on_detection' or 'on_schedule'.
+	ActionTriggers pulumi.StringArrayInput
+	// Minutes to wait between applying recommendations. Default: 300 (5 h).
+	CooldownMinutes    pulumi.IntPtrInput
+	CpuVerticalScaling VerticalScalingArgsPtrInput
+	// Cron expression for scheduled application (5-field format).
+	CronSchedule pulumi.StringPtrInput
+	// Cron expression for background defragmentation.
 	DefragmentationSchedule pulumi.StringPtrInput
-	Description             pulumi.StringPtrInput
-	DetectionTriggers       pulumi.StringArrayInput
-	DriftDeltaPercent       pulumi.Float64PtrInput
-	GpuVerticalScaling      VerticalScalingArgsPtrInput
-	GpuVramVerticalScaling  VerticalScalingArgsPtrInput
-	HorizontalScaling       HorizontalScalingArgsPtrInput
-	HysteresisVsTarget      pulumi.Float64PtrInput
-	LiveMigrationEnabled    pulumi.BoolPtrInput
-	LoopbackPeriodSeconds   pulumi.IntPtrInput
-	MemoryVerticalScaling   VerticalScalingArgsPtrInput
-	MinChangePercent        pulumi.Float64PtrInput
-	MinDataPoints           pulumi.IntPtrInput
-	MinVpaWindowDataPoints  pulumi.IntPtrInput
-	Name                    pulumi.StringInput
-	SchedulerPlugins        pulumi.StringArrayInput
-	StabilityCvMax          pulumi.Float64PtrInput
-	StartupPeriodSeconds    pulumi.IntPtrInput
+	// Free-form description of the policy.
+	Description pulumi.StringPtrInput
+	// Detection triggers: 'pod_creation', 'pod_update', or 'pod_reschedule'.
+	DetectionTriggers pulumi.StringArrayInput
+	// Percentage drift from baseline that triggers VPA refresh.
+	DriftDeltaPercent pulumi.Float64PtrInput
+	// Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true.
+	EnablePmaxProtection   pulumi.BoolPtrInput
+	GpuVerticalScaling     VerticalScalingArgsPtrInput
+	GpuVramVerticalScaling VerticalScalingArgsPtrInput
+	HorizontalScaling      HorizontalScalingArgsPtrInput
+	// Hysteresis threshold vs target for HPA coordination.
+	HysteresisVsTarget pulumi.Float64PtrInput
+	// Allow live migration when applying recommendations.
+	LiveMigrationEnabled pulumi.BoolPtrInput
+	// Period in seconds to look back for resource usage data. Default: 86400 (24 h).
+	LoopbackPeriodSeconds pulumi.IntPtrInput
+	MemoryVerticalScaling VerticalScalingArgsPtrInput
+	// Global minimum change threshold for applying recommendations. Default: 0.2 (20%).
+	MinChangePercent pulumi.Float64PtrInput
+	// Global minimum data points required for recommendations. Default: 15.
+	MinDataPoints pulumi.IntPtrInput
+	// Minimum data points in VPA analysis window. Default: 30.
+	MinVpaWindowDataPoints pulumi.IntPtrInput
+	// Human-friendly name for the policy.
+	Name pulumi.StringInput
+	// Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.
+	PmaxRatioThreshold pulumi.Float64PtrInput
+	// Kubernetes scheduler plugins to activate.
+	SchedulerPlugins pulumi.StringArrayInput
+	// Maximum coefficient of variation for workload to be considered stable.
+	StabilityCvMax pulumi.Float64PtrInput
+	// Period in seconds to ignore usage data after workload starts.
+	StartupPeriodSeconds pulumi.IntPtrInput
 }
 
 func (WorkloadPolicyArgs) ElementType() reflect.Type {
@@ -241,7 +317,7 @@ func (o WorkloadPolicyOutput) ActionTriggers() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *WorkloadPolicy) pulumi.StringArrayOutput { return v.ActionTriggers }).(pulumi.StringArrayOutput)
 }
 
-// Minutes to wait between applying recommendations.
+// Minutes to wait between applying recommendations. Default: 300 (5 h).
 func (o WorkloadPolicyOutput) CooldownMinutes() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *WorkloadPolicy) pulumi.IntPtrOutput { return v.CooldownMinutes }).(pulumi.IntPtrOutput)
 }
@@ -275,6 +351,11 @@ func (o WorkloadPolicyOutput) DriftDeltaPercent() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v *WorkloadPolicy) pulumi.Float64PtrOutput { return v.DriftDeltaPercent }).(pulumi.Float64PtrOutput)
 }
 
+// Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true.
+func (o WorkloadPolicyOutput) EnablePmaxProtection() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *WorkloadPolicy) pulumi.BoolPtrOutput { return v.EnablePmaxProtection }).(pulumi.BoolPtrOutput)
+}
+
 func (o WorkloadPolicyOutput) GpuVerticalScaling() VerticalScalingArgsPtrOutput {
 	return o.ApplyT(func(v *WorkloadPolicy) VerticalScalingArgsPtrOutput { return v.GpuVerticalScaling }).(VerticalScalingArgsPtrOutput)
 }
@@ -297,7 +378,7 @@ func (o WorkloadPolicyOutput) LiveMigrationEnabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *WorkloadPolicy) pulumi.BoolPtrOutput { return v.LiveMigrationEnabled }).(pulumi.BoolPtrOutput)
 }
 
-// Period in seconds to look back for resource usage data.
+// Period in seconds to look back for resource usage data. Default: 86400 (24 h).
 func (o WorkloadPolicyOutput) LoopbackPeriodSeconds() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *WorkloadPolicy) pulumi.IntPtrOutput { return v.LoopbackPeriodSeconds }).(pulumi.IntPtrOutput)
 }
@@ -306,17 +387,17 @@ func (o WorkloadPolicyOutput) MemoryVerticalScaling() VerticalScalingArgsPtrOutp
 	return o.ApplyT(func(v *WorkloadPolicy) VerticalScalingArgsPtrOutput { return v.MemoryVerticalScaling }).(VerticalScalingArgsPtrOutput)
 }
 
-// Global minimum change threshold for applying recommendations.
+// Global minimum change threshold for applying recommendations. Default: 0.2 (20%).
 func (o WorkloadPolicyOutput) MinChangePercent() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v *WorkloadPolicy) pulumi.Float64PtrOutput { return v.MinChangePercent }).(pulumi.Float64PtrOutput)
 }
 
-// Global minimum data points required for recommendations.
+// Global minimum data points required for recommendations. Default: 15.
 func (o WorkloadPolicyOutput) MinDataPoints() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *WorkloadPolicy) pulumi.IntPtrOutput { return v.MinDataPoints }).(pulumi.IntPtrOutput)
 }
 
-// Minimum data points in VPA analysis window.
+// Minimum data points in VPA analysis window. Default: 30.
 func (o WorkloadPolicyOutput) MinVpaWindowDataPoints() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *WorkloadPolicy) pulumi.IntPtrOutput { return v.MinVpaWindowDataPoints }).(pulumi.IntPtrOutput)
 }
@@ -324,6 +405,11 @@ func (o WorkloadPolicyOutput) MinVpaWindowDataPoints() pulumi.IntPtrOutput {
 // Human-friendly name for the policy.
 func (o WorkloadPolicyOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *WorkloadPolicy) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
+}
+
+// Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.
+func (o WorkloadPolicyOutput) PmaxRatioThreshold() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *WorkloadPolicy) pulumi.Float64PtrOutput { return v.PmaxRatioThreshold }).(pulumi.Float64PtrOutput)
 }
 
 // Kubernetes scheduler plugins to activate.

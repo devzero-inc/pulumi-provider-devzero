@@ -721,6 +721,10 @@
         },
         "devzero:resources:VerticalScalingArgs": {
             "properties": {
+                "adjustReqEvenIfNotSet": {
+                    "type": "boolean",
+                    "description": "Recommend requests even when the workload has no existing requests set. Server/web default: true."
+                },
                 "enabled": {
                     "type": "boolean",
                     "description": "Enable vertical scaling for this resource type."
@@ -733,21 +737,28 @@
                     "type": "boolean",
                     "description": "Whether to also adjust resource limits alongside requests."
                 },
+                "limitsRemovalEnabled": {
+                    "type": "boolean",
+                    "description": "Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Web default: true for CPU, false for Memory."
+                },
                 "maxRequest": {
                     "type": "integer",
                     "description": "Maximum resource request in millicores (CPU) or bytes (memory/GPU)."
                 },
                 "maxScaleDownPercent": {
                     "type": "number",
-                    "description": "Maximum percentage decrease allowed in a single recommendation cycle."
+                    "description": "Maximum percentage decrease allowed in a single recommendation cycle.",
+                    "default": 1
                 },
                 "maxScaleUpPercent": {
                     "type": "number",
-                    "description": "Maximum percentage increase allowed in a single recommendation cycle."
+                    "description": "Maximum percentage increase allowed in a single recommendation cycle.",
+                    "default": 1000
                 },
                 "minDataPoints": {
                     "type": "integer",
-                    "description": "Minimum number of data points required before a recommendation is emitted."
+                    "description": "Minimum number of data points required before a recommendation is emitted.",
+                    "default": 20
                 },
                 "minRequest": {
                     "type": "integer",
@@ -1050,7 +1061,8 @@
                 },
                 "cooldownMinutes": {
                     "type": "integer",
-                    "description": "Minutes to wait between applying recommendations."
+                    "description": "Minutes to wait between applying recommendations. Default: 300 (5 h).",
+                    "default": 300
                 },
                 "cpuVerticalScaling": {
                     "$ref": "#/types/devzero:resources:VerticalScalingArgs"
@@ -1078,6 +1090,10 @@
                     "type": "number",
                     "description": "Percentage drift from baseline that triggers VPA refresh."
                 },
+                "enablePmaxProtection": {
+                    "type": "boolean",
+                    "description": "Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true."
+                },
                 "gpuVerticalScaling": {
                     "$ref": "#/types/devzero:resources:VerticalScalingArgs"
                 },
@@ -1097,26 +1113,35 @@
                 },
                 "loopbackPeriodSeconds": {
                     "type": "integer",
-                    "description": "Period in seconds to look back for resource usage data."
+                    "description": "Period in seconds to look back for resource usage data. Default: 86400 (24 h).",
+                    "default": 86400
                 },
                 "memoryVerticalScaling": {
                     "$ref": "#/types/devzero:resources:VerticalScalingArgs"
                 },
                 "minChangePercent": {
                     "type": "number",
-                    "description": "Global minimum change threshold for applying recommendations."
+                    "description": "Global minimum change threshold for applying recommendations. Default: 0.2 (20%).",
+                    "default": 0.2
                 },
                 "minDataPoints": {
                     "type": "integer",
-                    "description": "Global minimum data points required for recommendations."
+                    "description": "Global minimum data points required for recommendations. Default: 15.",
+                    "default": 15
                 },
                 "minVpaWindowDataPoints": {
                     "type": "integer",
-                    "description": "Minimum data points in VPA analysis window."
+                    "description": "Minimum data points in VPA analysis window. Default: 30.",
+                    "default": 30
                 },
                 "name": {
                     "type": "string",
                     "description": "Human-friendly name for the policy."
+                },
+                "pmaxRatioThreshold": {
+                    "type": "number",
+                    "description": "Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.",
+                    "default": 3
                 },
                 "schedulerPlugins": {
                     "type": "array",
@@ -1146,22 +1171,28 @@
                             "on_detection",
                             "on_schedule"
                         ]
-                    }
+                    },
+                    "description": "Action triggers: 'on_detection' or 'on_schedule'."
                 },
                 "cooldownMinutes": {
-                    "type": "integer"
+                    "type": "integer",
+                    "description": "Minutes to wait between applying recommendations. Default: 300 (5 h).",
+                    "default": 300
                 },
                 "cpuVerticalScaling": {
                     "$ref": "#/types/devzero:resources:VerticalScalingArgs"
                 },
                 "cronSchedule": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Cron expression for scheduled application (5-field format)."
                 },
                 "defragmentationSchedule": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Cron expression for background defragmentation."
                 },
                 "description": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Free-form description of the policy."
                 },
                 "detectionTriggers": {
                     "type": "array",
@@ -1172,10 +1203,16 @@
                             "pod_update",
                             "pod_reschedule"
                         ]
-                    }
+                    },
+                    "description": "Detection triggers: 'pod_creation', 'pod_update', or 'pod_reschedule'."
                 },
                 "driftDeltaPercent": {
-                    "type": "number"
+                    "type": "number",
+                    "description": "Percentage drift from baseline that triggers VPA refresh."
+                },
+                "enablePmaxProtection": {
+                    "type": "boolean",
+                    "description": "Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true."
                 },
                 "gpuVerticalScaling": {
                     "$ref": "#/types/devzero:resources:VerticalScalingArgs"
@@ -1187,40 +1224,59 @@
                     "$ref": "#/types/devzero:resources:HorizontalScalingArgs"
                 },
                 "hysteresisVsTarget": {
-                    "type": "number"
+                    "type": "number",
+                    "description": "Hysteresis threshold vs target for HPA coordination."
                 },
                 "liveMigrationEnabled": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "description": "Allow live migration when applying recommendations."
                 },
                 "loopbackPeriodSeconds": {
-                    "type": "integer"
+                    "type": "integer",
+                    "description": "Period in seconds to look back for resource usage data. Default: 86400 (24 h).",
+                    "default": 86400
                 },
                 "memoryVerticalScaling": {
                     "$ref": "#/types/devzero:resources:VerticalScalingArgs"
                 },
                 "minChangePercent": {
-                    "type": "number"
+                    "type": "number",
+                    "description": "Global minimum change threshold for applying recommendations. Default: 0.2 (20%).",
+                    "default": 0.2
                 },
                 "minDataPoints": {
-                    "type": "integer"
+                    "type": "integer",
+                    "description": "Global minimum data points required for recommendations. Default: 15.",
+                    "default": 15
                 },
                 "minVpaWindowDataPoints": {
-                    "type": "integer"
+                    "type": "integer",
+                    "description": "Minimum data points in VPA analysis window. Default: 30.",
+                    "default": 30
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Human-friendly name for the policy."
+                },
+                "pmaxRatioThreshold": {
+                    "type": "number",
+                    "description": "Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.",
+                    "default": 3
                 },
                 "schedulerPlugins": {
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "description": "Kubernetes scheduler plugins to activate."
                 },
                 "stabilityCvMax": {
-                    "type": "number"
+                    "type": "number",
+                    "description": "Maximum coefficient of variation for workload to be considered stable."
                 },
                 "startupPeriodSeconds": {
-                    "type": "integer"
+                    "type": "integer",
+                    "description": "Period in seconds to ignore usage data after workload starts."
                 }
             },
             "requiredInputs": [

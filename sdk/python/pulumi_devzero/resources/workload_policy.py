@@ -30,6 +30,7 @@ class WorkloadPolicyArgs:
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  detection_triggers: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  drift_delta_percent: Optional[pulumi.Input[_builtins.float]] = None,
+                 enable_pmax_protection: Optional[pulumi.Input[_builtins.bool]] = None,
                  gpu_vertical_scaling: Optional[pulumi.Input['VerticalScalingArgsArgs']] = None,
                  gpu_vram_vertical_scaling: Optional[pulumi.Input['VerticalScalingArgsArgs']] = None,
                  horizontal_scaling: Optional[pulumi.Input['HorizontalScalingArgsArgs']] = None,
@@ -40,15 +41,38 @@ class WorkloadPolicyArgs:
                  min_change_percent: Optional[pulumi.Input[_builtins.float]] = None,
                  min_data_points: Optional[pulumi.Input[_builtins.int]] = None,
                  min_vpa_window_data_points: Optional[pulumi.Input[_builtins.int]] = None,
+                 pmax_ratio_threshold: Optional[pulumi.Input[_builtins.float]] = None,
                  scheduler_plugins: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  stability_cv_max: Optional[pulumi.Input[_builtins.float]] = None,
                  startup_period_seconds: Optional[pulumi.Input[_builtins.int]] = None):
         """
         The set of arguments for constructing a WorkloadPolicy resource.
+
+        :param pulumi.Input[_builtins.str] name: Human-friendly name for the policy.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] action_triggers: Action triggers: 'on_detection' or 'on_schedule'.
+        :param pulumi.Input[_builtins.int] cooldown_minutes: Minutes to wait between applying recommendations. Default: 300 (5 h).
+        :param pulumi.Input[_builtins.str] cron_schedule: Cron expression for scheduled application (5-field format).
+        :param pulumi.Input[_builtins.str] defragmentation_schedule: Cron expression for background defragmentation.
+        :param pulumi.Input[_builtins.str] description: Free-form description of the policy.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] detection_triggers: Detection triggers: 'pod_creation', 'pod_update', or 'pod_reschedule'.
+        :param pulumi.Input[_builtins.float] drift_delta_percent: Percentage drift from baseline that triggers VPA refresh.
+        :param pulumi.Input[_builtins.bool] enable_pmax_protection: Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true.
+        :param pulumi.Input[_builtins.float] hysteresis_vs_target: Hysteresis threshold vs target for HPA coordination.
+        :param pulumi.Input[_builtins.bool] live_migration_enabled: Allow live migration when applying recommendations.
+        :param pulumi.Input[_builtins.int] loopback_period_seconds: Period in seconds to look back for resource usage data. Default: 86400 (24 h).
+        :param pulumi.Input[_builtins.float] min_change_percent: Global minimum change threshold for applying recommendations. Default: 0.2 (20%).
+        :param pulumi.Input[_builtins.int] min_data_points: Global minimum data points required for recommendations. Default: 15.
+        :param pulumi.Input[_builtins.int] min_vpa_window_data_points: Minimum data points in VPA analysis window. Default: 30.
+        :param pulumi.Input[_builtins.float] pmax_ratio_threshold: Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] scheduler_plugins: Kubernetes scheduler plugins to activate.
+        :param pulumi.Input[_builtins.float] stability_cv_max: Maximum coefficient of variation for workload to be considered stable.
+        :param pulumi.Input[_builtins.int] startup_period_seconds: Period in seconds to ignore usage data after workload starts.
         """
         pulumi.set(__self__, "name", name)
         if action_triggers is not None:
             pulumi.set(__self__, "action_triggers", action_triggers)
+        if cooldown_minutes is None:
+            cooldown_minutes = 300
         if cooldown_minutes is not None:
             pulumi.set(__self__, "cooldown_minutes", cooldown_minutes)
         if cpu_vertical_scaling is not None:
@@ -63,6 +87,8 @@ class WorkloadPolicyArgs:
             pulumi.set(__self__, "detection_triggers", detection_triggers)
         if drift_delta_percent is not None:
             pulumi.set(__self__, "drift_delta_percent", drift_delta_percent)
+        if enable_pmax_protection is not None:
+            pulumi.set(__self__, "enable_pmax_protection", enable_pmax_protection)
         if gpu_vertical_scaling is not None:
             pulumi.set(__self__, "gpu_vertical_scaling", gpu_vertical_scaling)
         if gpu_vram_vertical_scaling is not None:
@@ -73,16 +99,28 @@ class WorkloadPolicyArgs:
             pulumi.set(__self__, "hysteresis_vs_target", hysteresis_vs_target)
         if live_migration_enabled is not None:
             pulumi.set(__self__, "live_migration_enabled", live_migration_enabled)
+        if loopback_period_seconds is None:
+            loopback_period_seconds = 86400
         if loopback_period_seconds is not None:
             pulumi.set(__self__, "loopback_period_seconds", loopback_period_seconds)
         if memory_vertical_scaling is not None:
             pulumi.set(__self__, "memory_vertical_scaling", memory_vertical_scaling)
+        if min_change_percent is None:
+            min_change_percent = 0.2
         if min_change_percent is not None:
             pulumi.set(__self__, "min_change_percent", min_change_percent)
+        if min_data_points is None:
+            min_data_points = 15
         if min_data_points is not None:
             pulumi.set(__self__, "min_data_points", min_data_points)
+        if min_vpa_window_data_points is None:
+            min_vpa_window_data_points = 30
         if min_vpa_window_data_points is not None:
             pulumi.set(__self__, "min_vpa_window_data_points", min_vpa_window_data_points)
+        if pmax_ratio_threshold is None:
+            pmax_ratio_threshold = 3
+        if pmax_ratio_threshold is not None:
+            pulumi.set(__self__, "pmax_ratio_threshold", pmax_ratio_threshold)
         if scheduler_plugins is not None:
             pulumi.set(__self__, "scheduler_plugins", scheduler_plugins)
         if stability_cv_max is not None:
@@ -93,6 +131,9 @@ class WorkloadPolicyArgs:
     @_builtins.property
     @pulumi.getter
     def name(self) -> pulumi.Input[_builtins.str]:
+        """
+        Human-friendly name for the policy.
+        """
         return pulumi.get(self, "name")
 
     @name.setter
@@ -102,6 +143,9 @@ class WorkloadPolicyArgs:
     @_builtins.property
     @pulumi.getter(name="actionTriggers")
     def action_triggers(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+        """
+        Action triggers: 'on_detection' or 'on_schedule'.
+        """
         return pulumi.get(self, "action_triggers")
 
     @action_triggers.setter
@@ -111,6 +155,9 @@ class WorkloadPolicyArgs:
     @_builtins.property
     @pulumi.getter(name="cooldownMinutes")
     def cooldown_minutes(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Minutes to wait between applying recommendations. Default: 300 (5 h).
+        """
         return pulumi.get(self, "cooldown_minutes")
 
     @cooldown_minutes.setter
@@ -129,6 +176,9 @@ class WorkloadPolicyArgs:
     @_builtins.property
     @pulumi.getter(name="cronSchedule")
     def cron_schedule(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Cron expression for scheduled application (5-field format).
+        """
         return pulumi.get(self, "cron_schedule")
 
     @cron_schedule.setter
@@ -138,6 +188,9 @@ class WorkloadPolicyArgs:
     @_builtins.property
     @pulumi.getter(name="defragmentationSchedule")
     def defragmentation_schedule(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Cron expression for background defragmentation.
+        """
         return pulumi.get(self, "defragmentation_schedule")
 
     @defragmentation_schedule.setter
@@ -147,6 +200,9 @@ class WorkloadPolicyArgs:
     @_builtins.property
     @pulumi.getter
     def description(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Free-form description of the policy.
+        """
         return pulumi.get(self, "description")
 
     @description.setter
@@ -156,6 +212,9 @@ class WorkloadPolicyArgs:
     @_builtins.property
     @pulumi.getter(name="detectionTriggers")
     def detection_triggers(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+        """
+        Detection triggers: 'pod_creation', 'pod_update', or 'pod_reschedule'.
+        """
         return pulumi.get(self, "detection_triggers")
 
     @detection_triggers.setter
@@ -165,11 +224,26 @@ class WorkloadPolicyArgs:
     @_builtins.property
     @pulumi.getter(name="driftDeltaPercent")
     def drift_delta_percent(self) -> Optional[pulumi.Input[_builtins.float]]:
+        """
+        Percentage drift from baseline that triggers VPA refresh.
+        """
         return pulumi.get(self, "drift_delta_percent")
 
     @drift_delta_percent.setter
     def drift_delta_percent(self, value: Optional[pulumi.Input[_builtins.float]]):
         pulumi.set(self, "drift_delta_percent", value)
+
+    @_builtins.property
+    @pulumi.getter(name="enablePmaxProtection")
+    def enable_pmax_protection(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true.
+        """
+        return pulumi.get(self, "enable_pmax_protection")
+
+    @enable_pmax_protection.setter
+    def enable_pmax_protection(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "enable_pmax_protection", value)
 
     @_builtins.property
     @pulumi.getter(name="gpuVerticalScaling")
@@ -201,6 +275,9 @@ class WorkloadPolicyArgs:
     @_builtins.property
     @pulumi.getter(name="hysteresisVsTarget")
     def hysteresis_vs_target(self) -> Optional[pulumi.Input[_builtins.float]]:
+        """
+        Hysteresis threshold vs target for HPA coordination.
+        """
         return pulumi.get(self, "hysteresis_vs_target")
 
     @hysteresis_vs_target.setter
@@ -210,6 +287,9 @@ class WorkloadPolicyArgs:
     @_builtins.property
     @pulumi.getter(name="liveMigrationEnabled")
     def live_migration_enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Allow live migration when applying recommendations.
+        """
         return pulumi.get(self, "live_migration_enabled")
 
     @live_migration_enabled.setter
@@ -219,6 +299,9 @@ class WorkloadPolicyArgs:
     @_builtins.property
     @pulumi.getter(name="loopbackPeriodSeconds")
     def loopback_period_seconds(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Period in seconds to look back for resource usage data. Default: 86400 (24 h).
+        """
         return pulumi.get(self, "loopback_period_seconds")
 
     @loopback_period_seconds.setter
@@ -237,6 +320,9 @@ class WorkloadPolicyArgs:
     @_builtins.property
     @pulumi.getter(name="minChangePercent")
     def min_change_percent(self) -> Optional[pulumi.Input[_builtins.float]]:
+        """
+        Global minimum change threshold for applying recommendations. Default: 0.2 (20%).
+        """
         return pulumi.get(self, "min_change_percent")
 
     @min_change_percent.setter
@@ -246,6 +332,9 @@ class WorkloadPolicyArgs:
     @_builtins.property
     @pulumi.getter(name="minDataPoints")
     def min_data_points(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Global minimum data points required for recommendations. Default: 15.
+        """
         return pulumi.get(self, "min_data_points")
 
     @min_data_points.setter
@@ -255,6 +344,9 @@ class WorkloadPolicyArgs:
     @_builtins.property
     @pulumi.getter(name="minVpaWindowDataPoints")
     def min_vpa_window_data_points(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Minimum data points in VPA analysis window. Default: 30.
+        """
         return pulumi.get(self, "min_vpa_window_data_points")
 
     @min_vpa_window_data_points.setter
@@ -262,8 +354,23 @@ class WorkloadPolicyArgs:
         pulumi.set(self, "min_vpa_window_data_points", value)
 
     @_builtins.property
+    @pulumi.getter(name="pmaxRatioThreshold")
+    def pmax_ratio_threshold(self) -> Optional[pulumi.Input[_builtins.float]]:
+        """
+        Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.
+        """
+        return pulumi.get(self, "pmax_ratio_threshold")
+
+    @pmax_ratio_threshold.setter
+    def pmax_ratio_threshold(self, value: Optional[pulumi.Input[_builtins.float]]):
+        pulumi.set(self, "pmax_ratio_threshold", value)
+
+    @_builtins.property
     @pulumi.getter(name="schedulerPlugins")
     def scheduler_plugins(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+        """
+        Kubernetes scheduler plugins to activate.
+        """
         return pulumi.get(self, "scheduler_plugins")
 
     @scheduler_plugins.setter
@@ -273,6 +380,9 @@ class WorkloadPolicyArgs:
     @_builtins.property
     @pulumi.getter(name="stabilityCvMax")
     def stability_cv_max(self) -> Optional[pulumi.Input[_builtins.float]]:
+        """
+        Maximum coefficient of variation for workload to be considered stable.
+        """
         return pulumi.get(self, "stability_cv_max")
 
     @stability_cv_max.setter
@@ -282,6 +392,9 @@ class WorkloadPolicyArgs:
     @_builtins.property
     @pulumi.getter(name="startupPeriodSeconds")
     def startup_period_seconds(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Period in seconds to ignore usage data after workload starts.
+        """
         return pulumi.get(self, "startup_period_seconds")
 
     @startup_period_seconds.setter
@@ -303,6 +416,7 @@ class WorkloadPolicy(pulumi.CustomResource):
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  detection_triggers: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  drift_delta_percent: Optional[pulumi.Input[_builtins.float]] = None,
+                 enable_pmax_protection: Optional[pulumi.Input[_builtins.bool]] = None,
                  gpu_vertical_scaling: Optional[pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']]] = None,
                  gpu_vram_vertical_scaling: Optional[pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']]] = None,
                  horizontal_scaling: Optional[pulumi.Input[Union['HorizontalScalingArgsArgs', 'HorizontalScalingArgsArgsDict']]] = None,
@@ -314,6 +428,7 @@ class WorkloadPolicy(pulumi.CustomResource):
                  min_data_points: Optional[pulumi.Input[_builtins.int]] = None,
                  min_vpa_window_data_points: Optional[pulumi.Input[_builtins.int]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
+                 pmax_ratio_threshold: Optional[pulumi.Input[_builtins.float]] = None,
                  scheduler_plugins: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  stability_cv_max: Optional[pulumi.Input[_builtins.float]] = None,
                  startup_period_seconds: Optional[pulumi.Input[_builtins.int]] = None,
@@ -323,6 +438,25 @@ class WorkloadPolicy(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] action_triggers: Action triggers: 'on_detection' or 'on_schedule'.
+        :param pulumi.Input[_builtins.int] cooldown_minutes: Minutes to wait between applying recommendations. Default: 300 (5 h).
+        :param pulumi.Input[_builtins.str] cron_schedule: Cron expression for scheduled application (5-field format).
+        :param pulumi.Input[_builtins.str] defragmentation_schedule: Cron expression for background defragmentation.
+        :param pulumi.Input[_builtins.str] description: Free-form description of the policy.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] detection_triggers: Detection triggers: 'pod_creation', 'pod_update', or 'pod_reschedule'.
+        :param pulumi.Input[_builtins.float] drift_delta_percent: Percentage drift from baseline that triggers VPA refresh.
+        :param pulumi.Input[_builtins.bool] enable_pmax_protection: Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true.
+        :param pulumi.Input[_builtins.float] hysteresis_vs_target: Hysteresis threshold vs target for HPA coordination.
+        :param pulumi.Input[_builtins.bool] live_migration_enabled: Allow live migration when applying recommendations.
+        :param pulumi.Input[_builtins.int] loopback_period_seconds: Period in seconds to look back for resource usage data. Default: 86400 (24 h).
+        :param pulumi.Input[_builtins.float] min_change_percent: Global minimum change threshold for applying recommendations. Default: 0.2 (20%).
+        :param pulumi.Input[_builtins.int] min_data_points: Global minimum data points required for recommendations. Default: 15.
+        :param pulumi.Input[_builtins.int] min_vpa_window_data_points: Minimum data points in VPA analysis window. Default: 30.
+        :param pulumi.Input[_builtins.str] name: Human-friendly name for the policy.
+        :param pulumi.Input[_builtins.float] pmax_ratio_threshold: Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] scheduler_plugins: Kubernetes scheduler plugins to activate.
+        :param pulumi.Input[_builtins.float] stability_cv_max: Maximum coefficient of variation for workload to be considered stable.
+        :param pulumi.Input[_builtins.int] startup_period_seconds: Period in seconds to ignore usage data after workload starts.
         """
         ...
     @overload
@@ -356,6 +490,7 @@ class WorkloadPolicy(pulumi.CustomResource):
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  detection_triggers: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  drift_delta_percent: Optional[pulumi.Input[_builtins.float]] = None,
+                 enable_pmax_protection: Optional[pulumi.Input[_builtins.bool]] = None,
                  gpu_vertical_scaling: Optional[pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']]] = None,
                  gpu_vram_vertical_scaling: Optional[pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']]] = None,
                  horizontal_scaling: Optional[pulumi.Input[Union['HorizontalScalingArgsArgs', 'HorizontalScalingArgsArgsDict']]] = None,
@@ -367,6 +502,7 @@ class WorkloadPolicy(pulumi.CustomResource):
                  min_data_points: Optional[pulumi.Input[_builtins.int]] = None,
                  min_vpa_window_data_points: Optional[pulumi.Input[_builtins.int]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
+                 pmax_ratio_threshold: Optional[pulumi.Input[_builtins.float]] = None,
                  scheduler_plugins: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  stability_cv_max: Optional[pulumi.Input[_builtins.float]] = None,
                  startup_period_seconds: Optional[pulumi.Input[_builtins.int]] = None,
@@ -380,6 +516,8 @@ class WorkloadPolicy(pulumi.CustomResource):
             __props__ = WorkloadPolicyArgs.__new__(WorkloadPolicyArgs)
 
             __props__.__dict__["action_triggers"] = action_triggers
+            if cooldown_minutes is None:
+                cooldown_minutes = 300
             __props__.__dict__["cooldown_minutes"] = cooldown_minutes
             __props__.__dict__["cpu_vertical_scaling"] = cpu_vertical_scaling
             __props__.__dict__["cron_schedule"] = cron_schedule
@@ -387,19 +525,31 @@ class WorkloadPolicy(pulumi.CustomResource):
             __props__.__dict__["description"] = description
             __props__.__dict__["detection_triggers"] = detection_triggers
             __props__.__dict__["drift_delta_percent"] = drift_delta_percent
+            __props__.__dict__["enable_pmax_protection"] = enable_pmax_protection
             __props__.__dict__["gpu_vertical_scaling"] = gpu_vertical_scaling
             __props__.__dict__["gpu_vram_vertical_scaling"] = gpu_vram_vertical_scaling
             __props__.__dict__["horizontal_scaling"] = horizontal_scaling
             __props__.__dict__["hysteresis_vs_target"] = hysteresis_vs_target
             __props__.__dict__["live_migration_enabled"] = live_migration_enabled
+            if loopback_period_seconds is None:
+                loopback_period_seconds = 86400
             __props__.__dict__["loopback_period_seconds"] = loopback_period_seconds
             __props__.__dict__["memory_vertical_scaling"] = memory_vertical_scaling
+            if min_change_percent is None:
+                min_change_percent = 0.2
             __props__.__dict__["min_change_percent"] = min_change_percent
+            if min_data_points is None:
+                min_data_points = 15
             __props__.__dict__["min_data_points"] = min_data_points
+            if min_vpa_window_data_points is None:
+                min_vpa_window_data_points = 30
             __props__.__dict__["min_vpa_window_data_points"] = min_vpa_window_data_points
             if name is None and not opts.urn:
                 raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
+            if pmax_ratio_threshold is None:
+                pmax_ratio_threshold = 3
+            __props__.__dict__["pmax_ratio_threshold"] = pmax_ratio_threshold
             __props__.__dict__["scheduler_plugins"] = scheduler_plugins
             __props__.__dict__["stability_cv_max"] = stability_cv_max
             __props__.__dict__["startup_period_seconds"] = startup_period_seconds
@@ -433,6 +583,7 @@ class WorkloadPolicy(pulumi.CustomResource):
         __props__.__dict__["description"] = None
         __props__.__dict__["detection_triggers"] = None
         __props__.__dict__["drift_delta_percent"] = None
+        __props__.__dict__["enable_pmax_protection"] = None
         __props__.__dict__["gpu_vertical_scaling"] = None
         __props__.__dict__["gpu_vram_vertical_scaling"] = None
         __props__.__dict__["horizontal_scaling"] = None
@@ -444,6 +595,7 @@ class WorkloadPolicy(pulumi.CustomResource):
         __props__.__dict__["min_data_points"] = None
         __props__.__dict__["min_vpa_window_data_points"] = None
         __props__.__dict__["name"] = None
+        __props__.__dict__["pmax_ratio_threshold"] = None
         __props__.__dict__["scheduler_plugins"] = None
         __props__.__dict__["stability_cv_max"] = None
         __props__.__dict__["startup_period_seconds"] = None
@@ -461,7 +613,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="cooldownMinutes")
     def cooldown_minutes(self) -> pulumi.Output[Optional[_builtins.int]]:
         """
-        Minutes to wait between applying recommendations.
+        Minutes to wait between applying recommendations. Default: 300 (5 h).
         """
         return pulumi.get(self, "cooldown_minutes")
 
@@ -511,6 +663,14 @@ class WorkloadPolicy(pulumi.CustomResource):
         return pulumi.get(self, "drift_delta_percent")
 
     @_builtins.property
+    @pulumi.getter(name="enablePmaxProtection")
+    def enable_pmax_protection(self) -> pulumi.Output[Optional[_builtins.bool]]:
+        """
+        Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true.
+        """
+        return pulumi.get(self, "enable_pmax_protection")
+
+    @_builtins.property
     @pulumi.getter(name="gpuVerticalScaling")
     def gpu_vertical_scaling(self) -> pulumi.Output[Optional['outputs.VerticalScalingArgs']]:
         return pulumi.get(self, "gpu_vertical_scaling")
@@ -545,7 +705,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="loopbackPeriodSeconds")
     def loopback_period_seconds(self) -> pulumi.Output[Optional[_builtins.int]]:
         """
-        Period in seconds to look back for resource usage data.
+        Period in seconds to look back for resource usage data. Default: 86400 (24 h).
         """
         return pulumi.get(self, "loopback_period_seconds")
 
@@ -558,7 +718,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="minChangePercent")
     def min_change_percent(self) -> pulumi.Output[Optional[_builtins.float]]:
         """
-        Global minimum change threshold for applying recommendations.
+        Global minimum change threshold for applying recommendations. Default: 0.2 (20%).
         """
         return pulumi.get(self, "min_change_percent")
 
@@ -566,7 +726,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="minDataPoints")
     def min_data_points(self) -> pulumi.Output[Optional[_builtins.int]]:
         """
-        Global minimum data points required for recommendations.
+        Global minimum data points required for recommendations. Default: 15.
         """
         return pulumi.get(self, "min_data_points")
 
@@ -574,7 +734,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="minVpaWindowDataPoints")
     def min_vpa_window_data_points(self) -> pulumi.Output[Optional[_builtins.int]]:
         """
-        Minimum data points in VPA analysis window.
+        Minimum data points in VPA analysis window. Default: 30.
         """
         return pulumi.get(self, "min_vpa_window_data_points")
 
@@ -585,6 +745,14 @@ class WorkloadPolicy(pulumi.CustomResource):
         Human-friendly name for the policy.
         """
         return pulumi.get(self, "name")
+
+    @_builtins.property
+    @pulumi.getter(name="pmaxRatioThreshold")
+    def pmax_ratio_threshold(self) -> pulumi.Output[Optional[_builtins.float]]:
+        """
+        Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.
+        """
+        return pulumi.get(self, "pmax_ratio_threshold")
 
     @_builtins.property
     @pulumi.getter(name="schedulerPlugins")
