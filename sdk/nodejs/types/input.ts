@@ -5,6 +5,8 @@ import * as pulumi from "@pulumi/pulumi";
 import * as inputs from "../types/input";
 import * as outputs from "../types/output";
 
+import * as utilities from "../utilities";
+
 export namespace resources {
     export interface AMISelectorTermArgsArgs {
         /**
@@ -492,6 +494,10 @@ export namespace resources {
 
     export interface VerticalScalingArgsArgs {
         /**
+         * Recommend requests even when the workload has no existing requests set. Server/web default: true.
+         */
+        adjustReqEvenIfNotSet?: pulumi.Input<boolean>;
+        /**
          * Enable vertical scaling for this resource type.
          */
         enabled?: pulumi.Input<boolean>;
@@ -503,6 +509,10 @@ export namespace resources {
          * Whether to also adjust resource limits alongside requests.
          */
         limitsAdjustmentEnabled?: pulumi.Input<boolean>;
+        /**
+         * Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Web default: true for CPU, false for Memory.
+         */
+        limitsRemovalEnabled?: pulumi.Input<boolean>;
         /**
          * Maximum resource request in millicores (CPU) or bytes (memory/GPU).
          */
@@ -531,5 +541,16 @@ export namespace resources {
          * Percentile of usage data used as the recommendation target (e.g. 0.95).
          */
         targetPercentile?: pulumi.Input<number>;
+    }
+    /**
+     * verticalScalingArgsArgsProvideDefaults sets the appropriate defaults for VerticalScalingArgsArgs
+     */
+    export function verticalScalingArgsArgsProvideDefaults(val: VerticalScalingArgsArgs): VerticalScalingArgsArgs {
+        return {
+            ...val,
+            maxScaleDownPercent: (val.maxScaleDownPercent) ?? 1,
+            maxScaleUpPercent: (val.maxScaleUpPercent) ?? 1000,
+            minDataPoints: (val.minDataPoints) ?? 20,
+        };
     }
 }

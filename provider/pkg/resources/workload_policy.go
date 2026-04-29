@@ -23,6 +23,8 @@ type VerticalScalingArgs struct {
 	LimitsAdjustmentEnabled *bool    `pulumi:"limitsAdjustmentEnabled,optional"`
 	LimitMultiplier         *float64 `pulumi:"limitMultiplier,optional"`
 	MinDataPoints           *int     `pulumi:"minDataPoints,optional"`
+	AdjustReqEvenIfNotSet   *bool    `pulumi:"adjustReqEvenIfNotSet,optional"`
+	LimitsRemovalEnabled    *bool    `pulumi:"limitsRemovalEnabled,optional"`
 }
 
 // Annotate provides SDK documentation for VerticalScalingArgs fields.
@@ -37,6 +39,12 @@ func (v *VerticalScalingArgs) Annotate(a infer.Annotator) {
 	a.Describe(&v.LimitsAdjustmentEnabled, "Whether to also adjust resource limits alongside requests.")
 	a.Describe(&v.LimitMultiplier, "Multiplier applied to the request to derive the resource limit.")
 	a.Describe(&v.MinDataPoints, "Minimum number of data points required before a recommendation is emitted.")
+	a.Describe(&v.AdjustReqEvenIfNotSet, "Recommend requests even when the workload has no existing requests set. Server/web default: true.")
+	a.Describe(&v.LimitsRemovalEnabled, "Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Web default: true for CPU, false for Memory.")
+
+	a.SetDefault(&v.MinDataPoints, 20)
+	a.SetDefault(&v.MaxScaleUpPercent, 1000.0)
+	a.SetDefault(&v.MaxScaleDownPercent, 1.0)
 }
 
 // HorizontalScalingArgs configures horizontal (replica) scaling.
@@ -85,32 +93,43 @@ type WorkloadPolicyArgs struct {
 	DriftDeltaPercent       *float64               `pulumi:"driftDeltaPercent,optional"`
 	MinVpaWindowDataPoints  *int                   `pulumi:"minVpaWindowDataPoints,optional"`
 	CooldownMinutes         *int                   `pulumi:"cooldownMinutes,optional"`
+	EnablePmaxProtection    *bool                  `pulumi:"enablePmaxProtection,optional"`
+	PmaxRatioThreshold      *float64               `pulumi:"pmaxRatioThreshold,optional"`
+}
+
+// Annotate provides SDK documentation and default values for WorkloadPolicyArgs fields.
+// Placed on Args (not State) so that inputProperties in the schema pick up defaults.
+func (a *WorkloadPolicyArgs) Annotate(ann infer.Annotator) {
+	ann.Describe(&a.Name, "Human-friendly name for the policy.")
+	ann.Describe(&a.Description, "Free-form description of the policy.")
+	ann.Describe(&a.ActionTriggers, "Action triggers: 'on_detection' or 'on_schedule'.")
+	ann.Describe(&a.CronSchedule, "Cron expression for scheduled application (5-field format).")
+	ann.Describe(&a.DetectionTriggers, "Detection triggers: 'pod_creation', 'pod_update', or 'pod_reschedule'.")
+	ann.Describe(&a.LoopbackPeriodSeconds, "Period in seconds to look back for resource usage data. Default: 86400 (24 h).")
+	ann.Describe(&a.StartupPeriodSeconds, "Period in seconds to ignore usage data after workload starts.")
+	ann.Describe(&a.LiveMigrationEnabled, "Allow live migration when applying recommendations.")
+	ann.Describe(&a.SchedulerPlugins, "Kubernetes scheduler plugins to activate.")
+	ann.Describe(&a.DefragmentationSchedule, "Cron expression for background defragmentation.")
+	ann.Describe(&a.MinChangePercent, "Global minimum change threshold for applying recommendations. Default: 0.2 (20%).")
+	ann.Describe(&a.MinDataPoints, "Global minimum data points required for recommendations. Default: 15.")
+	ann.Describe(&a.StabilityCvMax, "Maximum coefficient of variation for workload to be considered stable.")
+	ann.Describe(&a.HysteresisVsTarget, "Hysteresis threshold vs target for HPA coordination.")
+	ann.Describe(&a.DriftDeltaPercent, "Percentage drift from baseline that triggers VPA refresh.")
+	ann.Describe(&a.MinVpaWindowDataPoints, "Minimum data points in VPA analysis window. Default: 30.")
+	ann.Describe(&a.CooldownMinutes, "Minutes to wait between applying recommendations. Default: 300 (5 h).")
+	ann.Describe(&a.EnablePmaxProtection, "Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true.")
+	ann.Describe(&a.PmaxRatioThreshold, "Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.")
+	ann.SetDefault(&a.PmaxRatioThreshold, 3.0)
+	ann.SetDefault(&a.LoopbackPeriodSeconds, 86400)
+	ann.SetDefault(&a.MinDataPoints, 15)
+	ann.SetDefault(&a.MinChangePercent, 0.2)
+	ann.SetDefault(&a.MinVpaWindowDataPoints, 30)
+	ann.SetDefault(&a.CooldownMinutes, 300)
 }
 
 // WorkloadPolicyState is the full persisted state (identical to args — no additional computed fields).
 type WorkloadPolicyState struct {
 	WorkloadPolicyArgs
-}
-
-// Annotate provides SDK documentation for WorkloadPolicy fields.
-func (s *WorkloadPolicyState) Annotate(a infer.Annotator) {
-	a.Describe(&s.Name, "Human-friendly name for the policy.")
-	a.Describe(&s.Description, "Free-form description of the policy.")
-	a.Describe(&s.ActionTriggers, "Action triggers: 'on_detection' or 'on_schedule'.")
-	a.Describe(&s.CronSchedule, "Cron expression for scheduled application (5-field format).")
-	a.Describe(&s.DetectionTriggers, "Detection triggers: 'pod_creation', 'pod_update', or 'pod_reschedule'.")
-	a.Describe(&s.LoopbackPeriodSeconds, "Period in seconds to look back for resource usage data.")
-	a.Describe(&s.StartupPeriodSeconds, "Period in seconds to ignore usage data after workload starts.")
-	a.Describe(&s.LiveMigrationEnabled, "Allow live migration when applying recommendations.")
-	a.Describe(&s.SchedulerPlugins, "Kubernetes scheduler plugins to activate.")
-	a.Describe(&s.DefragmentationSchedule, "Cron expression for background defragmentation.")
-	a.Describe(&s.MinChangePercent, "Global minimum change threshold for applying recommendations.")
-	a.Describe(&s.MinDataPoints, "Global minimum data points required for recommendations.")
-	a.Describe(&s.StabilityCvMax, "Maximum coefficient of variation for workload to be considered stable.")
-	a.Describe(&s.HysteresisVsTarget, "Hysteresis threshold vs target for HPA coordination.")
-	a.Describe(&s.DriftDeltaPercent, "Percentage drift from baseline that triggers VPA refresh.")
-	a.Describe(&s.MinVpaWindowDataPoints, "Minimum data points in VPA analysis window.")
-	a.Describe(&s.CooldownMinutes, "Minutes to wait between applying recommendations.")
 }
 
 // WorkloadPolicy is the resource implementation.
@@ -277,6 +296,13 @@ func argsToProto(teamID, policyID string, a WorkloadPolicyArgs) *apiv1.WorkloadR
 		v := int32(*a.CooldownMinutes)
 		p.CooldownMinutes = &v
 	}
+	if a.EnablePmaxProtection != nil {
+		p.EnablePmaxProtection = *a.EnablePmaxProtection
+	}
+	if a.PmaxRatioThreshold != nil {
+		v := float32(*a.PmaxRatioThreshold)
+		p.PmaxRatioThreshold = &v
+	}
 	return p
 }
 
@@ -337,6 +363,12 @@ func protoToArgs(p *apiv1.WorkloadRecommendationPolicy) WorkloadPolicyArgs {
 	if p.CooldownMinutes != nil {
 		v := int(*p.CooldownMinutes)
 		a.CooldownMinutes = &v
+	}
+	v := p.EnablePmaxProtection
+	a.EnablePmaxProtection = &v
+	if p.PmaxRatioThreshold != nil {
+		v := float64(*p.PmaxRatioThreshold)
+		a.PmaxRatioThreshold = &v
 	}
 	return a
 }
@@ -445,6 +477,12 @@ func verticalScalingToProto(v *VerticalScalingArgs) *apiv1.VerticalScalingOptimi
 		x := int32(*v.MinDataPoints)
 		t.MinDataPoints = &x
 	}
+	if v.AdjustReqEvenIfNotSet != nil {
+		t.AdjustReqEvenIfNotSet = *v.AdjustReqEvenIfNotSet
+	}
+	if v.LimitsRemovalEnabled != nil {
+		t.LimitsRemovalEnabled = *v.LimitsRemovalEnabled
+	}
 	return t
 }
 
@@ -490,6 +528,10 @@ func verticalScalingFromProto(t *apiv1.VerticalScalingOptimizationTarget) *Verti
 		x := int(*t.MinDataPoints)
 		v.MinDataPoints = &x
 	}
+	adj := t.AdjustReqEvenIfNotSet
+	v.AdjustReqEvenIfNotSet = &adj
+	lre := t.LimitsRemovalEnabled
+	v.LimitsRemovalEnabled = &lre
 	return v
 }
 
