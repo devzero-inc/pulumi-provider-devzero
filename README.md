@@ -393,6 +393,13 @@ pulumi stack rm <stack-name>
 | `horizontalScaling` | `HorizontalScalingArgs` | Horizontal (replica) scaling configuration |
 | `actionTriggers` | string[] | `on_detection` \| `on_schedule` |
 | `detectionTriggers` | string[] | `pod_creation` \| `pod_update` \| `pod_reschedule` |
+| `enablePmaxProtection` | bool | Raise requests to cover peak usage when max/recommendation ratio exceeds `pmaxRatioThreshold`. Default: `true` |
+| `pmaxRatioThreshold` | float | Max-to-recommendation ratio that triggers pmax protection. Default: `3.0` |
+| `loopbackPeriodSeconds` | int | Period in seconds to look back for usage data. Default: `86400` (24 h) |
+| `minDataPoints` | int | Global minimum data points required before a recommendation is emitted. Default: `15` |
+| `minChangePercent` | float | Global minimum change threshold for applying recommendations. Default: `0.2` (20%) |
+| `minVpaWindowDataPoints` | int | Minimum data points in VPA analysis window. Default: `30` |
+| `cooldownMinutes` | int | Minutes to wait between applying recommendations. Default: `300` (5 h) |
 
 ### VerticalScalingArgs
 
@@ -402,11 +409,14 @@ pulumi stack rm <stack-name>
 | `targetPercentile` | float | Percentile of observed usage to target (e.g. `0.95`) |
 | `minRequest` | int | Minimum resource request (millicores / MiB) |
 | `maxRequest` | int | Maximum resource request (millicores / MiB) |
-| `maxScaleUpPercent` | float | Maximum percentage to scale up in one step |
-| `maxScaleDownPercent` | float | Maximum percentage to scale down in one step |
+| `maxScaleUpPercent` | float | Maximum percentage to scale up in one step. Default: `1000` |
+| `maxScaleDownPercent` | float | Maximum percentage to scale down in one step. Default: `1.0` |
 | `overheadMultiplier` | float | Multiplier added on top of the recommendation |
 | `limitsAdjustmentEnabled` | bool | Whether to also adjust resource limits |
 | `limitMultiplier` | float | Limits = request × limitMultiplier |
+| `minDataPoints` | int | Minimum data points required before a recommendation is emitted. Default: `20` |
+| `adjustReqEvenIfNotSet` | bool | Recommend requests even when the workload has no existing requests set. Default: `true` |
+| `limitsRemovalEnabled` | bool | Actively remove limits from workloads (CPU only). Takes precedence over `limitsAdjustmentEnabled`. Default: `true` for CPU, `false` for memory |
 
 ## WorkloadPolicyTarget — Key Fields
 
@@ -418,6 +428,69 @@ pulumi stack rm <stack-name>
 | `kindFilter` | string[] | Workload kinds: `Pod`, `Deployment`, `StatefulSet`, `DaemonSet`, `Job`, `CronJob`, `ReplicaSet`, `ReplicationController`, `Rollout` |
 | `namespaceFilter` | string[] | Restrict to specific namespaces |
 | `enabled` | bool | Activate the target |
+
+## NodePolicy — Key Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `name` | string | Unique policy name |
+| `description` | string | Human-readable description |
+| `weight` | int | Priority when multiple policies match (higher = preferred) |
+| `capacityTypes` | `LabelSelectorArgs` | Capacity types: `on-demand` \| `spot` |
+| `instanceCategories` | `LabelSelectorArgs` | Filter instance categories (e.g. `c`, `m`, `r`) |
+| `instanceFamilies` | `LabelSelectorArgs` | Filter instance families (e.g. `c5`, `m5`) |
+| `instanceCpus` | `LabelSelectorArgs` | Filter by vCPU count |
+| `instanceSizes` | `LabelSelectorArgs` | Filter instance sizes (e.g. `large`, `xlarge`) |
+| `instanceTypes` | `LabelSelectorArgs` | Explicit instance types (e.g. `m5.xlarge`) |
+| `zones` | `LabelSelectorArgs` | Availability zones to provision into |
+| `architectures` | `LabelSelectorArgs` | CPU architectures (e.g. `amd64`, `arm64`) |
+| `operatingSystems` | `LabelSelectorArgs` | OS filter (e.g. `linux`, `windows`) |
+| `labels` | map[string]string | Labels applied to provisioned nodes |
+| `taints` | `TaintArgs[]` | Taints applied to provisioned nodes |
+| `disruption` | `DisruptionPolicyArgs` | Node disruption / consolidation settings |
+| `limits` | `ResourceLimitsArgs` | Max total CPU/memory this policy may provision |
+| `aws` | `AWSNodeClassSpecArgs` | AWS-specific configuration (AMI, subnets, IAM role, EBS, etc.) |
+| `azure` | `AzureNodeClassSpecArgs` | Azure-specific configuration (subnet, image family, disk, etc.) |
+| `raw` | `RawKarpenterSpecArgs[]` | Raw Karpenter NodePool/NodeClass YAML (escape hatch) |
+
+### DisruptionPolicyArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `consolidationPolicy` | string | `WhenEmpty` \| `WhenUnderutilized` |
+| `consolidateAfter` | string | Wait time after node is empty before consolidating (e.g. `30s`) |
+| `expireAfter` | string | Force-replace nodes after this duration (e.g. `720h`) |
+| `terminationGracePeriodSeconds` | int | Grace period before forcefully terminating a draining node |
+| `budgets` | `DisruptionBudgetArgs[]` | Limits on how many nodes may be disrupted at once |
+
+### AWSNodeClassSpecArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `amiFamily` | string | AMI family: `AL2`, `Bottlerocket`, `Windows2022`, etc. |
+| `role` | string | IAM role name for nodes |
+| `subnetSelectorTerms` | `SubnetSelectorTermArgs[]` | Subnet selectors (by tag or ID) |
+| `securityGroupSelectorTerms` | `SecurityGroupSelectorTermArgs[]` | Security group selectors |
+| `amiSelectorTerms` | `AMISelectorTermArgs[]` | AMI selectors (by alias, tag, or ID) |
+| `blockDeviceMappings` | `BlockDeviceMappingArgs[]` | EBS volume configuration |
+| `tags` | map[string]string | AWS tags on all provisioned resources |
+| `associatePublicIpAddress` | bool | Assign a public IP to nodes |
+| `detailedMonitoring` | bool | Enable CloudWatch detailed monitoring |
+| `metadataOptions` | `MetadataOptionsArgs` | EC2 IMDS options (IMDSv2, hop limit, etc.) |
+| `kubelet` | `KubeletConfigurationArgs` | Kubelet overrides (maxPods, eviction thresholds, etc.) |
+| `userData` | string | Custom launch template user data |
+
+### AzureNodeClassSpecArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `vnetSubnetId` | string | Azure VNet subnet resource ID |
+| `imageFamily` | string | Image family: `AzureLinux`, `Ubuntu2204`, etc. |
+| `osDiskSizeGb` | int | OS disk size in GB |
+| `fipsMode` | string | `Enabled` \| `Disabled` |
+| `maxPods` | int | Max pods per node |
+| `tags` | map[string]string | Azure tags on provisioned resources |
+| `kubelet` | `AzureKubeletConfigurationArgs` | Kubelet overrides for Azure nodes |
 
 ## Building from Source
 

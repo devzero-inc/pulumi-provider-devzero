@@ -172,11 +172,26 @@ policy = devzero.resources.WorkloadPolicy("my-policy",
 | `target_percentile` | `float` | Percentile of observed usage to target (e.g. `0.95`) |
 | `min_request` | `int` | Minimum resource request (millicores / MiB) |
 | `max_request` | `int` | Maximum resource request (millicores / MiB) |
-| `max_scale_up_percent` | `int` | Max % to scale up in one step |
-| `max_scale_down_percent` | `int` | Max % to scale down in one step |
+| `max_scale_up_percent` | `float` | Max % to scale up in one step. Default: `1000` |
+| `max_scale_down_percent` | `float` | Max % to scale down in one step. Default: `1.0` |
 | `overhead_multiplier` | `float` | Multiplier added on top of the recommendation |
 | `limits_adjustment_enabled` | `bool` | Whether to also adjust resource limits |
 | `limit_multiplier` | `float` | Limits = request × limit_multiplier |
+| `min_data_points` | `int` | Minimum data points before a recommendation is emitted. Default: `20` |
+| `adjust_req_even_if_not_set` | `bool` | Recommend requests even when the workload has no existing requests set. Default: `true` |
+| `limits_removal_enabled` | `bool` | Actively remove limits from workloads (CPU only). Takes precedence over `limits_adjustment_enabled`. Default: `true` for CPU, `false` for memory |
+
+**`WorkloadPolicy` pmax & VPA knob fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `enable_pmax_protection` | `bool` | Raise requests to cover peak usage when max/recommendation ratio exceeds `pmax_ratio_threshold`. Default: `true` |
+| `pmax_ratio_threshold` | `float` | Max-to-recommendation ratio that triggers pmax protection. Default: `3.0` |
+| `loopback_period_seconds` | `int` | Look-back period in seconds for usage data. Default: `86400` (24 h) |
+| `min_data_points` | `int` | Global minimum data points for recommendations. Default: `15` |
+| `min_change_percent` | `float` | Global minimum change threshold. Default: `0.2` (20%) |
+| `min_vpa_window_data_points` | `int` | Minimum data points in VPA analysis window. Default: `30` |
+| `cooldown_minutes` | `int` | Minutes between applying recommendations. Default: `300` (5 h) |
 
 ---
 
@@ -212,15 +227,105 @@ target = devzero.resources.WorkloadPolicyTarget("my-target",
 
 ### `NodePolicy`
 
-Configure node provisioning and pooling (AWS / Azure).
+Configure node provisioning and pooling (AWS / Azure) using Karpenter under the hood.
 
 ```python
 import pulumi_devzero as devzero
 
 node_policy = devzero.resources.NodePolicy("my-node-policy",
     name="my-node-policy",
+    description="AWS node policy with on-demand and spot capacity",
+    weight=10,
+    capacity_types=devzero.resources.LabelSelectorArgsArgs(match_expressions=[devzero.resources.LabelSelectorRequirementArgsArgs(key="<label-key>", operator="In", values=["<value>"])]),
+    instance_categories=devzero.resources.LabelSelectorArgsArgs(match_labels={"<label-key>": "<label-value>"}),
+    labels={"environment": "production"},
+    taints=[devzero.resources.TaintArgsArgs(key="dedicated", value="gpu", effect="NoSchedule")],
+    disruption=devzero.resources.DisruptionPolicyArgsArgs(
+        consolidation_policy="WhenUnderutilized",
+        consolidate_after="30s",
+        expire_after="720h",
+    ),
+    limits=devzero.resources.ResourceLimitsArgsArgs(cpu="1000", memory="1000Gi"),
+    aws=devzero.resources.AWSNodeClassSpecArgsArgs(
+        ami_family="AL2",
+        role="KarpenterNodeRole",
+        subnet_selector_terms=[devzero.resources.SubnetSelectorTermArgsArgs(tags={"karpenter.sh/discovery": "my-cluster"})],
+        security_group_selector_terms=[devzero.resources.SecurityGroupSelectorTermArgsArgs(tags={"karpenter.sh/discovery": "my-cluster"})],
+        block_device_mappings=[devzero.resources.BlockDeviceMappingArgsArgs(
+            device_name="/dev/xvda",
+            root_volume=True,
+            ebs=devzero.resources.BlockDeviceArgsArgs(volume_size="100Gi", volume_type="gp3", encrypted=True),
+        )],
+    ),
 )
 ```
+
+**`NodePolicyArgs` fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `name` | `str` | Unique policy name |
+| `description` | `str` | Human-readable description |
+| `weight` | `int` | Priority weight when multiple policies match (higher = preferred) |
+| `instance_categories` | `LabelSelectorArgsArgs` | Filter instance categories (e.g. `c`, `m`, `r`) |
+| `instance_families` | `LabelSelectorArgsArgs` | Filter instance families (e.g. `c5`, `m5`) |
+| `instance_cpus` | `LabelSelectorArgsArgs` | Filter by vCPU count |
+| `instance_sizes` | `LabelSelectorArgsArgs` | Filter instance sizes (e.g. `large`, `xlarge`) |
+| `instance_types` | `LabelSelectorArgsArgs` | Explicit instance types (e.g. `m5.xlarge`) |
+| `instance_generations` | `LabelSelectorArgsArgs` | Filter by instance generation |
+| `instance_hypervisors` | `LabelSelectorArgsArgs` | Filter by hypervisor type |
+| `zones` | `LabelSelectorArgsArgs` | Availability zones to provision into |
+| `architectures` | `LabelSelectorArgsArgs` | CPU architectures (e.g. `amd64`, `arm64`) |
+| `capacity_types` | `LabelSelectorArgsArgs` | Capacity types: `on-demand` \| `spot` |
+| `operating_systems` | `LabelSelectorArgsArgs` | OS filter (e.g. `linux`, `windows`) |
+| `labels` | `dict[str, str]` | Labels applied to provisioned nodes |
+| `taints` | `list[TaintArgsArgs]` | Taints applied to provisioned nodes |
+| `disruption` | `DisruptionPolicyArgsArgs` | Node disruption / consolidation settings |
+| `limits` | `ResourceLimitsArgsArgs` | Max total CPU/memory this policy may provision |
+| `node_pool_name` | `str` | Override the Karpenter NodePool name |
+| `node_class_name` | `str` | Override the Karpenter NodeClass name |
+| `aws` | `AWSNodeClassSpecArgsArgs` | AWS-specific node class configuration |
+| `azure` | `AzureNodeClassSpecArgsArgs` | Azure-specific node class configuration |
+| `raw` | `list[RawKarpenterSpecArgsArgs]` | Raw Karpenter YAML (escape hatch) |
+
+**`DisruptionPolicyArgsArgs` fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `consolidation_policy` | `str` | `WhenEmpty` \| `WhenUnderutilized` |
+| `consolidate_after` | `str` | Wait time after node is empty before consolidating (e.g. `30s`) |
+| `expire_after` | `str` | Force-replace nodes after this duration (e.g. `720h`) |
+| `termination_grace_period_seconds` | `int` | Grace period before forcefully terminating a draining node |
+| `budgets` | `list[DisruptionBudgetArgsArgs]` | Limits on how many nodes may be disrupted at once |
+
+**`AWSNodeClassSpecArgsArgs` fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `ami_family` | `str` | AMI family: `AL2`, `Bottlerocket`, `Windows2022`, etc. |
+| `role` | `str` | IAM role name for nodes |
+| `subnet_selector_terms` | `list[SubnetSelectorTermArgsArgs]` | Subnet selectors (by tag or ID) |
+| `security_group_selector_terms` | `list[SecurityGroupSelectorTermArgsArgs]` | Security group selectors |
+| `ami_selector_terms` | `list[AMISelectorTermArgsArgs]` | AMI selectors (by alias, tag, or ID) |
+| `block_device_mappings` | `list[BlockDeviceMappingArgsArgs]` | EBS volume configuration |
+| `tags` | `dict[str, str]` | AWS tags on all provisioned resources |
+| `associate_public_ip_address` | `bool` | Assign a public IP to nodes |
+| `detailed_monitoring` | `bool` | Enable CloudWatch detailed monitoring |
+| `metadata_options` | `MetadataOptionsArgsArgs` | EC2 IMDS options (IMDSv2, hop limit, etc.) |
+| `kubelet` | `KubeletConfigurationArgsArgs` | Kubelet overrides (max_pods, eviction thresholds, etc.) |
+| `user_data` | `str` | Custom launch template user data |
+
+**`AzureNodeClassSpecArgsArgs` fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `vnet_subnet_id` | `str` | Azure VNet subnet resource ID |
+| `image_family` | `str` | Image family: `AzureLinux`, `Ubuntu2204`, etc. |
+| `os_disk_size_gb` | `int` | OS disk size in GB |
+| `fips_mode` | `str` | `Enabled` \| `Disabled` |
+| `max_pods` | `int` | Max pods per node |
+| `tags` | `dict[str, str]` | Azure tags on provisioned resources |
+| `kubelet` | `AzureKubeletConfigurationArgsArgs` | Kubelet overrides for Azure nodes |
 
 ---
 
