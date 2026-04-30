@@ -24,8 +24,8 @@ TARGET_PROTO_DIR       = internal/proto/api/v1
 TARGET_GEN_PB_DIR      = internal/gen/api/v1
 TARGET_GEN_CONNECT_DIR = internal/gen/api/v1/apiv1connect
 
-PROTO_FILES       = common.proto instance.proto k8s.proto recommendation.proto cluster.proto
-GEN_PB_FILES      = common.pb.go instance.pb.go k8s.pb.go recommendation.pb.go cluster.pb.go cluster_grpc.pb.go
+PROTO_FILES       = common.proto instance.proto k8s.proto recommendation.proto cluster.proto profiling.proto
+GEN_PB_FILES      = common.pb.go instance.pb.go k8s.pb.go recommendation.pb.go cluster.pb.go cluster_grpc.pb.go profiling.pb.go
 GEN_CONNECT_FILES = k8s.connect.go recommendation.connect.go cluster.connect.go
 
 OLD_IMPORT = github.com/devzero-inc/services/dakr/gen/api/v1
