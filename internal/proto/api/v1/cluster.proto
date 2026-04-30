@@ -14,6 +14,9 @@ service ClusterService {
   // GetClustersBasicInfo retrieves basic information for all clusters in a team
   rpc GetClustersBasicInfo(GetClustersBasicInfoRequest) returns (GetClustersBasicInfoResponse);
 
+  // GetClusterBasicInfo retrieves basic information for a single cluster (singular form of GetClustersBasicInfo)
+  rpc GetClusterBasicInfo(GetClusterBasicInfoRequest) returns (GetClusterBasicInfoResponse);
+
   // GetClustersWithMetrics retrieves clusters with full metrics using optimized batch queries
   rpc GetClustersWithMetrics(GetClustersWithMetricsRequest) returns (GetClustersWithMetricsResponse);
 
@@ -48,6 +51,19 @@ message GetClustersBasicInfoRequest {
 // GetClustersBasicInfoResponse contains basic information for all clusters in a team
 message GetClustersBasicInfoResponse {
   repeated Cluster clusters = 1; // List of clusters with basic info.
+}
+
+// GetClusterBasicInfoRequest is used to fetch basic information for a single cluster
+message GetClusterBasicInfoRequest {
+  string team_id = 1;
+  string cluster_id = 2;
+}
+
+// GetClusterBasicInfoResponse contains basic information for a single cluster
+// (id, name, displayName/custom_name, cloudProvider, isDisconnected). Mirrors a single
+// entry from GetClustersBasicInfoResponse.clusters — operator versions are NOT included.
+message GetClusterBasicInfoResponse {
+  Cluster cluster = 1;
 }
 
 // GetClustersWithMetricsRequest is used to fetch clusters with full metrics (optimized version)
@@ -219,10 +235,22 @@ message GetNodeTypeCountsResponse {
   NodeInfo node_info = 1;
 }
 
+// ClusterLivenessPreference controls whether GetClusterIDByName considers
+// zxporter heartbeat freshness when picking among multiple matching rows.
+enum ClusterLivenessPreference {
+  CLUSTER_LIVENESS_PREFERENCE_UNSPECIFIED = 0;  // = IGNORE
+  CLUSTER_LIVENESS_PREFERENCE_IGNORE = 1;       // pure created_at DESC
+  CLUSTER_LIVENESS_PREFERENCE_PREFER_LIVE = 2;  // live rows first, fall back to newest
+  CLUSTER_LIVENESS_PREFERENCE_REQUIRE_LIVE = 3; // 404 if no row pinged within 60m
+}
+
 // GetClusterIDByNameRequest looks up a cluster by team and name
 message GetClusterIDByNameRequest {
   string team_id = 1;
   string name = 2;
+  optional string region = 3;          // e.g. "us-east-1" — joined against regions.name
+  optional string cloud_provider = 4;  // e.g. "aws"      — joined against cloud_providers.name
+  optional ClusterLivenessPreference liveness = 5;
 }
 
 // GetClusterIDByNameResponse returns just the cluster ID

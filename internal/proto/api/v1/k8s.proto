@@ -598,27 +598,6 @@ message GetLatestOperatorVersionResponse {
   OperatorInfo trezr_helm_info = 42;
 }
 
-message GalaxyGetClusterPerspectiveRequest {
-  string team_id = 1;
-  repeated string cluster_ids = 2; // (optional) restrict to specific clusters
-  GalaxyPOVClusterGroupBy group_by = 3; // group response
-  PerspectiveDatapointOpts datapoint_opts = 4; // time range / resolution config
-}
-
-message GalaxyGetClusterPerspectiveResponse {
-  repeated GalaxyClusterGroup groupings = 1;
-}
-
-message GalaxyClusterGroup {
-  string group_key = 1; // e.g., "us-west-2", "AWS", "v1.27", etc.
-  // TODO (debo) might want to change cluster_ids to just cluster (same as GetClusters etc)
-  repeated string cluster_ids = 2; // IDs of clusters in this group 
-  CostInfo cost_info = 3; // aggregated cost for this group
-  ResourceMetrics resource_metrics = 4; // aggregated resource metrics
-  NodeInfo node_info = 5; // (optional) node counts (on-demand, spot, etc)
-}
-
-
 message GalaxyGetWorkloadPerspectiveRequest {
   string team_id = 1;
   repeated string cluster_ids = 2; // (optional) filter by cluster(s)
@@ -643,16 +622,6 @@ message GalaxyWorkloadGroup {
   ResourceSummary resource_summary = 6; // (optional) aggregated resource kind/status info
 }
 
-
-enum GalaxyPOVClusterGroupBy {
-  GALAXY_POV_CLUSTER_GROUP_BY_UNSPECIFIED = 0;
-  GALAXY_POV_CLUSTER_GROUP_BY_REGION = 1;
-  GALAXY_POV_CLUSTER_GROUP_BY_PROVIDER = 2;
-  GALAXY_POV_CLUSTER_GROUP_BY_PCT_OPTIMIZED = 3;
-  GALAXY_POV_CLUSTER_GROUP_BY_COST_PER_HOUR = 4;
-  GALAXY_POV_CLUSTER_GROUP_BY_K8S_VERSION = 5;
-  GALAXY_POV_CLUSTER_GROUP_BY_ZXPORTER_VERSION = 6;
-}
 
 enum GalaxyPOVNodeGroupBy {
   GALAXY_POV_NODE_GROUP_BY_UNSPECIFIED = 0;
@@ -1102,9 +1071,6 @@ service K8SService {
   rpc GetPods(GetPodsRequest) returns (GetPodsResponse);
 
   rpc GetLatestOperatorVersion(GetLatestOperatorVersionRequest) returns (GetLatestOperatorVersionResponse);
-
-  rpc GalaxyGetClusterPerspective(GalaxyGetClusterPerspectiveRequest) returns (GalaxyGetClusterPerspectiveResponse);
-
 
   rpc GalaxyGetWorkloadPerspective(GalaxyGetWorkloadPerspectiveRequest) returns (GalaxyGetWorkloadPerspectiveResponse);
 

@@ -125,7 +125,7 @@ message CostInfo {
   double cpu_cost_per_vcpu_per_hour = 21 [deprecated = true]; // Estimated CPU cost per vcpu per hour.
   double memory_cost_per_gib_per_hour = 22 [deprecated = true]; // Estimated memory cost per gib per hour.
 
-  google.type.Money node_recommendation_saved_cost_last_month = 23; // Estimated cost saved by node recommendations in the last month.
+  reserved 23; // was node_recommendation_saved_cost_last_month (removed)
 
   // Money-based cost fields for currency flexibility
   google.type.Money money_cpu_cost_per_hour = 100;
