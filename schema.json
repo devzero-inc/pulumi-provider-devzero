@@ -177,7 +177,7 @@
                 },
                 "instanceStorePolicy": {
                     "type": "string",
-                    "description": "Policy for handling NVMe instance store volumes. One of: 'RAID0'. Example: 'RAID0'."
+                    "description": "Policy for handling NVMe instance store volumes. One of: 'INSTANCE_STORE_POLICY_RAID0'. Example: 'INSTANCE_STORE_POLICY_RAID0'."
                 },
                 "kubelet": {
                     "$ref": "#/types/devzero:resources:KubeletConfigurationArgs",
@@ -420,7 +420,7 @@
                 },
                 "consolidationPolicy": {
                     "type": "string",
-                    "description": "When to consolidate nodes. One of: 'WhenEmpty', 'WhenUnderutilized'. Example: 'WhenUnderutilized'.",
+                    "description": "When to consolidate nodes. One of: 'WhenEmpty', 'WhenEmptyOrUnderutilized'. Example: 'WhenEmptyOrUnderutilized'.",
                     "enum": [
                         "WhenEmpty",
                         "WhenUnderutilized"
@@ -818,7 +818,7 @@
                 },
                 "capacityTypes": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
-                    "description": "Capacity purchasing types. Example: {in: [\"spot\", \"on-demand\"]}."
+                    "description": "Capacity purchasing types. Valid values: 'spot', 'on-demand', 'reserved'. Example: {in: [\"spot\", \"on-demand\"]}."
                 },
                 "description": {
                     "type": "string",
@@ -830,7 +830,7 @@
                 },
                 "instanceCategories": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
-                    "description": "Filter instances by category. Example: {in: [\"general-purpose\", \"compute-optimized\"]}."
+                    "description": "Filter instances by category letter (cloud-specific). Example: {in: [\"m\", \"c\", \"r\"]} for AWS, {in: [\"D\", \"E\"]} for Azure."
                 },
                 "instanceCpus": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
@@ -1095,10 +1095,12 @@
                     "description": "Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true."
                 },
                 "gpuVerticalScaling": {
-                    "$ref": "#/types/devzero:resources:VerticalScalingArgs"
+                    "$ref": "#/types/devzero:resources:VerticalScalingArgs",
+                    "description": "Vertical scaling configuration for GPU cores. Uses the same fields as cpuVerticalScaling; units are GPU cores (millicores)."
                 },
                 "gpuVramVerticalScaling": {
-                    "$ref": "#/types/devzero:resources:VerticalScalingArgs"
+                    "$ref": "#/types/devzero:resources:VerticalScalingArgs",
+                    "description": "Vertical scaling configuration for GPU VRAM. Uses the same fields as cpuVerticalScaling; units are bytes."
                 },
                 "horizontalScaling": {
                     "$ref": "#/types/devzero:resources:HorizontalScalingArgs"
@@ -1215,10 +1217,12 @@
                     "description": "Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true."
                 },
                 "gpuVerticalScaling": {
-                    "$ref": "#/types/devzero:resources:VerticalScalingArgs"
+                    "$ref": "#/types/devzero:resources:VerticalScalingArgs",
+                    "description": "Vertical scaling configuration for GPU cores. Uses the same fields as cpuVerticalScaling; units are GPU cores (millicores)."
                 },
                 "gpuVramVerticalScaling": {
-                    "$ref": "#/types/devzero:resources:VerticalScalingArgs"
+                    "$ref": "#/types/devzero:resources:VerticalScalingArgs",
+                    "description": "Vertical scaling configuration for GPU VRAM. Uses the same fields as cpuVerticalScaling; units are bytes."
                 },
                 "horizontalScaling": {
                     "$ref": "#/types/devzero:resources:HorizontalScalingArgs"
@@ -1425,7 +1429,7 @@
                 "properties": {
                     "cloudProvider": {
                         "type": "string",
-                        "description": "Optional cloud provider filter, e.g. \"aws\"."
+                        "description": "Optional cloud provider filter. One of: 'AWS', 'GCP', 'AKS', 'OCI'."
                     },
                     "liveness": {
                         "type": "string",

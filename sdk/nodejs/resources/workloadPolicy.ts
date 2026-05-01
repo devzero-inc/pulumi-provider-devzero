@@ -34,84 +34,90 @@ export class WorkloadPolicy extends pulumi.CustomResource {
     }
 
     /**
-     * Action triggers: 'on_detection' or 'on_schedule'.
+     * When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: ["on_detection"].
      */
     declare public readonly actionTriggers: pulumi.Output<string[] | undefined>;
     /**
-     * Minutes to wait between applying recommendations. Default: 300 (5 h).
+     * Minimum minutes to wait between consecutive recommendation applications. Example: 300 (5 h, default).
      */
     declare public readonly cooldownMinutes: pulumi.Output<number | undefined>;
     declare public readonly cpuVerticalScaling: pulumi.Output<outputs.resources.VerticalScalingArgs | undefined>;
     /**
-     * Cron expression for scheduled application (5-field format).
+     * Cron expression for scheduled application (5-field UTC format). Required when actionTriggers includes 'on_schedule'. Example: '0 2 * * *' (daily at 2 am UTC).
      */
     declare public readonly cronSchedule: pulumi.Output<string | undefined>;
     /**
-     * Cron expression for background defragmentation.
+     * Cron expression for background node defragmentation. Example: '0 3 * * 0' (weekly Sunday at 3 am).
      */
     declare public readonly defragmentationSchedule: pulumi.Output<string | undefined>;
     /**
-     * Free-form description of the policy.
+     * Free-form description of the policy. Example: 'VPA policy for production workloads'.
      */
     declare public readonly description: pulumi.Output<string | undefined>;
     /**
-     * Detection triggers: 'pod_creation', 'pod_update', or 'pod_reschedule'.
+     * Events that trigger a new recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: ["pod_creation", "pod_reschedule"].
      */
     declare public readonly detectionTriggers: pulumi.Output<string[] | undefined>;
     /**
-     * Percentage drift from baseline that triggers VPA refresh.
+     * Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
      */
     declare public readonly driftDeltaPercent: pulumi.Output<number | undefined>;
     /**
-     * Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true.
+     * Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true.
      */
     declare public readonly enablePmaxProtection: pulumi.Output<boolean | undefined>;
+    /**
+     * Vertical scaling configuration for GPU cores. Uses the same fields as cpuVerticalScaling; units are GPU cores (millicores).
+     */
     declare public readonly gpuVerticalScaling: pulumi.Output<outputs.resources.VerticalScalingArgs | undefined>;
+    /**
+     * Vertical scaling configuration for GPU VRAM. Uses the same fields as cpuVerticalScaling; units are bytes.
+     */
     declare public readonly gpuVramVerticalScaling: pulumi.Output<outputs.resources.VerticalScalingArgs | undefined>;
     declare public readonly horizontalScaling: pulumi.Output<outputs.resources.HorizontalScalingArgs | undefined>;
     /**
-     * Hysteresis threshold vs target for HPA coordination.
+     * Dead-band ratio around the HPA target to suppress oscillation between VPA and HPA. Example: 0.1 (10% band).
      */
     declare public readonly hysteresisVsTarget: pulumi.Output<number | undefined>;
     /**
-     * Allow live migration when applying recommendations.
+     * Allow live pod migration when applying recommendations without restart. Example: false.
      */
     declare public readonly liveMigrationEnabled: pulumi.Output<boolean | undefined>;
     /**
-     * Period in seconds to look back for resource usage data. Default: 86400 (24 h).
+     * Seconds of historical usage data considered per recommendation. Example: 86400 (24 h, default).
      */
     declare public readonly loopbackPeriodSeconds: pulumi.Output<number | undefined>;
     declare public readonly memoryVerticalScaling: pulumi.Output<outputs.resources.VerticalScalingArgs | undefined>;
     /**
-     * Global minimum change threshold for applying recommendations. Default: 0.2 (20%).
+     * Minimum relative change (0-1) required before a recommendation is applied globally. Example: 0.2 means 20% change needed (default).
      */
     declare public readonly minChangePercent: pulumi.Output<number | undefined>;
     /**
-     * Global minimum data points required for recommendations. Default: 15.
+     * Global minimum number of usage data points needed before any recommendation is emitted. Example: 15 (default).
      */
     declare public readonly minDataPoints: pulumi.Output<number | undefined>;
     /**
-     * Minimum data points in VPA analysis window. Default: 30.
+     * Minimum data points inside the VPA analysis window before a recommendation is generated. Example: 30 (default).
      */
     declare public readonly minVpaWindowDataPoints: pulumi.Output<number | undefined>;
     /**
-     * Human-friendly name for the policy.
+     * Human-friendly name for the policy. Example: 'production-vpa-policy'.
      */
     declare public readonly name: pulumi.Output<string>;
     /**
-     * Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.
+     * Peak-to-recommendation ratio above which pmax protection activates. Example: 3.0 (default) — triggers when peak is 3× the recommendation.
      */
     declare public readonly pmaxRatioThreshold: pulumi.Output<number | undefined>;
     /**
-     * Kubernetes scheduler plugins to activate.
+     * Kubernetes scheduler plugins to activate for this policy. Example: ["binpacking"].
      */
     declare public readonly schedulerPlugins: pulumi.Output<string[] | undefined>;
     /**
-     * Maximum coefficient of variation for workload to be considered stable.
+     * Maximum coefficient of variation (stddev/mean) for a workload to be considered stable enough for VPA. Example: 0.3.
      */
     declare public readonly stabilityCvMax: pulumi.Output<number | undefined>;
     /**
-     * Period in seconds to ignore usage data after workload starts.
+     * Seconds after workload start to exclude from usage data (avoids cold-start spikes). Example: 300 (5 min).
      */
     declare public readonly startupPeriodSeconds: pulumi.Output<number | undefined>;
 
@@ -189,84 +195,90 @@ export class WorkloadPolicy extends pulumi.CustomResource {
  */
 export interface WorkloadPolicyArgs {
     /**
-     * Action triggers: 'on_detection' or 'on_schedule'.
+     * When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: ["on_detection"].
      */
     actionTriggers?: pulumi.Input<pulumi.Input<string>[]>;
     /**
-     * Minutes to wait between applying recommendations. Default: 300 (5 h).
+     * Minimum minutes to wait between consecutive recommendation applications. Example: 300 (5 h, default).
      */
     cooldownMinutes?: pulumi.Input<number>;
     cpuVerticalScaling?: pulumi.Input<inputs.resources.VerticalScalingArgsArgs>;
     /**
-     * Cron expression for scheduled application (5-field format).
+     * Cron expression for scheduled application (5-field UTC format). Required when actionTriggers includes 'on_schedule'. Example: '0 2 * * *' (daily at 2 am UTC).
      */
     cronSchedule?: pulumi.Input<string>;
     /**
-     * Cron expression for background defragmentation.
+     * Cron expression for background node defragmentation. Example: '0 3 * * 0' (weekly Sunday at 3 am).
      */
     defragmentationSchedule?: pulumi.Input<string>;
     /**
-     * Free-form description of the policy.
+     * Free-form description of the policy. Example: 'VPA policy for production workloads'.
      */
     description?: pulumi.Input<string>;
     /**
-     * Detection triggers: 'pod_creation', 'pod_update', or 'pod_reschedule'.
+     * Events that trigger a new recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: ["pod_creation", "pod_reschedule"].
      */
     detectionTriggers?: pulumi.Input<pulumi.Input<string>[]>;
     /**
-     * Percentage drift from baseline that triggers VPA refresh.
+     * Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
      */
     driftDeltaPercent?: pulumi.Input<number>;
     /**
-     * Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true.
+     * Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true.
      */
     enablePmaxProtection?: pulumi.Input<boolean>;
+    /**
+     * Vertical scaling configuration for GPU cores. Uses the same fields as cpuVerticalScaling; units are GPU cores (millicores).
+     */
     gpuVerticalScaling?: pulumi.Input<inputs.resources.VerticalScalingArgsArgs>;
+    /**
+     * Vertical scaling configuration for GPU VRAM. Uses the same fields as cpuVerticalScaling; units are bytes.
+     */
     gpuVramVerticalScaling?: pulumi.Input<inputs.resources.VerticalScalingArgsArgs>;
     horizontalScaling?: pulumi.Input<inputs.resources.HorizontalScalingArgsArgs>;
     /**
-     * Hysteresis threshold vs target for HPA coordination.
+     * Dead-band ratio around the HPA target to suppress oscillation between VPA and HPA. Example: 0.1 (10% band).
      */
     hysteresisVsTarget?: pulumi.Input<number>;
     /**
-     * Allow live migration when applying recommendations.
+     * Allow live pod migration when applying recommendations without restart. Example: false.
      */
     liveMigrationEnabled?: pulumi.Input<boolean>;
     /**
-     * Period in seconds to look back for resource usage data. Default: 86400 (24 h).
+     * Seconds of historical usage data considered per recommendation. Example: 86400 (24 h, default).
      */
     loopbackPeriodSeconds?: pulumi.Input<number>;
     memoryVerticalScaling?: pulumi.Input<inputs.resources.VerticalScalingArgsArgs>;
     /**
-     * Global minimum change threshold for applying recommendations. Default: 0.2 (20%).
+     * Minimum relative change (0-1) required before a recommendation is applied globally. Example: 0.2 means 20% change needed (default).
      */
     minChangePercent?: pulumi.Input<number>;
     /**
-     * Global minimum data points required for recommendations. Default: 15.
+     * Global minimum number of usage data points needed before any recommendation is emitted. Example: 15 (default).
      */
     minDataPoints?: pulumi.Input<number>;
     /**
-     * Minimum data points in VPA analysis window. Default: 30.
+     * Minimum data points inside the VPA analysis window before a recommendation is generated. Example: 30 (default).
      */
     minVpaWindowDataPoints?: pulumi.Input<number>;
     /**
-     * Human-friendly name for the policy.
+     * Human-friendly name for the policy. Example: 'production-vpa-policy'.
      */
     name: pulumi.Input<string>;
     /**
-     * Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.
+     * Peak-to-recommendation ratio above which pmax protection activates. Example: 3.0 (default) — triggers when peak is 3× the recommendation.
      */
     pmaxRatioThreshold?: pulumi.Input<number>;
     /**
-     * Kubernetes scheduler plugins to activate.
+     * Kubernetes scheduler plugins to activate for this policy. Example: ["binpacking"].
      */
     schedulerPlugins?: pulumi.Input<pulumi.Input<string>[]>;
     /**
-     * Maximum coefficient of variation for workload to be considered stable.
+     * Maximum coefficient of variation (stddev/mean) for a workload to be considered stable enough for VPA. Example: 0.3.
      */
     stabilityCvMax?: pulumi.Input<number>;
     /**
-     * Period in seconds to ignore usage data after workload starts.
+     * Seconds after workload start to exclude from usage data (avoids cold-start spikes). Example: 300 (5 min).
      */
     startupPeriodSeconds?: pulumi.Input<number>;
 }

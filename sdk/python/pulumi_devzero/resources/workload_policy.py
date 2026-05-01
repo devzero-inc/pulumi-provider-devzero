@@ -48,25 +48,27 @@ class WorkloadPolicyArgs:
         """
         The set of arguments for constructing a WorkloadPolicy resource.
 
-        :param pulumi.Input[_builtins.str] name: Human-friendly name for the policy.
-        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] action_triggers: Action triggers: 'on_detection' or 'on_schedule'.
-        :param pulumi.Input[_builtins.int] cooldown_minutes: Minutes to wait between applying recommendations. Default: 300 (5 h).
-        :param pulumi.Input[_builtins.str] cron_schedule: Cron expression for scheduled application (5-field format).
-        :param pulumi.Input[_builtins.str] defragmentation_schedule: Cron expression for background defragmentation.
-        :param pulumi.Input[_builtins.str] description: Free-form description of the policy.
-        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] detection_triggers: Detection triggers: 'pod_creation', 'pod_update', or 'pod_reschedule'.
-        :param pulumi.Input[_builtins.float] drift_delta_percent: Percentage drift from baseline that triggers VPA refresh.
-        :param pulumi.Input[_builtins.bool] enable_pmax_protection: Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true.
-        :param pulumi.Input[_builtins.float] hysteresis_vs_target: Hysteresis threshold vs target for HPA coordination.
-        :param pulumi.Input[_builtins.bool] live_migration_enabled: Allow live migration when applying recommendations.
-        :param pulumi.Input[_builtins.int] loopback_period_seconds: Period in seconds to look back for resource usage data. Default: 86400 (24 h).
-        :param pulumi.Input[_builtins.float] min_change_percent: Global minimum change threshold for applying recommendations. Default: 0.2 (20%).
-        :param pulumi.Input[_builtins.int] min_data_points: Global minimum data points required for recommendations. Default: 15.
-        :param pulumi.Input[_builtins.int] min_vpa_window_data_points: Minimum data points in VPA analysis window. Default: 30.
-        :param pulumi.Input[_builtins.float] pmax_ratio_threshold: Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.
-        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] scheduler_plugins: Kubernetes scheduler plugins to activate.
-        :param pulumi.Input[_builtins.float] stability_cv_max: Maximum coefficient of variation for workload to be considered stable.
-        :param pulumi.Input[_builtins.int] startup_period_seconds: Period in seconds to ignore usage data after workload starts.
+        :param pulumi.Input[_builtins.str] name: Human-friendly name for the policy. Example: 'production-vpa-policy'.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] action_triggers: When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: ["on_detection"].
+        :param pulumi.Input[_builtins.int] cooldown_minutes: Minimum minutes to wait between consecutive recommendation applications. Example: 300 (5 h, default).
+        :param pulumi.Input[_builtins.str] cron_schedule: Cron expression for scheduled application (5-field UTC format). Required when actionTriggers includes 'on_schedule'. Example: '0 2 * * *' (daily at 2 am UTC).
+        :param pulumi.Input[_builtins.str] defragmentation_schedule: Cron expression for background node defragmentation. Example: '0 3 * * 0' (weekly Sunday at 3 am).
+        :param pulumi.Input[_builtins.str] description: Free-form description of the policy. Example: 'VPA policy for production workloads'.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] detection_triggers: Events that trigger a new recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: ["pod_creation", "pod_reschedule"].
+        :param pulumi.Input[_builtins.float] drift_delta_percent: Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
+        :param pulumi.Input[_builtins.bool] enable_pmax_protection: Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true.
+        :param pulumi.Input['VerticalScalingArgsArgs'] gpu_vertical_scaling: Vertical scaling configuration for GPU cores. Uses the same fields as cpuVerticalScaling; units are GPU cores (millicores).
+        :param pulumi.Input['VerticalScalingArgsArgs'] gpu_vram_vertical_scaling: Vertical scaling configuration for GPU VRAM. Uses the same fields as cpuVerticalScaling; units are bytes.
+        :param pulumi.Input[_builtins.float] hysteresis_vs_target: Dead-band ratio around the HPA target to suppress oscillation between VPA and HPA. Example: 0.1 (10% band).
+        :param pulumi.Input[_builtins.bool] live_migration_enabled: Allow live pod migration when applying recommendations without restart. Example: false.
+        :param pulumi.Input[_builtins.int] loopback_period_seconds: Seconds of historical usage data considered per recommendation. Example: 86400 (24 h, default).
+        :param pulumi.Input[_builtins.float] min_change_percent: Minimum relative change (0-1) required before a recommendation is applied globally. Example: 0.2 means 20% change needed (default).
+        :param pulumi.Input[_builtins.int] min_data_points: Global minimum number of usage data points needed before any recommendation is emitted. Example: 15 (default).
+        :param pulumi.Input[_builtins.int] min_vpa_window_data_points: Minimum data points inside the VPA analysis window before a recommendation is generated. Example: 30 (default).
+        :param pulumi.Input[_builtins.float] pmax_ratio_threshold: Peak-to-recommendation ratio above which pmax protection activates. Example: 3.0 (default) — triggers when peak is 3× the recommendation.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] scheduler_plugins: Kubernetes scheduler plugins to activate for this policy. Example: ["binpacking"].
+        :param pulumi.Input[_builtins.float] stability_cv_max: Maximum coefficient of variation (stddev/mean) for a workload to be considered stable enough for VPA. Example: 0.3.
+        :param pulumi.Input[_builtins.int] startup_period_seconds: Seconds after workload start to exclude from usage data (avoids cold-start spikes). Example: 300 (5 min).
         """
         pulumi.set(__self__, "name", name)
         if action_triggers is not None:
@@ -132,7 +134,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter
     def name(self) -> pulumi.Input[_builtins.str]:
         """
-        Human-friendly name for the policy.
+        Human-friendly name for the policy. Example: 'production-vpa-policy'.
         """
         return pulumi.get(self, "name")
 
@@ -144,7 +146,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter(name="actionTriggers")
     def action_triggers(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
         """
-        Action triggers: 'on_detection' or 'on_schedule'.
+        When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: ["on_detection"].
         """
         return pulumi.get(self, "action_triggers")
 
@@ -156,7 +158,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter(name="cooldownMinutes")
     def cooldown_minutes(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Minutes to wait between applying recommendations. Default: 300 (5 h).
+        Minimum minutes to wait between consecutive recommendation applications. Example: 300 (5 h, default).
         """
         return pulumi.get(self, "cooldown_minutes")
 
@@ -177,7 +179,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter(name="cronSchedule")
     def cron_schedule(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Cron expression for scheduled application (5-field format).
+        Cron expression for scheduled application (5-field UTC format). Required when actionTriggers includes 'on_schedule'. Example: '0 2 * * *' (daily at 2 am UTC).
         """
         return pulumi.get(self, "cron_schedule")
 
@@ -189,7 +191,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter(name="defragmentationSchedule")
     def defragmentation_schedule(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Cron expression for background defragmentation.
+        Cron expression for background node defragmentation. Example: '0 3 * * 0' (weekly Sunday at 3 am).
         """
         return pulumi.get(self, "defragmentation_schedule")
 
@@ -201,7 +203,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter
     def description(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Free-form description of the policy.
+        Free-form description of the policy. Example: 'VPA policy for production workloads'.
         """
         return pulumi.get(self, "description")
 
@@ -213,7 +215,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter(name="detectionTriggers")
     def detection_triggers(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
         """
-        Detection triggers: 'pod_creation', 'pod_update', or 'pod_reschedule'.
+        Events that trigger a new recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: ["pod_creation", "pod_reschedule"].
         """
         return pulumi.get(self, "detection_triggers")
 
@@ -225,7 +227,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter(name="driftDeltaPercent")
     def drift_delta_percent(self) -> Optional[pulumi.Input[_builtins.float]]:
         """
-        Percentage drift from baseline that triggers VPA refresh.
+        Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
         """
         return pulumi.get(self, "drift_delta_percent")
 
@@ -237,7 +239,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter(name="enablePmaxProtection")
     def enable_pmax_protection(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true.
+        Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true.
         """
         return pulumi.get(self, "enable_pmax_protection")
 
@@ -248,6 +250,9 @@ class WorkloadPolicyArgs:
     @_builtins.property
     @pulumi.getter(name="gpuVerticalScaling")
     def gpu_vertical_scaling(self) -> Optional[pulumi.Input['VerticalScalingArgsArgs']]:
+        """
+        Vertical scaling configuration for GPU cores. Uses the same fields as cpuVerticalScaling; units are GPU cores (millicores).
+        """
         return pulumi.get(self, "gpu_vertical_scaling")
 
     @gpu_vertical_scaling.setter
@@ -257,6 +262,9 @@ class WorkloadPolicyArgs:
     @_builtins.property
     @pulumi.getter(name="gpuVramVerticalScaling")
     def gpu_vram_vertical_scaling(self) -> Optional[pulumi.Input['VerticalScalingArgsArgs']]:
+        """
+        Vertical scaling configuration for GPU VRAM. Uses the same fields as cpuVerticalScaling; units are bytes.
+        """
         return pulumi.get(self, "gpu_vram_vertical_scaling")
 
     @gpu_vram_vertical_scaling.setter
@@ -276,7 +284,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter(name="hysteresisVsTarget")
     def hysteresis_vs_target(self) -> Optional[pulumi.Input[_builtins.float]]:
         """
-        Hysteresis threshold vs target for HPA coordination.
+        Dead-band ratio around the HPA target to suppress oscillation between VPA and HPA. Example: 0.1 (10% band).
         """
         return pulumi.get(self, "hysteresis_vs_target")
 
@@ -288,7 +296,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter(name="liveMigrationEnabled")
     def live_migration_enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Allow live migration when applying recommendations.
+        Allow live pod migration when applying recommendations without restart. Example: false.
         """
         return pulumi.get(self, "live_migration_enabled")
 
@@ -300,7 +308,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter(name="loopbackPeriodSeconds")
     def loopback_period_seconds(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Period in seconds to look back for resource usage data. Default: 86400 (24 h).
+        Seconds of historical usage data considered per recommendation. Example: 86400 (24 h, default).
         """
         return pulumi.get(self, "loopback_period_seconds")
 
@@ -321,7 +329,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter(name="minChangePercent")
     def min_change_percent(self) -> Optional[pulumi.Input[_builtins.float]]:
         """
-        Global minimum change threshold for applying recommendations. Default: 0.2 (20%).
+        Minimum relative change (0-1) required before a recommendation is applied globally. Example: 0.2 means 20% change needed (default).
         """
         return pulumi.get(self, "min_change_percent")
 
@@ -333,7 +341,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter(name="minDataPoints")
     def min_data_points(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Global minimum data points required for recommendations. Default: 15.
+        Global minimum number of usage data points needed before any recommendation is emitted. Example: 15 (default).
         """
         return pulumi.get(self, "min_data_points")
 
@@ -345,7 +353,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter(name="minVpaWindowDataPoints")
     def min_vpa_window_data_points(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Minimum data points in VPA analysis window. Default: 30.
+        Minimum data points inside the VPA analysis window before a recommendation is generated. Example: 30 (default).
         """
         return pulumi.get(self, "min_vpa_window_data_points")
 
@@ -357,7 +365,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter(name="pmaxRatioThreshold")
     def pmax_ratio_threshold(self) -> Optional[pulumi.Input[_builtins.float]]:
         """
-        Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.
+        Peak-to-recommendation ratio above which pmax protection activates. Example: 3.0 (default) — triggers when peak is 3× the recommendation.
         """
         return pulumi.get(self, "pmax_ratio_threshold")
 
@@ -369,7 +377,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter(name="schedulerPlugins")
     def scheduler_plugins(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
         """
-        Kubernetes scheduler plugins to activate.
+        Kubernetes scheduler plugins to activate for this policy. Example: ["binpacking"].
         """
         return pulumi.get(self, "scheduler_plugins")
 
@@ -381,7 +389,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter(name="stabilityCvMax")
     def stability_cv_max(self) -> Optional[pulumi.Input[_builtins.float]]:
         """
-        Maximum coefficient of variation for workload to be considered stable.
+        Maximum coefficient of variation (stddev/mean) for a workload to be considered stable enough for VPA. Example: 0.3.
         """
         return pulumi.get(self, "stability_cv_max")
 
@@ -393,7 +401,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter(name="startupPeriodSeconds")
     def startup_period_seconds(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Period in seconds to ignore usage data after workload starts.
+        Seconds after workload start to exclude from usage data (avoids cold-start spikes). Example: 300 (5 min).
         """
         return pulumi.get(self, "startup_period_seconds")
 
@@ -438,25 +446,27 @@ class WorkloadPolicy(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] action_triggers: Action triggers: 'on_detection' or 'on_schedule'.
-        :param pulumi.Input[_builtins.int] cooldown_minutes: Minutes to wait between applying recommendations. Default: 300 (5 h).
-        :param pulumi.Input[_builtins.str] cron_schedule: Cron expression for scheduled application (5-field format).
-        :param pulumi.Input[_builtins.str] defragmentation_schedule: Cron expression for background defragmentation.
-        :param pulumi.Input[_builtins.str] description: Free-form description of the policy.
-        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] detection_triggers: Detection triggers: 'pod_creation', 'pod_update', or 'pod_reschedule'.
-        :param pulumi.Input[_builtins.float] drift_delta_percent: Percentage drift from baseline that triggers VPA refresh.
-        :param pulumi.Input[_builtins.bool] enable_pmax_protection: Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true.
-        :param pulumi.Input[_builtins.float] hysteresis_vs_target: Hysteresis threshold vs target for HPA coordination.
-        :param pulumi.Input[_builtins.bool] live_migration_enabled: Allow live migration when applying recommendations.
-        :param pulumi.Input[_builtins.int] loopback_period_seconds: Period in seconds to look back for resource usage data. Default: 86400 (24 h).
-        :param pulumi.Input[_builtins.float] min_change_percent: Global minimum change threshold for applying recommendations. Default: 0.2 (20%).
-        :param pulumi.Input[_builtins.int] min_data_points: Global minimum data points required for recommendations. Default: 15.
-        :param pulumi.Input[_builtins.int] min_vpa_window_data_points: Minimum data points in VPA analysis window. Default: 30.
-        :param pulumi.Input[_builtins.str] name: Human-friendly name for the policy.
-        :param pulumi.Input[_builtins.float] pmax_ratio_threshold: Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.
-        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] scheduler_plugins: Kubernetes scheduler plugins to activate.
-        :param pulumi.Input[_builtins.float] stability_cv_max: Maximum coefficient of variation for workload to be considered stable.
-        :param pulumi.Input[_builtins.int] startup_period_seconds: Period in seconds to ignore usage data after workload starts.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] action_triggers: When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: ["on_detection"].
+        :param pulumi.Input[_builtins.int] cooldown_minutes: Minimum minutes to wait between consecutive recommendation applications. Example: 300 (5 h, default).
+        :param pulumi.Input[_builtins.str] cron_schedule: Cron expression for scheduled application (5-field UTC format). Required when actionTriggers includes 'on_schedule'. Example: '0 2 * * *' (daily at 2 am UTC).
+        :param pulumi.Input[_builtins.str] defragmentation_schedule: Cron expression for background node defragmentation. Example: '0 3 * * 0' (weekly Sunday at 3 am).
+        :param pulumi.Input[_builtins.str] description: Free-form description of the policy. Example: 'VPA policy for production workloads'.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] detection_triggers: Events that trigger a new recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: ["pod_creation", "pod_reschedule"].
+        :param pulumi.Input[_builtins.float] drift_delta_percent: Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
+        :param pulumi.Input[_builtins.bool] enable_pmax_protection: Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true.
+        :param pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']] gpu_vertical_scaling: Vertical scaling configuration for GPU cores. Uses the same fields as cpuVerticalScaling; units are GPU cores (millicores).
+        :param pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']] gpu_vram_vertical_scaling: Vertical scaling configuration for GPU VRAM. Uses the same fields as cpuVerticalScaling; units are bytes.
+        :param pulumi.Input[_builtins.float] hysteresis_vs_target: Dead-band ratio around the HPA target to suppress oscillation between VPA and HPA. Example: 0.1 (10% band).
+        :param pulumi.Input[_builtins.bool] live_migration_enabled: Allow live pod migration when applying recommendations without restart. Example: false.
+        :param pulumi.Input[_builtins.int] loopback_period_seconds: Seconds of historical usage data considered per recommendation. Example: 86400 (24 h, default).
+        :param pulumi.Input[_builtins.float] min_change_percent: Minimum relative change (0-1) required before a recommendation is applied globally. Example: 0.2 means 20% change needed (default).
+        :param pulumi.Input[_builtins.int] min_data_points: Global minimum number of usage data points needed before any recommendation is emitted. Example: 15 (default).
+        :param pulumi.Input[_builtins.int] min_vpa_window_data_points: Minimum data points inside the VPA analysis window before a recommendation is generated. Example: 30 (default).
+        :param pulumi.Input[_builtins.str] name: Human-friendly name for the policy. Example: 'production-vpa-policy'.
+        :param pulumi.Input[_builtins.float] pmax_ratio_threshold: Peak-to-recommendation ratio above which pmax protection activates. Example: 3.0 (default) — triggers when peak is 3× the recommendation.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] scheduler_plugins: Kubernetes scheduler plugins to activate for this policy. Example: ["binpacking"].
+        :param pulumi.Input[_builtins.float] stability_cv_max: Maximum coefficient of variation (stddev/mean) for a workload to be considered stable enough for VPA. Example: 0.3.
+        :param pulumi.Input[_builtins.int] startup_period_seconds: Seconds after workload start to exclude from usage data (avoids cold-start spikes). Example: 300 (5 min).
         """
         ...
     @overload
@@ -605,7 +615,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="actionTriggers")
     def action_triggers(self) -> pulumi.Output[Optional[Sequence[_builtins.str]]]:
         """
-        Action triggers: 'on_detection' or 'on_schedule'.
+        When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: ["on_detection"].
         """
         return pulumi.get(self, "action_triggers")
 
@@ -613,7 +623,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="cooldownMinutes")
     def cooldown_minutes(self) -> pulumi.Output[Optional[_builtins.int]]:
         """
-        Minutes to wait between applying recommendations. Default: 300 (5 h).
+        Minimum minutes to wait between consecutive recommendation applications. Example: 300 (5 h, default).
         """
         return pulumi.get(self, "cooldown_minutes")
 
@@ -626,7 +636,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="cronSchedule")
     def cron_schedule(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        Cron expression for scheduled application (5-field format).
+        Cron expression for scheduled application (5-field UTC format). Required when actionTriggers includes 'on_schedule'. Example: '0 2 * * *' (daily at 2 am UTC).
         """
         return pulumi.get(self, "cron_schedule")
 
@@ -634,7 +644,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="defragmentationSchedule")
     def defragmentation_schedule(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        Cron expression for background defragmentation.
+        Cron expression for background node defragmentation. Example: '0 3 * * 0' (weekly Sunday at 3 am).
         """
         return pulumi.get(self, "defragmentation_schedule")
 
@@ -642,7 +652,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter
     def description(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        Free-form description of the policy.
+        Free-form description of the policy. Example: 'VPA policy for production workloads'.
         """
         return pulumi.get(self, "description")
 
@@ -650,7 +660,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="detectionTriggers")
     def detection_triggers(self) -> pulumi.Output[Optional[Sequence[_builtins.str]]]:
         """
-        Detection triggers: 'pod_creation', 'pod_update', or 'pod_reschedule'.
+        Events that trigger a new recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: ["pod_creation", "pod_reschedule"].
         """
         return pulumi.get(self, "detection_triggers")
 
@@ -658,7 +668,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="driftDeltaPercent")
     def drift_delta_percent(self) -> pulumi.Output[Optional[_builtins.float]]:
         """
-        Percentage drift from baseline that triggers VPA refresh.
+        Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
         """
         return pulumi.get(self, "drift_delta_percent")
 
@@ -666,18 +676,24 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="enablePmaxProtection")
     def enable_pmax_protection(self) -> pulumi.Output[Optional[_builtins.bool]]:
         """
-        Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true.
+        Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true.
         """
         return pulumi.get(self, "enable_pmax_protection")
 
     @_builtins.property
     @pulumi.getter(name="gpuVerticalScaling")
     def gpu_vertical_scaling(self) -> pulumi.Output[Optional['outputs.VerticalScalingArgs']]:
+        """
+        Vertical scaling configuration for GPU cores. Uses the same fields as cpuVerticalScaling; units are GPU cores (millicores).
+        """
         return pulumi.get(self, "gpu_vertical_scaling")
 
     @_builtins.property
     @pulumi.getter(name="gpuVramVerticalScaling")
     def gpu_vram_vertical_scaling(self) -> pulumi.Output[Optional['outputs.VerticalScalingArgs']]:
+        """
+        Vertical scaling configuration for GPU VRAM. Uses the same fields as cpuVerticalScaling; units are bytes.
+        """
         return pulumi.get(self, "gpu_vram_vertical_scaling")
 
     @_builtins.property
@@ -689,7 +705,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="hysteresisVsTarget")
     def hysteresis_vs_target(self) -> pulumi.Output[Optional[_builtins.float]]:
         """
-        Hysteresis threshold vs target for HPA coordination.
+        Dead-band ratio around the HPA target to suppress oscillation between VPA and HPA. Example: 0.1 (10% band).
         """
         return pulumi.get(self, "hysteresis_vs_target")
 
@@ -697,7 +713,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="liveMigrationEnabled")
     def live_migration_enabled(self) -> pulumi.Output[Optional[_builtins.bool]]:
         """
-        Allow live migration when applying recommendations.
+        Allow live pod migration when applying recommendations without restart. Example: false.
         """
         return pulumi.get(self, "live_migration_enabled")
 
@@ -705,7 +721,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="loopbackPeriodSeconds")
     def loopback_period_seconds(self) -> pulumi.Output[Optional[_builtins.int]]:
         """
-        Period in seconds to look back for resource usage data. Default: 86400 (24 h).
+        Seconds of historical usage data considered per recommendation. Example: 86400 (24 h, default).
         """
         return pulumi.get(self, "loopback_period_seconds")
 
@@ -718,7 +734,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="minChangePercent")
     def min_change_percent(self) -> pulumi.Output[Optional[_builtins.float]]:
         """
-        Global minimum change threshold for applying recommendations. Default: 0.2 (20%).
+        Minimum relative change (0-1) required before a recommendation is applied globally. Example: 0.2 means 20% change needed (default).
         """
         return pulumi.get(self, "min_change_percent")
 
@@ -726,7 +742,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="minDataPoints")
     def min_data_points(self) -> pulumi.Output[Optional[_builtins.int]]:
         """
-        Global minimum data points required for recommendations. Default: 15.
+        Global minimum number of usage data points needed before any recommendation is emitted. Example: 15 (default).
         """
         return pulumi.get(self, "min_data_points")
 
@@ -734,7 +750,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="minVpaWindowDataPoints")
     def min_vpa_window_data_points(self) -> pulumi.Output[Optional[_builtins.int]]:
         """
-        Minimum data points in VPA analysis window. Default: 30.
+        Minimum data points inside the VPA analysis window before a recommendation is generated. Example: 30 (default).
         """
         return pulumi.get(self, "min_vpa_window_data_points")
 
@@ -742,7 +758,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter
     def name(self) -> pulumi.Output[_builtins.str]:
         """
-        Human-friendly name for the policy.
+        Human-friendly name for the policy. Example: 'production-vpa-policy'.
         """
         return pulumi.get(self, "name")
 
@@ -750,7 +766,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="pmaxRatioThreshold")
     def pmax_ratio_threshold(self) -> pulumi.Output[Optional[_builtins.float]]:
         """
-        Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.
+        Peak-to-recommendation ratio above which pmax protection activates. Example: 3.0 (default) — triggers when peak is 3× the recommendation.
         """
         return pulumi.get(self, "pmax_ratio_threshold")
 
@@ -758,7 +774,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="schedulerPlugins")
     def scheduler_plugins(self) -> pulumi.Output[Optional[Sequence[_builtins.str]]]:
         """
-        Kubernetes scheduler plugins to activate.
+        Kubernetes scheduler plugins to activate for this policy. Example: ["binpacking"].
         """
         return pulumi.get(self, "scheduler_plugins")
 
@@ -766,7 +782,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="stabilityCvMax")
     def stability_cv_max(self) -> pulumi.Output[Optional[_builtins.float]]:
         """
-        Maximum coefficient of variation for workload to be considered stable.
+        Maximum coefficient of variation (stddev/mean) for a workload to be considered stable enough for VPA. Example: 0.3.
         """
         return pulumi.get(self, "stability_cv_max")
 
@@ -774,7 +790,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="startupPeriodSeconds")
     def startup_period_seconds(self) -> pulumi.Output[Optional[_builtins.int]]:
         """
-        Period in seconds to ignore usage data after workload starts.
+        Seconds after workload start to exclude from usage data (avoids cold-start spikes). Example: 300 (5 min).
         """
         return pulumi.get(self, "startup_period_seconds")
 

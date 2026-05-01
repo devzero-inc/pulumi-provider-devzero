@@ -46,34 +46,52 @@ class AwaitableGetClusterIdByNameResult(GetClusterIdByNameResult):
             cluster_id=self.cluster_id)
 
 
-def get_cluster_id_by_name(name: Optional[_builtins.str] = None,
+def get_cluster_id_by_name(cloud_provider: Optional[_builtins.str] = None,
+                           liveness: Optional[_builtins.str] = None,
+                           name: Optional[_builtins.str] = None,
+                           region: Optional[_builtins.str] = None,
                            team_id: Optional[_builtins.str] = None,
                            opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableGetClusterIdByNameResult:
     """
     Use this data source to access information about an existing resource.
 
+    :param _builtins.str cloud_provider: Optional cloud provider filter. One of: 'AWS', 'GCP', 'AKS', 'OCI'.
+    :param _builtins.str liveness: Controls liveness filtering: IGNORE, PREFER_LIVE, or REQUIRE_LIVE.
     :param _builtins.str name: The cluster name to look up.
+    :param _builtins.str region: Optional region filter, e.g. "us-east-1".
     :param _builtins.str team_id: The team ID to search within.
     """
     __args__ = dict()
+    __args__['cloudProvider'] = cloud_provider
+    __args__['liveness'] = liveness
     __args__['name'] = name
+    __args__['region'] = region
     __args__['teamId'] = team_id
     opts = pulumi.InvokeOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
     __ret__ = pulumi.runtime.invoke('devzero:resources:getClusterIdByName', __args__, opts=opts, typ=GetClusterIdByNameResult).value
 
     return AwaitableGetClusterIdByNameResult(
         cluster_id=pulumi.get(__ret__, 'cluster_id'))
-def get_cluster_id_by_name_output(name: Optional[pulumi.Input[_builtins.str]] = None,
+def get_cluster_id_by_name_output(cloud_provider: Optional[pulumi.Input[Optional[_builtins.str]]] = None,
+                                  liveness: Optional[pulumi.Input[Optional[_builtins.str]]] = None,
+                                  name: Optional[pulumi.Input[_builtins.str]] = None,
+                                  region: Optional[pulumi.Input[Optional[_builtins.str]]] = None,
                                   team_id: Optional[pulumi.Input[_builtins.str]] = None,
                                   opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetClusterIdByNameResult]:
     """
     Use this data source to access information about an existing resource.
 
+    :param _builtins.str cloud_provider: Optional cloud provider filter. One of: 'AWS', 'GCP', 'AKS', 'OCI'.
+    :param _builtins.str liveness: Controls liveness filtering: IGNORE, PREFER_LIVE, or REQUIRE_LIVE.
     :param _builtins.str name: The cluster name to look up.
+    :param _builtins.str region: Optional region filter, e.g. "us-east-1".
     :param _builtins.str team_id: The team ID to search within.
     """
     __args__ = dict()
+    __args__['cloudProvider'] = cloud_provider
+    __args__['liveness'] = liveness
     __args__['name'] = name
+    __args__['region'] = region
     __args__['teamId'] = team_id
     opts = pulumi.InvokeOutputOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
     __ret__ = pulumi.runtime.invoke_output('devzero:resources:getClusterIdByName', __args__, opts=opts, typ=GetClusterIdByNameResult)

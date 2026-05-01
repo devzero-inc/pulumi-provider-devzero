@@ -10,148 +10,148 @@ import * as utilities from "../utilities";
 export namespace resources {
     export interface AMISelectorTermArgsArgs {
         /**
-         * Well-known alias for the AMI family (e.g. 'al2@latest').
+         * Well-known alias for the AMI family. Example: 'al2@latest' or 'bottlerocket@latest'.
          */
         alias?: pulumi.Input<string>;
         /**
-         * Explicit AMI ID.
+         * Explicit AMI ID. Example: 'ami-0a1b2c3d4e5f67890'.
          */
         id?: pulumi.Input<string>;
         /**
-         * AMI name filter (supports wildcards).
+         * AMI name filter (supports wildcards). Example: 'my-org-eks-node-*'.
          */
         name?: pulumi.Input<string>;
         /**
-         * AWS account ID or alias that owns the AMI.
+         * AWS account ID or alias that owns the AMI. Example: '123456789012' or 'amazon'.
          */
         owner?: pulumi.Input<string>;
         /**
-         * SSM parameter path that stores the AMI ID.
+         * SSM parameter path that stores the AMI ID. Example: '/aws/service/eks/optimized-ami/1.29/amazon-linux-2/recommended/image_id'.
          */
         ssmParameter?: pulumi.Input<string>;
         /**
-         * Map of AWS tags used to select AMIs.
+         * Map of AWS tags used to select AMIs. Example: {"my-org/ami": "approved"}.
          */
         tags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
     }
 
     export interface AWSNodeClassSpecArgsArgs {
         /**
-         * AMI family shorthand (e.g. 'AL2', 'Bottlerocket', 'Windows2022').
+         * AMI family shorthand used when no amiSelectorTerms are specified. One of: 'AL2', 'AL2023', 'Bottlerocket', 'Windows2019', 'Windows2022'. Example: 'AL2'.
          */
         amiFamily?: pulumi.Input<string>;
         /**
-         * Selectors for the AMIs used to launch nodes.
+         * Selectors for the AMIs used to launch nodes. Example: [{alias: "al2@latest"}].
          */
         amiSelectorTerms?: pulumi.Input<pulumi.Input<inputs.resources.AMISelectorTermArgsArgs>[]>;
         /**
-         * Whether to assign a public IP address to provisioned nodes.
+         * Whether to assign a public IP address to provisioned nodes. Example: false.
          */
         associatePublicIpAddress?: pulumi.Input<boolean>;
         /**
-         * EBS block device mappings for nodes.
+         * EBS block device mappings for nodes. Example: [{deviceName: "/dev/xvda", rootVolume: true, ebs: {volumeSize: "50Gi", volumeType: "gp3"}}].
          */
         blockDeviceMappings?: pulumi.Input<pulumi.Input<inputs.resources.BlockDeviceMappingArgsArgs>[]>;
         /**
-         * Selectors for EC2 capacity reservations to prioritize.
+         * Selectors for EC2 capacity reservations to prioritize. Example: [{tags: {"aws:ec2:fleet-id": "fleet-123"}}].
          */
         capacityReservationSelectorTerms?: pulumi.Input<pulumi.Input<inputs.resources.CapacityReservationSelectorTermArgsArgs>[]>;
         /**
-         * EC2 launch template context ARN.
+         * Additional EC2 launch template context ARN for advanced customization. Example: 'arn:aws:ec2:us-east-1:123456789012:launch-template/lt-0abc123'.
          */
         context?: pulumi.Input<string>;
         /**
-         * Enable detailed CloudWatch monitoring for instances.
+         * Enable detailed (1-minute interval) CloudWatch monitoring for instances. Example: false.
          */
         detailedMonitoring?: pulumi.Input<boolean>;
         /**
-         * IAM instance profile name (use instead of Role when profile already exists).
+         * IAM instance profile name to use directly (alternative to Role). Example: 'KarpenterNodeInstanceProfile-my-cluster'.
          */
         instanceProfile?: pulumi.Input<string>;
         /**
-         * Policy for handling instance store volumes. One of: 'RAID0'.
+         * Policy for handling NVMe instance store volumes. One of: 'INSTANCE_STORE_POLICY_RAID0'. Example: 'INSTANCE_STORE_POLICY_RAID0'.
          */
         instanceStorePolicy?: pulumi.Input<string>;
         /**
-         * Kubelet configuration overrides for AWS nodes.
+         * Kubelet configuration overrides applied to all nodes in this class.
          */
         kubelet?: pulumi.Input<inputs.resources.KubeletConfigurationArgsArgs>;
         /**
-         * EC2 instance metadata (IMDS) options.
+         * EC2 instance metadata service (IMDS) configuration.
          */
         metadataOptions?: pulumi.Input<inputs.resources.MetadataOptionsArgsArgs>;
         /**
-         * IAM role name assigned to nodes.
+         * IAM role name assigned to nodes (Karpenter creates the instance profile). Example: 'KarpenterNodeRole-my-cluster'.
          */
         role?: pulumi.Input<string>;
         /**
-         * Selectors for security groups attached to nodes.
+         * Selectors for security groups attached to provisioned nodes. Example: [{tags: {"karpenter.sh/discovery": "my-cluster"}}].
          */
         securityGroupSelectorTerms?: pulumi.Input<pulumi.Input<inputs.resources.SecurityGroupSelectorTermArgsArgs>[]>;
         /**
-         * Selectors for the subnets nodes will be launched into.
+         * Selectors for the subnets nodes will be launched into. Example: [{tags: {"karpenter.sh/discovery": "my-cluster"}}].
          */
         subnetSelectorTerms?: pulumi.Input<pulumi.Input<inputs.resources.SubnetSelectorTermArgsArgs>[]>;
         /**
-         * AWS tags applied to all resources created by this node class.
+         * AWS tags applied to all resources (instances, volumes, ENIs) created by this node class. Example: {"environment": "production", "team": "platform"}.
          */
         tags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
         /**
-         * Custom user data script injected into the node launch template.
+         * Custom user data script merged into the node launch template (base64 or plain text). Example: '#!/bin/bash\necho hello'.
          */
         userData?: pulumi.Input<string>;
     }
 
     export interface AzureKubeletConfigurationArgsArgs {
         /**
-         * Unsafe sysctl patterns that are allowed (e.g. 'net.ipv4.*').
+         * Unsafe sysctl patterns permitted on nodes. Example: ["net.ipv4.*", "net.ipv6.*"].
          */
         allowedUnsafeSysctls?: pulumi.Input<pulumi.Input<string>[]>;
         /**
-         * Maximum number of container log files to retain.
+         * Maximum number of container log files to retain per container. Example: 5.
          */
         containerLogMaxFiles?: pulumi.Input<number>;
         /**
-         * Maximum container log file size before rotation (e.g. '10Mi').
+         * Maximum container log file size before rotation. Example: '10Mi'.
          */
         containerLogMaxSize?: pulumi.Input<string>;
         /**
-         * Whether to enforce CPU CFS quota for containers.
+         * Whether to enforce CPU CFS quota limits for containers. Example: true.
          */
         cpuCfsQuota?: pulumi.Input<boolean>;
         /**
-         * CPU CFS quota period (e.g. '100ms').
+         * CPU CFS quota period. Example: '100ms'.
          */
         cpuCfsQuotaPeriod?: pulumi.Input<string>;
         /**
-         * CPU manager policy. One of: 'none', 'static'.
+         * CPU manager policy for CPU pinning. One of: 'none', 'static'. Example: 'static'.
          */
         cpuManagerPolicy?: pulumi.Input<string>;
         /**
-         * Disk usage percentage triggering image GC.
+         * Disk usage % that triggers image garbage collection. Example: 85.
          */
         imageGcHighThresholdPercent?: pulumi.Input<number>;
         /**
-         * Disk usage percentage below which image GC stops.
+         * Disk usage % at which image GC stops freeing space. Example: 70.
          */
         imageGcLowThresholdPercent?: pulumi.Input<number>;
         /**
-         * Maximum number of process IDs per pod.
+         * Maximum number of process IDs allowed per pod. Example: 1024.
          */
         podPidsLimit?: pulumi.Input<number>;
         /**
-         * Topology manager policy for NUMA-aware scheduling.
+         * Topology manager policy for NUMA-aware workloads. One of: 'none', 'best-effort', 'restricted', 'single-numa-node'. Example: 'none'.
          */
         topologyManagerPolicy?: pulumi.Input<string>;
     }
 
     export interface AzureNodeClassSpecArgsArgs {
         /**
-         * FIPS compliance mode. One of: 'Enabled', 'Disabled'.
+         * FIPS 140-2 compliance mode for the node. One of: 'Enabled', 'Disabled'. Example: 'Disabled'.
          */
         fipsMode?: pulumi.Input<string>;
         /**
-         * Azure node image family (e.g. 'AzureLinux', 'Ubuntu2204').
+         * Azure node image family. One of: 'AzureLinux', 'Ubuntu2204'. Example: 'AzureLinux'.
          */
         imageFamily?: pulumi.Input<string>;
         /**
@@ -159,216 +159,216 @@ export namespace resources {
          */
         kubelet?: pulumi.Input<inputs.resources.AzureKubeletConfigurationArgsArgs>;
         /**
-         * Maximum pods per node (overrides AKS default).
+         * Maximum pods per node, overrides the AKS cluster default. Example: 110.
          */
         maxPods?: pulumi.Input<number>;
         /**
-         * OS disk size in GB.
+         * OS disk size in GB. Example: 128.
          */
         osDiskSizeGb?: pulumi.Input<number>;
         /**
-         * Azure tags applied to all resources created by this node class.
+         * Azure tags applied to all resources created by this node class. Example: {"environment": "production"}.
          */
         tags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
         /**
-         * Azure VNet subnet resource ID for node networking.
+         * Azure VNet subnet resource ID where nodes will be placed. Example: '/subscriptions/sub-id/resourceGroups/my-rg/providers/Microsoft.Network/virtualNetworks/my-vnet/subnets/nodesubnet'.
          */
         vnetSubnetId?: pulumi.Input<string>;
     }
 
     export interface BlockDeviceArgsArgs {
         /**
-         * Whether to delete the EBS volume when the instance terminates.
+         * Whether to delete the EBS volume when the instance terminates. Example: true.
          */
         deleteOnTermination?: pulumi.Input<boolean>;
         /**
-         * Whether to encrypt the EBS volume.
+         * Whether to encrypt the EBS volume. Example: true.
          */
         encrypted?: pulumi.Input<boolean>;
         /**
-         * IOPS to provision for io1/io2 volume types.
+         * IOPS to provision for io1/io2 volume types. Example: 3000.
          */
         iops?: pulumi.Input<number>;
         /**
-         * KMS key ID or ARN used to encrypt the volume.
+         * KMS key ID or ARN used to encrypt the volume. Example: 'arn:aws:kms:us-east-1:123456789012:key/mrk-abc123'.
          */
         kmsKeyId?: pulumi.Input<string>;
         /**
-         * EBS snapshot ID to restore the volume from.
+         * EBS snapshot ID to restore the volume from. Example: 'snap-0a1b2c3d4e5f'.
          */
         snapshotId?: pulumi.Input<string>;
         /**
-         * Throughput in MiB/s for gp3 volumes.
+         * Throughput in MiB/s for gp3 volumes (125-1000). Example: 125.
          */
         throughput?: pulumi.Input<number>;
         /**
-         * Rate in MiB/s for initializing volumes from snapshots.
+         * Rate in MiB/s for initializing volumes from snapshots. Example: 300.
          */
         volumeInitializationRate?: pulumi.Input<number>;
         /**
-         * Volume size (e.g. '20Gi').
+         * Volume size with unit suffix. Example: '20Gi'.
          */
         volumeSize?: pulumi.Input<string>;
         /**
-         * EBS volume type (e.g. 'gp3', 'io1', 'st1').
+         * EBS volume type. One of: 'gp2', 'gp3', 'io1', 'io2', 'st1', 'sc1'. Example: 'gp3'.
          */
         volumeType?: pulumi.Input<string>;
     }
 
     export interface BlockDeviceMappingArgsArgs {
         /**
-         * Device name to map the volume to (e.g. '/dev/xvda').
+         * Device name to map the volume to. Example: '/dev/xvda' (root on AL2), '/dev/sdb' (data volume).
          */
         deviceName?: pulumi.Input<string>;
         /**
-         * EBS volume configuration for this device.
+         * EBS volume configuration for this device mapping.
          */
         ebs?: pulumi.Input<inputs.resources.BlockDeviceArgsArgs>;
         /**
-         * Whether this mapping is for the root volume.
+         * Whether this mapping is for the root (boot) volume. Example: true.
          */
         rootVolume?: pulumi.Input<boolean>;
     }
 
     export interface CapacityReservationSelectorTermArgsArgs {
         /**
-         * Explicit capacity reservation ID.
+         * Explicit capacity reservation ID. Example: 'cr-0a1b2c3d4e5f'.
          */
         id?: pulumi.Input<string>;
         /**
-         * AWS account ID that owns the capacity reservation.
+         * AWS account ID that owns the capacity reservation. Example: '123456789012'.
          */
         ownerId?: pulumi.Input<string>;
         /**
-         * Map of AWS tags used to select capacity reservations.
+         * Map of AWS tags used to select capacity reservations. Example: {"aws:ec2:fleet-id": "fleet-123"}.
          */
         tags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
     }
 
     export interface DisruptionBudgetArgsArgs {
         /**
-         * Duration the budget window stays active (e.g. '1h', '30m').
+         * How long the budget window stays active after the cron fires. Example: '8h'.
          */
         duration?: pulumi.Input<string>;
         /**
-         * Maximum nodes that may be disrupted, as an absolute count or percentage (e.g. '10%').
+         * Maximum nodes that may be disrupted simultaneously, as an absolute count or percentage. Example: '10%' or '5'.
          */
         nodes?: pulumi.Input<string>;
         /**
-         * Disruption reasons this budget applies to (e.g. 'Underutilized', 'Empty', 'Drifted').
+         * Disruption reasons this budget applies to. Valid values: 'Underutilized', 'Empty', 'Drifted'. Example: ["Underutilized", "Empty"].
          */
         reasons?: pulumi.Input<pulumi.Input<string>[]>;
         /**
-         * Cron schedule during which this budget is active (5-field format).
+         * Cron schedule (5-field UTC) during which this budget is active. Example: '0 9 * * mon-fri' (weekday business hours).
          */
         schedule?: pulumi.Input<string>;
     }
 
     export interface DisruptionPolicyArgsArgs {
         /**
-         * Disruption budgets limiting how many nodes can be disrupted at once.
+         * Disruption budgets controlling how many nodes can be disrupted simultaneously. Example: [{reasons: ["Underutilized"], nodes: "10%"}].
          */
         budgets?: pulumi.Input<pulumi.Input<inputs.resources.DisruptionBudgetArgsArgs>[]>;
         /**
-         * Duration to wait after a node becomes empty before consolidating (e.g. '30s').
+         * Duration to wait after a node becomes empty before consolidating. Example: '30s'.
          */
         consolidateAfter?: pulumi.Input<string>;
         /**
-         * When to consolidate nodes. One of: 'WhenEmpty', 'WhenUnderutilized'.
+         * When to consolidate nodes. One of: 'WhenEmpty', 'WhenEmptyOrUnderutilized'. Example: 'WhenEmptyOrUnderutilized'.
          */
         consolidationPolicy?: pulumi.Input<string>;
         /**
-         * Duration after which provisioned nodes are replaced regardless of load (e.g. '720h').
+         * Duration after which provisioned nodes are replaced regardless of load. Example: '720h' (30 days).
          */
         expireAfter?: pulumi.Input<string>;
         /**
-         * Grace period in seconds before forcefully terminating a draining node.
+         * Grace period in seconds before forcefully terminating a draining node. Example: 600.
          */
         terminationGracePeriodSeconds?: pulumi.Input<number>;
         /**
-         * Seconds before an empty node is terminated (deprecated; prefer ConsolidateAfter).
+         * Seconds before an empty node is terminated (deprecated; prefer consolidateAfter). Example: 30.
          */
         ttlSecondsAfterEmpty?: pulumi.Input<number>;
     }
 
     export interface HorizontalScalingArgsArgs {
         /**
-         * Enable horizontal (replica) scaling.
+         * Enable horizontal (replica) scaling. Example: true.
          */
         enabled?: pulumi.Input<boolean>;
         /**
-         * Maximum percentage change in replica count per recommendation cycle.
+         * Maximum percentage change in replica count per recommendation cycle. Example: 50.0 allows up to 50% change.
          */
         maxReplicaChangePercent?: pulumi.Input<number>;
         /**
-         * Maximum number of replicas to scale up to.
+         * Maximum number of replicas to scale up to. Example: 10.
          */
         maxReplicas?: pulumi.Input<number>;
         /**
-         * Minimum data points required before a recommendation is emitted.
+         * Minimum data points required before a recommendation is emitted. Example: 20.
          */
         minDataPoints?: pulumi.Input<number>;
         /**
-         * Minimum number of replicas to maintain.
+         * Minimum number of replicas to maintain. Example: 2.
          */
         minReplicas?: pulumi.Input<number>;
         /**
-         * Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'.
+         * Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
          */
         primaryMetric?: pulumi.Input<string>;
         /**
-         * Target utilization ratio (0-1) for the primary metric.
+         * Target utilization ratio (0-1) for the primary metric. Example: 0.7 targets 70% utilization.
          */
         targetUtilization?: pulumi.Input<number>;
     }
 
     export interface KubeletConfigurationArgsArgs {
         /**
-         * List of DNS server IP addresses used by kubelet.
+         * DNS server IP addresses passed to kubelet. Example: ["10.96.0.10"].
          */
         clusterDns?: pulumi.Input<pulumi.Input<string>[]>;
         /**
-         * Whether to enforce CPU CFS quota limits for containers.
+         * Whether to enforce CPU CFS quota limits for containers. Example: true.
          */
         cpuCfsQuota?: pulumi.Input<boolean>;
         /**
-         * Hard eviction thresholds that trigger immediate pod eviction.
+         * Hard eviction thresholds — pods are evicted immediately when crossed. Example: {"memory.available": "100Mi", "nodefs.available": "10%"}.
          */
         evictionHard?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
         /**
-         * Maximum grace period in seconds when evicting pods.
+         * Maximum pod termination grace period (seconds) during eviction. Example: 90.
          */
         evictionMaxPodGracePeriod?: pulumi.Input<number>;
         /**
-         * Soft eviction thresholds that trigger eviction after a grace period.
+         * Soft eviction thresholds — eviction begins after the grace period expires. Example: {"memory.available": "200Mi"}.
          */
         evictionSoft?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
         /**
-         * Grace period for each soft eviction threshold.
+         * Grace period before acting on a soft eviction threshold. Example: {"memory.available": "90s"}.
          */
         evictionSoftGracePeriod?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
         /**
-         * Disk usage percentage that triggers image garbage collection.
+         * Disk usage % that triggers image garbage collection. Example: 85.
          */
         imageGcHighThresholdPercent?: pulumi.Input<number>;
         /**
-         * Disk usage percentage below which image GC stops freeing space.
+         * Disk usage % at which image GC stops freeing space. Example: 70.
          */
         imageGcLowThresholdPercent?: pulumi.Input<number>;
         /**
-         * Resources reserved for Kubernetes system components.
+         * Resources reserved for Kubernetes system components (kubelet, kube-proxy). Example: {"cpu": "100m", "memory": "100Mi"}.
          */
         kubeReserved?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
         /**
-         * Maximum number of pods per node.
+         * Maximum number of pods allowed per node. Example: 110.
          */
         maxPods?: pulumi.Input<number>;
         /**
-         * Maximum pods per CPU core (multiplied by core count for max pods).
+         * Maximum pods per CPU core; multiplied by node core count for effective max. Example: 10.
          */
         podsPerCore?: pulumi.Input<number>;
         /**
-         * Resources reserved for OS system daemons (e.g. {'cpu': '100m'}).
+         * Resources reserved for OS system daemons (not Kubernetes). Example: {"cpu": "100m", "memory": "100Mi"}.
          */
         systemReserved?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
     }
@@ -401,19 +401,19 @@ export namespace resources {
 
     export interface MetadataOptionsArgsArgs {
         /**
-         * Enable or disable the instance metadata endpoint. One of: 'enabled', 'disabled'.
+         * Enable or disable the EC2 instance metadata endpoint. One of: 'enabled', 'disabled'. Example: 'enabled'.
          */
         httpEndpoint?: pulumi.Input<string>;
         /**
-         * Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'.
+         * Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'. Example: 'disabled'.
          */
         httpProtocolIpv6?: pulumi.Input<string>;
         /**
-         * HTTP PUT response hop limit for metadata requests (1-64).
+         * HTTP PUT response hop limit for metadata requests (1-64). Set to 1 to block pod-level IMDS access. Example: 1.
          */
         httpPutResponseHopLimit?: pulumi.Input<number>;
         /**
-         * Whether to require IMDSv2 tokens. One of: 'optional', 'required'.
+         * Whether to require IMDSv2 session tokens (recommended). One of: 'optional', 'required'. Example: 'required'.
          */
         httpTokens?: pulumi.Input<string>;
     }
@@ -431,114 +431,114 @@ export namespace resources {
 
     export interface RawKarpenterSpecArgsArgs {
         /**
-         * Raw YAML for a complete Karpenter NodeClass resource (escape hatch).
+         * Raw YAML for a complete Karpenter NodeClass resource — use as an escape hatch when structured fields are insufficient. Example: 'apiVersion: karpenter.k8s.aws/v1\nkind: EC2NodeClass\nmetadata:\n  name: default\n...'.
          */
         nodeclassYaml?: pulumi.Input<string>;
         /**
-         * Raw YAML for a complete Karpenter NodePool resource (escape hatch).
+         * Raw YAML for a complete Karpenter NodePool resource — use as an escape hatch when structured fields are insufficient. Example: 'apiVersion: karpenter.sh/v1\nkind: NodePool\nmetadata:\n  name: default\n...'.
          */
         nodepoolYaml?: pulumi.Input<string>;
     }
 
     export interface ResourceLimitsArgsArgs {
         /**
-         * Maximum total CPU that may be provisioned (e.g. '1000' for 1000 vCPUs).
+         * Maximum total vCPUs that may be provisioned across all nodes in this pool. Example: '1000'.
          */
         cpu?: pulumi.Input<string>;
         /**
-         * Maximum total memory that may be provisioned (e.g. '1000Gi').
+         * Maximum total memory that may be provisioned across all nodes. Example: '1000Gi'.
          */
         memory?: pulumi.Input<string>;
     }
 
     export interface SecurityGroupSelectorTermArgsArgs {
         /**
-         * Explicit AWS security group ID.
+         * Explicit AWS security group ID. Example: 'sg-0a1b2c3d4e5f'.
          */
         id?: pulumi.Input<string>;
         /**
-         * Security group name filter.
+         * Security group name filter (exact match). Example: 'my-cluster-node-sg'.
          */
         name?: pulumi.Input<string>;
         /**
-         * Map of AWS tags used to select security groups.
+         * Map of AWS tags used to select security groups. Example: {"karpenter.sh/discovery": "my-cluster"}.
          */
         tags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
     }
 
     export interface SubnetSelectorTermArgsArgs {
         /**
-         * Explicit AWS subnet ID.
+         * Explicit AWS subnet ID (use instead of tags for a fixed subnet). Example: 'subnet-0a1b2c3d4e5f'.
          */
         id?: pulumi.Input<string>;
         /**
-         * Map of AWS tags used to select subnets.
+         * Map of AWS tags used to select subnets. Example: {"karpenter.sh/discovery": "my-cluster"}.
          */
         tags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
     }
 
     export interface TaintArgsArgs {
         /**
-         * Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'.
+         * Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'. Example: 'NoSchedule'.
          */
         effect: pulumi.Input<string>;
         /**
-         * Taint key to apply to provisioned nodes.
+         * Taint key to apply to provisioned nodes. Example: 'dedicated'.
          */
         key: pulumi.Input<string>;
         /**
-         * Taint value associated with the key.
+         * Taint value associated with the key. Example: 'gpu'.
          */
         value?: pulumi.Input<string>;
     }
 
     export interface VerticalScalingArgsArgs {
         /**
-         * Recommend requests even when the workload has no existing requests set. Server/web default: true.
+         * Recommend requests even when the workload has no existing requests set. Example: true. Server/web default: true.
          */
         adjustReqEvenIfNotSet?: pulumi.Input<boolean>;
         /**
-         * Enable vertical scaling for this resource type.
+         * Enable vertical scaling for this resource type. Example: true
          */
         enabled?: pulumi.Input<boolean>;
         /**
-         * Multiplier applied to the request to derive the resource limit.
+         * Multiplier applied to the request to derive the resource limit. Example: 1.5 sets limit to 150% of request.
          */
         limitMultiplier?: pulumi.Input<number>;
         /**
-         * Whether to also adjust resource limits alongside requests.
+         * Whether to also adjust resource limits alongside requests. Example: true.
          */
         limitsAdjustmentEnabled?: pulumi.Input<boolean>;
         /**
-         * Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Web default: true for CPU, false for Memory.
+         * Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Example: true. Web default: true for CPU, false for Memory.
          */
         limitsRemovalEnabled?: pulumi.Input<boolean>;
         /**
-         * Maximum resource request in millicores (CPU) or bytes (memory/GPU).
+         * Maximum resource request in millicores (CPU) or bytes (memory/GPU). Example: 4000 (= 4 CPU cores), 1073741824 (= 1Gi memory).
          */
         maxRequest?: pulumi.Input<number>;
         /**
-         * Maximum percentage decrease allowed in a single recommendation cycle.
+         * Maximum percentage decrease allowed in a single recommendation cycle. Example: 20.0 allows up to 20% decrease. Default: 1.0.
          */
         maxScaleDownPercent?: pulumi.Input<number>;
         /**
-         * Maximum percentage increase allowed in a single recommendation cycle.
+         * Maximum percentage increase allowed in a single recommendation cycle. Example: 50.0 allows up to 50% increase. Default: 1000.0.
          */
         maxScaleUpPercent?: pulumi.Input<number>;
         /**
-         * Minimum number of data points required before a recommendation is emitted.
+         * Minimum number of data points required before a recommendation is emitted. Example: 20 (default).
          */
         minDataPoints?: pulumi.Input<number>;
         /**
-         * Minimum resource request in millicores (CPU) or bytes (memory/GPU).
+         * Minimum resource request in millicores (CPU) or bytes (memory/GPU). Example: 100 (= 100m CPU), 134217728 (= 128Mi memory).
          */
         minRequest?: pulumi.Input<number>;
         /**
-         * Multiplier applied on top of the recommendation to add headroom.
+         * Multiplier applied on top of the recommendation to add headroom. Example: 1.15 adds 15% overhead.
          */
         overheadMultiplier?: pulumi.Input<number>;
         /**
-         * Percentile of usage data used as the recommendation target (e.g. 0.95).
+         * Percentile of usage data used as the recommendation target (0-1). Example: 0.95 targets the 95th percentile.
          */
         targetPercentile?: pulumi.Input<number>;
     }

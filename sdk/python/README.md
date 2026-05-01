@@ -301,6 +301,7 @@ node_policy = devzero.resources.NodePolicy("my-node-policy",
 | `consolidation_policy` | `str` | `WhenEmpty` \| `WhenEmptyOrUnderutilized` |
 | `consolidate_after` | `str` | Wait time after node is empty before consolidating (e.g. `30s`) |
 | `expire_after` | `str` | Force-replace nodes after this duration (e.g. `720h`) |
+| `ttl_seconds_after_empty` | `int` | Seconds before an empty node is terminated (deprecated; prefer `consolidate_after`) |
 | `termination_grace_period_seconds` | `int` | Grace period before forcefully terminating a draining node |
 | `budgets` | `list[DisruptionBudgetArgsArgs]` | Limits on how many nodes may be disrupted at once |
 
@@ -308,18 +309,22 @@ node_policy = devzero.resources.NodePolicy("my-node-policy",
 
 | Field | Type | Description |
 |---|---|---|
-| `ami_family` | `str` | AMI family: `AL2`, `Bottlerocket`, `Windows2022`, etc. |
-| `role` | `str` | IAM role name for nodes |
+| `ami_family` | `str` | AMI family: `AL2`, `AL2023`, `Bottlerocket`, `Windows2019`, `Windows2022` |
+| `role` | `str` | IAM role name for nodes (Karpenter creates the instance profile) |
+| `instance_profile` | `str` | IAM instance profile name (alternative to `role`) |
 | `subnet_selector_terms` | `list[SubnetSelectorTermArgsArgs]` | Subnet selectors (by tag or ID) |
 | `security_group_selector_terms` | `list[SecurityGroupSelectorTermArgsArgs]` | Security group selectors |
+| `capacity_reservation_selector_terms` | `list[CapacityReservationSelectorTermArgsArgs]` | EC2 capacity reservation selectors |
 | `ami_selector_terms` | `list[AMISelectorTermArgsArgs]` | AMI selectors (by alias, tag, or ID) |
 | `block_device_mappings` | `list[BlockDeviceMappingArgsArgs]` | EBS volume configuration |
+| `instance_store_policy` | `str` | NVMe instance store policy. Value: `INSTANCE_STORE_POLICY_RAID0` |
 | `tags` | `dict[str, str]` | AWS tags on all provisioned resources |
 | `associate_public_ip_address` | `bool` | Assign a public IP to nodes |
 | `detailed_monitoring` | `bool` | Enable CloudWatch detailed monitoring |
 | `metadata_options` | `MetadataOptionsArgsArgs` | EC2 IMDS options (IMDSv2, hop limit, etc.) |
 | `kubelet` | `KubeletConfigurationArgsArgs` | Kubelet overrides (max_pods, eviction thresholds, etc.) |
 | `user_data` | `str` | Custom launch template user data |
+| `context` | `str` | Additional EC2 launch template context ARN for advanced customization |
 
 **`AzureNodeClassSpecArgsArgs` fields:**
 

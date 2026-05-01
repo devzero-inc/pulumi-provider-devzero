@@ -402,14 +402,24 @@ pulumi stack rm <stack-name>
 | `description` | string | Human-readable description |
 | `cpuVerticalScaling` | `VerticalScalingArgs` | CPU vertical scaling configuration |
 | `memoryVerticalScaling` | `VerticalScalingArgs` | Memory vertical scaling configuration |
+| `gpuVerticalScaling` | `VerticalScalingArgs` | GPU core vertical scaling configuration (same fields as `cpuVerticalScaling`; units: GPU millicores) |
+| `gpuVramVerticalScaling` | `VerticalScalingArgs` | GPU VRAM vertical scaling configuration (same fields as `cpuVerticalScaling`; units: bytes) |
 | `horizontalScaling` | `HorizontalScalingArgs` | Horizontal (replica) scaling configuration |
-| `actionTriggers` | string[] | `on_detection` \| `on_schedule` |
-| `detectionTriggers` | string[] | `pod_creation` \| `pod_update` \| `pod_reschedule` |
+| `actionTriggers` | string[] | When to apply recommendations: `on_detection` \| `on_schedule` |
+| `cronSchedule` | string | Cron expression for scheduled application (5-field UTC). Required when `actionTriggers` includes `on_schedule`. Example: `0 2 * * *` |
+| `detectionTriggers` | string[] | Events that trigger a recommendation: `pod_creation` \| `pod_update` \| `pod_reschedule` |
+| `loopbackPeriodSeconds` | int | Seconds of historical usage data to consider. Default: `86400` (24 h) |
+| `startupPeriodSeconds` | int | Seconds after workload start to exclude from usage data (avoids cold-start spikes). Example: `300` |
+| `liveMigrationEnabled` | bool | Allow live pod migration when applying recommendations without restart. Default: `false` |
+| `schedulerPlugins` | string[] | Kubernetes scheduler plugins to activate. Example: `["binpacking"]` |
+| `defragmentationSchedule` | string | Cron expression for background node defragmentation. Example: `0 3 * * 0` |
 | `enablePmaxProtection` | bool | Raise requests to cover peak usage when max/recommendation ratio exceeds `pmaxRatioThreshold`. Default: `true` |
-| `pmaxRatioThreshold` | float | Max-to-recommendation ratio that triggers pmax protection. Default: `3.0` |
-| `loopbackPeriodSeconds` | int | Period in seconds to look back for usage data. Default: `86400` (24 h) |
+| `pmaxRatioThreshold` | float | Peak-to-recommendation ratio that triggers pmax protection. Default: `3.0` |
 | `minDataPoints` | int | Global minimum data points required before a recommendation is emitted. Default: `15` |
-| `minChangePercent` | float | Global minimum change threshold for applying recommendations. Default: `0.2` (20%) |
+| `minChangePercent` | float | Global minimum relative change (0–1) required before applying a recommendation. Default: `0.2` (20%) |
+| `stabilityCvMax` | float | Maximum coefficient of variation (stddev/mean) for a workload to be considered stable enough for VPA. Example: `0.3` |
+| `hysteresisVsTarget` | float | Dead-band ratio around the HPA target to suppress VPA/HPA oscillation. Example: `0.1` |
+| `driftDeltaPercent` | float | Percentage change from baseline recommendation that triggers a VPA refresh. Example: `20.0` |
 | `minVpaWindowDataPoints` | int | Minimum data points in VPA analysis window. Default: `30` |
 | `cooldownMinutes` | int | Minutes to wait between applying recommendations. Default: `300` (5 h) |
 
@@ -454,6 +464,8 @@ pulumi stack rm <stack-name>
 | `instanceCpus` | `LabelSelectorArgs` | Filter by vCPU count |
 | `instanceSizes` | `LabelSelectorArgs` | Filter instance sizes (e.g. `large`, `xlarge`) |
 | `instanceTypes` | `LabelSelectorArgs` | Explicit instance types (e.g. `m5.xlarge`) |
+| `instanceGenerations` | `LabelSelectorArgs` | Filter by instance generation number (e.g. `2`, `3`) |
+| `instanceHypervisors` | `LabelSelectorArgs` | Filter by hypervisor type (e.g. `nitro`) |
 | `zones` | `LabelSelectorArgs` | Availability zones to provision into |
 | `architectures` | `LabelSelectorArgs` | CPU architectures (e.g. `amd64`, `arm64`) |
 | `operatingSystems` | `LabelSelectorArgs` | OS filter (e.g. `linux`, `windows`) |
@@ -461,6 +473,8 @@ pulumi stack rm <stack-name>
 | `taints` | `TaintArgs[]` | Taints applied to provisioned nodes |
 | `disruption` | `DisruptionPolicyArgs` | Node disruption / consolidation settings |
 | `limits` | `ResourceLimitsArgs` | Max total CPU/memory this policy may provision |
+| `nodePoolName` | string | Override name for the generated Karpenter NodePool resource |
+| `nodeClassName` | string | Override name for the generated Karpenter NodeClass resource |
 | `aws` | `AWSNodeClassSpecArgs` | AWS-specific configuration (AMI, subnets, IAM role, EBS, etc.) |
 | `azure` | `AzureNodeClassSpecArgs` | Azure-specific configuration (subnet, image family, disk, etc.) |
 | `raw` | `RawKarpenterSpecArgs[]` | Raw Karpenter NodePool/NodeClass YAML (escape hatch) |
@@ -472,6 +486,7 @@ pulumi stack rm <stack-name>
 | `consolidationPolicy` | string | `WhenEmpty` \| `WhenEmptyOrUnderutilized` |
 | `consolidateAfter` | string | Wait time after node is empty before consolidating (e.g. `30s`) |
 | `expireAfter` | string | Force-replace nodes after this duration (e.g. `720h`) |
+| `ttlSecondsAfterEmpty` | int | Seconds before an empty node is terminated (deprecated; prefer `consolidateAfter`) |
 | `terminationGracePeriodSeconds` | int | Grace period before forcefully terminating a draining node |
 | `budgets` | `DisruptionBudgetArgs[]` | Limits on how many nodes may be disrupted at once |
 
@@ -479,18 +494,22 @@ pulumi stack rm <stack-name>
 
 | Field | Type | Description |
 |---|---|---|
-| `amiFamily` | string | AMI family: `AL2`, `Bottlerocket`, `Windows2022`, etc. |
-| `role` | string | IAM role name for nodes |
+| `amiFamily` | string | AMI family: `AL2`, `AL2023`, `Bottlerocket`, `Windows2019`, `Windows2022` |
+| `role` | string | IAM role name for nodes (Karpenter creates the instance profile) |
+| `instanceProfile` | string | IAM instance profile name (alternative to `role`) |
 | `subnetSelectorTerms` | `SubnetSelectorTermArgs[]` | Subnet selectors (by tag or ID) |
 | `securityGroupSelectorTerms` | `SecurityGroupSelectorTermArgs[]` | Security group selectors |
+| `capacityReservationSelectorTerms` | `CapacityReservationSelectorTermArgs[]` | EC2 capacity reservation selectors |
 | `amiSelectorTerms` | `AMISelectorTermArgs[]` | AMI selectors (by alias, tag, or ID) |
 | `blockDeviceMappings` | `BlockDeviceMappingArgs[]` | EBS volume configuration |
+| `instanceStorePolicy` | string | NVMe instance store policy. Value: `INSTANCE_STORE_POLICY_RAID0` |
 | `tags` | map[string]string | AWS tags on all provisioned resources |
 | `associatePublicIpAddress` | bool | Assign a public IP to nodes |
 | `detailedMonitoring` | bool | Enable CloudWatch detailed monitoring |
 | `metadataOptions` | `MetadataOptionsArgs` | EC2 IMDS options (IMDSv2, hop limit, etc.) |
 | `kubelet` | `KubeletConfigurationArgs` | Kubelet overrides (maxPods, eviction thresholds, etc.) |
 | `userData` | string | Custom launch template user data |
+| `context` | string | Additional EC2 launch template context ARN for advanced customization |
 
 ### AzureNodeClassSpecArgs
 

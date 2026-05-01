@@ -117,6 +117,8 @@ func (a *WorkloadPolicyArgs) Annotate(ann infer.Annotator) {
 	ann.Describe(&a.DriftDeltaPercent, "Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.")
 	ann.Describe(&a.MinVpaWindowDataPoints, "Minimum data points inside the VPA analysis window before a recommendation is generated. Example: 30 (default).")
 	ann.Describe(&a.CooldownMinutes, "Minimum minutes to wait between consecutive recommendation applications. Example: 300 (5 h, default).")
+	ann.Describe(&a.GpuVerticalScaling, "Vertical scaling configuration for GPU cores. Uses the same fields as cpuVerticalScaling; units are GPU cores (millicores).")
+	ann.Describe(&a.GpuVramVerticalScaling, "Vertical scaling configuration for GPU VRAM. Uses the same fields as cpuVerticalScaling; units are bytes.")
 	ann.Describe(&a.EnablePmaxProtection, "Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true.")
 	ann.Describe(&a.PmaxRatioThreshold, "Peak-to-recommendation ratio above which pmax protection activates. Example: 3.0 (default) — triggers when peak is 3× the recommendation.")
 	ann.SetDefault(&a.PmaxRatioThreshold, 3.0)

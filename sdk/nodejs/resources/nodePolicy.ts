@@ -34,95 +34,95 @@ export class NodePolicy extends pulumi.CustomResource {
     }
 
     /**
-     * CPU architectures (e.g. amd64, arm64).
+     * CPU architectures for nodes. Example: {in: ["amd64"]}.
      */
     declare public readonly architectures: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
     /**
-     * AWS-specific node class configuration.
+     * AWS-specific EC2NodeClass configuration (subnets, AMIs, IAM role, EBS, etc.).
      */
     declare public readonly aws: pulumi.Output<outputs.resources.AWSNodeClassSpecArgs | undefined>;
     /**
-     * Azure-specific node class configuration.
+     * Azure-specific AKSNodeClass configuration (VNet subnet, OS disk, image family, etc.).
      */
     declare public readonly azure: pulumi.Output<outputs.resources.AzureNodeClassSpecArgs | undefined>;
     /**
-     * Capacity types (e.g. on-demand, spot).
+     * Capacity purchasing types. Valid values: 'spot', 'on-demand', 'reserved'. Example: {in: ["spot", "on-demand"]}.
      */
     declare public readonly capacityTypes: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
     /**
-     * Free-form description of the node policy.
+     * Free-form description of the node policy. Example: 'Spot instance policy for production batch workloads'.
      */
     declare public readonly description: pulumi.Output<string | undefined>;
     /**
-     * Karpenter disruption policy for consolidation and expiry.
+     * Karpenter disruption policy controlling consolidation, expiry, and budgets.
      */
     declare public readonly disruption: pulumi.Output<outputs.resources.DisruptionPolicyArgs | undefined>;
     /**
-     * Filter instances by category (e.g. general-purpose, compute-optimized).
+     * Filter instances by category letter (cloud-specific). Example: {in: ["m", "c", "r"]} for AWS, {in: ["D", "E"]} for Azure.
      */
     declare public readonly instanceCategories: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
     /**
-     * Filter instances by CPU count.
+     * Filter instances by vCPU count. Example: {in: ["4", "8", "16"]}.
      */
     declare public readonly instanceCpus: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
     /**
-     * Filter instances by family (e.g. m5, c6i).
+     * Filter instances by family. Example: {in: ["m5", "c6i", "m6i"]}.
      */
     declare public readonly instanceFamilies: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
     /**
-     * Filter instances by generation.
+     * Filter instances by generation number. Example: {in: ["2", "3"]}.
      */
     declare public readonly instanceGenerations: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
     /**
-     * Filter instances by hypervisor type.
+     * Filter instances by hypervisor type. Example: {in: ["nitro"]}.
      */
     declare public readonly instanceHypervisors: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
     /**
-     * Filter instances by size (e.g. large, xlarge).
+     * Filter instances by size label. Example: {in: ["large", "xlarge", "2xlarge"]}.
      */
     declare public readonly instanceSizes: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
     /**
-     * Explicitly select specific instance types.
+     * Explicitly allow specific instance types. Example: {in: ["m5.large", "c6i.large"]}.
      */
     declare public readonly instanceTypes: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
     /**
-     * Labels applied to provisioned nodes.
+     * Labels applied to all provisioned nodes. Example: {"team": "backend", "env": "prod"}.
      */
     declare public readonly labels: pulumi.Output<{[key: string]: string} | undefined>;
     /**
-     * Resource limits on the total capacity managed by this policy.
+     * Resource limits on total capacity managed by this policy. Example: {cpu: "1000", memory: "1000Gi"}.
      */
     declare public readonly limits: pulumi.Output<outputs.resources.ResourceLimitsArgs | undefined>;
     /**
-     * Human-friendly name for the node policy.
+     * Human-friendly name for the node policy. Example: 'prod-spot-policy'.
      */
     declare public readonly name: pulumi.Output<string>;
     /**
-     * Override name for the generated Karpenter NodeClass.
+     * Override name for the generated Karpenter NodeClass resource. Example: 'prod-aws-nodeclass'.
      */
     declare public readonly nodeClassName: pulumi.Output<string | undefined>;
     /**
-     * Override name for the generated Karpenter NodePool.
+     * Override name for the generated Karpenter NodePool resource. Example: 'prod-spot-nodepool'.
      */
     declare public readonly nodePoolName: pulumi.Output<string | undefined>;
     /**
-     * Operating systems for nodes (e.g. linux, windows).
+     * Operating systems for nodes. Example: {in: ["linux"]}.
      */
     declare public readonly operatingSystems: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
     /**
-     * Raw Karpenter YAML for full NodePool/NodeClass customization.
+     * Raw Karpenter YAML for full NodePool/NodeClass customization — use only when structured fields are insufficient.
      */
     declare public readonly raw: pulumi.Output<outputs.resources.RawKarpenterSpecArgs[] | undefined>;
     /**
-     * Taints applied to provisioned nodes.
+     * Taints applied to provisioned nodes to control pod scheduling. Example: [{key: "dedicated", value: "gpu", effect: "NoSchedule"}].
      */
     declare public readonly taints: pulumi.Output<outputs.resources.TaintArgs[] | undefined>;
     /**
-     * Priority weight for this policy; higher values take precedence.
+     * Priority weight; higher values take precedence when multiple policies match. Example: 100.
      */
     declare public readonly weight: pulumi.Output<number | undefined>;
     /**
-     * Availability zones where nodes may be provisioned.
+     * Availability zones where nodes may be provisioned. Example: {in: ["us-east-1a", "us-east-1b"]}.
      */
     declare public readonly zones: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
 
