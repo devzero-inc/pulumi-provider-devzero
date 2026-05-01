@@ -13,8 +13,11 @@ import (
 
 // GetClusterIDByNameArgs are the inputs for the GetClusterIdByName function.
 type GetClusterIDByNameArgs struct {
-	TeamID string `pulumi:"teamId"`
-	Name   string `pulumi:"name"`
+	TeamID        string  `pulumi:"teamId"`
+	Name          string  `pulumi:"name"`
+	Region        *string `pulumi:"region,optional"`
+	CloudProvider *string `pulumi:"cloudProvider,optional"`
+	Liveness      *string `pulumi:"liveness,optional"`
 }
 
 // GetClusterIDByNameResult is the output of the GetClusterIdByName function.
@@ -26,6 +29,9 @@ type GetClusterIDByNameResult struct {
 func (a *GetClusterIDByNameArgs) Annotate(ann infer.Annotator) {
 	ann.Describe(&a.TeamID, "The team ID to search within.")
 	ann.Describe(&a.Name, "The cluster name to look up.")
+	ann.Describe(&a.Region, "Optional region filter, e.g. \"us-east-1\".")
+	ann.Describe(&a.CloudProvider, "Optional cloud provider filter. One of: 'AWS', 'GCP', 'AKS', 'OCI'.")
+	ann.Describe(&a.Liveness, "Controls liveness filtering: IGNORE, PREFER_LIVE, or REQUIRE_LIVE.")
 }
 
 // Annotate provides descriptions used in SDK documentation.
@@ -49,10 +55,21 @@ func (f *GetClusterIdByName) Invoke(ctx context.Context, req infer.FunctionReque
 		teamID = cs.TeamID
 	}
 
-	resp, err := cs.ClusterServiceClient.GetClusterIDByName(ctx, connect.NewRequest(&apiv1.GetClusterIDByNameRequest{
+	rpcReq := &apiv1.GetClusterIDByNameRequest{
 		TeamId: teamID,
 		Name:   req.Input.Name,
-	}))
+		Region: req.Input.Region,
+		CloudProvider: req.Input.CloudProvider,
+	}
+	if req.Input.Liveness != nil {
+		val, ok := apiv1.ClusterLivenessPreference_value["CLUSTER_LIVENESS_PREFERENCE_"+*req.Input.Liveness]
+		if !ok {
+			return infer.FunctionResponse[GetClusterIDByNameResult]{}, fmt.Errorf("GetClusterIDByName: invalid liveness value %q, must be IGNORE, PREFER_LIVE, or REQUIRE_LIVE", *req.Input.Liveness)
+		}
+		liveness := apiv1.ClusterLivenessPreference(val)
+		rpcReq.Liveness = &liveness
+	}
+	resp, err := cs.ClusterServiceClient.GetClusterIDByName(ctx, connect.NewRequest(rpcReq))
 	if err != nil {
 		return infer.FunctionResponse[GetClusterIDByNameResult]{}, fmt.Errorf("GetClusterIDByName: %w", err)
 	}

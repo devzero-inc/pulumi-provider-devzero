@@ -276,7 +276,7 @@ pulumi up
 
 Look up an existing cluster by name and return its ID. Use this when a cluster was **registered manually** (not created by Pulumi) and you need its ID to attach policies, inject into `values.yaml`, or pass to a Kubernetes secret.
 
-> **Warning:** If multiple clusters share the same name, only the first active (non-deleted) one is returned. Ensure cluster names are unique within your team to avoid unexpected results.
+> **Note:** If multiple clusters share the same name, the newest one (by `created_at`) is returned by default. Use the `liveness` field to prefer or require a cluster whose zxporter agent has reported a heartbeat within the last 60 minutes.
 
 #### TypeScript
 
@@ -287,6 +287,9 @@ import { resources } from "@devzero/pulumi-devzero";
 const existing = await resources.getClusterIdByName({
     name: "my-existing-cluster",
     // teamId is optional — defaults to devzero:teamId from provider config
+    // region: "us-east-1",        // optional: filter by region
+    // cloudProvider: "AWS",       // optional: filter by cloud provider (AWS | GCP | AKS | OCI)
+    // liveness: "PREFER_LIVE",    // optional: IGNORE | PREFER_LIVE | REQUIRE_LIVE
 });
 
 // Attach a policy to the existing cluster
@@ -311,6 +314,9 @@ import pulumi_devzero as devzero
 existing = devzero.resources.get_cluster_id_by_name(
     name="my-existing-cluster",
     # team_id is optional — defaults to devzero:teamId from provider config
+    # region="us-east-1",        # optional: filter by region
+    # cloud_provider="AWS",      # optional: filter by cloud provider (AWS | GCP | AKS | OCI)
+    # liveness="PREFER_LIVE",    # optional: IGNORE | PREFER_LIVE | REQUIRE_LIVE
 )
 
 # Attach a policy to the existing cluster
@@ -332,6 +338,9 @@ pulumi.export("existing_cluster_id", existing.cluster_id)
 existing, err := resources.GetClusterIdByName(ctx, &resources.GetClusterIdByNameArgs{
     Name: "my-existing-cluster",
     // TeamId is optional — defaults to devzero:teamId from provider config
+    // Region:        pulumi.StringRef("us-east-1"),     // optional: filter by region
+    // CloudProvider: pulumi.StringRef("AWS"),           // optional: filter by cloud provider (AWS | GCP | AKS | OCI)
+    // Liveness:      pulumi.StringRef("PREFER_LIVE"),   // optional: IGNORE | PREFER_LIVE | REQUIRE_LIVE
 })
 if err != nil {
     return err
@@ -359,6 +368,9 @@ ctx.Export("existingClusterId", pulumi.String(existing.ClusterId))
 |---|---|---|---|
 | `name` | string | yes | Cluster name to look up |
 | `teamId` | string | no | Team to search within. Defaults to `devzero:teamId` from provider config |
+| `region` | string | no | Filter by region name (e.g. `us-east-1`) |
+| `cloudProvider` | string | no | Filter by cloud provider (e.g. `AWS`, `GCP`,`AKS`,`OCI`) |
+| `liveness` | string | no | Heartbeat filter. One of: `IGNORE` (default — newest by `created_at`), `PREFER_LIVE` (live clusters first, fallback to newest), `REQUIRE_LIVE` (404 if no heartbeat within 60 min) |
 
 **Outputs:**
 
@@ -436,8 +448,8 @@ pulumi stack rm <stack-name>
 | `name` | string | Unique policy name |
 | `description` | string | Human-readable description |
 | `weight` | int | Priority when multiple policies match (higher = preferred) |
-| `capacityTypes` | `LabelSelectorArgs` | Capacity types: `on-demand` \| `spot` |
-| `instanceCategories` | `LabelSelectorArgs` | Filter instance categories (e.g. `c`, `m`, `r`) |
+| `capacityTypes` | `LabelSelectorArgs` | Capacity types: `on-demand` \| `spot` \| `reserved` |
+| `instanceCategories` | `LabelSelectorArgs` | Filter by instance category letter: e.g. `m`, `c`, `r` (AWS) or `D`, `E` (Azure) |
 | `instanceFamilies` | `LabelSelectorArgs` | Filter instance families (e.g. `c5`, `m5`) |
 | `instanceCpus` | `LabelSelectorArgs` | Filter by vCPU count |
 | `instanceSizes` | `LabelSelectorArgs` | Filter instance sizes (e.g. `large`, `xlarge`) |
@@ -457,7 +469,7 @@ pulumi stack rm <stack-name>
 
 | Field | Type | Description |
 |---|---|---|
-| `consolidationPolicy` | string | `WhenEmpty` \| `WhenUnderutilized` |
+| `consolidationPolicy` | string | `WhenEmpty` \| `WhenEmptyOrUnderutilized` |
 | `consolidateAfter` | string | Wait time after node is empty before consolidating (e.g. `30s`) |
 | `expireAfter` | string | Force-replace nodes after this duration (e.g. `720h`) |
 | `terminationGracePeriodSeconds` | int | Grace period before forcefully terminating a draining node |

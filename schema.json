@@ -104,30 +104,30 @@
             "properties": {
                 "alias": {
                     "type": "string",
-                    "description": "Well-known alias for the AMI family (e.g. 'al2@latest')."
+                    "description": "Well-known alias for the AMI family. Example: 'al2@latest' or 'bottlerocket@latest'."
                 },
                 "id": {
                     "type": "string",
-                    "description": "Explicit AMI ID."
+                    "description": "Explicit AMI ID. Example: 'ami-0a1b2c3d4e5f67890'."
                 },
                 "name": {
                     "type": "string",
-                    "description": "AMI name filter (supports wildcards)."
+                    "description": "AMI name filter (supports wildcards). Example: 'my-org-eks-node-*'."
                 },
                 "owner": {
                     "type": "string",
-                    "description": "AWS account ID or alias that owns the AMI."
+                    "description": "AWS account ID or alias that owns the AMI. Example: '123456789012' or 'amazon'."
                 },
                 "ssmParameter": {
                     "type": "string",
-                    "description": "SSM parameter path that stores the AMI ID."
+                    "description": "SSM parameter path that stores the AMI ID. Example: '/aws/service/eks/optimized-ami/1.29/amazon-linux-2/recommended/image_id'."
                 },
                 "tags": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Map of AWS tags used to select AMIs."
+                    "description": "Map of AWS tags used to select AMIs. Example: {\"my-org/ami\": \"approved\"}."
                 }
             },
             "type": "object"
@@ -136,85 +136,85 @@
             "properties": {
                 "amiFamily": {
                     "type": "string",
-                    "description": "AMI family shorthand (e.g. 'AL2', 'Bottlerocket', 'Windows2022')."
+                    "description": "AMI family shorthand used when no amiSelectorTerms are specified. One of: 'AL2', 'AL2023', 'Bottlerocket', 'Windows2019', 'Windows2022'. Example: 'AL2'."
                 },
                 "amiSelectorTerms": {
                     "type": "array",
                     "items": {
                         "$ref": "#/types/devzero:resources:AMISelectorTermArgs"
                     },
-                    "description": "Selectors for the AMIs used to launch nodes."
+                    "description": "Selectors for the AMIs used to launch nodes. Example: [{alias: \"al2@latest\"}]."
                 },
                 "associatePublicIpAddress": {
                     "type": "boolean",
-                    "description": "Whether to assign a public IP address to provisioned nodes."
+                    "description": "Whether to assign a public IP address to provisioned nodes. Example: false."
                 },
                 "blockDeviceMappings": {
                     "type": "array",
                     "items": {
                         "$ref": "#/types/devzero:resources:BlockDeviceMappingArgs"
                     },
-                    "description": "EBS block device mappings for nodes."
+                    "description": "EBS block device mappings for nodes. Example: [{deviceName: \"/dev/xvda\", rootVolume: true, ebs: {volumeSize: \"50Gi\", volumeType: \"gp3\"}}]."
                 },
                 "capacityReservationSelectorTerms": {
                     "type": "array",
                     "items": {
                         "$ref": "#/types/devzero:resources:CapacityReservationSelectorTermArgs"
                     },
-                    "description": "Selectors for EC2 capacity reservations to prioritize."
+                    "description": "Selectors for EC2 capacity reservations to prioritize. Example: [{tags: {\"aws:ec2:fleet-id\": \"fleet-123\"}}]."
                 },
                 "context": {
                     "type": "string",
-                    "description": "EC2 launch template context ARN."
+                    "description": "Additional EC2 launch template context ARN for advanced customization. Example: 'arn:aws:ec2:us-east-1:123456789012:launch-template/lt-0abc123'."
                 },
                 "detailedMonitoring": {
                     "type": "boolean",
-                    "description": "Enable detailed CloudWatch monitoring for instances."
+                    "description": "Enable detailed (1-minute interval) CloudWatch monitoring for instances. Example: false."
                 },
                 "instanceProfile": {
                     "type": "string",
-                    "description": "IAM instance profile name (use instead of Role when profile already exists)."
+                    "description": "IAM instance profile name to use directly (alternative to Role). Example: 'KarpenterNodeInstanceProfile-my-cluster'."
                 },
                 "instanceStorePolicy": {
                     "type": "string",
-                    "description": "Policy for handling instance store volumes. One of: 'RAID0'."
+                    "description": "Policy for handling NVMe instance store volumes. One of: 'RAID0'. Example: 'RAID0'."
                 },
                 "kubelet": {
                     "$ref": "#/types/devzero:resources:KubeletConfigurationArgs",
-                    "description": "Kubelet configuration overrides for AWS nodes."
+                    "description": "Kubelet configuration overrides applied to all nodes in this class."
                 },
                 "metadataOptions": {
                     "$ref": "#/types/devzero:resources:MetadataOptionsArgs",
-                    "description": "EC2 instance metadata (IMDS) options."
+                    "description": "EC2 instance metadata service (IMDS) configuration."
                 },
                 "role": {
                     "type": "string",
-                    "description": "IAM role name assigned to nodes."
+                    "description": "IAM role name assigned to nodes (Karpenter creates the instance profile). Example: 'KarpenterNodeRole-my-cluster'."
                 },
                 "securityGroupSelectorTerms": {
                     "type": "array",
                     "items": {
                         "$ref": "#/types/devzero:resources:SecurityGroupSelectorTermArgs"
                     },
-                    "description": "Selectors for security groups attached to nodes."
+                    "description": "Selectors for security groups attached to provisioned nodes. Example: [{tags: {\"karpenter.sh/discovery\": \"my-cluster\"}}]."
                 },
                 "subnetSelectorTerms": {
                     "type": "array",
                     "items": {
                         "$ref": "#/types/devzero:resources:SubnetSelectorTermArgs"
                     },
-                    "description": "Selectors for the subnets nodes will be launched into."
+                    "description": "Selectors for the subnets nodes will be launched into. Example: [{tags: {\"karpenter.sh/discovery\": \"my-cluster\"}}]."
                 },
                 "tags": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "AWS tags applied to all resources created by this node class."
+                    "description": "AWS tags applied to all resources (instances, volumes, ENIs) created by this node class. Example: {\"environment\": \"production\", \"team\": \"platform\"}."
                 },
                 "userData": {
                     "type": "string",
-                    "description": "Custom user data script injected into the node launch template."
+                    "description": "Custom user data script merged into the node launch template (base64 or plain text). Example: '#!/bin/bash\\necho hello'."
                 }
             },
             "type": "object"
@@ -226,43 +226,43 @@
                     "items": {
                         "type": "string"
                     },
-                    "description": "Unsafe sysctl patterns that are allowed (e.g. 'net.ipv4.*')."
+                    "description": "Unsafe sysctl patterns permitted on nodes. Example: [\"net.ipv4.*\", \"net.ipv6.*\"]."
                 },
                 "containerLogMaxFiles": {
                     "type": "integer",
-                    "description": "Maximum number of container log files to retain."
+                    "description": "Maximum number of container log files to retain per container. Example: 5."
                 },
                 "containerLogMaxSize": {
                     "type": "string",
-                    "description": "Maximum container log file size before rotation (e.g. '10Mi')."
+                    "description": "Maximum container log file size before rotation. Example: '10Mi'."
                 },
                 "cpuCfsQuota": {
                     "type": "boolean",
-                    "description": "Whether to enforce CPU CFS quota for containers."
+                    "description": "Whether to enforce CPU CFS quota limits for containers. Example: true."
                 },
                 "cpuCfsQuotaPeriod": {
                     "type": "string",
-                    "description": "CPU CFS quota period (e.g. '100ms')."
+                    "description": "CPU CFS quota period. Example: '100ms'."
                 },
                 "cpuManagerPolicy": {
                     "type": "string",
-                    "description": "CPU manager policy. One of: 'none', 'static'."
+                    "description": "CPU manager policy for CPU pinning. One of: 'none', 'static'. Example: 'static'."
                 },
                 "imageGcHighThresholdPercent": {
                     "type": "integer",
-                    "description": "Disk usage percentage triggering image GC."
+                    "description": "Disk usage % that triggers image garbage collection. Example: 85."
                 },
                 "imageGcLowThresholdPercent": {
                     "type": "integer",
-                    "description": "Disk usage percentage below which image GC stops."
+                    "description": "Disk usage % at which image GC stops freeing space. Example: 70."
                 },
                 "podPidsLimit": {
                     "type": "integer",
-                    "description": "Maximum number of process IDs per pod."
+                    "description": "Maximum number of process IDs allowed per pod. Example: 1024."
                 },
                 "topologyManagerPolicy": {
                     "type": "string",
-                    "description": "Topology manager policy for NUMA-aware scheduling."
+                    "description": "Topology manager policy for NUMA-aware workloads. One of: 'none', 'best-effort', 'restricted', 'single-numa-node'. Example: 'none'."
                 }
             },
             "type": "object"
@@ -271,11 +271,11 @@
             "properties": {
                 "fipsMode": {
                     "type": "string",
-                    "description": "FIPS compliance mode. One of: 'Enabled', 'Disabled'."
+                    "description": "FIPS 140-2 compliance mode for the node. One of: 'Enabled', 'Disabled'. Example: 'Disabled'."
                 },
                 "imageFamily": {
                     "type": "string",
-                    "description": "Azure node image family (e.g. 'AzureLinux', 'Ubuntu2204')."
+                    "description": "Azure node image family. One of: 'AzureLinux', 'Ubuntu2204'. Example: 'AzureLinux'."
                 },
                 "kubelet": {
                     "$ref": "#/types/devzero:resources:AzureKubeletConfigurationArgs",
@@ -283,22 +283,22 @@
                 },
                 "maxPods": {
                     "type": "integer",
-                    "description": "Maximum pods per node (overrides AKS default)."
+                    "description": "Maximum pods per node, overrides the AKS cluster default. Example: 110."
                 },
                 "osDiskSizeGb": {
                     "type": "integer",
-                    "description": "OS disk size in GB."
+                    "description": "OS disk size in GB. Example: 128."
                 },
                 "tags": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Azure tags applied to all resources created by this node class."
+                    "description": "Azure tags applied to all resources created by this node class. Example: {\"environment\": \"production\"}."
                 },
                 "vnetSubnetId": {
                     "type": "string",
-                    "description": "Azure VNet subnet resource ID for node networking."
+                    "description": "Azure VNet subnet resource ID where nodes will be placed. Example: '/subscriptions/sub-id/resourceGroups/my-rg/providers/Microsoft.Network/virtualNetworks/my-vnet/subnets/nodesubnet'."
                 }
             },
             "type": "object"
@@ -307,39 +307,39 @@
             "properties": {
                 "deleteOnTermination": {
                     "type": "boolean",
-                    "description": "Whether to delete the EBS volume when the instance terminates."
+                    "description": "Whether to delete the EBS volume when the instance terminates. Example: true."
                 },
                 "encrypted": {
                     "type": "boolean",
-                    "description": "Whether to encrypt the EBS volume."
+                    "description": "Whether to encrypt the EBS volume. Example: true."
                 },
                 "iops": {
                     "type": "integer",
-                    "description": "IOPS to provision for io1/io2 volume types."
+                    "description": "IOPS to provision for io1/io2 volume types. Example: 3000."
                 },
                 "kmsKeyId": {
                     "type": "string",
-                    "description": "KMS key ID or ARN used to encrypt the volume."
+                    "description": "KMS key ID or ARN used to encrypt the volume. Example: 'arn:aws:kms:us-east-1:123456789012:key/mrk-abc123'."
                 },
                 "snapshotId": {
                     "type": "string",
-                    "description": "EBS snapshot ID to restore the volume from."
+                    "description": "EBS snapshot ID to restore the volume from. Example: 'snap-0a1b2c3d4e5f'."
                 },
                 "throughput": {
                     "type": "integer",
-                    "description": "Throughput in MiB/s for gp3 volumes."
+                    "description": "Throughput in MiB/s for gp3 volumes (125-1000). Example: 125."
                 },
                 "volumeInitializationRate": {
                     "type": "integer",
-                    "description": "Rate in MiB/s for initializing volumes from snapshots."
+                    "description": "Rate in MiB/s for initializing volumes from snapshots. Example: 300."
                 },
                 "volumeSize": {
                     "type": "string",
-                    "description": "Volume size (e.g. '20Gi')."
+                    "description": "Volume size with unit suffix. Example: '20Gi'."
                 },
                 "volumeType": {
                     "type": "string",
-                    "description": "EBS volume type (e.g. 'gp3', 'io1', 'st1')."
+                    "description": "EBS volume type. One of: 'gp2', 'gp3', 'io1', 'io2', 'st1', 'sc1'. Example: 'gp3'."
                 }
             },
             "type": "object"
@@ -348,15 +348,15 @@
             "properties": {
                 "deviceName": {
                     "type": "string",
-                    "description": "Device name to map the volume to (e.g. '/dev/xvda')."
+                    "description": "Device name to map the volume to. Example: '/dev/xvda' (root on AL2), '/dev/sdb' (data volume)."
                 },
                 "ebs": {
                     "$ref": "#/types/devzero:resources:BlockDeviceArgs",
-                    "description": "EBS volume configuration for this device."
+                    "description": "EBS volume configuration for this device mapping."
                 },
                 "rootVolume": {
                     "type": "boolean",
-                    "description": "Whether this mapping is for the root volume."
+                    "description": "Whether this mapping is for the root (boot) volume. Example: true."
                 }
             },
             "type": "object"
@@ -365,18 +365,18 @@
             "properties": {
                 "id": {
                     "type": "string",
-                    "description": "Explicit capacity reservation ID."
+                    "description": "Explicit capacity reservation ID. Example: 'cr-0a1b2c3d4e5f'."
                 },
                 "ownerId": {
                     "type": "string",
-                    "description": "AWS account ID that owns the capacity reservation."
+                    "description": "AWS account ID that owns the capacity reservation. Example: '123456789012'."
                 },
                 "tags": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Map of AWS tags used to select capacity reservations."
+                    "description": "Map of AWS tags used to select capacity reservations. Example: {\"aws:ec2:fleet-id\": \"fleet-123\"}."
                 }
             },
             "type": "object"
@@ -385,22 +385,22 @@
             "properties": {
                 "duration": {
                     "type": "string",
-                    "description": "Duration the budget window stays active (e.g. '1h', '30m')."
+                    "description": "How long the budget window stays active after the cron fires. Example: '8h'."
                 },
                 "nodes": {
                     "type": "string",
-                    "description": "Maximum nodes that may be disrupted, as an absolute count or percentage (e.g. '10%')."
+                    "description": "Maximum nodes that may be disrupted simultaneously, as an absolute count or percentage. Example: '10%' or '5'."
                 },
                 "reasons": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     },
-                    "description": "Disruption reasons this budget applies to (e.g. 'Underutilized', 'Empty', 'Drifted')."
+                    "description": "Disruption reasons this budget applies to. Valid values: 'Underutilized', 'Empty', 'Drifted'. Example: [\"Underutilized\", \"Empty\"]."
                 },
                 "schedule": {
                     "type": "string",
-                    "description": "Cron schedule during which this budget is active (5-field format)."
+                    "description": "Cron schedule (5-field UTC) during which this budget is active. Example: '0 9 * * mon-fri' (weekday business hours)."
                 }
             },
             "type": "object"
@@ -412,15 +412,15 @@
                     "items": {
                         "$ref": "#/types/devzero:resources:DisruptionBudgetArgs"
                     },
-                    "description": "Disruption budgets limiting how many nodes can be disrupted at once."
+                    "description": "Disruption budgets controlling how many nodes can be disrupted simultaneously. Example: [{reasons: [\"Underutilized\"], nodes: \"10%\"}]."
                 },
                 "consolidateAfter": {
                     "type": "string",
-                    "description": "Duration to wait after a node becomes empty before consolidating (e.g. '30s')."
+                    "description": "Duration to wait after a node becomes empty before consolidating. Example: '30s'."
                 },
                 "consolidationPolicy": {
                     "type": "string",
-                    "description": "When to consolidate nodes. One of: 'WhenEmpty', 'WhenUnderutilized'.",
+                    "description": "When to consolidate nodes. One of: 'WhenEmpty', 'WhenUnderutilized'. Example: 'WhenUnderutilized'.",
                     "enum": [
                         "WhenEmpty",
                         "WhenUnderutilized"
@@ -428,15 +428,15 @@
                 },
                 "expireAfter": {
                     "type": "string",
-                    "description": "Duration after which provisioned nodes are replaced regardless of load (e.g. '720h')."
+                    "description": "Duration after which provisioned nodes are replaced regardless of load. Example: '720h' (30 days)."
                 },
                 "terminationGracePeriodSeconds": {
                     "type": "integer",
-                    "description": "Grace period in seconds before forcefully terminating a draining node."
+                    "description": "Grace period in seconds before forcefully terminating a draining node. Example: 600."
                 },
                 "ttlSecondsAfterEmpty": {
                     "type": "integer",
-                    "description": "Seconds before an empty node is terminated (deprecated; prefer ConsolidateAfter)."
+                    "description": "Seconds before an empty node is terminated (deprecated; prefer consolidateAfter). Example: 30."
                 }
             },
             "type": "object"
@@ -445,27 +445,27 @@
             "properties": {
                 "enabled": {
                     "type": "boolean",
-                    "description": "Enable horizontal (replica) scaling."
+                    "description": "Enable horizontal (replica) scaling. Example: true."
                 },
                 "maxReplicaChangePercent": {
                     "type": "number",
-                    "description": "Maximum percentage change in replica count per recommendation cycle."
+                    "description": "Maximum percentage change in replica count per recommendation cycle. Example: 50.0 allows up to 50% change."
                 },
                 "maxReplicas": {
                     "type": "integer",
-                    "description": "Maximum number of replicas to scale up to."
+                    "description": "Maximum number of replicas to scale up to. Example: 10."
                 },
                 "minDataPoints": {
                     "type": "integer",
-                    "description": "Minimum data points required before a recommendation is emitted."
+                    "description": "Minimum data points required before a recommendation is emitted. Example: 20."
                 },
                 "minReplicas": {
                     "type": "integer",
-                    "description": "Minimum number of replicas to maintain."
+                    "description": "Minimum number of replicas to maintain. Example: 2."
                 },
                 "primaryMetric": {
                     "type": "string",
-                    "description": "Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'.",
+                    "description": "Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.",
                     "enum": [
                         "cpu",
                         "memory",
@@ -476,7 +476,7 @@
                 },
                 "targetUtilization": {
                     "type": "number",
-                    "description": "Target utilization ratio (0-1) for the primary metric."
+                    "description": "Target utilization ratio (0-1) for the primary metric. Example: 0.7 targets 70% utilization."
                 }
             },
             "type": "object"
@@ -488,66 +488,66 @@
                     "items": {
                         "type": "string"
                     },
-                    "description": "List of DNS server IP addresses used by kubelet."
+                    "description": "DNS server IP addresses passed to kubelet. Example: [\"10.96.0.10\"]."
                 },
                 "cpuCfsQuota": {
                     "type": "boolean",
-                    "description": "Whether to enforce CPU CFS quota limits for containers."
+                    "description": "Whether to enforce CPU CFS quota limits for containers. Example: true."
                 },
                 "evictionHard": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Hard eviction thresholds that trigger immediate pod eviction."
+                    "description": "Hard eviction thresholds \u2014 pods are evicted immediately when crossed. Example: {\"memory.available\": \"100Mi\", \"nodefs.available\": \"10%\"}."
                 },
                 "evictionMaxPodGracePeriod": {
                     "type": "integer",
-                    "description": "Maximum grace period in seconds when evicting pods."
+                    "description": "Maximum pod termination grace period (seconds) during eviction. Example: 90."
                 },
                 "evictionSoft": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Soft eviction thresholds that trigger eviction after a grace period."
+                    "description": "Soft eviction thresholds \u2014 eviction begins after the grace period expires. Example: {\"memory.available\": \"200Mi\"}."
                 },
                 "evictionSoftGracePeriod": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Grace period for each soft eviction threshold."
+                    "description": "Grace period before acting on a soft eviction threshold. Example: {\"memory.available\": \"90s\"}."
                 },
                 "imageGcHighThresholdPercent": {
                     "type": "integer",
-                    "description": "Disk usage percentage that triggers image garbage collection."
+                    "description": "Disk usage % that triggers image garbage collection. Example: 85."
                 },
                 "imageGcLowThresholdPercent": {
                     "type": "integer",
-                    "description": "Disk usage percentage below which image GC stops freeing space."
+                    "description": "Disk usage % at which image GC stops freeing space. Example: 70."
                 },
                 "kubeReserved": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Resources reserved for Kubernetes system components."
+                    "description": "Resources reserved for Kubernetes system components (kubelet, kube-proxy). Example: {\"cpu\": \"100m\", \"memory\": \"100Mi\"}."
                 },
                 "maxPods": {
                     "type": "integer",
-                    "description": "Maximum number of pods per node."
+                    "description": "Maximum number of pods allowed per node. Example: 110."
                 },
                 "podsPerCore": {
                     "type": "integer",
-                    "description": "Maximum pods per CPU core (multiplied by core count for max pods)."
+                    "description": "Maximum pods per CPU core; multiplied by node core count for effective max. Example: 10."
                 },
                 "systemReserved": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Resources reserved for OS system daemons (e.g. {'cpu': '100m'})."
+                    "description": "Resources reserved for OS system daemons (not Kubernetes). Example: {\"cpu\": \"100m\", \"memory\": \"100Mi\"}."
                 }
             },
             "type": "object"
@@ -601,19 +601,19 @@
             "properties": {
                 "httpEndpoint": {
                     "type": "string",
-                    "description": "Enable or disable the instance metadata endpoint. One of: 'enabled', 'disabled'."
+                    "description": "Enable or disable the EC2 instance metadata endpoint. One of: 'enabled', 'disabled'. Example: 'enabled'."
                 },
                 "httpProtocolIpv6": {
                     "type": "string",
-                    "description": "Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'."
+                    "description": "Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'. Example: 'disabled'."
                 },
                 "httpPutResponseHopLimit": {
                     "type": "integer",
-                    "description": "HTTP PUT response hop limit for metadata requests (1-64)."
+                    "description": "HTTP PUT response hop limit for metadata requests (1-64). Set to 1 to block pod-level IMDS access. Example: 1."
                 },
                 "httpTokens": {
                     "type": "string",
-                    "description": "Whether to require IMDSv2 tokens. One of: 'optional', 'required'."
+                    "description": "Whether to require IMDSv2 session tokens (recommended). One of: 'optional', 'required'. Example: 'required'."
                 }
             },
             "type": "object"
@@ -635,11 +635,11 @@
             "properties": {
                 "nodeclassYaml": {
                     "type": "string",
-                    "description": "Raw YAML for a complete Karpenter NodeClass resource (escape hatch)."
+                    "description": "Raw YAML for a complete Karpenter NodeClass resource \u2014 use as an escape hatch when structured fields are insufficient. Example: 'apiVersion: karpenter.k8s.aws/v1\\nkind: EC2NodeClass\\nmetadata:\\n  name: default\\n...'."
                 },
                 "nodepoolYaml": {
                     "type": "string",
-                    "description": "Raw YAML for a complete Karpenter NodePool resource (escape hatch)."
+                    "description": "Raw YAML for a complete Karpenter NodePool resource \u2014 use as an escape hatch when structured fields are insufficient. Example: 'apiVersion: karpenter.sh/v1\\nkind: NodePool\\nmetadata:\\n  name: default\\n...'."
                 }
             },
             "type": "object"
@@ -648,11 +648,11 @@
             "properties": {
                 "cpu": {
                     "type": "string",
-                    "description": "Maximum total CPU that may be provisioned (e.g. '1000' for 1000 vCPUs)."
+                    "description": "Maximum total vCPUs that may be provisioned across all nodes in this pool. Example: '1000'."
                 },
                 "memory": {
                     "type": "string",
-                    "description": "Maximum total memory that may be provisioned (e.g. '1000Gi')."
+                    "description": "Maximum total memory that may be provisioned across all nodes. Example: '1000Gi'."
                 }
             },
             "type": "object"
@@ -661,18 +661,18 @@
             "properties": {
                 "id": {
                     "type": "string",
-                    "description": "Explicit AWS security group ID."
+                    "description": "Explicit AWS security group ID. Example: 'sg-0a1b2c3d4e5f'."
                 },
                 "name": {
                     "type": "string",
-                    "description": "Security group name filter."
+                    "description": "Security group name filter (exact match). Example: 'my-cluster-node-sg'."
                 },
                 "tags": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Map of AWS tags used to select security groups."
+                    "description": "Map of AWS tags used to select security groups. Example: {\"karpenter.sh/discovery\": \"my-cluster\"}."
                 }
             },
             "type": "object"
@@ -681,14 +681,14 @@
             "properties": {
                 "id": {
                     "type": "string",
-                    "description": "Explicit AWS subnet ID."
+                    "description": "Explicit AWS subnet ID (use instead of tags for a fixed subnet). Example: 'subnet-0a1b2c3d4e5f'."
                 },
                 "tags": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Map of AWS tags used to select subnets."
+                    "description": "Map of AWS tags used to select subnets. Example: {\"karpenter.sh/discovery\": \"my-cluster\"}."
                 }
             },
             "type": "object"
@@ -697,7 +697,7 @@
             "properties": {
                 "effect": {
                     "type": "string",
-                    "description": "Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'.",
+                    "description": "Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'. Example: 'NoSchedule'.",
                     "enum": [
                         "NoSchedule",
                         "PreferNoSchedule",
@@ -706,11 +706,11 @@
                 },
                 "key": {
                     "type": "string",
-                    "description": "Taint key to apply to provisioned nodes."
+                    "description": "Taint key to apply to provisioned nodes. Example: 'dedicated'."
                 },
                 "value": {
                     "type": "string",
-                    "description": "Taint value associated with the key."
+                    "description": "Taint value associated with the key. Example: 'gpu'."
                 }
             },
             "type": "object",
@@ -723,54 +723,54 @@
             "properties": {
                 "adjustReqEvenIfNotSet": {
                     "type": "boolean",
-                    "description": "Recommend requests even when the workload has no existing requests set. Server/web default: true."
+                    "description": "Recommend requests even when the workload has no existing requests set. Example: true. Server/web default: true."
                 },
                 "enabled": {
                     "type": "boolean",
-                    "description": "Enable vertical scaling for this resource type."
+                    "description": "Enable vertical scaling for this resource type. Example: true"
                 },
                 "limitMultiplier": {
                     "type": "number",
-                    "description": "Multiplier applied to the request to derive the resource limit."
+                    "description": "Multiplier applied to the request to derive the resource limit. Example: 1.5 sets limit to 150% of request."
                 },
                 "limitsAdjustmentEnabled": {
                     "type": "boolean",
-                    "description": "Whether to also adjust resource limits alongside requests."
+                    "description": "Whether to also adjust resource limits alongside requests. Example: true."
                 },
                 "limitsRemovalEnabled": {
                     "type": "boolean",
-                    "description": "Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Web default: true for CPU, false for Memory."
+                    "description": "Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Example: true. Web default: true for CPU, false for Memory."
                 },
                 "maxRequest": {
                     "type": "integer",
-                    "description": "Maximum resource request in millicores (CPU) or bytes (memory/GPU)."
+                    "description": "Maximum resource request in millicores (CPU) or bytes (memory/GPU). Example: 4000 (= 4 CPU cores), 1073741824 (= 1Gi memory)."
                 },
                 "maxScaleDownPercent": {
                     "type": "number",
-                    "description": "Maximum percentage decrease allowed in a single recommendation cycle.",
+                    "description": "Maximum percentage decrease allowed in a single recommendation cycle. Example: 20.0 allows up to 20% decrease. Default: 1.0.",
                     "default": 1
                 },
                 "maxScaleUpPercent": {
                     "type": "number",
-                    "description": "Maximum percentage increase allowed in a single recommendation cycle.",
+                    "description": "Maximum percentage increase allowed in a single recommendation cycle. Example: 50.0 allows up to 50% increase. Default: 1000.0.",
                     "default": 1000
                 },
                 "minDataPoints": {
                     "type": "integer",
-                    "description": "Minimum number of data points required before a recommendation is emitted.",
+                    "description": "Minimum number of data points required before a recommendation is emitted. Example: 20 (default).",
                     "default": 20
                 },
                 "minRequest": {
                     "type": "integer",
-                    "description": "Minimum resource request in millicores (CPU) or bytes (memory/GPU)."
+                    "description": "Minimum resource request in millicores (CPU) or bytes (memory/GPU). Example: 100 (= 100m CPU), 134217728 (= 128Mi memory)."
                 },
                 "overheadMultiplier": {
                     "type": "number",
-                    "description": "Multiplier applied on top of the recommendation to add headroom."
+                    "description": "Multiplier applied on top of the recommendation to add headroom. Example: 1.15 adds 15% overhead."
                 },
                 "targetPercentile": {
                     "type": "number",
-                    "description": "Percentile of usage data used as the recommendation target (e.g. 0.95)."
+                    "description": "Percentile of usage data used as the recommendation target (0-1). Example: 0.95 targets the 95th percentile."
                 }
             },
             "type": "object"
@@ -806,104 +806,104 @@
             "properties": {
                 "architectures": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
-                    "description": "CPU architectures (e.g. amd64, arm64)."
+                    "description": "CPU architectures for nodes. Example: {in: [\"amd64\"]}."
                 },
                 "aws": {
                     "$ref": "#/types/devzero:resources:AWSNodeClassSpecArgs",
-                    "description": "AWS-specific node class configuration."
+                    "description": "AWS-specific EC2NodeClass configuration (subnets, AMIs, IAM role, EBS, etc.)."
                 },
                 "azure": {
                     "$ref": "#/types/devzero:resources:AzureNodeClassSpecArgs",
-                    "description": "Azure-specific node class configuration."
+                    "description": "Azure-specific AKSNodeClass configuration (VNet subnet, OS disk, image family, etc.)."
                 },
                 "capacityTypes": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
-                    "description": "Capacity types (e.g. on-demand, spot)."
+                    "description": "Capacity purchasing types. Example: {in: [\"spot\", \"on-demand\"]}."
                 },
                 "description": {
                     "type": "string",
-                    "description": "Free-form description of the node policy."
+                    "description": "Free-form description of the node policy. Example: 'Spot instance policy for production batch workloads'."
                 },
                 "disruption": {
                     "$ref": "#/types/devzero:resources:DisruptionPolicyArgs",
-                    "description": "Karpenter disruption policy for consolidation and expiry."
+                    "description": "Karpenter disruption policy controlling consolidation, expiry, and budgets."
                 },
                 "instanceCategories": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
-                    "description": "Filter instances by category (e.g. general-purpose, compute-optimized)."
+                    "description": "Filter instances by category. Example: {in: [\"general-purpose\", \"compute-optimized\"]}."
                 },
                 "instanceCpus": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
-                    "description": "Filter instances by CPU count."
+                    "description": "Filter instances by vCPU count. Example: {in: [\"4\", \"8\", \"16\"]}."
                 },
                 "instanceFamilies": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
-                    "description": "Filter instances by family (e.g. m5, c6i)."
+                    "description": "Filter instances by family. Example: {in: [\"m5\", \"c6i\", \"m6i\"]}."
                 },
                 "instanceGenerations": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
-                    "description": "Filter instances by generation."
+                    "description": "Filter instances by generation number. Example: {in: [\"2\", \"3\"]}."
                 },
                 "instanceHypervisors": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
-                    "description": "Filter instances by hypervisor type."
+                    "description": "Filter instances by hypervisor type. Example: {in: [\"nitro\"]}."
                 },
                 "instanceSizes": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
-                    "description": "Filter instances by size (e.g. large, xlarge)."
+                    "description": "Filter instances by size label. Example: {in: [\"large\", \"xlarge\", \"2xlarge\"]}."
                 },
                 "instanceTypes": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
-                    "description": "Explicitly select specific instance types."
+                    "description": "Explicitly allow specific instance types. Example: {in: [\"m5.large\", \"c6i.large\"]}."
                 },
                 "labels": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Labels applied to provisioned nodes."
+                    "description": "Labels applied to all provisioned nodes. Example: {\"team\": \"backend\", \"env\": \"prod\"}."
                 },
                 "limits": {
                     "$ref": "#/types/devzero:resources:ResourceLimitsArgs",
-                    "description": "Resource limits on the total capacity managed by this policy."
+                    "description": "Resource limits on total capacity managed by this policy. Example: {cpu: \"1000\", memory: \"1000Gi\"}."
                 },
                 "name": {
                     "type": "string",
-                    "description": "Human-friendly name for the node policy."
+                    "description": "Human-friendly name for the node policy. Example: 'prod-spot-policy'."
                 },
                 "nodeClassName": {
                     "type": "string",
-                    "description": "Override name for the generated Karpenter NodeClass."
+                    "description": "Override name for the generated Karpenter NodeClass resource. Example: 'prod-aws-nodeclass'."
                 },
                 "nodePoolName": {
                     "type": "string",
-                    "description": "Override name for the generated Karpenter NodePool."
+                    "description": "Override name for the generated Karpenter NodePool resource. Example: 'prod-spot-nodepool'."
                 },
                 "operatingSystems": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
-                    "description": "Operating systems for nodes (e.g. linux, windows)."
+                    "description": "Operating systems for nodes. Example: {in: [\"linux\"]}."
                 },
                 "raw": {
                     "type": "array",
                     "items": {
                         "$ref": "#/types/devzero:resources:RawKarpenterSpecArgs"
                     },
-                    "description": "Raw Karpenter YAML for full NodePool/NodeClass customization."
+                    "description": "Raw Karpenter YAML for full NodePool/NodeClass customization \u2014 use only when structured fields are insufficient."
                 },
                 "taints": {
                     "type": "array",
                     "items": {
                         "$ref": "#/types/devzero:resources:TaintArgs"
                     },
-                    "description": "Taints applied to provisioned nodes."
+                    "description": "Taints applied to provisioned nodes to control pod scheduling. Example: [{key: \"dedicated\", value: \"gpu\", effect: \"NoSchedule\"}]."
                 },
                 "weight": {
                     "type": "integer",
-                    "description": "Priority weight for this policy; higher values take precedence."
+                    "description": "Priority weight; higher values take precedence when multiple policies match. Example: 100."
                 },
                 "zones": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
-                    "description": "Availability zones where nodes may be provisioned."
+                    "description": "Availability zones where nodes may be provisioned. Example: {in: [\"us-east-1a\", \"us-east-1b\"]}."
                 }
             },
             "required": [
@@ -1057,11 +1057,11 @@
                     "items": {
                         "type": "string"
                     },
-                    "description": "Action triggers: 'on_detection' or 'on_schedule'."
+                    "description": "When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: [\"on_detection\"]."
                 },
                 "cooldownMinutes": {
                     "type": "integer",
-                    "description": "Minutes to wait between applying recommendations. Default: 300 (5 h).",
+                    "description": "Minimum minutes to wait between consecutive recommendation applications. Example: 300 (5 h, default).",
                     "default": 300
                 },
                 "cpuVerticalScaling": {
@@ -1069,30 +1069,30 @@
                 },
                 "cronSchedule": {
                     "type": "string",
-                    "description": "Cron expression for scheduled application (5-field format)."
+                    "description": "Cron expression for scheduled application (5-field UTC format). Required when actionTriggers includes 'on_schedule'. Example: '0 2 * * *' (daily at 2 am UTC)."
                 },
                 "defragmentationSchedule": {
                     "type": "string",
-                    "description": "Cron expression for background defragmentation."
+                    "description": "Cron expression for background node defragmentation. Example: '0 3 * * 0' (weekly Sunday at 3 am)."
                 },
                 "description": {
                     "type": "string",
-                    "description": "Free-form description of the policy."
+                    "description": "Free-form description of the policy. Example: 'VPA policy for production workloads'."
                 },
                 "detectionTriggers": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     },
-                    "description": "Detection triggers: 'pod_creation', 'pod_update', or 'pod_reschedule'."
+                    "description": "Events that trigger a new recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: [\"pod_creation\", \"pod_reschedule\"]."
                 },
                 "driftDeltaPercent": {
                     "type": "number",
-                    "description": "Percentage drift from baseline that triggers VPA refresh."
+                    "description": "Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0."
                 },
                 "enablePmaxProtection": {
                     "type": "boolean",
-                    "description": "Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true."
+                    "description": "Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true."
                 },
                 "gpuVerticalScaling": {
                     "$ref": "#/types/devzero:resources:VerticalScalingArgs"
@@ -1105,15 +1105,15 @@
                 },
                 "hysteresisVsTarget": {
                     "type": "number",
-                    "description": "Hysteresis threshold vs target for HPA coordination."
+                    "description": "Dead-band ratio around the HPA target to suppress oscillation between VPA and HPA. Example: 0.1 (10% band)."
                 },
                 "liveMigrationEnabled": {
                     "type": "boolean",
-                    "description": "Allow live migration when applying recommendations."
+                    "description": "Allow live pod migration when applying recommendations without restart. Example: false."
                 },
                 "loopbackPeriodSeconds": {
                     "type": "integer",
-                    "description": "Period in seconds to look back for resource usage data. Default: 86400 (24 h).",
+                    "description": "Seconds of historical usage data considered per recommendation. Example: 86400 (24 h, default).",
                     "default": 86400
                 },
                 "memoryVerticalScaling": {
@@ -1121,26 +1121,26 @@
                 },
                 "minChangePercent": {
                     "type": "number",
-                    "description": "Global minimum change threshold for applying recommendations. Default: 0.2 (20%).",
+                    "description": "Minimum relative change (0-1) required before a recommendation is applied globally. Example: 0.2 means 20% change needed (default).",
                     "default": 0.2
                 },
                 "minDataPoints": {
                     "type": "integer",
-                    "description": "Global minimum data points required for recommendations. Default: 15.",
+                    "description": "Global minimum number of usage data points needed before any recommendation is emitted. Example: 15 (default).",
                     "default": 15
                 },
                 "minVpaWindowDataPoints": {
                     "type": "integer",
-                    "description": "Minimum data points in VPA analysis window. Default: 30.",
+                    "description": "Minimum data points inside the VPA analysis window before a recommendation is generated. Example: 30 (default).",
                     "default": 30
                 },
                 "name": {
                     "type": "string",
-                    "description": "Human-friendly name for the policy."
+                    "description": "Human-friendly name for the policy. Example: 'production-vpa-policy'."
                 },
                 "pmaxRatioThreshold": {
                     "type": "number",
-                    "description": "Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.",
+                    "description": "Peak-to-recommendation ratio above which pmax protection activates. Example: 3.0 (default) \u2014 triggers when peak is 3\u00d7 the recommendation.",
                     "default": 3
                 },
                 "schedulerPlugins": {
@@ -1148,15 +1148,15 @@
                     "items": {
                         "type": "string"
                     },
-                    "description": "Kubernetes scheduler plugins to activate."
+                    "description": "Kubernetes scheduler plugins to activate for this policy. Example: [\"binpacking\"]."
                 },
                 "stabilityCvMax": {
                     "type": "number",
-                    "description": "Maximum coefficient of variation for workload to be considered stable."
+                    "description": "Maximum coefficient of variation (stddev/mean) for a workload to be considered stable enough for VPA. Example: 0.3."
                 },
                 "startupPeriodSeconds": {
                     "type": "integer",
-                    "description": "Period in seconds to ignore usage data after workload starts."
+                    "description": "Seconds after workload start to exclude from usage data (avoids cold-start spikes). Example: 300 (5 min)."
                 }
             },
             "required": [
@@ -1172,11 +1172,11 @@
                             "on_schedule"
                         ]
                     },
-                    "description": "Action triggers: 'on_detection' or 'on_schedule'."
+                    "description": "When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: [\"on_detection\"]."
                 },
                 "cooldownMinutes": {
                     "type": "integer",
-                    "description": "Minutes to wait between applying recommendations. Default: 300 (5 h).",
+                    "description": "Minimum minutes to wait between consecutive recommendation applications. Example: 300 (5 h, default).",
                     "default": 300
                 },
                 "cpuVerticalScaling": {
@@ -1184,15 +1184,15 @@
                 },
                 "cronSchedule": {
                     "type": "string",
-                    "description": "Cron expression for scheduled application (5-field format)."
+                    "description": "Cron expression for scheduled application (5-field UTC format). Required when actionTriggers includes 'on_schedule'. Example: '0 2 * * *' (daily at 2 am UTC)."
                 },
                 "defragmentationSchedule": {
                     "type": "string",
-                    "description": "Cron expression for background defragmentation."
+                    "description": "Cron expression for background node defragmentation. Example: '0 3 * * 0' (weekly Sunday at 3 am)."
                 },
                 "description": {
                     "type": "string",
-                    "description": "Free-form description of the policy."
+                    "description": "Free-form description of the policy. Example: 'VPA policy for production workloads'."
                 },
                 "detectionTriggers": {
                     "type": "array",
@@ -1204,15 +1204,15 @@
                             "pod_reschedule"
                         ]
                     },
-                    "description": "Detection triggers: 'pod_creation', 'pod_update', or 'pod_reschedule'."
+                    "description": "Events that trigger a new recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: [\"pod_creation\", \"pod_reschedule\"]."
                 },
                 "driftDeltaPercent": {
                     "type": "number",
-                    "description": "Percentage drift from baseline that triggers VPA refresh."
+                    "description": "Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0."
                 },
                 "enablePmaxProtection": {
                     "type": "boolean",
-                    "description": "Raise requests to cover peak usage when max/recommendation ratio exceeds pmaxRatioThreshold. Server/web default: true."
+                    "description": "Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true."
                 },
                 "gpuVerticalScaling": {
                     "$ref": "#/types/devzero:resources:VerticalScalingArgs"
@@ -1225,15 +1225,15 @@
                 },
                 "hysteresisVsTarget": {
                     "type": "number",
-                    "description": "Hysteresis threshold vs target for HPA coordination."
+                    "description": "Dead-band ratio around the HPA target to suppress oscillation between VPA and HPA. Example: 0.1 (10% band)."
                 },
                 "liveMigrationEnabled": {
                     "type": "boolean",
-                    "description": "Allow live migration when applying recommendations."
+                    "description": "Allow live pod migration when applying recommendations without restart. Example: false."
                 },
                 "loopbackPeriodSeconds": {
                     "type": "integer",
-                    "description": "Period in seconds to look back for resource usage data. Default: 86400 (24 h).",
+                    "description": "Seconds of historical usage data considered per recommendation. Example: 86400 (24 h, default).",
                     "default": 86400
                 },
                 "memoryVerticalScaling": {
@@ -1241,26 +1241,26 @@
                 },
                 "minChangePercent": {
                     "type": "number",
-                    "description": "Global minimum change threshold for applying recommendations. Default: 0.2 (20%).",
+                    "description": "Minimum relative change (0-1) required before a recommendation is applied globally. Example: 0.2 means 20% change needed (default).",
                     "default": 0.2
                 },
                 "minDataPoints": {
                     "type": "integer",
-                    "description": "Global minimum data points required for recommendations. Default: 15.",
+                    "description": "Global minimum number of usage data points needed before any recommendation is emitted. Example: 15 (default).",
                     "default": 15
                 },
                 "minVpaWindowDataPoints": {
                     "type": "integer",
-                    "description": "Minimum data points in VPA analysis window. Default: 30.",
+                    "description": "Minimum data points inside the VPA analysis window before a recommendation is generated. Example: 30 (default).",
                     "default": 30
                 },
                 "name": {
                     "type": "string",
-                    "description": "Human-friendly name for the policy."
+                    "description": "Human-friendly name for the policy. Example: 'production-vpa-policy'."
                 },
                 "pmaxRatioThreshold": {
                     "type": "number",
-                    "description": "Max-to-recommendation ratio that triggers pmax protection. Default: 3.0.",
+                    "description": "Peak-to-recommendation ratio above which pmax protection activates. Example: 3.0 (default) \u2014 triggers when peak is 3\u00d7 the recommendation.",
                     "default": 3
                 },
                 "schedulerPlugins": {
@@ -1268,15 +1268,15 @@
                     "items": {
                         "type": "string"
                     },
-                    "description": "Kubernetes scheduler plugins to activate."
+                    "description": "Kubernetes scheduler plugins to activate for this policy. Example: [\"binpacking\"]."
                 },
                 "stabilityCvMax": {
                     "type": "number",
-                    "description": "Maximum coefficient of variation for workload to be considered stable."
+                    "description": "Maximum coefficient of variation (stddev/mean) for a workload to be considered stable enough for VPA. Example: 0.3."
                 },
                 "startupPeriodSeconds": {
                     "type": "integer",
-                    "description": "Period in seconds to ignore usage data after workload starts."
+                    "description": "Seconds after workload start to exclude from usage data (avoids cold-start spikes). Example: 300 (5 min)."
                 }
             },
             "requiredInputs": [
@@ -1423,9 +1423,21 @@
         "devzero:resources:getClusterIdByName": {
             "inputs": {
                 "properties": {
+                    "cloudProvider": {
+                        "type": "string",
+                        "description": "Optional cloud provider filter, e.g. \"aws\"."
+                    },
+                    "liveness": {
+                        "type": "string",
+                        "description": "Controls liveness filtering: IGNORE, PREFER_LIVE, or REQUIRE_LIVE."
+                    },
                     "name": {
                         "type": "string",
                         "description": "The cluster name to look up."
+                    },
+                    "region": {
+                        "type": "string",
+                        "description": "Optional region filter, e.g. \"us-east-1\"."
                     },
                     "teamId": {
                         "type": "string",

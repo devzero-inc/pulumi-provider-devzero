@@ -132,3 +132,106 @@ func TestGetClusterIDByName_EmptyID(t *testing.T) {
 		t.Fatal("expected error when response ID is empty")
 	}
 }
+
+func ptr(s string) *string { return &s }
+
+func TestGetClusterIDByName_WithRegionAndCloudProvider(t *testing.T) {
+	svc := &mockClusterServiceClient{
+		getClusterIDByNameFn: func(_ context.Context, req *connect.Request[apiv1.GetClusterIDByNameRequest]) (*connect.Response[apiv1.GetClusterIDByNameResponse], error) {
+			if req.Msg.Region == nil || *req.Msg.Region != "us-east-1" {
+				t.Errorf("Region: got %v, want %q", req.Msg.Region, "us-east-1")
+			}
+			if req.Msg.CloudProvider == nil || *req.Msg.CloudProvider != "aws" {
+				t.Errorf("CloudProvider: got %v, want %q", req.Msg.CloudProvider, "aws")
+			}
+			return connect.NewResponse(&apiv1.GetClusterIDByNameResponse{Id: "cluster-regional"}), nil
+		},
+	}
+	withMockClusterServiceClient(t, svc)
+
+	f := &GetClusterIdByName{}
+	resp, err := f.Invoke(context.Background(), infer.FunctionRequest[GetClusterIDByNameArgs]{
+		Input: GetClusterIDByNameArgs{
+			TeamID:        "team-test",
+			Name:          "my-cluster",
+			Region:        ptr("us-east-1"),
+			CloudProvider: ptr("aws"),
+		},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.Output.ClusterID != "cluster-regional" {
+		t.Errorf("clusterId: got %q, want %q", resp.Output.ClusterID, "cluster-regional")
+	}
+}
+
+func TestGetClusterIDByName_WithLivenessPreferLive(t *testing.T) {
+	svc := &mockClusterServiceClient{
+		getClusterIDByNameFn: func(_ context.Context, req *connect.Request[apiv1.GetClusterIDByNameRequest]) (*connect.Response[apiv1.GetClusterIDByNameResponse], error) {
+			if req.Msg.Liveness == nil {
+				t.Fatal("Liveness: got nil, want PREFER_LIVE")
+			}
+			if *req.Msg.Liveness != apiv1.ClusterLivenessPreference_CLUSTER_LIVENESS_PREFERENCE_PREFER_LIVE {
+				t.Errorf("Liveness: got %v, want PREFER_LIVE", *req.Msg.Liveness)
+			}
+			return connect.NewResponse(&apiv1.GetClusterIDByNameResponse{Id: "cluster-live"}), nil
+		},
+	}
+	withMockClusterServiceClient(t, svc)
+
+	f := &GetClusterIdByName{}
+	resp, err := f.Invoke(context.Background(), infer.FunctionRequest[GetClusterIDByNameArgs]{
+		Input: GetClusterIDByNameArgs{TeamID: "team-test", Name: "my-cluster", Liveness: ptr("PREFER_LIVE")},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.Output.ClusterID != "cluster-live" {
+		t.Errorf("clusterId: got %q, want %q", resp.Output.ClusterID, "cluster-live")
+	}
+}
+
+func TestGetClusterIDByName_WithLivenessRequireLive(t *testing.T) {
+	svc := &mockClusterServiceClient{
+		getClusterIDByNameFn: func(_ context.Context, req *connect.Request[apiv1.GetClusterIDByNameRequest]) (*connect.Response[apiv1.GetClusterIDByNameResponse], error) {
+			if req.Msg.Liveness == nil {
+				t.Fatal("Liveness: got nil, want REQUIRE_LIVE")
+			}
+			if *req.Msg.Liveness != apiv1.ClusterLivenessPreference_CLUSTER_LIVENESS_PREFERENCE_REQUIRE_LIVE {
+				t.Errorf("Liveness: got %v, want REQUIRE_LIVE", *req.Msg.Liveness)
+			}
+			return connect.NewResponse(&apiv1.GetClusterIDByNameResponse{Id: "cluster-required"}), nil
+		},
+	}
+	withMockClusterServiceClient(t, svc)
+
+	f := &GetClusterIdByName{}
+	resp, err := f.Invoke(context.Background(), infer.FunctionRequest[GetClusterIDByNameArgs]{
+		Input: GetClusterIDByNameArgs{TeamID: "team-test", Name: "my-cluster", Liveness: ptr("REQUIRE_LIVE")},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.Output.ClusterID != "cluster-required" {
+		t.Errorf("clusterId: got %q, want %q", resp.Output.ClusterID, "cluster-required")
+	}
+}
+
+func TestGetClusterIDByName_InvalidLiveness(t *testing.T) {
+	svc := &mockClusterServiceClient{
+		getClusterIDByNameFn: func(_ context.Context, _ *connect.Request[apiv1.GetClusterIDByNameRequest]) (*connect.Response[apiv1.GetClusterIDByNameResponse], error) {
+			t.Fatal("RPC should not be called with invalid liveness")
+			return nil, nil
+		},
+	}
+	withMockClusterServiceClient(t, svc)
+
+	f := &GetClusterIdByName{}
+	_, err := f.Invoke(context.Background(), infer.FunctionRequest[GetClusterIDByNameArgs]{
+		Input: GetClusterIDByNameArgs{TeamID: "team-test", Name: "my-cluster", Liveness: ptr("INVALID_VALUE")},
+	})
+	if err == nil {
+		t.Fatal("expected error for invalid liveness value")
+	}
+}

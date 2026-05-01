@@ -247,7 +247,7 @@ node_policy = devzero.resources.NodePolicy("my-node-policy",
     labels={"environment": "production"},
     taints=[devzero.resources.TaintArgsArgs(key="dedicated", value="gpu", effect="NoSchedule")],
     disruption=devzero.resources.DisruptionPolicyArgsArgs(
-        consolidation_policy="WhenUnderutilized",
+        consolidation_policy="WhenEmptyOrUnderutilized",
         consolidate_after="30s",
         expire_after="720h",
     ),
@@ -273,7 +273,7 @@ node_policy = devzero.resources.NodePolicy("my-node-policy",
 | `name` | `str` | Unique policy name |
 | `description` | `str` | Human-readable description |
 | `weight` | `int` | Priority weight when multiple policies match (higher = preferred) |
-| `instance_categories` | `LabelSelectorArgsArgs` | Filter instance categories (e.g. `c`, `m`, `r`) |
+| `instance_categories` | `LabelSelectorArgsArgs` | Filter by instance category letter: e.g. `m`, `c`, `r` (AWS) or `D`, `E` (Azure) |
 | `instance_families` | `LabelSelectorArgsArgs` | Filter instance families (e.g. `c5`, `m5`) |
 | `instance_cpus` | `LabelSelectorArgsArgs` | Filter by vCPU count |
 | `instance_sizes` | `LabelSelectorArgsArgs` | Filter instance sizes (e.g. `large`, `xlarge`) |
@@ -282,7 +282,7 @@ node_policy = devzero.resources.NodePolicy("my-node-policy",
 | `instance_hypervisors` | `LabelSelectorArgsArgs` | Filter by hypervisor type |
 | `zones` | `LabelSelectorArgsArgs` | Availability zones to provision into |
 | `architectures` | `LabelSelectorArgsArgs` | CPU architectures (e.g. `amd64`, `arm64`) |
-| `capacity_types` | `LabelSelectorArgsArgs` | Capacity types: `on-demand` \| `spot` |
+| `capacity_types` | `LabelSelectorArgsArgs` | Capacity types: `on-demand` \| `spot` \| `reserved` |
 | `operating_systems` | `LabelSelectorArgsArgs` | OS filter (e.g. `linux`, `windows`) |
 | `labels` | `dict[str, str]` | Labels applied to provisioned nodes |
 | `taints` | `list[TaintArgsArgs]` | Taints applied to provisioned nodes |
@@ -298,7 +298,7 @@ node_policy = devzero.resources.NodePolicy("my-node-policy",
 
 | Field | Type | Description |
 |---|---|---|
-| `consolidation_policy` | `str` | `WhenEmpty` \| `WhenUnderutilized` |
+| `consolidation_policy` | `str` | `WhenEmpty` \| `WhenEmptyOrUnderutilized` |
 | `consolidate_after` | `str` | Wait time after node is empty before consolidating (e.g. `30s`) |
 | `expire_after` | `str` | Force-replace nodes after this duration (e.g. `720h`) |
 | `termination_grace_period_seconds` | `int` | Grace period before forcefully terminating a draining node |
@@ -365,6 +365,9 @@ import pulumi_devzero as devzero
 existing = devzero.resources.get_cluster_id_by_name(
     name="my-existing-cluster",
     # team_id is optional — defaults to devzero:teamId from provider config
+    # region="us-east-1",        # optional: filter by region
+    # cloud_provider="AWS",      # optional: AWS | GCP | AKS | OCI
+    # liveness="PREFER_LIVE",    # optional: IGNORE | PREFER_LIVE | REQUIRE_LIVE
 )
 
 # Attach a policy to the existing cluster
@@ -385,6 +388,9 @@ pulumi.export("existing_cluster_id", existing.cluster_id)
 |---|---|---|---|
 | `name` | `str` | yes | Cluster name to look up |
 | `team_id` | `str` | no | Defaults to `devzero:teamId` from provider config |
+| `region` | `str` | no | Filter by region name (e.g. `us-east-1`) |
+| `cloud_provider` | `str` | no | Filter by cloud provider: `AWS` \| `GCP` \| `AKS` \| `OCI` |
+| `liveness` | `str` | no | `IGNORE` (default) \| `PREFER_LIVE` \| `REQUIRE_LIVE` |
 
 **Outputs:**
 
@@ -392,7 +398,7 @@ pulumi.export("existing_cluster_id", existing.cluster_id)
 |---|---|---|
 | `cluster_id` | `str` | UUID of the matching cluster |
 
-> **Warning:** If multiple clusters share the same name, only the first active (non-deleted) one is returned. Ensure cluster names are unique within your team to avoid unexpected results.
+> **Note:** If multiple clusters share the same name, the newest one is returned by default. Use `liveness="PREFER_LIVE"` or `"REQUIRE_LIVE"` to filter by heartbeat freshness.
 
 ---
 
