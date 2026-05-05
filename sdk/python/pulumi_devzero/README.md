@@ -178,14 +178,14 @@ policy = devzero.resources.WorkloadPolicy("my-policy",
 | `limits_adjustment_enabled` | `bool` | Whether to also adjust resource limits |
 | `limit_multiplier` | `float` | Limits = request × limit_multiplier |
 | `min_data_points` | `int` | Minimum data points before a recommendation is emitted. Default: `20` |
-| `adjust_req_even_if_not_set` | `bool` | Recommend requests even when the workload has no existing requests set. Default: `true` |
-| `limits_removal_enabled` | `bool` | Actively remove limits from workloads (CPU only). Takes precedence over `limits_adjustment_enabled`. Default: `true` for CPU, `false` for memory |
+| `adjust_req_even_if_not_set` | `bool` | Recommend requests even when the workload has no existing requests set. Default: `false` |
+| `limits_removal_enabled` | `bool` | Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over `limits_adjustment_enabled`. Default: `false` |
 
 **`WorkloadPolicy` pmax & VPA knob fields:**
 
 | Field | Type | Description |
 |---|---|---|
-| `enable_pmax_protection` | `bool` | Raise requests to cover peak usage when max/recommendation ratio exceeds `pmax_ratio_threshold`. Default: `true` |
+| `enable_pmax_protection` | `bool` | Raise requests to cover peak usage when max/recommendation ratio exceeds `pmax_ratio_threshold`. Default: `false` |
 | `pmax_ratio_threshold` | `float` | Max-to-recommendation ratio that triggers pmax protection. Default: `3.0` |
 | `loopback_period_seconds` | `int` | Look-back period in seconds for usage data. Default: `86400` (24 h) |
 | `min_data_points` | `int` | Global minimum data points for recommendations. Default: `15` |
@@ -207,7 +207,7 @@ target = devzero.resources.WorkloadPolicyTarget("my-target",
     policy_id=policy.id,
     cluster_ids=[cluster.id],
     kind_filter=["Deployment", "StatefulSet"],
-    namespace_filter=["production"],
+    namespace_selector=devzero.resources.LabelSelectorArgsArgs(match_labels={"env": "production"}),
     enabled=True,
 )
 ```
@@ -219,8 +219,14 @@ target = devzero.resources.WorkloadPolicyTarget("my-target",
 | `name` | `str` | Unique target name |
 | `policy_id` | `str` | ID of the `WorkloadPolicy` to apply |
 | `cluster_ids` | `list[str]` | Cluster IDs to target |
+| `description` | `str` | Human-readable description (optional) |
+| `priority` | `int` | Evaluation priority; higher value wins when targets overlap |
 | `kind_filter` | `list[str]` | `Pod` \| `Deployment` \| `StatefulSet` \| `DaemonSet` \| `Job` \| `CronJob` \| `ReplicaSet` \| `ReplicationController` \| `Rollout` |
-| `namespace_filter` | `list[str]` | Restrict to specific namespaces (optional) |
+| `workload_names` | `list[str]` | Explicit list of workload names to include |
+| `node_group_names` | `list[str]` | Restrict matching to specific node groups by name |
+| `name_pattern` | `NamePatternArgsArgs` | Regex pattern to match workload names |
+| `namespace_selector` | `LabelSelectorArgsArgs` | Select namespaces by labels (match_labels / match_expressions) |
+| `workload_selector` | `LabelSelectorArgsArgs` | Select workloads by labels |
 | `enabled` | `bool` | Activate the target |
 
 ---
@@ -288,6 +294,13 @@ node_policy = devzero.resources.NodePolicy("my-node-policy",
 | `azure` | `AzureNodeClassSpecArgsArgs` | Azure-specific node class configuration |
 | `raw` | `list[RawKarpenterSpecArgsArgs]` | Raw Karpenter YAML (escape hatch) |
 
+**`RawKarpenterSpecArgsArgs` fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `nodepool_yaml` | `str` | Raw YAML for a complete Karpenter NodePool resource |
+| `nodeclass_yaml` | `str` | Raw YAML for a complete Karpenter NodeClass resource |
+
 **`DisruptionPolicyArgsArgs` fields:**
 
 | Field | Type | Description |
@@ -348,6 +361,18 @@ node_policy_target = devzero.resources.NodePolicyTarget("my-node-policy-target",
     enabled=True,
 )
 ```
+
+**Fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `name` | `str` | Unique target name |
+| `policy_id` | `str` | ID of the `NodePolicy` to apply |
+| `cluster_ids` | `list[str]` | Cluster IDs to target. **At most 1 entry** — the backend rejects more than one. |
+| `description` | `str` | Human-readable description (optional) |
+| `enabled` | `bool` | Activate the target |
+
+> **Note:** `pulumi destroy` removes this resource from Pulumi state but does **not** delete it on the DevZero backend — no delete RPC exists for NodePolicyTarget.
 
 ---
 

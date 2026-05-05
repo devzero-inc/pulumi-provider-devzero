@@ -175,14 +175,14 @@ const policy = new resources.WorkloadPolicy("my-policy", {
 | `limitsAdjustmentEnabled` | `boolean` | Whether to also adjust resource limits |
 | `limitMultiplier` | `number` | Limits = request × limitMultiplier |
 | `minDataPoints` | `number` | Minimum data points before a recommendation is emitted. Default: `20` |
-| `adjustReqEvenIfNotSet` | `boolean` | Recommend requests even when the workload has no existing requests set. Default: `true` |
-| `limitsRemovalEnabled` | `boolean` | Actively remove limits from workloads (CPU only). Takes precedence over `limitsAdjustmentEnabled`. Default: `true` for CPU, `false` for memory |
+| `adjustReqEvenIfNotSet` | `boolean` | Recommend requests even when the workload has no existing requests set. Default: `false` |
+| `limitsRemovalEnabled` | `boolean` | Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over `limitsAdjustmentEnabled`. Default: `false` |
 
 **`WorkloadPolicy` pmax & VPA knob fields:**
 
 | Field | Type | Description |
 |---|---|---|
-| `enablePmaxProtection` | `boolean` | Raise requests to cover peak usage when max/recommendation ratio exceeds `pmaxRatioThreshold`. Default: `true` |
+| `enablePmaxProtection` | `boolean` | Raise requests to cover peak usage when max/recommendation ratio exceeds `pmaxRatioThreshold`. Default: `false` |
 | `pmaxRatioThreshold` | `number` | Max-to-recommendation ratio that triggers pmax protection. Default: `3.0` |
 | `loopbackPeriodSeconds` | `number` | Look-back period in seconds for usage data. Default: `86400` (24 h) |
 | `minDataPoints` | `number` | Global minimum data points for recommendations. Default: `15` |
@@ -202,7 +202,7 @@ const target = new resources.WorkloadPolicyTarget("my-target", {
     policyId: policy.id,
     clusterIds: [cluster.id],
     kindFilter: ["Deployment", "StatefulSet"],
-    namespaceFilter: ["production"],
+    namespaceSelector: { matchLabels: { "env": "production" } },
     enabled: true,
 });
 ```
@@ -214,8 +214,14 @@ const target = new resources.WorkloadPolicyTarget("my-target", {
 | `name` | `string` | Unique target name |
 | `policyId` | `string` | ID of the `WorkloadPolicy` to apply |
 | `clusterIds` | `string[]` | Cluster IDs to target |
+| `description` | `string` | Human-readable description (optional) |
+| `priority` | `number` | Evaluation priority; higher value wins when targets overlap |
 | `kindFilter` | `string[]` | `Pod` \| `Deployment` \| `StatefulSet` \| `DaemonSet` \| `Job` \| `CronJob` \| `ReplicaSet` \| `ReplicationController` \| `Rollout` |
-| `namespaceFilter` | `string[]` | Restrict to specific namespaces (optional) |
+| `workloadNames` | `string[]` | Explicit list of workload names to include |
+| `nodeGroupNames` | `string[]` | Restrict matching to specific node groups by name |
+| `namePattern` | `NamePatternArgs` | Regex pattern to match workload names |
+| `namespaceSelector` | `LabelSelectorArgs` | Select namespaces by labels (matchLabels / matchExpressions) |
+| `workloadSelector` | `LabelSelectorArgs` | Select workloads by labels |
 | `enabled` | `boolean` | Activate the target |
 
 ---
@@ -285,6 +291,13 @@ const nodePolicy = new resources.NodePolicy("my-node-policy", {
 | `azure` | `AzureNodeClassSpecArgs` | Azure-specific node class configuration |
 | `raw` | `RawKarpenterSpecArgs[]` | Raw Karpenter YAML (escape hatch) |
 
+**`RawKarpenterSpecArgs` fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `nodepoolYaml` | `string` | Raw YAML for a complete Karpenter NodePool resource |
+| `nodeclassYaml` | `string` | Raw YAML for a complete Karpenter NodeClass resource |
+
 **`DisruptionPolicyArgs` fields:**
 
 | Field | Type | Description |
@@ -343,6 +356,18 @@ const nodePolicyTarget = new resources.NodePolicyTarget("my-node-policy-target",
     enabled: true,
 });
 ```
+
+**Fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `name` | `string` | Unique target name |
+| `policyId` | `string` | ID of the `NodePolicy` to apply |
+| `clusterIds` | `string[]` | Cluster IDs to target. **At most 1 entry** — the backend rejects more than one. |
+| `description` | `string` | Human-readable description (optional) |
+| `enabled` | `boolean` | Activate the target |
+
+> **Note:** `pulumi destroy` removes this resource from Pulumi state but does **not** delete it on the DevZero backend — no delete RPC exists for NodePolicyTarget.
 
 ---
 

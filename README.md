@@ -413,7 +413,7 @@ pulumi stack rm <stack-name>
 | `liveMigrationEnabled` | bool | Allow live pod migration when applying recommendations without restart. Default: `false` |
 | `schedulerPlugins` | string[] | Kubernetes scheduler plugins to activate. Example: `["binpacking"]` |
 | `defragmentationSchedule` | string | Cron expression for background node defragmentation. Example: `0 3 * * 0` |
-| `enablePmaxProtection` | bool | Raise requests to cover peak usage when max/recommendation ratio exceeds `pmaxRatioThreshold`. Default: `true` |
+| `enablePmaxProtection` | bool | Raise requests to cover peak usage when max/recommendation ratio exceeds `pmaxRatioThreshold`. Default: `false` |
 | `pmaxRatioThreshold` | float | Peak-to-recommendation ratio that triggers pmax protection. Default: `3.0` |
 | `minDataPoints` | int | Global minimum data points required before a recommendation is emitted. Default: `15` |
 | `minChangePercent` | float | Global minimum relative change (0–1) required before applying a recommendation. Default: `0.2` (20%) |
@@ -437,8 +437,20 @@ pulumi stack rm <stack-name>
 | `limitsAdjustmentEnabled` | bool | Whether to also adjust resource limits |
 | `limitMultiplier` | float | Limits = request × limitMultiplier |
 | `minDataPoints` | int | Minimum data points required before a recommendation is emitted. Default: `20` |
-| `adjustReqEvenIfNotSet` | bool | Recommend requests even when the workload has no existing requests set. Default: `true` |
-| `limitsRemovalEnabled` | bool | Actively remove limits from workloads (CPU only). Takes precedence over `limitsAdjustmentEnabled`. Default: `true` for CPU, `false` for memory |
+| `adjustReqEvenIfNotSet` | bool | Recommend requests even when the workload has no existing requests set. Default: `false` |
+| `limitsRemovalEnabled` | bool | Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over `limitsAdjustmentEnabled`. Default: `false` |
+
+### HorizontalScalingArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `enabled` | bool | Enable horizontal (replica) scaling |
+| `minReplicas` | int | Minimum number of replicas to maintain |
+| `maxReplicas` | int | Maximum number of replicas to scale to |
+| `targetUtilization` | float | Target utilization ratio (0–1) for the primary metric. Example: `0.7` |
+| `primaryMetric` | string | Metric driving HPA: `cpu` \| `memory` \| `gpu` \| `network_ingress` \| `network_egress` |
+| `minDataPoints` | int | Minimum data points before a recommendation is emitted |
+| `maxReplicaChangePercent` | float | Maximum % change in replica count per cycle. Example: `50.0` |
 
 ## WorkloadPolicyTarget — Key Fields
 
@@ -447,8 +459,14 @@ pulumi stack rm <stack-name>
 | `name` | string | Unique target name |
 | `policyId` | string | ID of the `WorkloadPolicy` to apply |
 | `clusterIds` | string[] | IDs of clusters to target |
-| `kindFilter` | string[] | Workload kinds: `Pod`, `Deployment`, `StatefulSet`, `DaemonSet`, `Job`, `CronJob`, `ReplicaSet`, `ReplicationController`, `Rollout` |
-| `namespaceFilter` | string[] | Restrict to specific namespaces |
+| `description` | string | Human-readable description (optional) |
+| `priority` | int | Evaluation priority; higher value wins when targets overlap |
+| `kindFilter` | string[] | Workload kinds: `Pod` \| `Deployment` \| `StatefulSet` \| `DaemonSet` \| `Job` \| `CronJob` \| `ReplicaSet` \| `ReplicationController` \| `Rollout` |
+| `workloadNames` | string[] | Explicit list of workload names to include |
+| `nodeGroupNames` | string[] | Restrict matching to specific node groups by name |
+| `namePattern` | `NamePatternArgs` | Regex pattern to match workload names |
+| `namespaceSelector` | `LabelSelectorArgs` | Select namespaces by labels (matchLabels / matchExpressions) |
+| `workloadSelector` | `LabelSelectorArgs` | Select workloads by labels |
 | `enabled` | bool | Activate the target |
 
 ## NodePolicy — Key Fields
@@ -522,6 +540,25 @@ pulumi stack rm <stack-name>
 | `maxPods` | int | Max pods per node |
 | `tags` | map[string]string | Azure tags on provisioned resources |
 | `kubelet` | `AzureKubeletConfigurationArgs` | Kubelet overrides for Azure nodes |
+
+### RawKarpenterSpecArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `nodepoolYaml` | string | Raw YAML for a complete Karpenter NodePool resource |
+| `nodeclassYaml` | string | Raw YAML for a complete Karpenter NodeClass resource |
+
+## NodePolicyTarget — Key Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `name` | string | Unique target name |
+| `policyId` | string | ID of the `NodePolicy` to apply |
+| `clusterIds` | string[] | Cluster IDs to target. **At most 1 entry** — the backend rejects more than one. |
+| `description` | string | Human-readable description (optional) |
+| `enabled` | bool | Activate the target |
+
+> **Note:** `pulumi destroy` removes this resource from Pulumi state but does **not** delete it on the DevZero backend — no delete RPC exists for NodePolicyTarget.
 
 ## Building from Source
 
