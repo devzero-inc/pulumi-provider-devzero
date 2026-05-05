@@ -494,7 +494,7 @@ export namespace resources {
 
     export interface VerticalScalingArgs {
         /**
-         * Recommend requests even when the workload has no existing requests set. Example: true. Server/web default: true.
+         * Recommend requests even when the workload has no existing requests set. Default: false.
          */
         adjustReqEvenIfNotSet?: boolean;
         /**
@@ -510,7 +510,7 @@ export namespace resources {
          */
         limitsAdjustmentEnabled?: boolean;
         /**
-         * Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Example: true. Web default: true for CPU, false for Memory.
+         * Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over limitsAdjustmentEnabled when set. Default: false.
          */
         limitsRemovalEnabled?: boolean;
         /**

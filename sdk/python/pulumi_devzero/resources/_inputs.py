@@ -2360,7 +2360,7 @@ class TaintArgsArgs:
 class VerticalScalingArgsArgsDict(TypedDict):
     adjust_req_even_if_not_set: NotRequired[pulumi.Input[_builtins.bool]]
     """
-    Recommend requests even when the workload has no existing requests set. Example: true. Server/web default: true.
+    Recommend requests even when the workload has no existing requests set. Default: false.
     """
     enabled: NotRequired[pulumi.Input[_builtins.bool]]
     """
@@ -2376,7 +2376,7 @@ class VerticalScalingArgsArgsDict(TypedDict):
     """
     limits_removal_enabled: NotRequired[pulumi.Input[_builtins.bool]]
     """
-    Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Example: true. Web default: true for CPU, false for Memory.
+    Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over limitsAdjustmentEnabled when set. Default: false.
     """
     max_request: NotRequired[pulumi.Input[_builtins.int]]
     """
@@ -2423,11 +2423,11 @@ class VerticalScalingArgsArgs:
                  overhead_multiplier: Optional[pulumi.Input[_builtins.float]] = None,
                  target_percentile: Optional[pulumi.Input[_builtins.float]] = None):
         """
-        :param pulumi.Input[_builtins.bool] adjust_req_even_if_not_set: Recommend requests even when the workload has no existing requests set. Example: true. Server/web default: true.
+        :param pulumi.Input[_builtins.bool] adjust_req_even_if_not_set: Recommend requests even when the workload has no existing requests set. Default: false.
         :param pulumi.Input[_builtins.bool] enabled: Enable vertical scaling for this resource type. Example: true
         :param pulumi.Input[_builtins.float] limit_multiplier: Multiplier applied to the request to derive the resource limit. Example: 1.5 sets limit to 150% of request.
         :param pulumi.Input[_builtins.bool] limits_adjustment_enabled: Whether to also adjust resource limits alongside requests. Example: true.
-        :param pulumi.Input[_builtins.bool] limits_removal_enabled: Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Example: true. Web default: true for CPU, false for Memory.
+        :param pulumi.Input[_builtins.bool] limits_removal_enabled: Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over limitsAdjustmentEnabled when set. Default: false.
         :param pulumi.Input[_builtins.int] max_request: Maximum resource request in millicores (CPU) or bytes (memory/GPU). Example: 4000 (= 4 CPU cores), 1073741824 (= 1Gi memory).
         :param pulumi.Input[_builtins.float] max_scale_down_percent: Maximum percentage decrease allowed in a single recommendation cycle. Example: 20.0 allows up to 20% decrease. Default: 1.0.
         :param pulumi.Input[_builtins.float] max_scale_up_percent: Maximum percentage increase allowed in a single recommendation cycle. Example: 50.0 allows up to 50% increase. Default: 1000.0.
@@ -2471,7 +2471,7 @@ class VerticalScalingArgsArgs:
     @pulumi.getter(name="adjustReqEvenIfNotSet")
     def adjust_req_even_if_not_set(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Recommend requests even when the workload has no existing requests set. Example: true. Server/web default: true.
+        Recommend requests even when the workload has no existing requests set. Default: false.
         """
         return pulumi.get(self, "adjust_req_even_if_not_set")
 
@@ -2519,7 +2519,7 @@ class VerticalScalingArgsArgs:
     @pulumi.getter(name="limitsRemovalEnabled")
     def limits_removal_enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Example: true. Web default: true for CPU, false for Memory.
+        Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over limitsAdjustmentEnabled when set. Default: false.
         """
         return pulumi.get(self, "limits_removal_enabled")
 

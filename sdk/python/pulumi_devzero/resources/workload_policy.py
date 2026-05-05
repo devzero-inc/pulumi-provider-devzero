@@ -56,7 +56,7 @@ class WorkloadPolicyArgs:
         :param pulumi.Input[_builtins.str] description: Free-form description of the policy. Example: 'VPA policy for production workloads'.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] detection_triggers: Events that trigger a new recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: ["pod_creation", "pod_reschedule"].
         :param pulumi.Input[_builtins.float] drift_delta_percent: Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
-        :param pulumi.Input[_builtins.bool] enable_pmax_protection: Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true.
+        :param pulumi.Input[_builtins.bool] enable_pmax_protection: Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.
         :param pulumi.Input['VerticalScalingArgsArgs'] gpu_vertical_scaling: Vertical scaling configuration for GPU cores. Uses the same fields as cpuVerticalScaling; units are GPU cores (millicores).
         :param pulumi.Input['VerticalScalingArgsArgs'] gpu_vram_vertical_scaling: Vertical scaling configuration for GPU VRAM. Uses the same fields as cpuVerticalScaling; units are bytes.
         :param pulumi.Input[_builtins.float] hysteresis_vs_target: Dead-band ratio around the HPA target to suppress oscillation between VPA and HPA. Example: 0.1 (10% band).
@@ -239,7 +239,7 @@ class WorkloadPolicyArgs:
     @pulumi.getter(name="enablePmaxProtection")
     def enable_pmax_protection(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true.
+        Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.
         """
         return pulumi.get(self, "enable_pmax_protection")
 
@@ -453,7 +453,7 @@ class WorkloadPolicy(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] description: Free-form description of the policy. Example: 'VPA policy for production workloads'.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] detection_triggers: Events that trigger a new recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: ["pod_creation", "pod_reschedule"].
         :param pulumi.Input[_builtins.float] drift_delta_percent: Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
-        :param pulumi.Input[_builtins.bool] enable_pmax_protection: Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true.
+        :param pulumi.Input[_builtins.bool] enable_pmax_protection: Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.
         :param pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']] gpu_vertical_scaling: Vertical scaling configuration for GPU cores. Uses the same fields as cpuVerticalScaling; units are GPU cores (millicores).
         :param pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']] gpu_vram_vertical_scaling: Vertical scaling configuration for GPU VRAM. Uses the same fields as cpuVerticalScaling; units are bytes.
         :param pulumi.Input[_builtins.float] hysteresis_vs_target: Dead-band ratio around the HPA target to suppress oscillation between VPA and HPA. Example: 0.1 (10% band).
@@ -676,7 +676,7 @@ class WorkloadPolicy(pulumi.CustomResource):
     @pulumi.getter(name="enablePmaxProtection")
     def enable_pmax_protection(self) -> pulumi.Output[Optional[_builtins.bool]]:
         """
-        Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true.
+        Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.
         """
         return pulumi.get(self, "enable_pmax_protection")
 

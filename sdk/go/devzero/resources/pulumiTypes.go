@@ -3830,7 +3830,7 @@ func (o TaintArgsArrayOutput) Index(i pulumi.IntInput) TaintArgsOutput {
 }
 
 type VerticalScalingArgs struct {
-	// Recommend requests even when the workload has no existing requests set. Example: true. Server/web default: true.
+	// Recommend requests even when the workload has no existing requests set. Default: false.
 	AdjustReqEvenIfNotSet *bool `pulumi:"adjustReqEvenIfNotSet"`
 	// Enable vertical scaling for this resource type. Example: true
 	Enabled *bool `pulumi:"enabled"`
@@ -3838,7 +3838,7 @@ type VerticalScalingArgs struct {
 	LimitMultiplier *float64 `pulumi:"limitMultiplier"`
 	// Whether to also adjust resource limits alongside requests. Example: true.
 	LimitsAdjustmentEnabled *bool `pulumi:"limitsAdjustmentEnabled"`
-	// Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Example: true. Web default: true for CPU, false for Memory.
+	// Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over limitsAdjustmentEnabled when set. Default: false.
 	LimitsRemovalEnabled *bool `pulumi:"limitsRemovalEnabled"`
 	// Maximum resource request in millicores (CPU) or bytes (memory/GPU). Example: 4000 (= 4 CPU cores), 1073741824 (= 1Gi memory).
 	MaxRequest *int `pulumi:"maxRequest"`
@@ -3889,7 +3889,7 @@ type VerticalScalingArgsInput interface {
 }
 
 type VerticalScalingArgsArgs struct {
-	// Recommend requests even when the workload has no existing requests set. Example: true. Server/web default: true.
+	// Recommend requests even when the workload has no existing requests set. Default: false.
 	AdjustReqEvenIfNotSet pulumi.BoolPtrInput `pulumi:"adjustReqEvenIfNotSet"`
 	// Enable vertical scaling for this resource type. Example: true
 	Enabled pulumi.BoolPtrInput `pulumi:"enabled"`
@@ -3897,7 +3897,7 @@ type VerticalScalingArgsArgs struct {
 	LimitMultiplier pulumi.Float64PtrInput `pulumi:"limitMultiplier"`
 	// Whether to also adjust resource limits alongside requests. Example: true.
 	LimitsAdjustmentEnabled pulumi.BoolPtrInput `pulumi:"limitsAdjustmentEnabled"`
-	// Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Example: true. Web default: true for CPU, false for Memory.
+	// Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over limitsAdjustmentEnabled when set. Default: false.
 	LimitsRemovalEnabled pulumi.BoolPtrInput `pulumi:"limitsRemovalEnabled"`
 	// Maximum resource request in millicores (CPU) or bytes (memory/GPU). Example: 4000 (= 4 CPU cores), 1073741824 (= 1Gi memory).
 	MaxRequest pulumi.IntPtrInput `pulumi:"maxRequest"`
@@ -4009,7 +4009,7 @@ func (o VerticalScalingArgsOutput) ToVerticalScalingArgsPtrOutputWithContext(ctx
 	}).(VerticalScalingArgsPtrOutput)
 }
 
-// Recommend requests even when the workload has no existing requests set. Example: true. Server/web default: true.
+// Recommend requests even when the workload has no existing requests set. Default: false.
 func (o VerticalScalingArgsOutput) AdjustReqEvenIfNotSet() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *bool { return v.AdjustReqEvenIfNotSet }).(pulumi.BoolPtrOutput)
 }
@@ -4029,7 +4029,7 @@ func (o VerticalScalingArgsOutput) LimitsAdjustmentEnabled() pulumi.BoolPtrOutpu
 	return o.ApplyT(func(v VerticalScalingArgs) *bool { return v.LimitsAdjustmentEnabled }).(pulumi.BoolPtrOutput)
 }
 
-// Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Example: true. Web default: true for CPU, false for Memory.
+// Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over limitsAdjustmentEnabled when set. Default: false.
 func (o VerticalScalingArgsOutput) LimitsRemovalEnabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *bool { return v.LimitsRemovalEnabled }).(pulumi.BoolPtrOutput)
 }
@@ -4093,7 +4093,7 @@ func (o VerticalScalingArgsPtrOutput) Elem() VerticalScalingArgsOutput {
 	}).(VerticalScalingArgsOutput)
 }
 
-// Recommend requests even when the workload has no existing requests set. Example: true. Server/web default: true.
+// Recommend requests even when the workload has no existing requests set. Default: false.
 func (o VerticalScalingArgsPtrOutput) AdjustReqEvenIfNotSet() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *VerticalScalingArgs) *bool {
 		if v == nil {
@@ -4133,7 +4133,7 @@ func (o VerticalScalingArgsPtrOutput) LimitsAdjustmentEnabled() pulumi.BoolPtrOu
 	}).(pulumi.BoolPtrOutput)
 }
 
-// Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Example: true. Web default: true for CPU, false for Memory.
+// Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over limitsAdjustmentEnabled when set. Default: false.
 func (o VerticalScalingArgsPtrOutput) LimitsRemovalEnabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *VerticalScalingArgs) *bool {
 		if v == nil {

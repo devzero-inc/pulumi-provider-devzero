@@ -30,7 +30,7 @@ type WorkloadPolicy struct {
 	DetectionTriggers pulumi.StringArrayOutput `pulumi:"detectionTriggers"`
 	// Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
 	DriftDeltaPercent pulumi.Float64PtrOutput `pulumi:"driftDeltaPercent"`
-	// Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true.
+	// Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.
 	EnablePmaxProtection pulumi.BoolPtrOutput `pulumi:"enablePmaxProtection"`
 	// Vertical scaling configuration for GPU cores. Uses the same fields as cpuVerticalScaling; units are GPU cores (millicores).
 	GpuVerticalScaling VerticalScalingArgsPtrOutput `pulumi:"gpuVerticalScaling"`
@@ -150,7 +150,7 @@ type workloadPolicyArgs struct {
 	DetectionTriggers []string `pulumi:"detectionTriggers"`
 	// Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
 	DriftDeltaPercent *float64 `pulumi:"driftDeltaPercent"`
-	// Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true.
+	// Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.
 	EnablePmaxProtection *bool `pulumi:"enablePmaxProtection"`
 	// Vertical scaling configuration for GPU cores. Uses the same fields as cpuVerticalScaling; units are GPU cores (millicores).
 	GpuVerticalScaling *VerticalScalingArgs `pulumi:"gpuVerticalScaling"`
@@ -199,7 +199,7 @@ type WorkloadPolicyArgs struct {
 	DetectionTriggers pulumi.StringArrayInput
 	// Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
 	DriftDeltaPercent pulumi.Float64PtrInput
-	// Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true.
+	// Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.
 	EnablePmaxProtection pulumi.BoolPtrInput
 	// Vertical scaling configuration for GPU cores. Uses the same fields as cpuVerticalScaling; units are GPU cores (millicores).
 	GpuVerticalScaling VerticalScalingArgsPtrInput
@@ -357,7 +357,7 @@ func (o WorkloadPolicyOutput) DriftDeltaPercent() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v *WorkloadPolicy) pulumi.Float64PtrOutput { return v.DriftDeltaPercent }).(pulumi.Float64PtrOutput)
 }
 
-// Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true.
+// Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.
 func (o WorkloadPolicyOutput) EnablePmaxProtection() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *WorkloadPolicy) pulumi.BoolPtrOutput { return v.EnablePmaxProtection }).(pulumi.BoolPtrOutput)
 }

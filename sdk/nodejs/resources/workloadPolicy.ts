@@ -63,7 +63,7 @@ export class WorkloadPolicy extends pulumi.CustomResource {
      */
     declare public readonly driftDeltaPercent: pulumi.Output<number | undefined>;
     /**
-     * Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true.
+     * Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.
      */
     declare public readonly enablePmaxProtection: pulumi.Output<boolean | undefined>;
     /**
@@ -224,7 +224,7 @@ export interface WorkloadPolicyArgs {
      */
     driftDeltaPercent?: pulumi.Input<number>;
     /**
-     * Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true.
+     * Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.
      */
     enablePmaxProtection?: pulumi.Input<boolean>;
     /**

@@ -723,7 +723,7 @@
             "properties": {
                 "adjustReqEvenIfNotSet": {
                     "type": "boolean",
-                    "description": "Recommend requests even when the workload has no existing requests set. Example: true. Server/web default: true."
+                    "description": "Recommend requests even when the workload has no existing requests set. Default: false."
                 },
                 "enabled": {
                     "type": "boolean",
@@ -739,7 +739,7 @@
                 },
                 "limitsRemovalEnabled": {
                     "type": "boolean",
-                    "description": "Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Example: true. Web default: true for CPU, false for Memory."
+                    "description": "Actively remove limits from workloads (CPU axis only \u2014 memory limits removal is not supported). Takes precedence over limitsAdjustmentEnabled when set. Default: false."
                 },
                 "maxRequest": {
                     "type": "integer",
@@ -1092,7 +1092,7 @@
                 },
                 "enablePmaxProtection": {
                     "type": "boolean",
-                    "description": "Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true."
+                    "description": "Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false."
                 },
                 "gpuVerticalScaling": {
                     "$ref": "#/types/devzero:resources:VerticalScalingArgs",
@@ -1214,7 +1214,7 @@
                 },
                 "enablePmaxProtection": {
                     "type": "boolean",
-                    "description": "Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Example: true. Server/web default: true."
+                    "description": "Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false."
                 },
                 "gpuVerticalScaling": {
                     "$ref": "#/types/devzero:resources:VerticalScalingArgs",
