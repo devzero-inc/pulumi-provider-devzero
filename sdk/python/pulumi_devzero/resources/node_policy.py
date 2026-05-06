@@ -469,7 +469,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter
     def architectures(self) -> pulumi.Output[Optional['outputs.LabelSelectorArgs']]:
         """
-        CPU architectures (e.g. amd64, arm64).
+        CPU architectures for nodes. Example: {in: ["amd64"]}.
         """
         return pulumi.get(self, "architectures")
 
@@ -477,7 +477,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter
     def aws(self) -> pulumi.Output[Optional['outputs.AWSNodeClassSpecArgs']]:
         """
-        AWS-specific node class configuration.
+        AWS-specific EC2NodeClass configuration (subnets, AMIs, IAM role, EBS, etc.).
         """
         return pulumi.get(self, "aws")
 
@@ -485,7 +485,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter
     def azure(self) -> pulumi.Output[Optional['outputs.AzureNodeClassSpecArgs']]:
         """
-        Azure-specific node class configuration.
+        Azure-specific AKSNodeClass configuration (VNet subnet, OS disk, image family, etc.).
         """
         return pulumi.get(self, "azure")
 
@@ -493,7 +493,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter(name="capacityTypes")
     def capacity_types(self) -> pulumi.Output[Optional['outputs.LabelSelectorArgs']]:
         """
-        Capacity types (e.g. on-demand, spot).
+        Capacity purchasing types. Valid values: 'spot', 'on-demand', 'reserved'. Example: {in: ["spot", "on-demand"]}.
         """
         return pulumi.get(self, "capacity_types")
 
@@ -501,7 +501,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter
     def description(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        Free-form description of the node policy.
+        Free-form description of the node policy. Example: 'Spot instance policy for production batch workloads'.
         """
         return pulumi.get(self, "description")
 
@@ -509,7 +509,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter
     def disruption(self) -> pulumi.Output[Optional['outputs.DisruptionPolicyArgs']]:
         """
-        Karpenter disruption policy for consolidation and expiry.
+        Karpenter disruption policy controlling consolidation, expiry, and budgets.
         """
         return pulumi.get(self, "disruption")
 
@@ -517,7 +517,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter(name="instanceCategories")
     def instance_categories(self) -> pulumi.Output[Optional['outputs.LabelSelectorArgs']]:
         """
-        Filter instances by category (e.g. general-purpose, compute-optimized).
+        Filter instances by category letter (cloud-specific). Example: {in: ["m", "c", "r"]} for AWS, {in: ["D", "E"]} for Azure.
         """
         return pulumi.get(self, "instance_categories")
 
@@ -525,7 +525,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter(name="instanceCpus")
     def instance_cpus(self) -> pulumi.Output[Optional['outputs.LabelSelectorArgs']]:
         """
-        Filter instances by CPU count.
+        Filter instances by vCPU count. Example: {in: ["4", "8", "16"]}.
         """
         return pulumi.get(self, "instance_cpus")
 
@@ -533,7 +533,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter(name="instanceFamilies")
     def instance_families(self) -> pulumi.Output[Optional['outputs.LabelSelectorArgs']]:
         """
-        Filter instances by family (e.g. m5, c6i).
+        Filter instances by family. Example: {in: ["m5", "c6i", "m6i"]}.
         """
         return pulumi.get(self, "instance_families")
 
@@ -541,7 +541,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter(name="instanceGenerations")
     def instance_generations(self) -> pulumi.Output[Optional['outputs.LabelSelectorArgs']]:
         """
-        Filter instances by generation.
+        Filter instances by generation number. Example: {in: ["2", "3"]}.
         """
         return pulumi.get(self, "instance_generations")
 
@@ -549,7 +549,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter(name="instanceHypervisors")
     def instance_hypervisors(self) -> pulumi.Output[Optional['outputs.LabelSelectorArgs']]:
         """
-        Filter instances by hypervisor type.
+        Filter instances by hypervisor type. Example: {in: ["nitro"]}.
         """
         return pulumi.get(self, "instance_hypervisors")
 
@@ -557,7 +557,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter(name="instanceSizes")
     def instance_sizes(self) -> pulumi.Output[Optional['outputs.LabelSelectorArgs']]:
         """
-        Filter instances by size (e.g. large, xlarge).
+        Filter instances by size label. Example: {in: ["large", "xlarge", "2xlarge"]}.
         """
         return pulumi.get(self, "instance_sizes")
 
@@ -565,7 +565,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter(name="instanceTypes")
     def instance_types(self) -> pulumi.Output[Optional['outputs.LabelSelectorArgs']]:
         """
-        Explicitly select specific instance types.
+        Explicitly allow specific instance types. Example: {in: ["m5.large", "c6i.large"]}.
         """
         return pulumi.get(self, "instance_types")
 
@@ -573,7 +573,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter
     def labels(self) -> pulumi.Output[Optional[Mapping[str, _builtins.str]]]:
         """
-        Labels applied to provisioned nodes.
+        Labels applied to all provisioned nodes. Example: {"team": "backend", "env": "prod"}.
         """
         return pulumi.get(self, "labels")
 
@@ -581,7 +581,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter
     def limits(self) -> pulumi.Output[Optional['outputs.ResourceLimitsArgs']]:
         """
-        Resource limits on the total capacity managed by this policy.
+        Resource limits on total capacity managed by this policy. Example: {cpu: "1000", memory: "1000Gi"}.
         """
         return pulumi.get(self, "limits")
 
@@ -589,7 +589,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter
     def name(self) -> pulumi.Output[_builtins.str]:
         """
-        Human-friendly name for the node policy.
+        Human-friendly name for the node policy. Example: 'prod-spot-policy'.
         """
         return pulumi.get(self, "name")
 
@@ -597,7 +597,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter(name="nodeClassName")
     def node_class_name(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        Override name for the generated Karpenter NodeClass.
+        Override name for the generated Karpenter NodeClass resource. Example: 'prod-aws-nodeclass'.
         """
         return pulumi.get(self, "node_class_name")
 
@@ -605,7 +605,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter(name="nodePoolName")
     def node_pool_name(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        Override name for the generated Karpenter NodePool.
+        Override name for the generated Karpenter NodePool resource. Example: 'prod-spot-nodepool'.
         """
         return pulumi.get(self, "node_pool_name")
 
@@ -613,7 +613,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter(name="operatingSystems")
     def operating_systems(self) -> pulumi.Output[Optional['outputs.LabelSelectorArgs']]:
         """
-        Operating systems for nodes (e.g. linux, windows).
+        Operating systems for nodes. Example: {in: ["linux"]}.
         """
         return pulumi.get(self, "operating_systems")
 
@@ -621,7 +621,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter
     def raw(self) -> pulumi.Output[Optional[Sequence['outputs.RawKarpenterSpecArgs']]]:
         """
-        Raw Karpenter YAML for full NodePool/NodeClass customization.
+        Raw Karpenter YAML for full NodePool/NodeClass customization — use only when structured fields are insufficient.
         """
         return pulumi.get(self, "raw")
 
@@ -629,7 +629,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter
     def taints(self) -> pulumi.Output[Optional[Sequence['outputs.TaintArgs']]]:
         """
-        Taints applied to provisioned nodes.
+        Taints applied to provisioned nodes to control pod scheduling. Example: [{key: "dedicated", value: "gpu", effect: "NoSchedule"}].
         """
         return pulumi.get(self, "taints")
 
@@ -637,7 +637,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter
     def weight(self) -> pulumi.Output[Optional[_builtins.int]]:
         """
-        Priority weight for this policy; higher values take precedence.
+        Priority weight; higher values take precedence when multiple policies match. Example: 100.
         """
         return pulumi.get(self, "weight")
 
@@ -645,7 +645,7 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter
     def zones(self) -> pulumi.Output[Optional['outputs.LabelSelectorArgs']]:
         """
-        Availability zones where nodes may be provisioned.
+        Availability zones where nodes may be provisioned. Example: {in: ["us-east-1a", "us-east-1b"]}.
         """
         return pulumi.get(self, "zones")
 

@@ -14,17 +14,17 @@ import (
 var _ = internal.GetEnvOrDefault
 
 type AMISelectorTermArgs struct {
-	// Well-known alias for the AMI family (e.g. 'al2@latest').
+	// Well-known alias for the AMI family. Example: 'al2@latest' or 'bottlerocket@latest'.
 	Alias *string `pulumi:"alias"`
-	// Explicit AMI ID.
+	// Explicit AMI ID. Example: 'ami-0a1b2c3d4e5f67890'.
 	Id *string `pulumi:"id"`
-	// AMI name filter (supports wildcards).
+	// AMI name filter (supports wildcards). Example: 'my-org-eks-node-*'.
 	Name *string `pulumi:"name"`
-	// AWS account ID or alias that owns the AMI.
+	// AWS account ID or alias that owns the AMI. Example: '123456789012' or 'amazon'.
 	Owner *string `pulumi:"owner"`
-	// SSM parameter path that stores the AMI ID.
+	// SSM parameter path that stores the AMI ID. Example: '/aws/service/eks/optimized-ami/1.29/amazon-linux-2/recommended/image_id'.
 	SsmParameter *string `pulumi:"ssmParameter"`
-	// Map of AWS tags used to select AMIs.
+	// Map of AWS tags used to select AMIs. Example: {"my-org/ami": "approved"}.
 	Tags map[string]string `pulumi:"tags"`
 }
 
@@ -40,17 +40,17 @@ type AMISelectorTermArgsInput interface {
 }
 
 type AMISelectorTermArgsArgs struct {
-	// Well-known alias for the AMI family (e.g. 'al2@latest').
+	// Well-known alias for the AMI family. Example: 'al2@latest' or 'bottlerocket@latest'.
 	Alias pulumi.StringPtrInput `pulumi:"alias"`
-	// Explicit AMI ID.
+	// Explicit AMI ID. Example: 'ami-0a1b2c3d4e5f67890'.
 	Id pulumi.StringPtrInput `pulumi:"id"`
-	// AMI name filter (supports wildcards).
+	// AMI name filter (supports wildcards). Example: 'my-org-eks-node-*'.
 	Name pulumi.StringPtrInput `pulumi:"name"`
-	// AWS account ID or alias that owns the AMI.
+	// AWS account ID or alias that owns the AMI. Example: '123456789012' or 'amazon'.
 	Owner pulumi.StringPtrInput `pulumi:"owner"`
-	// SSM parameter path that stores the AMI ID.
+	// SSM parameter path that stores the AMI ID. Example: '/aws/service/eks/optimized-ami/1.29/amazon-linux-2/recommended/image_id'.
 	SsmParameter pulumi.StringPtrInput `pulumi:"ssmParameter"`
-	// Map of AWS tags used to select AMIs.
+	// Map of AWS tags used to select AMIs. Example: {"my-org/ami": "approved"}.
 	Tags pulumi.StringMapInput `pulumi:"tags"`
 }
 
@@ -105,32 +105,32 @@ func (o AMISelectorTermArgsOutput) ToAMISelectorTermArgsOutputWithContext(ctx co
 	return o
 }
 
-// Well-known alias for the AMI family (e.g. 'al2@latest').
+// Well-known alias for the AMI family. Example: 'al2@latest' or 'bottlerocket@latest'.
 func (o AMISelectorTermArgsOutput) Alias() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AMISelectorTermArgs) *string { return v.Alias }).(pulumi.StringPtrOutput)
 }
 
-// Explicit AMI ID.
+// Explicit AMI ID. Example: 'ami-0a1b2c3d4e5f67890'.
 func (o AMISelectorTermArgsOutput) Id() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AMISelectorTermArgs) *string { return v.Id }).(pulumi.StringPtrOutput)
 }
 
-// AMI name filter (supports wildcards).
+// AMI name filter (supports wildcards). Example: 'my-org-eks-node-*'.
 func (o AMISelectorTermArgsOutput) Name() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AMISelectorTermArgs) *string { return v.Name }).(pulumi.StringPtrOutput)
 }
 
-// AWS account ID or alias that owns the AMI.
+// AWS account ID or alias that owns the AMI. Example: '123456789012' or 'amazon'.
 func (o AMISelectorTermArgsOutput) Owner() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AMISelectorTermArgs) *string { return v.Owner }).(pulumi.StringPtrOutput)
 }
 
-// SSM parameter path that stores the AMI ID.
+// SSM parameter path that stores the AMI ID. Example: '/aws/service/eks/optimized-ami/1.29/amazon-linux-2/recommended/image_id'.
 func (o AMISelectorTermArgsOutput) SsmParameter() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AMISelectorTermArgs) *string { return v.SsmParameter }).(pulumi.StringPtrOutput)
 }
 
-// Map of AWS tags used to select AMIs.
+// Map of AWS tags used to select AMIs. Example: {"my-org/ami": "approved"}.
 func (o AMISelectorTermArgsOutput) Tags() pulumi.StringMapOutput {
 	return o.ApplyT(func(v AMISelectorTermArgs) map[string]string { return v.Tags }).(pulumi.StringMapOutput)
 }
@@ -156,37 +156,37 @@ func (o AMISelectorTermArgsArrayOutput) Index(i pulumi.IntInput) AMISelectorTerm
 }
 
 type AWSNodeClassSpecArgs struct {
-	// AMI family shorthand (e.g. 'AL2', 'Bottlerocket', 'Windows2022').
+	// AMI family shorthand used when no amiSelectorTerms are specified. One of: 'AL2', 'AL2023', 'Bottlerocket', 'Windows2019', 'Windows2022'. Example: 'AL2'.
 	AmiFamily *string `pulumi:"amiFamily"`
-	// Selectors for the AMIs used to launch nodes.
+	// Selectors for the AMIs used to launch nodes. Example: [{alias: "al2@latest"}].
 	AmiSelectorTerms []AMISelectorTermArgs `pulumi:"amiSelectorTerms"`
-	// Whether to assign a public IP address to provisioned nodes.
+	// Whether to assign a public IP address to provisioned nodes. Example: false.
 	AssociatePublicIpAddress *bool `pulumi:"associatePublicIpAddress"`
-	// EBS block device mappings for nodes.
+	// EBS block device mappings for nodes. Example: [{deviceName: "/dev/xvda", rootVolume: true, ebs: {volumeSize: "50Gi", volumeType: "gp3"}}].
 	BlockDeviceMappings []BlockDeviceMappingArgs `pulumi:"blockDeviceMappings"`
-	// Selectors for EC2 capacity reservations to prioritize.
+	// Selectors for EC2 capacity reservations to prioritize. Example: [{tags: {"aws:ec2:fleet-id": "fleet-123"}}].
 	CapacityReservationSelectorTerms []CapacityReservationSelectorTermArgs `pulumi:"capacityReservationSelectorTerms"`
-	// EC2 launch template context ARN.
+	// Additional EC2 launch template context ARN for advanced customization. Example: 'arn:aws:ec2:us-east-1:123456789012:launch-template/lt-0abc123'.
 	Context *string `pulumi:"context"`
-	// Enable detailed CloudWatch monitoring for instances.
+	// Enable detailed (1-minute interval) CloudWatch monitoring for instances. Example: false.
 	DetailedMonitoring *bool `pulumi:"detailedMonitoring"`
-	// IAM instance profile name (use instead of Role when profile already exists).
+	// IAM instance profile name to use directly (alternative to Role). Example: 'KarpenterNodeInstanceProfile-my-cluster'.
 	InstanceProfile *string `pulumi:"instanceProfile"`
-	// Policy for handling instance store volumes. One of: 'RAID0'.
+	// Policy for handling NVMe instance store volumes. One of: 'INSTANCE_STORE_POLICY_RAID0'. Example: 'INSTANCE_STORE_POLICY_RAID0'.
 	InstanceStorePolicy *string `pulumi:"instanceStorePolicy"`
-	// Kubelet configuration overrides for AWS nodes.
+	// Kubelet configuration overrides applied to all nodes in this class.
 	Kubelet *KubeletConfigurationArgs `pulumi:"kubelet"`
-	// EC2 instance metadata (IMDS) options.
+	// EC2 instance metadata service (IMDS) configuration.
 	MetadataOptions *MetadataOptionsArgs `pulumi:"metadataOptions"`
-	// IAM role name assigned to nodes.
+	// IAM role name assigned to nodes (Karpenter creates the instance profile). Example: 'KarpenterNodeRole-my-cluster'.
 	Role *string `pulumi:"role"`
-	// Selectors for security groups attached to nodes.
+	// Selectors for security groups attached to provisioned nodes. Example: [{tags: {"karpenter.sh/discovery": "my-cluster"}}].
 	SecurityGroupSelectorTerms []SecurityGroupSelectorTermArgs `pulumi:"securityGroupSelectorTerms"`
-	// Selectors for the subnets nodes will be launched into.
+	// Selectors for the subnets nodes will be launched into. Example: [{tags: {"karpenter.sh/discovery": "my-cluster"}}].
 	SubnetSelectorTerms []SubnetSelectorTermArgs `pulumi:"subnetSelectorTerms"`
-	// AWS tags applied to all resources created by this node class.
+	// AWS tags applied to all resources (instances, volumes, ENIs) created by this node class. Example: {"environment": "production", "team": "platform"}.
 	Tags map[string]string `pulumi:"tags"`
-	// Custom user data script injected into the node launch template.
+	// Custom user data script merged into the node launch template (base64 or plain text). Example: '#!/bin/bash\necho hello'.
 	UserData *string `pulumi:"userData"`
 }
 
@@ -202,37 +202,37 @@ type AWSNodeClassSpecArgsInput interface {
 }
 
 type AWSNodeClassSpecArgsArgs struct {
-	// AMI family shorthand (e.g. 'AL2', 'Bottlerocket', 'Windows2022').
+	// AMI family shorthand used when no amiSelectorTerms are specified. One of: 'AL2', 'AL2023', 'Bottlerocket', 'Windows2019', 'Windows2022'. Example: 'AL2'.
 	AmiFamily pulumi.StringPtrInput `pulumi:"amiFamily"`
-	// Selectors for the AMIs used to launch nodes.
+	// Selectors for the AMIs used to launch nodes. Example: [{alias: "al2@latest"}].
 	AmiSelectorTerms AMISelectorTermArgsArrayInput `pulumi:"amiSelectorTerms"`
-	// Whether to assign a public IP address to provisioned nodes.
+	// Whether to assign a public IP address to provisioned nodes. Example: false.
 	AssociatePublicIpAddress pulumi.BoolPtrInput `pulumi:"associatePublicIpAddress"`
-	// EBS block device mappings for nodes.
+	// EBS block device mappings for nodes. Example: [{deviceName: "/dev/xvda", rootVolume: true, ebs: {volumeSize: "50Gi", volumeType: "gp3"}}].
 	BlockDeviceMappings BlockDeviceMappingArgsArrayInput `pulumi:"blockDeviceMappings"`
-	// Selectors for EC2 capacity reservations to prioritize.
+	// Selectors for EC2 capacity reservations to prioritize. Example: [{tags: {"aws:ec2:fleet-id": "fleet-123"}}].
 	CapacityReservationSelectorTerms CapacityReservationSelectorTermArgsArrayInput `pulumi:"capacityReservationSelectorTerms"`
-	// EC2 launch template context ARN.
+	// Additional EC2 launch template context ARN for advanced customization. Example: 'arn:aws:ec2:us-east-1:123456789012:launch-template/lt-0abc123'.
 	Context pulumi.StringPtrInput `pulumi:"context"`
-	// Enable detailed CloudWatch monitoring for instances.
+	// Enable detailed (1-minute interval) CloudWatch monitoring for instances. Example: false.
 	DetailedMonitoring pulumi.BoolPtrInput `pulumi:"detailedMonitoring"`
-	// IAM instance profile name (use instead of Role when profile already exists).
+	// IAM instance profile name to use directly (alternative to Role). Example: 'KarpenterNodeInstanceProfile-my-cluster'.
 	InstanceProfile pulumi.StringPtrInput `pulumi:"instanceProfile"`
-	// Policy for handling instance store volumes. One of: 'RAID0'.
+	// Policy for handling NVMe instance store volumes. One of: 'INSTANCE_STORE_POLICY_RAID0'. Example: 'INSTANCE_STORE_POLICY_RAID0'.
 	InstanceStorePolicy pulumi.StringPtrInput `pulumi:"instanceStorePolicy"`
-	// Kubelet configuration overrides for AWS nodes.
+	// Kubelet configuration overrides applied to all nodes in this class.
 	Kubelet KubeletConfigurationArgsPtrInput `pulumi:"kubelet"`
-	// EC2 instance metadata (IMDS) options.
+	// EC2 instance metadata service (IMDS) configuration.
 	MetadataOptions MetadataOptionsArgsPtrInput `pulumi:"metadataOptions"`
-	// IAM role name assigned to nodes.
+	// IAM role name assigned to nodes (Karpenter creates the instance profile). Example: 'KarpenterNodeRole-my-cluster'.
 	Role pulumi.StringPtrInput `pulumi:"role"`
-	// Selectors for security groups attached to nodes.
+	// Selectors for security groups attached to provisioned nodes. Example: [{tags: {"karpenter.sh/discovery": "my-cluster"}}].
 	SecurityGroupSelectorTerms SecurityGroupSelectorTermArgsArrayInput `pulumi:"securityGroupSelectorTerms"`
-	// Selectors for the subnets nodes will be launched into.
+	// Selectors for the subnets nodes will be launched into. Example: [{tags: {"karpenter.sh/discovery": "my-cluster"}}].
 	SubnetSelectorTerms SubnetSelectorTermArgsArrayInput `pulumi:"subnetSelectorTerms"`
-	// AWS tags applied to all resources created by this node class.
+	// AWS tags applied to all resources (instances, volumes, ENIs) created by this node class. Example: {"environment": "production", "team": "platform"}.
 	Tags pulumi.StringMapInput `pulumi:"tags"`
-	// Custom user data script injected into the node launch template.
+	// Custom user data script merged into the node launch template (base64 or plain text). Example: '#!/bin/bash\necho hello'.
 	UserData pulumi.StringPtrInput `pulumi:"userData"`
 }
 
@@ -313,84 +313,84 @@ func (o AWSNodeClassSpecArgsOutput) ToAWSNodeClassSpecArgsPtrOutputWithContext(c
 	}).(AWSNodeClassSpecArgsPtrOutput)
 }
 
-// AMI family shorthand (e.g. 'AL2', 'Bottlerocket', 'Windows2022').
+// AMI family shorthand used when no amiSelectorTerms are specified. One of: 'AL2', 'AL2023', 'Bottlerocket', 'Windows2019', 'Windows2022'. Example: 'AL2'.
 func (o AWSNodeClassSpecArgsOutput) AmiFamily() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AWSNodeClassSpecArgs) *string { return v.AmiFamily }).(pulumi.StringPtrOutput)
 }
 
-// Selectors for the AMIs used to launch nodes.
+// Selectors for the AMIs used to launch nodes. Example: [{alias: "al2@latest"}].
 func (o AWSNodeClassSpecArgsOutput) AmiSelectorTerms() AMISelectorTermArgsArrayOutput {
 	return o.ApplyT(func(v AWSNodeClassSpecArgs) []AMISelectorTermArgs { return v.AmiSelectorTerms }).(AMISelectorTermArgsArrayOutput)
 }
 
-// Whether to assign a public IP address to provisioned nodes.
+// Whether to assign a public IP address to provisioned nodes. Example: false.
 func (o AWSNodeClassSpecArgsOutput) AssociatePublicIpAddress() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v AWSNodeClassSpecArgs) *bool { return v.AssociatePublicIpAddress }).(pulumi.BoolPtrOutput)
 }
 
-// EBS block device mappings for nodes.
+// EBS block device mappings for nodes. Example: [{deviceName: "/dev/xvda", rootVolume: true, ebs: {volumeSize: "50Gi", volumeType: "gp3"}}].
 func (o AWSNodeClassSpecArgsOutput) BlockDeviceMappings() BlockDeviceMappingArgsArrayOutput {
 	return o.ApplyT(func(v AWSNodeClassSpecArgs) []BlockDeviceMappingArgs { return v.BlockDeviceMappings }).(BlockDeviceMappingArgsArrayOutput)
 }
 
-// Selectors for EC2 capacity reservations to prioritize.
+// Selectors for EC2 capacity reservations to prioritize. Example: [{tags: {"aws:ec2:fleet-id": "fleet-123"}}].
 func (o AWSNodeClassSpecArgsOutput) CapacityReservationSelectorTerms() CapacityReservationSelectorTermArgsArrayOutput {
 	return o.ApplyT(func(v AWSNodeClassSpecArgs) []CapacityReservationSelectorTermArgs {
 		return v.CapacityReservationSelectorTerms
 	}).(CapacityReservationSelectorTermArgsArrayOutput)
 }
 
-// EC2 launch template context ARN.
+// Additional EC2 launch template context ARN for advanced customization. Example: 'arn:aws:ec2:us-east-1:123456789012:launch-template/lt-0abc123'.
 func (o AWSNodeClassSpecArgsOutput) Context() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AWSNodeClassSpecArgs) *string { return v.Context }).(pulumi.StringPtrOutput)
 }
 
-// Enable detailed CloudWatch monitoring for instances.
+// Enable detailed (1-minute interval) CloudWatch monitoring for instances. Example: false.
 func (o AWSNodeClassSpecArgsOutput) DetailedMonitoring() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v AWSNodeClassSpecArgs) *bool { return v.DetailedMonitoring }).(pulumi.BoolPtrOutput)
 }
 
-// IAM instance profile name (use instead of Role when profile already exists).
+// IAM instance profile name to use directly (alternative to Role). Example: 'KarpenterNodeInstanceProfile-my-cluster'.
 func (o AWSNodeClassSpecArgsOutput) InstanceProfile() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AWSNodeClassSpecArgs) *string { return v.InstanceProfile }).(pulumi.StringPtrOutput)
 }
 
-// Policy for handling instance store volumes. One of: 'RAID0'.
+// Policy for handling NVMe instance store volumes. One of: 'INSTANCE_STORE_POLICY_RAID0'. Example: 'INSTANCE_STORE_POLICY_RAID0'.
 func (o AWSNodeClassSpecArgsOutput) InstanceStorePolicy() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AWSNodeClassSpecArgs) *string { return v.InstanceStorePolicy }).(pulumi.StringPtrOutput)
 }
 
-// Kubelet configuration overrides for AWS nodes.
+// Kubelet configuration overrides applied to all nodes in this class.
 func (o AWSNodeClassSpecArgsOutput) Kubelet() KubeletConfigurationArgsPtrOutput {
 	return o.ApplyT(func(v AWSNodeClassSpecArgs) *KubeletConfigurationArgs { return v.Kubelet }).(KubeletConfigurationArgsPtrOutput)
 }
 
-// EC2 instance metadata (IMDS) options.
+// EC2 instance metadata service (IMDS) configuration.
 func (o AWSNodeClassSpecArgsOutput) MetadataOptions() MetadataOptionsArgsPtrOutput {
 	return o.ApplyT(func(v AWSNodeClassSpecArgs) *MetadataOptionsArgs { return v.MetadataOptions }).(MetadataOptionsArgsPtrOutput)
 }
 
-// IAM role name assigned to nodes.
+// IAM role name assigned to nodes (Karpenter creates the instance profile). Example: 'KarpenterNodeRole-my-cluster'.
 func (o AWSNodeClassSpecArgsOutput) Role() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AWSNodeClassSpecArgs) *string { return v.Role }).(pulumi.StringPtrOutput)
 }
 
-// Selectors for security groups attached to nodes.
+// Selectors for security groups attached to provisioned nodes. Example: [{tags: {"karpenter.sh/discovery": "my-cluster"}}].
 func (o AWSNodeClassSpecArgsOutput) SecurityGroupSelectorTerms() SecurityGroupSelectorTermArgsArrayOutput {
 	return o.ApplyT(func(v AWSNodeClassSpecArgs) []SecurityGroupSelectorTermArgs { return v.SecurityGroupSelectorTerms }).(SecurityGroupSelectorTermArgsArrayOutput)
 }
 
-// Selectors for the subnets nodes will be launched into.
+// Selectors for the subnets nodes will be launched into. Example: [{tags: {"karpenter.sh/discovery": "my-cluster"}}].
 func (o AWSNodeClassSpecArgsOutput) SubnetSelectorTerms() SubnetSelectorTermArgsArrayOutput {
 	return o.ApplyT(func(v AWSNodeClassSpecArgs) []SubnetSelectorTermArgs { return v.SubnetSelectorTerms }).(SubnetSelectorTermArgsArrayOutput)
 }
 
-// AWS tags applied to all resources created by this node class.
+// AWS tags applied to all resources (instances, volumes, ENIs) created by this node class. Example: {"environment": "production", "team": "platform"}.
 func (o AWSNodeClassSpecArgsOutput) Tags() pulumi.StringMapOutput {
 	return o.ApplyT(func(v AWSNodeClassSpecArgs) map[string]string { return v.Tags }).(pulumi.StringMapOutput)
 }
 
-// Custom user data script injected into the node launch template.
+// Custom user data script merged into the node launch template (base64 or plain text). Example: '#!/bin/bash\necho hello'.
 func (o AWSNodeClassSpecArgsOutput) UserData() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AWSNodeClassSpecArgs) *string { return v.UserData }).(pulumi.StringPtrOutput)
 }
@@ -419,7 +419,7 @@ func (o AWSNodeClassSpecArgsPtrOutput) Elem() AWSNodeClassSpecArgsOutput {
 	}).(AWSNodeClassSpecArgsOutput)
 }
 
-// AMI family shorthand (e.g. 'AL2', 'Bottlerocket', 'Windows2022').
+// AMI family shorthand used when no amiSelectorTerms are specified. One of: 'AL2', 'AL2023', 'Bottlerocket', 'Windows2019', 'Windows2022'. Example: 'AL2'.
 func (o AWSNodeClassSpecArgsPtrOutput) AmiFamily() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AWSNodeClassSpecArgs) *string {
 		if v == nil {
@@ -429,7 +429,7 @@ func (o AWSNodeClassSpecArgsPtrOutput) AmiFamily() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-// Selectors for the AMIs used to launch nodes.
+// Selectors for the AMIs used to launch nodes. Example: [{alias: "al2@latest"}].
 func (o AWSNodeClassSpecArgsPtrOutput) AmiSelectorTerms() AMISelectorTermArgsArrayOutput {
 	return o.ApplyT(func(v *AWSNodeClassSpecArgs) []AMISelectorTermArgs {
 		if v == nil {
@@ -439,7 +439,7 @@ func (o AWSNodeClassSpecArgsPtrOutput) AmiSelectorTerms() AMISelectorTermArgsArr
 	}).(AMISelectorTermArgsArrayOutput)
 }
 
-// Whether to assign a public IP address to provisioned nodes.
+// Whether to assign a public IP address to provisioned nodes. Example: false.
 func (o AWSNodeClassSpecArgsPtrOutput) AssociatePublicIpAddress() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *AWSNodeClassSpecArgs) *bool {
 		if v == nil {
@@ -449,7 +449,7 @@ func (o AWSNodeClassSpecArgsPtrOutput) AssociatePublicIpAddress() pulumi.BoolPtr
 	}).(pulumi.BoolPtrOutput)
 }
 
-// EBS block device mappings for nodes.
+// EBS block device mappings for nodes. Example: [{deviceName: "/dev/xvda", rootVolume: true, ebs: {volumeSize: "50Gi", volumeType: "gp3"}}].
 func (o AWSNodeClassSpecArgsPtrOutput) BlockDeviceMappings() BlockDeviceMappingArgsArrayOutput {
 	return o.ApplyT(func(v *AWSNodeClassSpecArgs) []BlockDeviceMappingArgs {
 		if v == nil {
@@ -459,7 +459,7 @@ func (o AWSNodeClassSpecArgsPtrOutput) BlockDeviceMappings() BlockDeviceMappingA
 	}).(BlockDeviceMappingArgsArrayOutput)
 }
 
-// Selectors for EC2 capacity reservations to prioritize.
+// Selectors for EC2 capacity reservations to prioritize. Example: [{tags: {"aws:ec2:fleet-id": "fleet-123"}}].
 func (o AWSNodeClassSpecArgsPtrOutput) CapacityReservationSelectorTerms() CapacityReservationSelectorTermArgsArrayOutput {
 	return o.ApplyT(func(v *AWSNodeClassSpecArgs) []CapacityReservationSelectorTermArgs {
 		if v == nil {
@@ -469,7 +469,7 @@ func (o AWSNodeClassSpecArgsPtrOutput) CapacityReservationSelectorTerms() Capaci
 	}).(CapacityReservationSelectorTermArgsArrayOutput)
 }
 
-// EC2 launch template context ARN.
+// Additional EC2 launch template context ARN for advanced customization. Example: 'arn:aws:ec2:us-east-1:123456789012:launch-template/lt-0abc123'.
 func (o AWSNodeClassSpecArgsPtrOutput) Context() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AWSNodeClassSpecArgs) *string {
 		if v == nil {
@@ -479,7 +479,7 @@ func (o AWSNodeClassSpecArgsPtrOutput) Context() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-// Enable detailed CloudWatch monitoring for instances.
+// Enable detailed (1-minute interval) CloudWatch monitoring for instances. Example: false.
 func (o AWSNodeClassSpecArgsPtrOutput) DetailedMonitoring() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *AWSNodeClassSpecArgs) *bool {
 		if v == nil {
@@ -489,7 +489,7 @@ func (o AWSNodeClassSpecArgsPtrOutput) DetailedMonitoring() pulumi.BoolPtrOutput
 	}).(pulumi.BoolPtrOutput)
 }
 
-// IAM instance profile name (use instead of Role when profile already exists).
+// IAM instance profile name to use directly (alternative to Role). Example: 'KarpenterNodeInstanceProfile-my-cluster'.
 func (o AWSNodeClassSpecArgsPtrOutput) InstanceProfile() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AWSNodeClassSpecArgs) *string {
 		if v == nil {
@@ -499,7 +499,7 @@ func (o AWSNodeClassSpecArgsPtrOutput) InstanceProfile() pulumi.StringPtrOutput 
 	}).(pulumi.StringPtrOutput)
 }
 
-// Policy for handling instance store volumes. One of: 'RAID0'.
+// Policy for handling NVMe instance store volumes. One of: 'INSTANCE_STORE_POLICY_RAID0'. Example: 'INSTANCE_STORE_POLICY_RAID0'.
 func (o AWSNodeClassSpecArgsPtrOutput) InstanceStorePolicy() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AWSNodeClassSpecArgs) *string {
 		if v == nil {
@@ -509,7 +509,7 @@ func (o AWSNodeClassSpecArgsPtrOutput) InstanceStorePolicy() pulumi.StringPtrOut
 	}).(pulumi.StringPtrOutput)
 }
 
-// Kubelet configuration overrides for AWS nodes.
+// Kubelet configuration overrides applied to all nodes in this class.
 func (o AWSNodeClassSpecArgsPtrOutput) Kubelet() KubeletConfigurationArgsPtrOutput {
 	return o.ApplyT(func(v *AWSNodeClassSpecArgs) *KubeletConfigurationArgs {
 		if v == nil {
@@ -519,7 +519,7 @@ func (o AWSNodeClassSpecArgsPtrOutput) Kubelet() KubeletConfigurationArgsPtrOutp
 	}).(KubeletConfigurationArgsPtrOutput)
 }
 
-// EC2 instance metadata (IMDS) options.
+// EC2 instance metadata service (IMDS) configuration.
 func (o AWSNodeClassSpecArgsPtrOutput) MetadataOptions() MetadataOptionsArgsPtrOutput {
 	return o.ApplyT(func(v *AWSNodeClassSpecArgs) *MetadataOptionsArgs {
 		if v == nil {
@@ -529,7 +529,7 @@ func (o AWSNodeClassSpecArgsPtrOutput) MetadataOptions() MetadataOptionsArgsPtrO
 	}).(MetadataOptionsArgsPtrOutput)
 }
 
-// IAM role name assigned to nodes.
+// IAM role name assigned to nodes (Karpenter creates the instance profile). Example: 'KarpenterNodeRole-my-cluster'.
 func (o AWSNodeClassSpecArgsPtrOutput) Role() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AWSNodeClassSpecArgs) *string {
 		if v == nil {
@@ -539,7 +539,7 @@ func (o AWSNodeClassSpecArgsPtrOutput) Role() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-// Selectors for security groups attached to nodes.
+// Selectors for security groups attached to provisioned nodes. Example: [{tags: {"karpenter.sh/discovery": "my-cluster"}}].
 func (o AWSNodeClassSpecArgsPtrOutput) SecurityGroupSelectorTerms() SecurityGroupSelectorTermArgsArrayOutput {
 	return o.ApplyT(func(v *AWSNodeClassSpecArgs) []SecurityGroupSelectorTermArgs {
 		if v == nil {
@@ -549,7 +549,7 @@ func (o AWSNodeClassSpecArgsPtrOutput) SecurityGroupSelectorTerms() SecurityGrou
 	}).(SecurityGroupSelectorTermArgsArrayOutput)
 }
 
-// Selectors for the subnets nodes will be launched into.
+// Selectors for the subnets nodes will be launched into. Example: [{tags: {"karpenter.sh/discovery": "my-cluster"}}].
 func (o AWSNodeClassSpecArgsPtrOutput) SubnetSelectorTerms() SubnetSelectorTermArgsArrayOutput {
 	return o.ApplyT(func(v *AWSNodeClassSpecArgs) []SubnetSelectorTermArgs {
 		if v == nil {
@@ -559,7 +559,7 @@ func (o AWSNodeClassSpecArgsPtrOutput) SubnetSelectorTerms() SubnetSelectorTermA
 	}).(SubnetSelectorTermArgsArrayOutput)
 }
 
-// AWS tags applied to all resources created by this node class.
+// AWS tags applied to all resources (instances, volumes, ENIs) created by this node class. Example: {"environment": "production", "team": "platform"}.
 func (o AWSNodeClassSpecArgsPtrOutput) Tags() pulumi.StringMapOutput {
 	return o.ApplyT(func(v *AWSNodeClassSpecArgs) map[string]string {
 		if v == nil {
@@ -569,7 +569,7 @@ func (o AWSNodeClassSpecArgsPtrOutput) Tags() pulumi.StringMapOutput {
 	}).(pulumi.StringMapOutput)
 }
 
-// Custom user data script injected into the node launch template.
+// Custom user data script merged into the node launch template (base64 or plain text). Example: '#!/bin/bash\necho hello'.
 func (o AWSNodeClassSpecArgsPtrOutput) UserData() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AWSNodeClassSpecArgs) *string {
 		if v == nil {
@@ -580,25 +580,25 @@ func (o AWSNodeClassSpecArgsPtrOutput) UserData() pulumi.StringPtrOutput {
 }
 
 type AzureKubeletConfigurationArgs struct {
-	// Unsafe sysctl patterns that are allowed (e.g. 'net.ipv4.*').
+	// Unsafe sysctl patterns permitted on nodes. Example: ["net.ipv4.*", "net.ipv6.*"].
 	AllowedUnsafeSysctls []string `pulumi:"allowedUnsafeSysctls"`
-	// Maximum number of container log files to retain.
+	// Maximum number of container log files to retain per container. Example: 5.
 	ContainerLogMaxFiles *int `pulumi:"containerLogMaxFiles"`
-	// Maximum container log file size before rotation (e.g. '10Mi').
+	// Maximum container log file size before rotation. Example: '10Mi'.
 	ContainerLogMaxSize *string `pulumi:"containerLogMaxSize"`
-	// Whether to enforce CPU CFS quota for containers.
+	// Whether to enforce CPU CFS quota limits for containers. Example: true.
 	CpuCfsQuota *bool `pulumi:"cpuCfsQuota"`
-	// CPU CFS quota period (e.g. '100ms').
+	// CPU CFS quota period. Example: '100ms'.
 	CpuCfsQuotaPeriod *string `pulumi:"cpuCfsQuotaPeriod"`
-	// CPU manager policy. One of: 'none', 'static'.
+	// CPU manager policy for CPU pinning. One of: 'none', 'static'. Example: 'static'.
 	CpuManagerPolicy *string `pulumi:"cpuManagerPolicy"`
-	// Disk usage percentage triggering image GC.
+	// Disk usage % that triggers image garbage collection. Example: 85.
 	ImageGcHighThresholdPercent *int `pulumi:"imageGcHighThresholdPercent"`
-	// Disk usage percentage below which image GC stops.
+	// Disk usage % at which image GC stops freeing space. Example: 70.
 	ImageGcLowThresholdPercent *int `pulumi:"imageGcLowThresholdPercent"`
-	// Maximum number of process IDs per pod.
+	// Maximum number of process IDs allowed per pod. Example: 1024.
 	PodPidsLimit *int `pulumi:"podPidsLimit"`
-	// Topology manager policy for NUMA-aware scheduling.
+	// Topology manager policy for NUMA-aware workloads. One of: 'none', 'best-effort', 'restricted', 'single-numa-node'. Example: 'none'.
 	TopologyManagerPolicy *string `pulumi:"topologyManagerPolicy"`
 }
 
@@ -614,25 +614,25 @@ type AzureKubeletConfigurationArgsInput interface {
 }
 
 type AzureKubeletConfigurationArgsArgs struct {
-	// Unsafe sysctl patterns that are allowed (e.g. 'net.ipv4.*').
+	// Unsafe sysctl patterns permitted on nodes. Example: ["net.ipv4.*", "net.ipv6.*"].
 	AllowedUnsafeSysctls pulumi.StringArrayInput `pulumi:"allowedUnsafeSysctls"`
-	// Maximum number of container log files to retain.
+	// Maximum number of container log files to retain per container. Example: 5.
 	ContainerLogMaxFiles pulumi.IntPtrInput `pulumi:"containerLogMaxFiles"`
-	// Maximum container log file size before rotation (e.g. '10Mi').
+	// Maximum container log file size before rotation. Example: '10Mi'.
 	ContainerLogMaxSize pulumi.StringPtrInput `pulumi:"containerLogMaxSize"`
-	// Whether to enforce CPU CFS quota for containers.
+	// Whether to enforce CPU CFS quota limits for containers. Example: true.
 	CpuCfsQuota pulumi.BoolPtrInput `pulumi:"cpuCfsQuota"`
-	// CPU CFS quota period (e.g. '100ms').
+	// CPU CFS quota period. Example: '100ms'.
 	CpuCfsQuotaPeriod pulumi.StringPtrInput `pulumi:"cpuCfsQuotaPeriod"`
-	// CPU manager policy. One of: 'none', 'static'.
+	// CPU manager policy for CPU pinning. One of: 'none', 'static'. Example: 'static'.
 	CpuManagerPolicy pulumi.StringPtrInput `pulumi:"cpuManagerPolicy"`
-	// Disk usage percentage triggering image GC.
+	// Disk usage % that triggers image garbage collection. Example: 85.
 	ImageGcHighThresholdPercent pulumi.IntPtrInput `pulumi:"imageGcHighThresholdPercent"`
-	// Disk usage percentage below which image GC stops.
+	// Disk usage % at which image GC stops freeing space. Example: 70.
 	ImageGcLowThresholdPercent pulumi.IntPtrInput `pulumi:"imageGcLowThresholdPercent"`
-	// Maximum number of process IDs per pod.
+	// Maximum number of process IDs allowed per pod. Example: 1024.
 	PodPidsLimit pulumi.IntPtrInput `pulumi:"podPidsLimit"`
-	// Topology manager policy for NUMA-aware scheduling.
+	// Topology manager policy for NUMA-aware workloads. One of: 'none', 'best-effort', 'restricted', 'single-numa-node'. Example: 'none'.
 	TopologyManagerPolicy pulumi.StringPtrInput `pulumi:"topologyManagerPolicy"`
 }
 
@@ -713,52 +713,52 @@ func (o AzureKubeletConfigurationArgsOutput) ToAzureKubeletConfigurationArgsPtrO
 	}).(AzureKubeletConfigurationArgsPtrOutput)
 }
 
-// Unsafe sysctl patterns that are allowed (e.g. 'net.ipv4.*').
+// Unsafe sysctl patterns permitted on nodes. Example: ["net.ipv4.*", "net.ipv6.*"].
 func (o AzureKubeletConfigurationArgsOutput) AllowedUnsafeSysctls() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v AzureKubeletConfigurationArgs) []string { return v.AllowedUnsafeSysctls }).(pulumi.StringArrayOutput)
 }
 
-// Maximum number of container log files to retain.
+// Maximum number of container log files to retain per container. Example: 5.
 func (o AzureKubeletConfigurationArgsOutput) ContainerLogMaxFiles() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v AzureKubeletConfigurationArgs) *int { return v.ContainerLogMaxFiles }).(pulumi.IntPtrOutput)
 }
 
-// Maximum container log file size before rotation (e.g. '10Mi').
+// Maximum container log file size before rotation. Example: '10Mi'.
 func (o AzureKubeletConfigurationArgsOutput) ContainerLogMaxSize() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AzureKubeletConfigurationArgs) *string { return v.ContainerLogMaxSize }).(pulumi.StringPtrOutput)
 }
 
-// Whether to enforce CPU CFS quota for containers.
+// Whether to enforce CPU CFS quota limits for containers. Example: true.
 func (o AzureKubeletConfigurationArgsOutput) CpuCfsQuota() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v AzureKubeletConfigurationArgs) *bool { return v.CpuCfsQuota }).(pulumi.BoolPtrOutput)
 }
 
-// CPU CFS quota period (e.g. '100ms').
+// CPU CFS quota period. Example: '100ms'.
 func (o AzureKubeletConfigurationArgsOutput) CpuCfsQuotaPeriod() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AzureKubeletConfigurationArgs) *string { return v.CpuCfsQuotaPeriod }).(pulumi.StringPtrOutput)
 }
 
-// CPU manager policy. One of: 'none', 'static'.
+// CPU manager policy for CPU pinning. One of: 'none', 'static'. Example: 'static'.
 func (o AzureKubeletConfigurationArgsOutput) CpuManagerPolicy() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AzureKubeletConfigurationArgs) *string { return v.CpuManagerPolicy }).(pulumi.StringPtrOutput)
 }
 
-// Disk usage percentage triggering image GC.
+// Disk usage % that triggers image garbage collection. Example: 85.
 func (o AzureKubeletConfigurationArgsOutput) ImageGcHighThresholdPercent() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v AzureKubeletConfigurationArgs) *int { return v.ImageGcHighThresholdPercent }).(pulumi.IntPtrOutput)
 }
 
-// Disk usage percentage below which image GC stops.
+// Disk usage % at which image GC stops freeing space. Example: 70.
 func (o AzureKubeletConfigurationArgsOutput) ImageGcLowThresholdPercent() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v AzureKubeletConfigurationArgs) *int { return v.ImageGcLowThresholdPercent }).(pulumi.IntPtrOutput)
 }
 
-// Maximum number of process IDs per pod.
+// Maximum number of process IDs allowed per pod. Example: 1024.
 func (o AzureKubeletConfigurationArgsOutput) PodPidsLimit() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v AzureKubeletConfigurationArgs) *int { return v.PodPidsLimit }).(pulumi.IntPtrOutput)
 }
 
-// Topology manager policy for NUMA-aware scheduling.
+// Topology manager policy for NUMA-aware workloads. One of: 'none', 'best-effort', 'restricted', 'single-numa-node'. Example: 'none'.
 func (o AzureKubeletConfigurationArgsOutput) TopologyManagerPolicy() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AzureKubeletConfigurationArgs) *string { return v.TopologyManagerPolicy }).(pulumi.StringPtrOutput)
 }
@@ -787,7 +787,7 @@ func (o AzureKubeletConfigurationArgsPtrOutput) Elem() AzureKubeletConfiguration
 	}).(AzureKubeletConfigurationArgsOutput)
 }
 
-// Unsafe sysctl patterns that are allowed (e.g. 'net.ipv4.*').
+// Unsafe sysctl patterns permitted on nodes. Example: ["net.ipv4.*", "net.ipv6.*"].
 func (o AzureKubeletConfigurationArgsPtrOutput) AllowedUnsafeSysctls() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *AzureKubeletConfigurationArgs) []string {
 		if v == nil {
@@ -797,7 +797,7 @@ func (o AzureKubeletConfigurationArgsPtrOutput) AllowedUnsafeSysctls() pulumi.St
 	}).(pulumi.StringArrayOutput)
 }
 
-// Maximum number of container log files to retain.
+// Maximum number of container log files to retain per container. Example: 5.
 func (o AzureKubeletConfigurationArgsPtrOutput) ContainerLogMaxFiles() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *AzureKubeletConfigurationArgs) *int {
 		if v == nil {
@@ -807,7 +807,7 @@ func (o AzureKubeletConfigurationArgsPtrOutput) ContainerLogMaxFiles() pulumi.In
 	}).(pulumi.IntPtrOutput)
 }
 
-// Maximum container log file size before rotation (e.g. '10Mi').
+// Maximum container log file size before rotation. Example: '10Mi'.
 func (o AzureKubeletConfigurationArgsPtrOutput) ContainerLogMaxSize() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AzureKubeletConfigurationArgs) *string {
 		if v == nil {
@@ -817,7 +817,7 @@ func (o AzureKubeletConfigurationArgsPtrOutput) ContainerLogMaxSize() pulumi.Str
 	}).(pulumi.StringPtrOutput)
 }
 
-// Whether to enforce CPU CFS quota for containers.
+// Whether to enforce CPU CFS quota limits for containers. Example: true.
 func (o AzureKubeletConfigurationArgsPtrOutput) CpuCfsQuota() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *AzureKubeletConfigurationArgs) *bool {
 		if v == nil {
@@ -827,7 +827,7 @@ func (o AzureKubeletConfigurationArgsPtrOutput) CpuCfsQuota() pulumi.BoolPtrOutp
 	}).(pulumi.BoolPtrOutput)
 }
 
-// CPU CFS quota period (e.g. '100ms').
+// CPU CFS quota period. Example: '100ms'.
 func (o AzureKubeletConfigurationArgsPtrOutput) CpuCfsQuotaPeriod() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AzureKubeletConfigurationArgs) *string {
 		if v == nil {
@@ -837,7 +837,7 @@ func (o AzureKubeletConfigurationArgsPtrOutput) CpuCfsQuotaPeriod() pulumi.Strin
 	}).(pulumi.StringPtrOutput)
 }
 
-// CPU manager policy. One of: 'none', 'static'.
+// CPU manager policy for CPU pinning. One of: 'none', 'static'. Example: 'static'.
 func (o AzureKubeletConfigurationArgsPtrOutput) CpuManagerPolicy() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AzureKubeletConfigurationArgs) *string {
 		if v == nil {
@@ -847,7 +847,7 @@ func (o AzureKubeletConfigurationArgsPtrOutput) CpuManagerPolicy() pulumi.String
 	}).(pulumi.StringPtrOutput)
 }
 
-// Disk usage percentage triggering image GC.
+// Disk usage % that triggers image garbage collection. Example: 85.
 func (o AzureKubeletConfigurationArgsPtrOutput) ImageGcHighThresholdPercent() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *AzureKubeletConfigurationArgs) *int {
 		if v == nil {
@@ -857,7 +857,7 @@ func (o AzureKubeletConfigurationArgsPtrOutput) ImageGcHighThresholdPercent() pu
 	}).(pulumi.IntPtrOutput)
 }
 
-// Disk usage percentage below which image GC stops.
+// Disk usage % at which image GC stops freeing space. Example: 70.
 func (o AzureKubeletConfigurationArgsPtrOutput) ImageGcLowThresholdPercent() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *AzureKubeletConfigurationArgs) *int {
 		if v == nil {
@@ -867,7 +867,7 @@ func (o AzureKubeletConfigurationArgsPtrOutput) ImageGcLowThresholdPercent() pul
 	}).(pulumi.IntPtrOutput)
 }
 
-// Maximum number of process IDs per pod.
+// Maximum number of process IDs allowed per pod. Example: 1024.
 func (o AzureKubeletConfigurationArgsPtrOutput) PodPidsLimit() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *AzureKubeletConfigurationArgs) *int {
 		if v == nil {
@@ -877,7 +877,7 @@ func (o AzureKubeletConfigurationArgsPtrOutput) PodPidsLimit() pulumi.IntPtrOutp
 	}).(pulumi.IntPtrOutput)
 }
 
-// Topology manager policy for NUMA-aware scheduling.
+// Topology manager policy for NUMA-aware workloads. One of: 'none', 'best-effort', 'restricted', 'single-numa-node'. Example: 'none'.
 func (o AzureKubeletConfigurationArgsPtrOutput) TopologyManagerPolicy() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AzureKubeletConfigurationArgs) *string {
 		if v == nil {
@@ -888,19 +888,19 @@ func (o AzureKubeletConfigurationArgsPtrOutput) TopologyManagerPolicy() pulumi.S
 }
 
 type AzureNodeClassSpecArgs struct {
-	// FIPS compliance mode. One of: 'Enabled', 'Disabled'.
+	// FIPS 140-2 compliance mode for the node. One of: 'Enabled', 'Disabled'. Example: 'Disabled'.
 	FipsMode *string `pulumi:"fipsMode"`
-	// Azure node image family (e.g. 'AzureLinux', 'Ubuntu2204').
+	// Azure node image family. One of: 'AzureLinux', 'Ubuntu2204'. Example: 'AzureLinux'.
 	ImageFamily *string `pulumi:"imageFamily"`
 	// Kubelet configuration overrides for Azure nodes.
 	Kubelet *AzureKubeletConfigurationArgs `pulumi:"kubelet"`
-	// Maximum pods per node (overrides AKS default).
+	// Maximum pods per node, overrides the AKS cluster default. Example: 110.
 	MaxPods *int `pulumi:"maxPods"`
-	// OS disk size in GB.
+	// OS disk size in GB. Example: 128.
 	OsDiskSizeGb *int `pulumi:"osDiskSizeGb"`
-	// Azure tags applied to all resources created by this node class.
+	// Azure tags applied to all resources created by this node class. Example: {"environment": "production"}.
 	Tags map[string]string `pulumi:"tags"`
-	// Azure VNet subnet resource ID for node networking.
+	// Azure VNet subnet resource ID where nodes will be placed. Example: '/subscriptions/sub-id/resourceGroups/my-rg/providers/Microsoft.Network/virtualNetworks/my-vnet/subnets/nodesubnet'.
 	VnetSubnetId *string `pulumi:"vnetSubnetId"`
 }
 
@@ -916,19 +916,19 @@ type AzureNodeClassSpecArgsInput interface {
 }
 
 type AzureNodeClassSpecArgsArgs struct {
-	// FIPS compliance mode. One of: 'Enabled', 'Disabled'.
+	// FIPS 140-2 compliance mode for the node. One of: 'Enabled', 'Disabled'. Example: 'Disabled'.
 	FipsMode pulumi.StringPtrInput `pulumi:"fipsMode"`
-	// Azure node image family (e.g. 'AzureLinux', 'Ubuntu2204').
+	// Azure node image family. One of: 'AzureLinux', 'Ubuntu2204'. Example: 'AzureLinux'.
 	ImageFamily pulumi.StringPtrInput `pulumi:"imageFamily"`
 	// Kubelet configuration overrides for Azure nodes.
 	Kubelet AzureKubeletConfigurationArgsPtrInput `pulumi:"kubelet"`
-	// Maximum pods per node (overrides AKS default).
+	// Maximum pods per node, overrides the AKS cluster default. Example: 110.
 	MaxPods pulumi.IntPtrInput `pulumi:"maxPods"`
-	// OS disk size in GB.
+	// OS disk size in GB. Example: 128.
 	OsDiskSizeGb pulumi.IntPtrInput `pulumi:"osDiskSizeGb"`
-	// Azure tags applied to all resources created by this node class.
+	// Azure tags applied to all resources created by this node class. Example: {"environment": "production"}.
 	Tags pulumi.StringMapInput `pulumi:"tags"`
-	// Azure VNet subnet resource ID for node networking.
+	// Azure VNet subnet resource ID where nodes will be placed. Example: '/subscriptions/sub-id/resourceGroups/my-rg/providers/Microsoft.Network/virtualNetworks/my-vnet/subnets/nodesubnet'.
 	VnetSubnetId pulumi.StringPtrInput `pulumi:"vnetSubnetId"`
 }
 
@@ -1009,12 +1009,12 @@ func (o AzureNodeClassSpecArgsOutput) ToAzureNodeClassSpecArgsPtrOutputWithConte
 	}).(AzureNodeClassSpecArgsPtrOutput)
 }
 
-// FIPS compliance mode. One of: 'Enabled', 'Disabled'.
+// FIPS 140-2 compliance mode for the node. One of: 'Enabled', 'Disabled'. Example: 'Disabled'.
 func (o AzureNodeClassSpecArgsOutput) FipsMode() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AzureNodeClassSpecArgs) *string { return v.FipsMode }).(pulumi.StringPtrOutput)
 }
 
-// Azure node image family (e.g. 'AzureLinux', 'Ubuntu2204').
+// Azure node image family. One of: 'AzureLinux', 'Ubuntu2204'. Example: 'AzureLinux'.
 func (o AzureNodeClassSpecArgsOutput) ImageFamily() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AzureNodeClassSpecArgs) *string { return v.ImageFamily }).(pulumi.StringPtrOutput)
 }
@@ -1024,22 +1024,22 @@ func (o AzureNodeClassSpecArgsOutput) Kubelet() AzureKubeletConfigurationArgsPtr
 	return o.ApplyT(func(v AzureNodeClassSpecArgs) *AzureKubeletConfigurationArgs { return v.Kubelet }).(AzureKubeletConfigurationArgsPtrOutput)
 }
 
-// Maximum pods per node (overrides AKS default).
+// Maximum pods per node, overrides the AKS cluster default. Example: 110.
 func (o AzureNodeClassSpecArgsOutput) MaxPods() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v AzureNodeClassSpecArgs) *int { return v.MaxPods }).(pulumi.IntPtrOutput)
 }
 
-// OS disk size in GB.
+// OS disk size in GB. Example: 128.
 func (o AzureNodeClassSpecArgsOutput) OsDiskSizeGb() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v AzureNodeClassSpecArgs) *int { return v.OsDiskSizeGb }).(pulumi.IntPtrOutput)
 }
 
-// Azure tags applied to all resources created by this node class.
+// Azure tags applied to all resources created by this node class. Example: {"environment": "production"}.
 func (o AzureNodeClassSpecArgsOutput) Tags() pulumi.StringMapOutput {
 	return o.ApplyT(func(v AzureNodeClassSpecArgs) map[string]string { return v.Tags }).(pulumi.StringMapOutput)
 }
 
-// Azure VNet subnet resource ID for node networking.
+// Azure VNet subnet resource ID where nodes will be placed. Example: '/subscriptions/sub-id/resourceGroups/my-rg/providers/Microsoft.Network/virtualNetworks/my-vnet/subnets/nodesubnet'.
 func (o AzureNodeClassSpecArgsOutput) VnetSubnetId() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AzureNodeClassSpecArgs) *string { return v.VnetSubnetId }).(pulumi.StringPtrOutput)
 }
@@ -1068,7 +1068,7 @@ func (o AzureNodeClassSpecArgsPtrOutput) Elem() AzureNodeClassSpecArgsOutput {
 	}).(AzureNodeClassSpecArgsOutput)
 }
 
-// FIPS compliance mode. One of: 'Enabled', 'Disabled'.
+// FIPS 140-2 compliance mode for the node. One of: 'Enabled', 'Disabled'. Example: 'Disabled'.
 func (o AzureNodeClassSpecArgsPtrOutput) FipsMode() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AzureNodeClassSpecArgs) *string {
 		if v == nil {
@@ -1078,7 +1078,7 @@ func (o AzureNodeClassSpecArgsPtrOutput) FipsMode() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-// Azure node image family (e.g. 'AzureLinux', 'Ubuntu2204').
+// Azure node image family. One of: 'AzureLinux', 'Ubuntu2204'. Example: 'AzureLinux'.
 func (o AzureNodeClassSpecArgsPtrOutput) ImageFamily() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AzureNodeClassSpecArgs) *string {
 		if v == nil {
@@ -1098,7 +1098,7 @@ func (o AzureNodeClassSpecArgsPtrOutput) Kubelet() AzureKubeletConfigurationArgs
 	}).(AzureKubeletConfigurationArgsPtrOutput)
 }
 
-// Maximum pods per node (overrides AKS default).
+// Maximum pods per node, overrides the AKS cluster default. Example: 110.
 func (o AzureNodeClassSpecArgsPtrOutput) MaxPods() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *AzureNodeClassSpecArgs) *int {
 		if v == nil {
@@ -1108,7 +1108,7 @@ func (o AzureNodeClassSpecArgsPtrOutput) MaxPods() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
-// OS disk size in GB.
+// OS disk size in GB. Example: 128.
 func (o AzureNodeClassSpecArgsPtrOutput) OsDiskSizeGb() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *AzureNodeClassSpecArgs) *int {
 		if v == nil {
@@ -1118,7 +1118,7 @@ func (o AzureNodeClassSpecArgsPtrOutput) OsDiskSizeGb() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
-// Azure tags applied to all resources created by this node class.
+// Azure tags applied to all resources created by this node class. Example: {"environment": "production"}.
 func (o AzureNodeClassSpecArgsPtrOutput) Tags() pulumi.StringMapOutput {
 	return o.ApplyT(func(v *AzureNodeClassSpecArgs) map[string]string {
 		if v == nil {
@@ -1128,7 +1128,7 @@ func (o AzureNodeClassSpecArgsPtrOutput) Tags() pulumi.StringMapOutput {
 	}).(pulumi.StringMapOutput)
 }
 
-// Azure VNet subnet resource ID for node networking.
+// Azure VNet subnet resource ID where nodes will be placed. Example: '/subscriptions/sub-id/resourceGroups/my-rg/providers/Microsoft.Network/virtualNetworks/my-vnet/subnets/nodesubnet'.
 func (o AzureNodeClassSpecArgsPtrOutput) VnetSubnetId() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AzureNodeClassSpecArgs) *string {
 		if v == nil {
@@ -1139,23 +1139,23 @@ func (o AzureNodeClassSpecArgsPtrOutput) VnetSubnetId() pulumi.StringPtrOutput {
 }
 
 type BlockDeviceArgs struct {
-	// Whether to delete the EBS volume when the instance terminates.
+	// Whether to delete the EBS volume when the instance terminates. Example: true.
 	DeleteOnTermination *bool `pulumi:"deleteOnTermination"`
-	// Whether to encrypt the EBS volume.
+	// Whether to encrypt the EBS volume. Example: true.
 	Encrypted *bool `pulumi:"encrypted"`
-	// IOPS to provision for io1/io2 volume types.
+	// IOPS to provision for io1/io2 volume types. Example: 3000.
 	Iops *int `pulumi:"iops"`
-	// KMS key ID or ARN used to encrypt the volume.
+	// KMS key ID or ARN used to encrypt the volume. Example: 'arn:aws:kms:us-east-1:123456789012:key/mrk-abc123'.
 	KmsKeyId *string `pulumi:"kmsKeyId"`
-	// EBS snapshot ID to restore the volume from.
+	// EBS snapshot ID to restore the volume from. Example: 'snap-0a1b2c3d4e5f'.
 	SnapshotId *string `pulumi:"snapshotId"`
-	// Throughput in MiB/s for gp3 volumes.
+	// Throughput in MiB/s for gp3 volumes (125-1000). Example: 125.
 	Throughput *int `pulumi:"throughput"`
-	// Rate in MiB/s for initializing volumes from snapshots.
+	// Rate in MiB/s for initializing volumes from snapshots. Example: 300.
 	VolumeInitializationRate *int `pulumi:"volumeInitializationRate"`
-	// Volume size (e.g. '20Gi').
+	// Volume size with unit suffix. Example: '20Gi'.
 	VolumeSize *string `pulumi:"volumeSize"`
-	// EBS volume type (e.g. 'gp3', 'io1', 'st1').
+	// EBS volume type. One of: 'gp2', 'gp3', 'io1', 'io2', 'st1', 'sc1'. Example: 'gp3'.
 	VolumeType *string `pulumi:"volumeType"`
 }
 
@@ -1171,23 +1171,23 @@ type BlockDeviceArgsInput interface {
 }
 
 type BlockDeviceArgsArgs struct {
-	// Whether to delete the EBS volume when the instance terminates.
+	// Whether to delete the EBS volume when the instance terminates. Example: true.
 	DeleteOnTermination pulumi.BoolPtrInput `pulumi:"deleteOnTermination"`
-	// Whether to encrypt the EBS volume.
+	// Whether to encrypt the EBS volume. Example: true.
 	Encrypted pulumi.BoolPtrInput `pulumi:"encrypted"`
-	// IOPS to provision for io1/io2 volume types.
+	// IOPS to provision for io1/io2 volume types. Example: 3000.
 	Iops pulumi.IntPtrInput `pulumi:"iops"`
-	// KMS key ID or ARN used to encrypt the volume.
+	// KMS key ID or ARN used to encrypt the volume. Example: 'arn:aws:kms:us-east-1:123456789012:key/mrk-abc123'.
 	KmsKeyId pulumi.StringPtrInput `pulumi:"kmsKeyId"`
-	// EBS snapshot ID to restore the volume from.
+	// EBS snapshot ID to restore the volume from. Example: 'snap-0a1b2c3d4e5f'.
 	SnapshotId pulumi.StringPtrInput `pulumi:"snapshotId"`
-	// Throughput in MiB/s for gp3 volumes.
+	// Throughput in MiB/s for gp3 volumes (125-1000). Example: 125.
 	Throughput pulumi.IntPtrInput `pulumi:"throughput"`
-	// Rate in MiB/s for initializing volumes from snapshots.
+	// Rate in MiB/s for initializing volumes from snapshots. Example: 300.
 	VolumeInitializationRate pulumi.IntPtrInput `pulumi:"volumeInitializationRate"`
-	// Volume size (e.g. '20Gi').
+	// Volume size with unit suffix. Example: '20Gi'.
 	VolumeSize pulumi.StringPtrInput `pulumi:"volumeSize"`
-	// EBS volume type (e.g. 'gp3', 'io1', 'st1').
+	// EBS volume type. One of: 'gp2', 'gp3', 'io1', 'io2', 'st1', 'sc1'. Example: 'gp3'.
 	VolumeType pulumi.StringPtrInput `pulumi:"volumeType"`
 }
 
@@ -1268,47 +1268,47 @@ func (o BlockDeviceArgsOutput) ToBlockDeviceArgsPtrOutputWithContext(ctx context
 	}).(BlockDeviceArgsPtrOutput)
 }
 
-// Whether to delete the EBS volume when the instance terminates.
+// Whether to delete the EBS volume when the instance terminates. Example: true.
 func (o BlockDeviceArgsOutput) DeleteOnTermination() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v BlockDeviceArgs) *bool { return v.DeleteOnTermination }).(pulumi.BoolPtrOutput)
 }
 
-// Whether to encrypt the EBS volume.
+// Whether to encrypt the EBS volume. Example: true.
 func (o BlockDeviceArgsOutput) Encrypted() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v BlockDeviceArgs) *bool { return v.Encrypted }).(pulumi.BoolPtrOutput)
 }
 
-// IOPS to provision for io1/io2 volume types.
+// IOPS to provision for io1/io2 volume types. Example: 3000.
 func (o BlockDeviceArgsOutput) Iops() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v BlockDeviceArgs) *int { return v.Iops }).(pulumi.IntPtrOutput)
 }
 
-// KMS key ID or ARN used to encrypt the volume.
+// KMS key ID or ARN used to encrypt the volume. Example: 'arn:aws:kms:us-east-1:123456789012:key/mrk-abc123'.
 func (o BlockDeviceArgsOutput) KmsKeyId() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v BlockDeviceArgs) *string { return v.KmsKeyId }).(pulumi.StringPtrOutput)
 }
 
-// EBS snapshot ID to restore the volume from.
+// EBS snapshot ID to restore the volume from. Example: 'snap-0a1b2c3d4e5f'.
 func (o BlockDeviceArgsOutput) SnapshotId() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v BlockDeviceArgs) *string { return v.SnapshotId }).(pulumi.StringPtrOutput)
 }
 
-// Throughput in MiB/s for gp3 volumes.
+// Throughput in MiB/s for gp3 volumes (125-1000). Example: 125.
 func (o BlockDeviceArgsOutput) Throughput() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v BlockDeviceArgs) *int { return v.Throughput }).(pulumi.IntPtrOutput)
 }
 
-// Rate in MiB/s for initializing volumes from snapshots.
+// Rate in MiB/s for initializing volumes from snapshots. Example: 300.
 func (o BlockDeviceArgsOutput) VolumeInitializationRate() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v BlockDeviceArgs) *int { return v.VolumeInitializationRate }).(pulumi.IntPtrOutput)
 }
 
-// Volume size (e.g. '20Gi').
+// Volume size with unit suffix. Example: '20Gi'.
 func (o BlockDeviceArgsOutput) VolumeSize() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v BlockDeviceArgs) *string { return v.VolumeSize }).(pulumi.StringPtrOutput)
 }
 
-// EBS volume type (e.g. 'gp3', 'io1', 'st1').
+// EBS volume type. One of: 'gp2', 'gp3', 'io1', 'io2', 'st1', 'sc1'. Example: 'gp3'.
 func (o BlockDeviceArgsOutput) VolumeType() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v BlockDeviceArgs) *string { return v.VolumeType }).(pulumi.StringPtrOutput)
 }
@@ -1337,7 +1337,7 @@ func (o BlockDeviceArgsPtrOutput) Elem() BlockDeviceArgsOutput {
 	}).(BlockDeviceArgsOutput)
 }
 
-// Whether to delete the EBS volume when the instance terminates.
+// Whether to delete the EBS volume when the instance terminates. Example: true.
 func (o BlockDeviceArgsPtrOutput) DeleteOnTermination() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *BlockDeviceArgs) *bool {
 		if v == nil {
@@ -1347,7 +1347,7 @@ func (o BlockDeviceArgsPtrOutput) DeleteOnTermination() pulumi.BoolPtrOutput {
 	}).(pulumi.BoolPtrOutput)
 }
 
-// Whether to encrypt the EBS volume.
+// Whether to encrypt the EBS volume. Example: true.
 func (o BlockDeviceArgsPtrOutput) Encrypted() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *BlockDeviceArgs) *bool {
 		if v == nil {
@@ -1357,7 +1357,7 @@ func (o BlockDeviceArgsPtrOutput) Encrypted() pulumi.BoolPtrOutput {
 	}).(pulumi.BoolPtrOutput)
 }
 
-// IOPS to provision for io1/io2 volume types.
+// IOPS to provision for io1/io2 volume types. Example: 3000.
 func (o BlockDeviceArgsPtrOutput) Iops() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *BlockDeviceArgs) *int {
 		if v == nil {
@@ -1367,7 +1367,7 @@ func (o BlockDeviceArgsPtrOutput) Iops() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
-// KMS key ID or ARN used to encrypt the volume.
+// KMS key ID or ARN used to encrypt the volume. Example: 'arn:aws:kms:us-east-1:123456789012:key/mrk-abc123'.
 func (o BlockDeviceArgsPtrOutput) KmsKeyId() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *BlockDeviceArgs) *string {
 		if v == nil {
@@ -1377,7 +1377,7 @@ func (o BlockDeviceArgsPtrOutput) KmsKeyId() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-// EBS snapshot ID to restore the volume from.
+// EBS snapshot ID to restore the volume from. Example: 'snap-0a1b2c3d4e5f'.
 func (o BlockDeviceArgsPtrOutput) SnapshotId() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *BlockDeviceArgs) *string {
 		if v == nil {
@@ -1387,7 +1387,7 @@ func (o BlockDeviceArgsPtrOutput) SnapshotId() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-// Throughput in MiB/s for gp3 volumes.
+// Throughput in MiB/s for gp3 volumes (125-1000). Example: 125.
 func (o BlockDeviceArgsPtrOutput) Throughput() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *BlockDeviceArgs) *int {
 		if v == nil {
@@ -1397,7 +1397,7 @@ func (o BlockDeviceArgsPtrOutput) Throughput() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
-// Rate in MiB/s for initializing volumes from snapshots.
+// Rate in MiB/s for initializing volumes from snapshots. Example: 300.
 func (o BlockDeviceArgsPtrOutput) VolumeInitializationRate() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *BlockDeviceArgs) *int {
 		if v == nil {
@@ -1407,7 +1407,7 @@ func (o BlockDeviceArgsPtrOutput) VolumeInitializationRate() pulumi.IntPtrOutput
 	}).(pulumi.IntPtrOutput)
 }
 
-// Volume size (e.g. '20Gi').
+// Volume size with unit suffix. Example: '20Gi'.
 func (o BlockDeviceArgsPtrOutput) VolumeSize() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *BlockDeviceArgs) *string {
 		if v == nil {
@@ -1417,7 +1417,7 @@ func (o BlockDeviceArgsPtrOutput) VolumeSize() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-// EBS volume type (e.g. 'gp3', 'io1', 'st1').
+// EBS volume type. One of: 'gp2', 'gp3', 'io1', 'io2', 'st1', 'sc1'. Example: 'gp3'.
 func (o BlockDeviceArgsPtrOutput) VolumeType() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *BlockDeviceArgs) *string {
 		if v == nil {
@@ -1428,11 +1428,11 @@ func (o BlockDeviceArgsPtrOutput) VolumeType() pulumi.StringPtrOutput {
 }
 
 type BlockDeviceMappingArgs struct {
-	// Device name to map the volume to (e.g. '/dev/xvda').
+	// Device name to map the volume to. Example: '/dev/xvda' (root on AL2), '/dev/sdb' (data volume).
 	DeviceName *string `pulumi:"deviceName"`
-	// EBS volume configuration for this device.
+	// EBS volume configuration for this device mapping.
 	Ebs *BlockDeviceArgs `pulumi:"ebs"`
-	// Whether this mapping is for the root volume.
+	// Whether this mapping is for the root (boot) volume. Example: true.
 	RootVolume *bool `pulumi:"rootVolume"`
 }
 
@@ -1448,11 +1448,11 @@ type BlockDeviceMappingArgsInput interface {
 }
 
 type BlockDeviceMappingArgsArgs struct {
-	// Device name to map the volume to (e.g. '/dev/xvda').
+	// Device name to map the volume to. Example: '/dev/xvda' (root on AL2), '/dev/sdb' (data volume).
 	DeviceName pulumi.StringPtrInput `pulumi:"deviceName"`
-	// EBS volume configuration for this device.
+	// EBS volume configuration for this device mapping.
 	Ebs BlockDeviceArgsPtrInput `pulumi:"ebs"`
-	// Whether this mapping is for the root volume.
+	// Whether this mapping is for the root (boot) volume. Example: true.
 	RootVolume pulumi.BoolPtrInput `pulumi:"rootVolume"`
 }
 
@@ -1507,17 +1507,17 @@ func (o BlockDeviceMappingArgsOutput) ToBlockDeviceMappingArgsOutputWithContext(
 	return o
 }
 
-// Device name to map the volume to (e.g. '/dev/xvda').
+// Device name to map the volume to. Example: '/dev/xvda' (root on AL2), '/dev/sdb' (data volume).
 func (o BlockDeviceMappingArgsOutput) DeviceName() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v BlockDeviceMappingArgs) *string { return v.DeviceName }).(pulumi.StringPtrOutput)
 }
 
-// EBS volume configuration for this device.
+// EBS volume configuration for this device mapping.
 func (o BlockDeviceMappingArgsOutput) Ebs() BlockDeviceArgsPtrOutput {
 	return o.ApplyT(func(v BlockDeviceMappingArgs) *BlockDeviceArgs { return v.Ebs }).(BlockDeviceArgsPtrOutput)
 }
 
-// Whether this mapping is for the root volume.
+// Whether this mapping is for the root (boot) volume. Example: true.
 func (o BlockDeviceMappingArgsOutput) RootVolume() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v BlockDeviceMappingArgs) *bool { return v.RootVolume }).(pulumi.BoolPtrOutput)
 }
@@ -1543,11 +1543,11 @@ func (o BlockDeviceMappingArgsArrayOutput) Index(i pulumi.IntInput) BlockDeviceM
 }
 
 type CapacityReservationSelectorTermArgs struct {
-	// Explicit capacity reservation ID.
+	// Explicit capacity reservation ID. Example: 'cr-0a1b2c3d4e5f'.
 	Id *string `pulumi:"id"`
-	// AWS account ID that owns the capacity reservation.
+	// AWS account ID that owns the capacity reservation. Example: '123456789012'.
 	OwnerId *string `pulumi:"ownerId"`
-	// Map of AWS tags used to select capacity reservations.
+	// Map of AWS tags used to select capacity reservations. Example: {"aws:ec2:fleet-id": "fleet-123"}.
 	Tags map[string]string `pulumi:"tags"`
 }
 
@@ -1563,11 +1563,11 @@ type CapacityReservationSelectorTermArgsInput interface {
 }
 
 type CapacityReservationSelectorTermArgsArgs struct {
-	// Explicit capacity reservation ID.
+	// Explicit capacity reservation ID. Example: 'cr-0a1b2c3d4e5f'.
 	Id pulumi.StringPtrInput `pulumi:"id"`
-	// AWS account ID that owns the capacity reservation.
+	// AWS account ID that owns the capacity reservation. Example: '123456789012'.
 	OwnerId pulumi.StringPtrInput `pulumi:"ownerId"`
-	// Map of AWS tags used to select capacity reservations.
+	// Map of AWS tags used to select capacity reservations. Example: {"aws:ec2:fleet-id": "fleet-123"}.
 	Tags pulumi.StringMapInput `pulumi:"tags"`
 }
 
@@ -1622,17 +1622,17 @@ func (o CapacityReservationSelectorTermArgsOutput) ToCapacityReservationSelector
 	return o
 }
 
-// Explicit capacity reservation ID.
+// Explicit capacity reservation ID. Example: 'cr-0a1b2c3d4e5f'.
 func (o CapacityReservationSelectorTermArgsOutput) Id() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v CapacityReservationSelectorTermArgs) *string { return v.Id }).(pulumi.StringPtrOutput)
 }
 
-// AWS account ID that owns the capacity reservation.
+// AWS account ID that owns the capacity reservation. Example: '123456789012'.
 func (o CapacityReservationSelectorTermArgsOutput) OwnerId() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v CapacityReservationSelectorTermArgs) *string { return v.OwnerId }).(pulumi.StringPtrOutput)
 }
 
-// Map of AWS tags used to select capacity reservations.
+// Map of AWS tags used to select capacity reservations. Example: {"aws:ec2:fleet-id": "fleet-123"}.
 func (o CapacityReservationSelectorTermArgsOutput) Tags() pulumi.StringMapOutput {
 	return o.ApplyT(func(v CapacityReservationSelectorTermArgs) map[string]string { return v.Tags }).(pulumi.StringMapOutput)
 }
@@ -1658,13 +1658,13 @@ func (o CapacityReservationSelectorTermArgsArrayOutput) Index(i pulumi.IntInput)
 }
 
 type DisruptionBudgetArgs struct {
-	// Duration the budget window stays active (e.g. '1h', '30m').
+	// How long the budget window stays active after the cron fires. Example: '8h'.
 	Duration *string `pulumi:"duration"`
-	// Maximum nodes that may be disrupted, as an absolute count or percentage (e.g. '10%').
+	// Maximum nodes that may be disrupted simultaneously, as an absolute count or percentage. Example: '10%' or '5'.
 	Nodes *string `pulumi:"nodes"`
-	// Disruption reasons this budget applies to (e.g. 'Underutilized', 'Empty', 'Drifted').
+	// Disruption reasons this budget applies to. Valid values: 'Underutilized', 'Empty', 'Drifted'. Example: ["Underutilized", "Empty"].
 	Reasons []string `pulumi:"reasons"`
-	// Cron schedule during which this budget is active (5-field format).
+	// Cron schedule (5-field UTC) during which this budget is active. Example: '0 9 * * mon-fri' (weekday business hours).
 	Schedule *string `pulumi:"schedule"`
 }
 
@@ -1680,13 +1680,13 @@ type DisruptionBudgetArgsInput interface {
 }
 
 type DisruptionBudgetArgsArgs struct {
-	// Duration the budget window stays active (e.g. '1h', '30m').
+	// How long the budget window stays active after the cron fires. Example: '8h'.
 	Duration pulumi.StringPtrInput `pulumi:"duration"`
-	// Maximum nodes that may be disrupted, as an absolute count or percentage (e.g. '10%').
+	// Maximum nodes that may be disrupted simultaneously, as an absolute count or percentage. Example: '10%' or '5'.
 	Nodes pulumi.StringPtrInput `pulumi:"nodes"`
-	// Disruption reasons this budget applies to (e.g. 'Underutilized', 'Empty', 'Drifted').
+	// Disruption reasons this budget applies to. Valid values: 'Underutilized', 'Empty', 'Drifted'. Example: ["Underutilized", "Empty"].
 	Reasons pulumi.StringArrayInput `pulumi:"reasons"`
-	// Cron schedule during which this budget is active (5-field format).
+	// Cron schedule (5-field UTC) during which this budget is active. Example: '0 9 * * mon-fri' (weekday business hours).
 	Schedule pulumi.StringPtrInput `pulumi:"schedule"`
 }
 
@@ -1741,22 +1741,22 @@ func (o DisruptionBudgetArgsOutput) ToDisruptionBudgetArgsOutputWithContext(ctx 
 	return o
 }
 
-// Duration the budget window stays active (e.g. '1h', '30m').
+// How long the budget window stays active after the cron fires. Example: '8h'.
 func (o DisruptionBudgetArgsOutput) Duration() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v DisruptionBudgetArgs) *string { return v.Duration }).(pulumi.StringPtrOutput)
 }
 
-// Maximum nodes that may be disrupted, as an absolute count or percentage (e.g. '10%').
+// Maximum nodes that may be disrupted simultaneously, as an absolute count or percentage. Example: '10%' or '5'.
 func (o DisruptionBudgetArgsOutput) Nodes() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v DisruptionBudgetArgs) *string { return v.Nodes }).(pulumi.StringPtrOutput)
 }
 
-// Disruption reasons this budget applies to (e.g. 'Underutilized', 'Empty', 'Drifted').
+// Disruption reasons this budget applies to. Valid values: 'Underutilized', 'Empty', 'Drifted'. Example: ["Underutilized", "Empty"].
 func (o DisruptionBudgetArgsOutput) Reasons() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v DisruptionBudgetArgs) []string { return v.Reasons }).(pulumi.StringArrayOutput)
 }
 
-// Cron schedule during which this budget is active (5-field format).
+// Cron schedule (5-field UTC) during which this budget is active. Example: '0 9 * * mon-fri' (weekday business hours).
 func (o DisruptionBudgetArgsOutput) Schedule() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v DisruptionBudgetArgs) *string { return v.Schedule }).(pulumi.StringPtrOutput)
 }
@@ -1782,17 +1782,17 @@ func (o DisruptionBudgetArgsArrayOutput) Index(i pulumi.IntInput) DisruptionBudg
 }
 
 type DisruptionPolicyArgs struct {
-	// Disruption budgets limiting how many nodes can be disrupted at once.
+	// Disruption budgets controlling how many nodes can be disrupted simultaneously. Example: [{reasons: ["Underutilized"], nodes: "10%"}].
 	Budgets []DisruptionBudgetArgs `pulumi:"budgets"`
-	// Duration to wait after a node becomes empty before consolidating (e.g. '30s').
+	// Duration to wait after a node becomes empty before consolidating. Example: '30s'.
 	ConsolidateAfter *string `pulumi:"consolidateAfter"`
-	// When to consolidate nodes. One of: 'WhenEmpty', 'WhenUnderutilized'.
+	// When to consolidate nodes. One of: 'WhenEmpty', 'WhenEmptyOrUnderutilized'. Example: 'WhenEmptyOrUnderutilized'.
 	ConsolidationPolicy *string `pulumi:"consolidationPolicy"`
-	// Duration after which provisioned nodes are replaced regardless of load (e.g. '720h').
+	// Duration after which provisioned nodes are replaced regardless of load. Example: '720h' (30 days).
 	ExpireAfter *string `pulumi:"expireAfter"`
-	// Grace period in seconds before forcefully terminating a draining node.
+	// Grace period in seconds before forcefully terminating a draining node. Example: 600.
 	TerminationGracePeriodSeconds *int `pulumi:"terminationGracePeriodSeconds"`
-	// Seconds before an empty node is terminated (deprecated; prefer ConsolidateAfter).
+	// Seconds before an empty node is terminated (deprecated; prefer consolidateAfter). Example: 30.
 	TtlSecondsAfterEmpty *int `pulumi:"ttlSecondsAfterEmpty"`
 }
 
@@ -1808,17 +1808,17 @@ type DisruptionPolicyArgsInput interface {
 }
 
 type DisruptionPolicyArgsArgs struct {
-	// Disruption budgets limiting how many nodes can be disrupted at once.
+	// Disruption budgets controlling how many nodes can be disrupted simultaneously. Example: [{reasons: ["Underutilized"], nodes: "10%"}].
 	Budgets DisruptionBudgetArgsArrayInput `pulumi:"budgets"`
-	// Duration to wait after a node becomes empty before consolidating (e.g. '30s').
+	// Duration to wait after a node becomes empty before consolidating. Example: '30s'.
 	ConsolidateAfter pulumi.StringPtrInput `pulumi:"consolidateAfter"`
-	// When to consolidate nodes. One of: 'WhenEmpty', 'WhenUnderutilized'.
+	// When to consolidate nodes. One of: 'WhenEmpty', 'WhenEmptyOrUnderutilized'. Example: 'WhenEmptyOrUnderutilized'.
 	ConsolidationPolicy pulumi.StringPtrInput `pulumi:"consolidationPolicy"`
-	// Duration after which provisioned nodes are replaced regardless of load (e.g. '720h').
+	// Duration after which provisioned nodes are replaced regardless of load. Example: '720h' (30 days).
 	ExpireAfter pulumi.StringPtrInput `pulumi:"expireAfter"`
-	// Grace period in seconds before forcefully terminating a draining node.
+	// Grace period in seconds before forcefully terminating a draining node. Example: 600.
 	TerminationGracePeriodSeconds pulumi.IntPtrInput `pulumi:"terminationGracePeriodSeconds"`
-	// Seconds before an empty node is terminated (deprecated; prefer ConsolidateAfter).
+	// Seconds before an empty node is terminated (deprecated; prefer consolidateAfter). Example: 30.
 	TtlSecondsAfterEmpty pulumi.IntPtrInput `pulumi:"ttlSecondsAfterEmpty"`
 }
 
@@ -1899,32 +1899,32 @@ func (o DisruptionPolicyArgsOutput) ToDisruptionPolicyArgsPtrOutputWithContext(c
 	}).(DisruptionPolicyArgsPtrOutput)
 }
 
-// Disruption budgets limiting how many nodes can be disrupted at once.
+// Disruption budgets controlling how many nodes can be disrupted simultaneously. Example: [{reasons: ["Underutilized"], nodes: "10%"}].
 func (o DisruptionPolicyArgsOutput) Budgets() DisruptionBudgetArgsArrayOutput {
 	return o.ApplyT(func(v DisruptionPolicyArgs) []DisruptionBudgetArgs { return v.Budgets }).(DisruptionBudgetArgsArrayOutput)
 }
 
-// Duration to wait after a node becomes empty before consolidating (e.g. '30s').
+// Duration to wait after a node becomes empty before consolidating. Example: '30s'.
 func (o DisruptionPolicyArgsOutput) ConsolidateAfter() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v DisruptionPolicyArgs) *string { return v.ConsolidateAfter }).(pulumi.StringPtrOutput)
 }
 
-// When to consolidate nodes. One of: 'WhenEmpty', 'WhenUnderutilized'.
+// When to consolidate nodes. One of: 'WhenEmpty', 'WhenEmptyOrUnderutilized'. Example: 'WhenEmptyOrUnderutilized'.
 func (o DisruptionPolicyArgsOutput) ConsolidationPolicy() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v DisruptionPolicyArgs) *string { return v.ConsolidationPolicy }).(pulumi.StringPtrOutput)
 }
 
-// Duration after which provisioned nodes are replaced regardless of load (e.g. '720h').
+// Duration after which provisioned nodes are replaced regardless of load. Example: '720h' (30 days).
 func (o DisruptionPolicyArgsOutput) ExpireAfter() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v DisruptionPolicyArgs) *string { return v.ExpireAfter }).(pulumi.StringPtrOutput)
 }
 
-// Grace period in seconds before forcefully terminating a draining node.
+// Grace period in seconds before forcefully terminating a draining node. Example: 600.
 func (o DisruptionPolicyArgsOutput) TerminationGracePeriodSeconds() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v DisruptionPolicyArgs) *int { return v.TerminationGracePeriodSeconds }).(pulumi.IntPtrOutput)
 }
 
-// Seconds before an empty node is terminated (deprecated; prefer ConsolidateAfter).
+// Seconds before an empty node is terminated (deprecated; prefer consolidateAfter). Example: 30.
 func (o DisruptionPolicyArgsOutput) TtlSecondsAfterEmpty() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v DisruptionPolicyArgs) *int { return v.TtlSecondsAfterEmpty }).(pulumi.IntPtrOutput)
 }
@@ -1953,7 +1953,7 @@ func (o DisruptionPolicyArgsPtrOutput) Elem() DisruptionPolicyArgsOutput {
 	}).(DisruptionPolicyArgsOutput)
 }
 
-// Disruption budgets limiting how many nodes can be disrupted at once.
+// Disruption budgets controlling how many nodes can be disrupted simultaneously. Example: [{reasons: ["Underutilized"], nodes: "10%"}].
 func (o DisruptionPolicyArgsPtrOutput) Budgets() DisruptionBudgetArgsArrayOutput {
 	return o.ApplyT(func(v *DisruptionPolicyArgs) []DisruptionBudgetArgs {
 		if v == nil {
@@ -1963,7 +1963,7 @@ func (o DisruptionPolicyArgsPtrOutput) Budgets() DisruptionBudgetArgsArrayOutput
 	}).(DisruptionBudgetArgsArrayOutput)
 }
 
-// Duration to wait after a node becomes empty before consolidating (e.g. '30s').
+// Duration to wait after a node becomes empty before consolidating. Example: '30s'.
 func (o DisruptionPolicyArgsPtrOutput) ConsolidateAfter() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *DisruptionPolicyArgs) *string {
 		if v == nil {
@@ -1973,7 +1973,7 @@ func (o DisruptionPolicyArgsPtrOutput) ConsolidateAfter() pulumi.StringPtrOutput
 	}).(pulumi.StringPtrOutput)
 }
 
-// When to consolidate nodes. One of: 'WhenEmpty', 'WhenUnderutilized'.
+// When to consolidate nodes. One of: 'WhenEmpty', 'WhenEmptyOrUnderutilized'. Example: 'WhenEmptyOrUnderutilized'.
 func (o DisruptionPolicyArgsPtrOutput) ConsolidationPolicy() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *DisruptionPolicyArgs) *string {
 		if v == nil {
@@ -1983,7 +1983,7 @@ func (o DisruptionPolicyArgsPtrOutput) ConsolidationPolicy() pulumi.StringPtrOut
 	}).(pulumi.StringPtrOutput)
 }
 
-// Duration after which provisioned nodes are replaced regardless of load (e.g. '720h').
+// Duration after which provisioned nodes are replaced regardless of load. Example: '720h' (30 days).
 func (o DisruptionPolicyArgsPtrOutput) ExpireAfter() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *DisruptionPolicyArgs) *string {
 		if v == nil {
@@ -1993,7 +1993,7 @@ func (o DisruptionPolicyArgsPtrOutput) ExpireAfter() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-// Grace period in seconds before forcefully terminating a draining node.
+// Grace period in seconds before forcefully terminating a draining node. Example: 600.
 func (o DisruptionPolicyArgsPtrOutput) TerminationGracePeriodSeconds() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *DisruptionPolicyArgs) *int {
 		if v == nil {
@@ -2003,7 +2003,7 @@ func (o DisruptionPolicyArgsPtrOutput) TerminationGracePeriodSeconds() pulumi.In
 	}).(pulumi.IntPtrOutput)
 }
 
-// Seconds before an empty node is terminated (deprecated; prefer ConsolidateAfter).
+// Seconds before an empty node is terminated (deprecated; prefer consolidateAfter). Example: 30.
 func (o DisruptionPolicyArgsPtrOutput) TtlSecondsAfterEmpty() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *DisruptionPolicyArgs) *int {
 		if v == nil {
@@ -2014,19 +2014,19 @@ func (o DisruptionPolicyArgsPtrOutput) TtlSecondsAfterEmpty() pulumi.IntPtrOutpu
 }
 
 type HorizontalScalingArgs struct {
-	// Enable horizontal (replica) scaling.
+	// Enable horizontal (replica) scaling. Example: true.
 	Enabled *bool `pulumi:"enabled"`
-	// Maximum percentage change in replica count per recommendation cycle.
+	// Maximum percentage change in replica count per recommendation cycle. Example: 50.0 allows up to 50% change.
 	MaxReplicaChangePercent *float64 `pulumi:"maxReplicaChangePercent"`
-	// Maximum number of replicas to scale up to.
+	// Maximum number of replicas to scale up to. Example: 10.
 	MaxReplicas *int `pulumi:"maxReplicas"`
-	// Minimum data points required before a recommendation is emitted.
+	// Minimum data points required before a recommendation is emitted. Example: 20.
 	MinDataPoints *int `pulumi:"minDataPoints"`
-	// Minimum number of replicas to maintain.
+	// Minimum number of replicas to maintain. Example: 2.
 	MinReplicas *int `pulumi:"minReplicas"`
-	// Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'.
+	// Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
 	PrimaryMetric *string `pulumi:"primaryMetric"`
-	// Target utilization ratio (0-1) for the primary metric.
+	// Target utilization ratio (0-1) for the primary metric. Example: 0.7 targets 70% utilization.
 	TargetUtilization *float64 `pulumi:"targetUtilization"`
 }
 
@@ -2042,19 +2042,19 @@ type HorizontalScalingArgsInput interface {
 }
 
 type HorizontalScalingArgsArgs struct {
-	// Enable horizontal (replica) scaling.
+	// Enable horizontal (replica) scaling. Example: true.
 	Enabled pulumi.BoolPtrInput `pulumi:"enabled"`
-	// Maximum percentage change in replica count per recommendation cycle.
+	// Maximum percentage change in replica count per recommendation cycle. Example: 50.0 allows up to 50% change.
 	MaxReplicaChangePercent pulumi.Float64PtrInput `pulumi:"maxReplicaChangePercent"`
-	// Maximum number of replicas to scale up to.
+	// Maximum number of replicas to scale up to. Example: 10.
 	MaxReplicas pulumi.IntPtrInput `pulumi:"maxReplicas"`
-	// Minimum data points required before a recommendation is emitted.
+	// Minimum data points required before a recommendation is emitted. Example: 20.
 	MinDataPoints pulumi.IntPtrInput `pulumi:"minDataPoints"`
-	// Minimum number of replicas to maintain.
+	// Minimum number of replicas to maintain. Example: 2.
 	MinReplicas pulumi.IntPtrInput `pulumi:"minReplicas"`
-	// Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'.
+	// Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
 	PrimaryMetric pulumi.StringPtrInput `pulumi:"primaryMetric"`
-	// Target utilization ratio (0-1) for the primary metric.
+	// Target utilization ratio (0-1) for the primary metric. Example: 0.7 targets 70% utilization.
 	TargetUtilization pulumi.Float64PtrInput `pulumi:"targetUtilization"`
 }
 
@@ -2135,37 +2135,37 @@ func (o HorizontalScalingArgsOutput) ToHorizontalScalingArgsPtrOutputWithContext
 	}).(HorizontalScalingArgsPtrOutput)
 }
 
-// Enable horizontal (replica) scaling.
+// Enable horizontal (replica) scaling. Example: true.
 func (o HorizontalScalingArgsOutput) Enabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v HorizontalScalingArgs) *bool { return v.Enabled }).(pulumi.BoolPtrOutput)
 }
 
-// Maximum percentage change in replica count per recommendation cycle.
+// Maximum percentage change in replica count per recommendation cycle. Example: 50.0 allows up to 50% change.
 func (o HorizontalScalingArgsOutput) MaxReplicaChangePercent() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v HorizontalScalingArgs) *float64 { return v.MaxReplicaChangePercent }).(pulumi.Float64PtrOutput)
 }
 
-// Maximum number of replicas to scale up to.
+// Maximum number of replicas to scale up to. Example: 10.
 func (o HorizontalScalingArgsOutput) MaxReplicas() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v HorizontalScalingArgs) *int { return v.MaxReplicas }).(pulumi.IntPtrOutput)
 }
 
-// Minimum data points required before a recommendation is emitted.
+// Minimum data points required before a recommendation is emitted. Example: 20.
 func (o HorizontalScalingArgsOutput) MinDataPoints() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v HorizontalScalingArgs) *int { return v.MinDataPoints }).(pulumi.IntPtrOutput)
 }
 
-// Minimum number of replicas to maintain.
+// Minimum number of replicas to maintain. Example: 2.
 func (o HorizontalScalingArgsOutput) MinReplicas() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v HorizontalScalingArgs) *int { return v.MinReplicas }).(pulumi.IntPtrOutput)
 }
 
-// Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'.
+// Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
 func (o HorizontalScalingArgsOutput) PrimaryMetric() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v HorizontalScalingArgs) *string { return v.PrimaryMetric }).(pulumi.StringPtrOutput)
 }
 
-// Target utilization ratio (0-1) for the primary metric.
+// Target utilization ratio (0-1) for the primary metric. Example: 0.7 targets 70% utilization.
 func (o HorizontalScalingArgsOutput) TargetUtilization() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v HorizontalScalingArgs) *float64 { return v.TargetUtilization }).(pulumi.Float64PtrOutput)
 }
@@ -2194,7 +2194,7 @@ func (o HorizontalScalingArgsPtrOutput) Elem() HorizontalScalingArgsOutput {
 	}).(HorizontalScalingArgsOutput)
 }
 
-// Enable horizontal (replica) scaling.
+// Enable horizontal (replica) scaling. Example: true.
 func (o HorizontalScalingArgsPtrOutput) Enabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *HorizontalScalingArgs) *bool {
 		if v == nil {
@@ -2204,7 +2204,7 @@ func (o HorizontalScalingArgsPtrOutput) Enabled() pulumi.BoolPtrOutput {
 	}).(pulumi.BoolPtrOutput)
 }
 
-// Maximum percentage change in replica count per recommendation cycle.
+// Maximum percentage change in replica count per recommendation cycle. Example: 50.0 allows up to 50% change.
 func (o HorizontalScalingArgsPtrOutput) MaxReplicaChangePercent() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v *HorizontalScalingArgs) *float64 {
 		if v == nil {
@@ -2214,7 +2214,7 @@ func (o HorizontalScalingArgsPtrOutput) MaxReplicaChangePercent() pulumi.Float64
 	}).(pulumi.Float64PtrOutput)
 }
 
-// Maximum number of replicas to scale up to.
+// Maximum number of replicas to scale up to. Example: 10.
 func (o HorizontalScalingArgsPtrOutput) MaxReplicas() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *HorizontalScalingArgs) *int {
 		if v == nil {
@@ -2224,7 +2224,7 @@ func (o HorizontalScalingArgsPtrOutput) MaxReplicas() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
-// Minimum data points required before a recommendation is emitted.
+// Minimum data points required before a recommendation is emitted. Example: 20.
 func (o HorizontalScalingArgsPtrOutput) MinDataPoints() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *HorizontalScalingArgs) *int {
 		if v == nil {
@@ -2234,7 +2234,7 @@ func (o HorizontalScalingArgsPtrOutput) MinDataPoints() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
-// Minimum number of replicas to maintain.
+// Minimum number of replicas to maintain. Example: 2.
 func (o HorizontalScalingArgsPtrOutput) MinReplicas() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *HorizontalScalingArgs) *int {
 		if v == nil {
@@ -2244,7 +2244,7 @@ func (o HorizontalScalingArgsPtrOutput) MinReplicas() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
-// Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'.
+// Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
 func (o HorizontalScalingArgsPtrOutput) PrimaryMetric() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *HorizontalScalingArgs) *string {
 		if v == nil {
@@ -2254,7 +2254,7 @@ func (o HorizontalScalingArgsPtrOutput) PrimaryMetric() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-// Target utilization ratio (0-1) for the primary metric.
+// Target utilization ratio (0-1) for the primary metric. Example: 0.7 targets 70% utilization.
 func (o HorizontalScalingArgsPtrOutput) TargetUtilization() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v *HorizontalScalingArgs) *float64 {
 		if v == nil {
@@ -2265,29 +2265,29 @@ func (o HorizontalScalingArgsPtrOutput) TargetUtilization() pulumi.Float64PtrOut
 }
 
 type KubeletConfigurationArgs struct {
-	// List of DNS server IP addresses used by kubelet.
+	// DNS server IP addresses passed to kubelet. Example: ["10.96.0.10"].
 	ClusterDns []string `pulumi:"clusterDns"`
-	// Whether to enforce CPU CFS quota limits for containers.
+	// Whether to enforce CPU CFS quota limits for containers. Example: true.
 	CpuCfsQuota *bool `pulumi:"cpuCfsQuota"`
-	// Hard eviction thresholds that trigger immediate pod eviction.
+	// Hard eviction thresholds — pods are evicted immediately when crossed. Example: {"memory.available": "100Mi", "nodefs.available": "10%"}.
 	EvictionHard map[string]string `pulumi:"evictionHard"`
-	// Maximum grace period in seconds when evicting pods.
+	// Maximum pod termination grace period (seconds) during eviction. Example: 90.
 	EvictionMaxPodGracePeriod *int `pulumi:"evictionMaxPodGracePeriod"`
-	// Soft eviction thresholds that trigger eviction after a grace period.
+	// Soft eviction thresholds — eviction begins after the grace period expires. Example: {"memory.available": "200Mi"}.
 	EvictionSoft map[string]string `pulumi:"evictionSoft"`
-	// Grace period for each soft eviction threshold.
+	// Grace period before acting on a soft eviction threshold. Example: {"memory.available": "90s"}.
 	EvictionSoftGracePeriod map[string]string `pulumi:"evictionSoftGracePeriod"`
-	// Disk usage percentage that triggers image garbage collection.
+	// Disk usage % that triggers image garbage collection. Example: 85.
 	ImageGcHighThresholdPercent *int `pulumi:"imageGcHighThresholdPercent"`
-	// Disk usage percentage below which image GC stops freeing space.
+	// Disk usage % at which image GC stops freeing space. Example: 70.
 	ImageGcLowThresholdPercent *int `pulumi:"imageGcLowThresholdPercent"`
-	// Resources reserved for Kubernetes system components.
+	// Resources reserved for Kubernetes system components (kubelet, kube-proxy). Example: {"cpu": "100m", "memory": "100Mi"}.
 	KubeReserved map[string]string `pulumi:"kubeReserved"`
-	// Maximum number of pods per node.
+	// Maximum number of pods allowed per node. Example: 110.
 	MaxPods *int `pulumi:"maxPods"`
-	// Maximum pods per CPU core (multiplied by core count for max pods).
+	// Maximum pods per CPU core; multiplied by node core count for effective max. Example: 10.
 	PodsPerCore *int `pulumi:"podsPerCore"`
-	// Resources reserved for OS system daemons (e.g. {'cpu': '100m'}).
+	// Resources reserved for OS system daemons (not Kubernetes). Example: {"cpu": "100m", "memory": "100Mi"}.
 	SystemReserved map[string]string `pulumi:"systemReserved"`
 }
 
@@ -2303,29 +2303,29 @@ type KubeletConfigurationArgsInput interface {
 }
 
 type KubeletConfigurationArgsArgs struct {
-	// List of DNS server IP addresses used by kubelet.
+	// DNS server IP addresses passed to kubelet. Example: ["10.96.0.10"].
 	ClusterDns pulumi.StringArrayInput `pulumi:"clusterDns"`
-	// Whether to enforce CPU CFS quota limits for containers.
+	// Whether to enforce CPU CFS quota limits for containers. Example: true.
 	CpuCfsQuota pulumi.BoolPtrInput `pulumi:"cpuCfsQuota"`
-	// Hard eviction thresholds that trigger immediate pod eviction.
+	// Hard eviction thresholds — pods are evicted immediately when crossed. Example: {"memory.available": "100Mi", "nodefs.available": "10%"}.
 	EvictionHard pulumi.StringMapInput `pulumi:"evictionHard"`
-	// Maximum grace period in seconds when evicting pods.
+	// Maximum pod termination grace period (seconds) during eviction. Example: 90.
 	EvictionMaxPodGracePeriod pulumi.IntPtrInput `pulumi:"evictionMaxPodGracePeriod"`
-	// Soft eviction thresholds that trigger eviction after a grace period.
+	// Soft eviction thresholds — eviction begins after the grace period expires. Example: {"memory.available": "200Mi"}.
 	EvictionSoft pulumi.StringMapInput `pulumi:"evictionSoft"`
-	// Grace period for each soft eviction threshold.
+	// Grace period before acting on a soft eviction threshold. Example: {"memory.available": "90s"}.
 	EvictionSoftGracePeriod pulumi.StringMapInput `pulumi:"evictionSoftGracePeriod"`
-	// Disk usage percentage that triggers image garbage collection.
+	// Disk usage % that triggers image garbage collection. Example: 85.
 	ImageGcHighThresholdPercent pulumi.IntPtrInput `pulumi:"imageGcHighThresholdPercent"`
-	// Disk usage percentage below which image GC stops freeing space.
+	// Disk usage % at which image GC stops freeing space. Example: 70.
 	ImageGcLowThresholdPercent pulumi.IntPtrInput `pulumi:"imageGcLowThresholdPercent"`
-	// Resources reserved for Kubernetes system components.
+	// Resources reserved for Kubernetes system components (kubelet, kube-proxy). Example: {"cpu": "100m", "memory": "100Mi"}.
 	KubeReserved pulumi.StringMapInput `pulumi:"kubeReserved"`
-	// Maximum number of pods per node.
+	// Maximum number of pods allowed per node. Example: 110.
 	MaxPods pulumi.IntPtrInput `pulumi:"maxPods"`
-	// Maximum pods per CPU core (multiplied by core count for max pods).
+	// Maximum pods per CPU core; multiplied by node core count for effective max. Example: 10.
 	PodsPerCore pulumi.IntPtrInput `pulumi:"podsPerCore"`
-	// Resources reserved for OS system daemons (e.g. {'cpu': '100m'}).
+	// Resources reserved for OS system daemons (not Kubernetes). Example: {"cpu": "100m", "memory": "100Mi"}.
 	SystemReserved pulumi.StringMapInput `pulumi:"systemReserved"`
 }
 
@@ -2406,62 +2406,62 @@ func (o KubeletConfigurationArgsOutput) ToKubeletConfigurationArgsPtrOutputWithC
 	}).(KubeletConfigurationArgsPtrOutput)
 }
 
-// List of DNS server IP addresses used by kubelet.
+// DNS server IP addresses passed to kubelet. Example: ["10.96.0.10"].
 func (o KubeletConfigurationArgsOutput) ClusterDns() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v KubeletConfigurationArgs) []string { return v.ClusterDns }).(pulumi.StringArrayOutput)
 }
 
-// Whether to enforce CPU CFS quota limits for containers.
+// Whether to enforce CPU CFS quota limits for containers. Example: true.
 func (o KubeletConfigurationArgsOutput) CpuCfsQuota() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v KubeletConfigurationArgs) *bool { return v.CpuCfsQuota }).(pulumi.BoolPtrOutput)
 }
 
-// Hard eviction thresholds that trigger immediate pod eviction.
+// Hard eviction thresholds — pods are evicted immediately when crossed. Example: {"memory.available": "100Mi", "nodefs.available": "10%"}.
 func (o KubeletConfigurationArgsOutput) EvictionHard() pulumi.StringMapOutput {
 	return o.ApplyT(func(v KubeletConfigurationArgs) map[string]string { return v.EvictionHard }).(pulumi.StringMapOutput)
 }
 
-// Maximum grace period in seconds when evicting pods.
+// Maximum pod termination grace period (seconds) during eviction. Example: 90.
 func (o KubeletConfigurationArgsOutput) EvictionMaxPodGracePeriod() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v KubeletConfigurationArgs) *int { return v.EvictionMaxPodGracePeriod }).(pulumi.IntPtrOutput)
 }
 
-// Soft eviction thresholds that trigger eviction after a grace period.
+// Soft eviction thresholds — eviction begins after the grace period expires. Example: {"memory.available": "200Mi"}.
 func (o KubeletConfigurationArgsOutput) EvictionSoft() pulumi.StringMapOutput {
 	return o.ApplyT(func(v KubeletConfigurationArgs) map[string]string { return v.EvictionSoft }).(pulumi.StringMapOutput)
 }
 
-// Grace period for each soft eviction threshold.
+// Grace period before acting on a soft eviction threshold. Example: {"memory.available": "90s"}.
 func (o KubeletConfigurationArgsOutput) EvictionSoftGracePeriod() pulumi.StringMapOutput {
 	return o.ApplyT(func(v KubeletConfigurationArgs) map[string]string { return v.EvictionSoftGracePeriod }).(pulumi.StringMapOutput)
 }
 
-// Disk usage percentage that triggers image garbage collection.
+// Disk usage % that triggers image garbage collection. Example: 85.
 func (o KubeletConfigurationArgsOutput) ImageGcHighThresholdPercent() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v KubeletConfigurationArgs) *int { return v.ImageGcHighThresholdPercent }).(pulumi.IntPtrOutput)
 }
 
-// Disk usage percentage below which image GC stops freeing space.
+// Disk usage % at which image GC stops freeing space. Example: 70.
 func (o KubeletConfigurationArgsOutput) ImageGcLowThresholdPercent() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v KubeletConfigurationArgs) *int { return v.ImageGcLowThresholdPercent }).(pulumi.IntPtrOutput)
 }
 
-// Resources reserved for Kubernetes system components.
+// Resources reserved for Kubernetes system components (kubelet, kube-proxy). Example: {"cpu": "100m", "memory": "100Mi"}.
 func (o KubeletConfigurationArgsOutput) KubeReserved() pulumi.StringMapOutput {
 	return o.ApplyT(func(v KubeletConfigurationArgs) map[string]string { return v.KubeReserved }).(pulumi.StringMapOutput)
 }
 
-// Maximum number of pods per node.
+// Maximum number of pods allowed per node. Example: 110.
 func (o KubeletConfigurationArgsOutput) MaxPods() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v KubeletConfigurationArgs) *int { return v.MaxPods }).(pulumi.IntPtrOutput)
 }
 
-// Maximum pods per CPU core (multiplied by core count for max pods).
+// Maximum pods per CPU core; multiplied by node core count for effective max. Example: 10.
 func (o KubeletConfigurationArgsOutput) PodsPerCore() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v KubeletConfigurationArgs) *int { return v.PodsPerCore }).(pulumi.IntPtrOutput)
 }
 
-// Resources reserved for OS system daemons (e.g. {'cpu': '100m'}).
+// Resources reserved for OS system daemons (not Kubernetes). Example: {"cpu": "100m", "memory": "100Mi"}.
 func (o KubeletConfigurationArgsOutput) SystemReserved() pulumi.StringMapOutput {
 	return o.ApplyT(func(v KubeletConfigurationArgs) map[string]string { return v.SystemReserved }).(pulumi.StringMapOutput)
 }
@@ -2490,7 +2490,7 @@ func (o KubeletConfigurationArgsPtrOutput) Elem() KubeletConfigurationArgsOutput
 	}).(KubeletConfigurationArgsOutput)
 }
 
-// List of DNS server IP addresses used by kubelet.
+// DNS server IP addresses passed to kubelet. Example: ["10.96.0.10"].
 func (o KubeletConfigurationArgsPtrOutput) ClusterDns() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *KubeletConfigurationArgs) []string {
 		if v == nil {
@@ -2500,7 +2500,7 @@ func (o KubeletConfigurationArgsPtrOutput) ClusterDns() pulumi.StringArrayOutput
 	}).(pulumi.StringArrayOutput)
 }
 
-// Whether to enforce CPU CFS quota limits for containers.
+// Whether to enforce CPU CFS quota limits for containers. Example: true.
 func (o KubeletConfigurationArgsPtrOutput) CpuCfsQuota() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *KubeletConfigurationArgs) *bool {
 		if v == nil {
@@ -2510,7 +2510,7 @@ func (o KubeletConfigurationArgsPtrOutput) CpuCfsQuota() pulumi.BoolPtrOutput {
 	}).(pulumi.BoolPtrOutput)
 }
 
-// Hard eviction thresholds that trigger immediate pod eviction.
+// Hard eviction thresholds — pods are evicted immediately when crossed. Example: {"memory.available": "100Mi", "nodefs.available": "10%"}.
 func (o KubeletConfigurationArgsPtrOutput) EvictionHard() pulumi.StringMapOutput {
 	return o.ApplyT(func(v *KubeletConfigurationArgs) map[string]string {
 		if v == nil {
@@ -2520,7 +2520,7 @@ func (o KubeletConfigurationArgsPtrOutput) EvictionHard() pulumi.StringMapOutput
 	}).(pulumi.StringMapOutput)
 }
 
-// Maximum grace period in seconds when evicting pods.
+// Maximum pod termination grace period (seconds) during eviction. Example: 90.
 func (o KubeletConfigurationArgsPtrOutput) EvictionMaxPodGracePeriod() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *KubeletConfigurationArgs) *int {
 		if v == nil {
@@ -2530,7 +2530,7 @@ func (o KubeletConfigurationArgsPtrOutput) EvictionMaxPodGracePeriod() pulumi.In
 	}).(pulumi.IntPtrOutput)
 }
 
-// Soft eviction thresholds that trigger eviction after a grace period.
+// Soft eviction thresholds — eviction begins after the grace period expires. Example: {"memory.available": "200Mi"}.
 func (o KubeletConfigurationArgsPtrOutput) EvictionSoft() pulumi.StringMapOutput {
 	return o.ApplyT(func(v *KubeletConfigurationArgs) map[string]string {
 		if v == nil {
@@ -2540,7 +2540,7 @@ func (o KubeletConfigurationArgsPtrOutput) EvictionSoft() pulumi.StringMapOutput
 	}).(pulumi.StringMapOutput)
 }
 
-// Grace period for each soft eviction threshold.
+// Grace period before acting on a soft eviction threshold. Example: {"memory.available": "90s"}.
 func (o KubeletConfigurationArgsPtrOutput) EvictionSoftGracePeriod() pulumi.StringMapOutput {
 	return o.ApplyT(func(v *KubeletConfigurationArgs) map[string]string {
 		if v == nil {
@@ -2550,7 +2550,7 @@ func (o KubeletConfigurationArgsPtrOutput) EvictionSoftGracePeriod() pulumi.Stri
 	}).(pulumi.StringMapOutput)
 }
 
-// Disk usage percentage that triggers image garbage collection.
+// Disk usage % that triggers image garbage collection. Example: 85.
 func (o KubeletConfigurationArgsPtrOutput) ImageGcHighThresholdPercent() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *KubeletConfigurationArgs) *int {
 		if v == nil {
@@ -2560,7 +2560,7 @@ func (o KubeletConfigurationArgsPtrOutput) ImageGcHighThresholdPercent() pulumi.
 	}).(pulumi.IntPtrOutput)
 }
 
-// Disk usage percentage below which image GC stops freeing space.
+// Disk usage % at which image GC stops freeing space. Example: 70.
 func (o KubeletConfigurationArgsPtrOutput) ImageGcLowThresholdPercent() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *KubeletConfigurationArgs) *int {
 		if v == nil {
@@ -2570,7 +2570,7 @@ func (o KubeletConfigurationArgsPtrOutput) ImageGcLowThresholdPercent() pulumi.I
 	}).(pulumi.IntPtrOutput)
 }
 
-// Resources reserved for Kubernetes system components.
+// Resources reserved for Kubernetes system components (kubelet, kube-proxy). Example: {"cpu": "100m", "memory": "100Mi"}.
 func (o KubeletConfigurationArgsPtrOutput) KubeReserved() pulumi.StringMapOutput {
 	return o.ApplyT(func(v *KubeletConfigurationArgs) map[string]string {
 		if v == nil {
@@ -2580,7 +2580,7 @@ func (o KubeletConfigurationArgsPtrOutput) KubeReserved() pulumi.StringMapOutput
 	}).(pulumi.StringMapOutput)
 }
 
-// Maximum number of pods per node.
+// Maximum number of pods allowed per node. Example: 110.
 func (o KubeletConfigurationArgsPtrOutput) MaxPods() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *KubeletConfigurationArgs) *int {
 		if v == nil {
@@ -2590,7 +2590,7 @@ func (o KubeletConfigurationArgsPtrOutput) MaxPods() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
-// Maximum pods per CPU core (multiplied by core count for max pods).
+// Maximum pods per CPU core; multiplied by node core count for effective max. Example: 10.
 func (o KubeletConfigurationArgsPtrOutput) PodsPerCore() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *KubeletConfigurationArgs) *int {
 		if v == nil {
@@ -2600,7 +2600,7 @@ func (o KubeletConfigurationArgsPtrOutput) PodsPerCore() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
-// Resources reserved for OS system daemons (e.g. {'cpu': '100m'}).
+// Resources reserved for OS system daemons (not Kubernetes). Example: {"cpu": "100m", "memory": "100Mi"}.
 func (o KubeletConfigurationArgsPtrOutput) SystemReserved() pulumi.StringMapOutput {
 	return o.ApplyT(func(v *KubeletConfigurationArgs) map[string]string {
 		if v == nil {
@@ -2882,13 +2882,13 @@ func (o LabelSelectorRequirementArgsArrayOutput) Index(i pulumi.IntInput) LabelS
 }
 
 type MetadataOptionsArgs struct {
-	// Enable or disable the instance metadata endpoint. One of: 'enabled', 'disabled'.
+	// Enable or disable the EC2 instance metadata endpoint. One of: 'enabled', 'disabled'. Example: 'enabled'.
 	HttpEndpoint *string `pulumi:"httpEndpoint"`
-	// Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'.
+	// Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'. Example: 'disabled'.
 	HttpProtocolIpv6 *string `pulumi:"httpProtocolIpv6"`
-	// HTTP PUT response hop limit for metadata requests (1-64).
+	// HTTP PUT response hop limit for metadata requests (1-64). Set to 1 to block pod-level IMDS access. Example: 1.
 	HttpPutResponseHopLimit *int `pulumi:"httpPutResponseHopLimit"`
-	// Whether to require IMDSv2 tokens. One of: 'optional', 'required'.
+	// Whether to require IMDSv2 session tokens (recommended). One of: 'optional', 'required'. Example: 'required'.
 	HttpTokens *string `pulumi:"httpTokens"`
 }
 
@@ -2904,13 +2904,13 @@ type MetadataOptionsArgsInput interface {
 }
 
 type MetadataOptionsArgsArgs struct {
-	// Enable or disable the instance metadata endpoint. One of: 'enabled', 'disabled'.
+	// Enable or disable the EC2 instance metadata endpoint. One of: 'enabled', 'disabled'. Example: 'enabled'.
 	HttpEndpoint pulumi.StringPtrInput `pulumi:"httpEndpoint"`
-	// Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'.
+	// Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'. Example: 'disabled'.
 	HttpProtocolIpv6 pulumi.StringPtrInput `pulumi:"httpProtocolIpv6"`
-	// HTTP PUT response hop limit for metadata requests (1-64).
+	// HTTP PUT response hop limit for metadata requests (1-64). Set to 1 to block pod-level IMDS access. Example: 1.
 	HttpPutResponseHopLimit pulumi.IntPtrInput `pulumi:"httpPutResponseHopLimit"`
-	// Whether to require IMDSv2 tokens. One of: 'optional', 'required'.
+	// Whether to require IMDSv2 session tokens (recommended). One of: 'optional', 'required'. Example: 'required'.
 	HttpTokens pulumi.StringPtrInput `pulumi:"httpTokens"`
 }
 
@@ -2991,22 +2991,22 @@ func (o MetadataOptionsArgsOutput) ToMetadataOptionsArgsPtrOutputWithContext(ctx
 	}).(MetadataOptionsArgsPtrOutput)
 }
 
-// Enable or disable the instance metadata endpoint. One of: 'enabled', 'disabled'.
+// Enable or disable the EC2 instance metadata endpoint. One of: 'enabled', 'disabled'. Example: 'enabled'.
 func (o MetadataOptionsArgsOutput) HttpEndpoint() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v MetadataOptionsArgs) *string { return v.HttpEndpoint }).(pulumi.StringPtrOutput)
 }
 
-// Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'.
+// Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'. Example: 'disabled'.
 func (o MetadataOptionsArgsOutput) HttpProtocolIpv6() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v MetadataOptionsArgs) *string { return v.HttpProtocolIpv6 }).(pulumi.StringPtrOutput)
 }
 
-// HTTP PUT response hop limit for metadata requests (1-64).
+// HTTP PUT response hop limit for metadata requests (1-64). Set to 1 to block pod-level IMDS access. Example: 1.
 func (o MetadataOptionsArgsOutput) HttpPutResponseHopLimit() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v MetadataOptionsArgs) *int { return v.HttpPutResponseHopLimit }).(pulumi.IntPtrOutput)
 }
 
-// Whether to require IMDSv2 tokens. One of: 'optional', 'required'.
+// Whether to require IMDSv2 session tokens (recommended). One of: 'optional', 'required'. Example: 'required'.
 func (o MetadataOptionsArgsOutput) HttpTokens() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v MetadataOptionsArgs) *string { return v.HttpTokens }).(pulumi.StringPtrOutput)
 }
@@ -3035,7 +3035,7 @@ func (o MetadataOptionsArgsPtrOutput) Elem() MetadataOptionsArgsOutput {
 	}).(MetadataOptionsArgsOutput)
 }
 
-// Enable or disable the instance metadata endpoint. One of: 'enabled', 'disabled'.
+// Enable or disable the EC2 instance metadata endpoint. One of: 'enabled', 'disabled'. Example: 'enabled'.
 func (o MetadataOptionsArgsPtrOutput) HttpEndpoint() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *MetadataOptionsArgs) *string {
 		if v == nil {
@@ -3045,7 +3045,7 @@ func (o MetadataOptionsArgsPtrOutput) HttpEndpoint() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-// Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'.
+// Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'. Example: 'disabled'.
 func (o MetadataOptionsArgsPtrOutput) HttpProtocolIpv6() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *MetadataOptionsArgs) *string {
 		if v == nil {
@@ -3055,7 +3055,7 @@ func (o MetadataOptionsArgsPtrOutput) HttpProtocolIpv6() pulumi.StringPtrOutput 
 	}).(pulumi.StringPtrOutput)
 }
 
-// HTTP PUT response hop limit for metadata requests (1-64).
+// HTTP PUT response hop limit for metadata requests (1-64). Set to 1 to block pod-level IMDS access. Example: 1.
 func (o MetadataOptionsArgsPtrOutput) HttpPutResponseHopLimit() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *MetadataOptionsArgs) *int {
 		if v == nil {
@@ -3065,7 +3065,7 @@ func (o MetadataOptionsArgsPtrOutput) HttpPutResponseHopLimit() pulumi.IntPtrOut
 	}).(pulumi.IntPtrOutput)
 }
 
-// Whether to require IMDSv2 tokens. One of: 'optional', 'required'.
+// Whether to require IMDSv2 session tokens (recommended). One of: 'optional', 'required'. Example: 'required'.
 func (o MetadataOptionsArgsPtrOutput) HttpTokens() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *MetadataOptionsArgs) *string {
 		if v == nil {
@@ -3232,9 +3232,9 @@ func (o NamePatternArgsPtrOutput) Pattern() pulumi.StringPtrOutput {
 }
 
 type RawKarpenterSpecArgs struct {
-	// Raw YAML for a complete Karpenter NodeClass resource (escape hatch).
+	// Raw YAML for a complete Karpenter NodeClass resource — use as an escape hatch when structured fields are insufficient. Example: 'apiVersion: karpenter.k8s.aws/v1\nkind: EC2NodeClass\nmetadata:\n  name: default\n...'.
 	NodeclassYaml *string `pulumi:"nodeclassYaml"`
-	// Raw YAML for a complete Karpenter NodePool resource (escape hatch).
+	// Raw YAML for a complete Karpenter NodePool resource — use as an escape hatch when structured fields are insufficient. Example: 'apiVersion: karpenter.sh/v1\nkind: NodePool\nmetadata:\n  name: default\n...'.
 	NodepoolYaml *string `pulumi:"nodepoolYaml"`
 }
 
@@ -3250,9 +3250,9 @@ type RawKarpenterSpecArgsInput interface {
 }
 
 type RawKarpenterSpecArgsArgs struct {
-	// Raw YAML for a complete Karpenter NodeClass resource (escape hatch).
+	// Raw YAML for a complete Karpenter NodeClass resource — use as an escape hatch when structured fields are insufficient. Example: 'apiVersion: karpenter.k8s.aws/v1\nkind: EC2NodeClass\nmetadata:\n  name: default\n...'.
 	NodeclassYaml pulumi.StringPtrInput `pulumi:"nodeclassYaml"`
-	// Raw YAML for a complete Karpenter NodePool resource (escape hatch).
+	// Raw YAML for a complete Karpenter NodePool resource — use as an escape hatch when structured fields are insufficient. Example: 'apiVersion: karpenter.sh/v1\nkind: NodePool\nmetadata:\n  name: default\n...'.
 	NodepoolYaml pulumi.StringPtrInput `pulumi:"nodepoolYaml"`
 }
 
@@ -3307,12 +3307,12 @@ func (o RawKarpenterSpecArgsOutput) ToRawKarpenterSpecArgsOutputWithContext(ctx 
 	return o
 }
 
-// Raw YAML for a complete Karpenter NodeClass resource (escape hatch).
+// Raw YAML for a complete Karpenter NodeClass resource — use as an escape hatch when structured fields are insufficient. Example: 'apiVersion: karpenter.k8s.aws/v1\nkind: EC2NodeClass\nmetadata:\n  name: default\n...'.
 func (o RawKarpenterSpecArgsOutput) NodeclassYaml() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v RawKarpenterSpecArgs) *string { return v.NodeclassYaml }).(pulumi.StringPtrOutput)
 }
 
-// Raw YAML for a complete Karpenter NodePool resource (escape hatch).
+// Raw YAML for a complete Karpenter NodePool resource — use as an escape hatch when structured fields are insufficient. Example: 'apiVersion: karpenter.sh/v1\nkind: NodePool\nmetadata:\n  name: default\n...'.
 func (o RawKarpenterSpecArgsOutput) NodepoolYaml() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v RawKarpenterSpecArgs) *string { return v.NodepoolYaml }).(pulumi.StringPtrOutput)
 }
@@ -3338,9 +3338,9 @@ func (o RawKarpenterSpecArgsArrayOutput) Index(i pulumi.IntInput) RawKarpenterSp
 }
 
 type ResourceLimitsArgs struct {
-	// Maximum total CPU that may be provisioned (e.g. '1000' for 1000 vCPUs).
+	// Maximum total vCPUs that may be provisioned across all nodes in this pool. Example: '1000'.
 	Cpu *string `pulumi:"cpu"`
-	// Maximum total memory that may be provisioned (e.g. '1000Gi').
+	// Maximum total memory that may be provisioned across all nodes. Example: '1000Gi'.
 	Memory *string `pulumi:"memory"`
 }
 
@@ -3356,9 +3356,9 @@ type ResourceLimitsArgsInput interface {
 }
 
 type ResourceLimitsArgsArgs struct {
-	// Maximum total CPU that may be provisioned (e.g. '1000' for 1000 vCPUs).
+	// Maximum total vCPUs that may be provisioned across all nodes in this pool. Example: '1000'.
 	Cpu pulumi.StringPtrInput `pulumi:"cpu"`
-	// Maximum total memory that may be provisioned (e.g. '1000Gi').
+	// Maximum total memory that may be provisioned across all nodes. Example: '1000Gi'.
 	Memory pulumi.StringPtrInput `pulumi:"memory"`
 }
 
@@ -3439,12 +3439,12 @@ func (o ResourceLimitsArgsOutput) ToResourceLimitsArgsPtrOutputWithContext(ctx c
 	}).(ResourceLimitsArgsPtrOutput)
 }
 
-// Maximum total CPU that may be provisioned (e.g. '1000' for 1000 vCPUs).
+// Maximum total vCPUs that may be provisioned across all nodes in this pool. Example: '1000'.
 func (o ResourceLimitsArgsOutput) Cpu() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v ResourceLimitsArgs) *string { return v.Cpu }).(pulumi.StringPtrOutput)
 }
 
-// Maximum total memory that may be provisioned (e.g. '1000Gi').
+// Maximum total memory that may be provisioned across all nodes. Example: '1000Gi'.
 func (o ResourceLimitsArgsOutput) Memory() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v ResourceLimitsArgs) *string { return v.Memory }).(pulumi.StringPtrOutput)
 }
@@ -3473,7 +3473,7 @@ func (o ResourceLimitsArgsPtrOutput) Elem() ResourceLimitsArgsOutput {
 	}).(ResourceLimitsArgsOutput)
 }
 
-// Maximum total CPU that may be provisioned (e.g. '1000' for 1000 vCPUs).
+// Maximum total vCPUs that may be provisioned across all nodes in this pool. Example: '1000'.
 func (o ResourceLimitsArgsPtrOutput) Cpu() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *ResourceLimitsArgs) *string {
 		if v == nil {
@@ -3483,7 +3483,7 @@ func (o ResourceLimitsArgsPtrOutput) Cpu() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-// Maximum total memory that may be provisioned (e.g. '1000Gi').
+// Maximum total memory that may be provisioned across all nodes. Example: '1000Gi'.
 func (o ResourceLimitsArgsPtrOutput) Memory() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *ResourceLimitsArgs) *string {
 		if v == nil {
@@ -3494,11 +3494,11 @@ func (o ResourceLimitsArgsPtrOutput) Memory() pulumi.StringPtrOutput {
 }
 
 type SecurityGroupSelectorTermArgs struct {
-	// Explicit AWS security group ID.
+	// Explicit AWS security group ID. Example: 'sg-0a1b2c3d4e5f'.
 	Id *string `pulumi:"id"`
-	// Security group name filter.
+	// Security group name filter (exact match). Example: 'my-cluster-node-sg'.
 	Name *string `pulumi:"name"`
-	// Map of AWS tags used to select security groups.
+	// Map of AWS tags used to select security groups. Example: {"karpenter.sh/discovery": "my-cluster"}.
 	Tags map[string]string `pulumi:"tags"`
 }
 
@@ -3514,11 +3514,11 @@ type SecurityGroupSelectorTermArgsInput interface {
 }
 
 type SecurityGroupSelectorTermArgsArgs struct {
-	// Explicit AWS security group ID.
+	// Explicit AWS security group ID. Example: 'sg-0a1b2c3d4e5f'.
 	Id pulumi.StringPtrInput `pulumi:"id"`
-	// Security group name filter.
+	// Security group name filter (exact match). Example: 'my-cluster-node-sg'.
 	Name pulumi.StringPtrInput `pulumi:"name"`
-	// Map of AWS tags used to select security groups.
+	// Map of AWS tags used to select security groups. Example: {"karpenter.sh/discovery": "my-cluster"}.
 	Tags pulumi.StringMapInput `pulumi:"tags"`
 }
 
@@ -3573,17 +3573,17 @@ func (o SecurityGroupSelectorTermArgsOutput) ToSecurityGroupSelectorTermArgsOutp
 	return o
 }
 
-// Explicit AWS security group ID.
+// Explicit AWS security group ID. Example: 'sg-0a1b2c3d4e5f'.
 func (o SecurityGroupSelectorTermArgsOutput) Id() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v SecurityGroupSelectorTermArgs) *string { return v.Id }).(pulumi.StringPtrOutput)
 }
 
-// Security group name filter.
+// Security group name filter (exact match). Example: 'my-cluster-node-sg'.
 func (o SecurityGroupSelectorTermArgsOutput) Name() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v SecurityGroupSelectorTermArgs) *string { return v.Name }).(pulumi.StringPtrOutput)
 }
 
-// Map of AWS tags used to select security groups.
+// Map of AWS tags used to select security groups. Example: {"karpenter.sh/discovery": "my-cluster"}.
 func (o SecurityGroupSelectorTermArgsOutput) Tags() pulumi.StringMapOutput {
 	return o.ApplyT(func(v SecurityGroupSelectorTermArgs) map[string]string { return v.Tags }).(pulumi.StringMapOutput)
 }
@@ -3609,9 +3609,9 @@ func (o SecurityGroupSelectorTermArgsArrayOutput) Index(i pulumi.IntInput) Secur
 }
 
 type SubnetSelectorTermArgs struct {
-	// Explicit AWS subnet ID.
+	// Explicit AWS subnet ID (use instead of tags for a fixed subnet). Example: 'subnet-0a1b2c3d4e5f'.
 	Id *string `pulumi:"id"`
-	// Map of AWS tags used to select subnets.
+	// Map of AWS tags used to select subnets. Example: {"karpenter.sh/discovery": "my-cluster"}.
 	Tags map[string]string `pulumi:"tags"`
 }
 
@@ -3627,9 +3627,9 @@ type SubnetSelectorTermArgsInput interface {
 }
 
 type SubnetSelectorTermArgsArgs struct {
-	// Explicit AWS subnet ID.
+	// Explicit AWS subnet ID (use instead of tags for a fixed subnet). Example: 'subnet-0a1b2c3d4e5f'.
 	Id pulumi.StringPtrInput `pulumi:"id"`
-	// Map of AWS tags used to select subnets.
+	// Map of AWS tags used to select subnets. Example: {"karpenter.sh/discovery": "my-cluster"}.
 	Tags pulumi.StringMapInput `pulumi:"tags"`
 }
 
@@ -3684,12 +3684,12 @@ func (o SubnetSelectorTermArgsOutput) ToSubnetSelectorTermArgsOutputWithContext(
 	return o
 }
 
-// Explicit AWS subnet ID.
+// Explicit AWS subnet ID (use instead of tags for a fixed subnet). Example: 'subnet-0a1b2c3d4e5f'.
 func (o SubnetSelectorTermArgsOutput) Id() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v SubnetSelectorTermArgs) *string { return v.Id }).(pulumi.StringPtrOutput)
 }
 
-// Map of AWS tags used to select subnets.
+// Map of AWS tags used to select subnets. Example: {"karpenter.sh/discovery": "my-cluster"}.
 func (o SubnetSelectorTermArgsOutput) Tags() pulumi.StringMapOutput {
 	return o.ApplyT(func(v SubnetSelectorTermArgs) map[string]string { return v.Tags }).(pulumi.StringMapOutput)
 }
@@ -3715,11 +3715,11 @@ func (o SubnetSelectorTermArgsArrayOutput) Index(i pulumi.IntInput) SubnetSelect
 }
 
 type TaintArgs struct {
-	// Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'.
+	// Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'. Example: 'NoSchedule'.
 	Effect string `pulumi:"effect"`
-	// Taint key to apply to provisioned nodes.
+	// Taint key to apply to provisioned nodes. Example: 'dedicated'.
 	Key string `pulumi:"key"`
-	// Taint value associated with the key.
+	// Taint value associated with the key. Example: 'gpu'.
 	Value *string `pulumi:"value"`
 }
 
@@ -3735,11 +3735,11 @@ type TaintArgsInput interface {
 }
 
 type TaintArgsArgs struct {
-	// Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'.
+	// Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'. Example: 'NoSchedule'.
 	Effect pulumi.StringInput `pulumi:"effect"`
-	// Taint key to apply to provisioned nodes.
+	// Taint key to apply to provisioned nodes. Example: 'dedicated'.
 	Key pulumi.StringInput `pulumi:"key"`
-	// Taint value associated with the key.
+	// Taint value associated with the key. Example: 'gpu'.
 	Value pulumi.StringPtrInput `pulumi:"value"`
 }
 
@@ -3794,17 +3794,17 @@ func (o TaintArgsOutput) ToTaintArgsOutputWithContext(ctx context.Context) Taint
 	return o
 }
 
-// Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'.
+// Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'. Example: 'NoSchedule'.
 func (o TaintArgsOutput) Effect() pulumi.StringOutput {
 	return o.ApplyT(func(v TaintArgs) string { return v.Effect }).(pulumi.StringOutput)
 }
 
-// Taint key to apply to provisioned nodes.
+// Taint key to apply to provisioned nodes. Example: 'dedicated'.
 func (o TaintArgsOutput) Key() pulumi.StringOutput {
 	return o.ApplyT(func(v TaintArgs) string { return v.Key }).(pulumi.StringOutput)
 }
 
-// Taint value associated with the key.
+// Taint value associated with the key. Example: 'gpu'.
 func (o TaintArgsOutput) Value() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v TaintArgs) *string { return v.Value }).(pulumi.StringPtrOutput)
 }
@@ -3830,29 +3830,29 @@ func (o TaintArgsArrayOutput) Index(i pulumi.IntInput) TaintArgsOutput {
 }
 
 type VerticalScalingArgs struct {
-	// Recommend requests even when the workload has no existing requests set. Server/web default: true.
+	// Recommend requests even when the workload has no existing requests set. Default: false.
 	AdjustReqEvenIfNotSet *bool `pulumi:"adjustReqEvenIfNotSet"`
-	// Enable vertical scaling for this resource type.
+	// Enable vertical scaling for this resource type. Example: true
 	Enabled *bool `pulumi:"enabled"`
-	// Multiplier applied to the request to derive the resource limit.
+	// Multiplier applied to the request to derive the resource limit. Example: 1.5 sets limit to 150% of request.
 	LimitMultiplier *float64 `pulumi:"limitMultiplier"`
-	// Whether to also adjust resource limits alongside requests.
+	// Whether to also adjust resource limits alongside requests. Example: true.
 	LimitsAdjustmentEnabled *bool `pulumi:"limitsAdjustmentEnabled"`
-	// Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Web default: true for CPU, false for Memory.
+	// Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over limitsAdjustmentEnabled when set. Default: false.
 	LimitsRemovalEnabled *bool `pulumi:"limitsRemovalEnabled"`
-	// Maximum resource request in millicores (CPU) or bytes (memory/GPU).
+	// Maximum resource request in millicores (CPU) or bytes (memory/GPU). Example: 4000 (= 4 CPU cores), 1073741824 (= 1Gi memory).
 	MaxRequest *int `pulumi:"maxRequest"`
-	// Maximum percentage decrease allowed in a single recommendation cycle.
+	// Maximum percentage decrease allowed in a single recommendation cycle. Example: 20.0 allows up to 20% decrease. Default: 1.0.
 	MaxScaleDownPercent *float64 `pulumi:"maxScaleDownPercent"`
-	// Maximum percentage increase allowed in a single recommendation cycle.
+	// Maximum percentage increase allowed in a single recommendation cycle. Example: 50.0 allows up to 50% increase. Default: 1000.0.
 	MaxScaleUpPercent *float64 `pulumi:"maxScaleUpPercent"`
-	// Minimum number of data points required before a recommendation is emitted.
+	// Minimum number of data points required before a recommendation is emitted. Example: 20 (default).
 	MinDataPoints *int `pulumi:"minDataPoints"`
-	// Minimum resource request in millicores (CPU) or bytes (memory/GPU).
+	// Minimum resource request in millicores (CPU) or bytes (memory/GPU). Example: 100 (= 100m CPU), 134217728 (= 128Mi memory).
 	MinRequest *int `pulumi:"minRequest"`
-	// Multiplier applied on top of the recommendation to add headroom.
+	// Multiplier applied on top of the recommendation to add headroom. Example: 1.15 adds 15% overhead.
 	OverheadMultiplier *float64 `pulumi:"overheadMultiplier"`
-	// Percentile of usage data used as the recommendation target (e.g. 0.95).
+	// Percentile of usage data used as the recommendation target (0-1). Example: 0.95 targets the 95th percentile.
 	TargetPercentile *float64 `pulumi:"targetPercentile"`
 }
 
@@ -3889,29 +3889,29 @@ type VerticalScalingArgsInput interface {
 }
 
 type VerticalScalingArgsArgs struct {
-	// Recommend requests even when the workload has no existing requests set. Server/web default: true.
+	// Recommend requests even when the workload has no existing requests set. Default: false.
 	AdjustReqEvenIfNotSet pulumi.BoolPtrInput `pulumi:"adjustReqEvenIfNotSet"`
-	// Enable vertical scaling for this resource type.
+	// Enable vertical scaling for this resource type. Example: true
 	Enabled pulumi.BoolPtrInput `pulumi:"enabled"`
-	// Multiplier applied to the request to derive the resource limit.
+	// Multiplier applied to the request to derive the resource limit. Example: 1.5 sets limit to 150% of request.
 	LimitMultiplier pulumi.Float64PtrInput `pulumi:"limitMultiplier"`
-	// Whether to also adjust resource limits alongside requests.
+	// Whether to also adjust resource limits alongside requests. Example: true.
 	LimitsAdjustmentEnabled pulumi.BoolPtrInput `pulumi:"limitsAdjustmentEnabled"`
-	// Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Web default: true for CPU, false for Memory.
+	// Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over limitsAdjustmentEnabled when set. Default: false.
 	LimitsRemovalEnabled pulumi.BoolPtrInput `pulumi:"limitsRemovalEnabled"`
-	// Maximum resource request in millicores (CPU) or bytes (memory/GPU).
+	// Maximum resource request in millicores (CPU) or bytes (memory/GPU). Example: 4000 (= 4 CPU cores), 1073741824 (= 1Gi memory).
 	MaxRequest pulumi.IntPtrInput `pulumi:"maxRequest"`
-	// Maximum percentage decrease allowed in a single recommendation cycle.
+	// Maximum percentage decrease allowed in a single recommendation cycle. Example: 20.0 allows up to 20% decrease. Default: 1.0.
 	MaxScaleDownPercent pulumi.Float64PtrInput `pulumi:"maxScaleDownPercent"`
-	// Maximum percentage increase allowed in a single recommendation cycle.
+	// Maximum percentage increase allowed in a single recommendation cycle. Example: 50.0 allows up to 50% increase. Default: 1000.0.
 	MaxScaleUpPercent pulumi.Float64PtrInput `pulumi:"maxScaleUpPercent"`
-	// Minimum number of data points required before a recommendation is emitted.
+	// Minimum number of data points required before a recommendation is emitted. Example: 20 (default).
 	MinDataPoints pulumi.IntPtrInput `pulumi:"minDataPoints"`
-	// Minimum resource request in millicores (CPU) or bytes (memory/GPU).
+	// Minimum resource request in millicores (CPU) or bytes (memory/GPU). Example: 100 (= 100m CPU), 134217728 (= 128Mi memory).
 	MinRequest pulumi.IntPtrInput `pulumi:"minRequest"`
-	// Multiplier applied on top of the recommendation to add headroom.
+	// Multiplier applied on top of the recommendation to add headroom. Example: 1.15 adds 15% overhead.
 	OverheadMultiplier pulumi.Float64PtrInput `pulumi:"overheadMultiplier"`
-	// Percentile of usage data used as the recommendation target (e.g. 0.95).
+	// Percentile of usage data used as the recommendation target (0-1). Example: 0.95 targets the 95th percentile.
 	TargetPercentile pulumi.Float64PtrInput `pulumi:"targetPercentile"`
 }
 
@@ -4009,62 +4009,62 @@ func (o VerticalScalingArgsOutput) ToVerticalScalingArgsPtrOutputWithContext(ctx
 	}).(VerticalScalingArgsPtrOutput)
 }
 
-// Recommend requests even when the workload has no existing requests set. Server/web default: true.
+// Recommend requests even when the workload has no existing requests set. Default: false.
 func (o VerticalScalingArgsOutput) AdjustReqEvenIfNotSet() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *bool { return v.AdjustReqEvenIfNotSet }).(pulumi.BoolPtrOutput)
 }
 
-// Enable vertical scaling for this resource type.
+// Enable vertical scaling for this resource type. Example: true
 func (o VerticalScalingArgsOutput) Enabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *bool { return v.Enabled }).(pulumi.BoolPtrOutput)
 }
 
-// Multiplier applied to the request to derive the resource limit.
+// Multiplier applied to the request to derive the resource limit. Example: 1.5 sets limit to 150% of request.
 func (o VerticalScalingArgsOutput) LimitMultiplier() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *float64 { return v.LimitMultiplier }).(pulumi.Float64PtrOutput)
 }
 
-// Whether to also adjust resource limits alongside requests.
+// Whether to also adjust resource limits alongside requests. Example: true.
 func (o VerticalScalingArgsOutput) LimitsAdjustmentEnabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *bool { return v.LimitsAdjustmentEnabled }).(pulumi.BoolPtrOutput)
 }
 
-// Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Web default: true for CPU, false for Memory.
+// Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over limitsAdjustmentEnabled when set. Default: false.
 func (o VerticalScalingArgsOutput) LimitsRemovalEnabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *bool { return v.LimitsRemovalEnabled }).(pulumi.BoolPtrOutput)
 }
 
-// Maximum resource request in millicores (CPU) or bytes (memory/GPU).
+// Maximum resource request in millicores (CPU) or bytes (memory/GPU). Example: 4000 (= 4 CPU cores), 1073741824 (= 1Gi memory).
 func (o VerticalScalingArgsOutput) MaxRequest() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *int { return v.MaxRequest }).(pulumi.IntPtrOutput)
 }
 
-// Maximum percentage decrease allowed in a single recommendation cycle.
+// Maximum percentage decrease allowed in a single recommendation cycle. Example: 20.0 allows up to 20% decrease. Default: 1.0.
 func (o VerticalScalingArgsOutput) MaxScaleDownPercent() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *float64 { return v.MaxScaleDownPercent }).(pulumi.Float64PtrOutput)
 }
 
-// Maximum percentage increase allowed in a single recommendation cycle.
+// Maximum percentage increase allowed in a single recommendation cycle. Example: 50.0 allows up to 50% increase. Default: 1000.0.
 func (o VerticalScalingArgsOutput) MaxScaleUpPercent() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *float64 { return v.MaxScaleUpPercent }).(pulumi.Float64PtrOutput)
 }
 
-// Minimum number of data points required before a recommendation is emitted.
+// Minimum number of data points required before a recommendation is emitted. Example: 20 (default).
 func (o VerticalScalingArgsOutput) MinDataPoints() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *int { return v.MinDataPoints }).(pulumi.IntPtrOutput)
 }
 
-// Minimum resource request in millicores (CPU) or bytes (memory/GPU).
+// Minimum resource request in millicores (CPU) or bytes (memory/GPU). Example: 100 (= 100m CPU), 134217728 (= 128Mi memory).
 func (o VerticalScalingArgsOutput) MinRequest() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *int { return v.MinRequest }).(pulumi.IntPtrOutput)
 }
 
-// Multiplier applied on top of the recommendation to add headroom.
+// Multiplier applied on top of the recommendation to add headroom. Example: 1.15 adds 15% overhead.
 func (o VerticalScalingArgsOutput) OverheadMultiplier() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *float64 { return v.OverheadMultiplier }).(pulumi.Float64PtrOutput)
 }
 
-// Percentile of usage data used as the recommendation target (e.g. 0.95).
+// Percentile of usage data used as the recommendation target (0-1). Example: 0.95 targets the 95th percentile.
 func (o VerticalScalingArgsOutput) TargetPercentile() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *float64 { return v.TargetPercentile }).(pulumi.Float64PtrOutput)
 }
@@ -4093,7 +4093,7 @@ func (o VerticalScalingArgsPtrOutput) Elem() VerticalScalingArgsOutput {
 	}).(VerticalScalingArgsOutput)
 }
 
-// Recommend requests even when the workload has no existing requests set. Server/web default: true.
+// Recommend requests even when the workload has no existing requests set. Default: false.
 func (o VerticalScalingArgsPtrOutput) AdjustReqEvenIfNotSet() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *VerticalScalingArgs) *bool {
 		if v == nil {
@@ -4103,7 +4103,7 @@ func (o VerticalScalingArgsPtrOutput) AdjustReqEvenIfNotSet() pulumi.BoolPtrOutp
 	}).(pulumi.BoolPtrOutput)
 }
 
-// Enable vertical scaling for this resource type.
+// Enable vertical scaling for this resource type. Example: true
 func (o VerticalScalingArgsPtrOutput) Enabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *VerticalScalingArgs) *bool {
 		if v == nil {
@@ -4113,7 +4113,7 @@ func (o VerticalScalingArgsPtrOutput) Enabled() pulumi.BoolPtrOutput {
 	}).(pulumi.BoolPtrOutput)
 }
 
-// Multiplier applied to the request to derive the resource limit.
+// Multiplier applied to the request to derive the resource limit. Example: 1.5 sets limit to 150% of request.
 func (o VerticalScalingArgsPtrOutput) LimitMultiplier() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v *VerticalScalingArgs) *float64 {
 		if v == nil {
@@ -4123,7 +4123,7 @@ func (o VerticalScalingArgsPtrOutput) LimitMultiplier() pulumi.Float64PtrOutput 
 	}).(pulumi.Float64PtrOutput)
 }
 
-// Whether to also adjust resource limits alongside requests.
+// Whether to also adjust resource limits alongside requests. Example: true.
 func (o VerticalScalingArgsPtrOutput) LimitsAdjustmentEnabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *VerticalScalingArgs) *bool {
 		if v == nil {
@@ -4133,7 +4133,7 @@ func (o VerticalScalingArgsPtrOutput) LimitsAdjustmentEnabled() pulumi.BoolPtrOu
 	}).(pulumi.BoolPtrOutput)
 }
 
-// Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Web default: true for CPU, false for Memory.
+// Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over limitsAdjustmentEnabled when set. Default: false.
 func (o VerticalScalingArgsPtrOutput) LimitsRemovalEnabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *VerticalScalingArgs) *bool {
 		if v == nil {
@@ -4143,7 +4143,7 @@ func (o VerticalScalingArgsPtrOutput) LimitsRemovalEnabled() pulumi.BoolPtrOutpu
 	}).(pulumi.BoolPtrOutput)
 }
 
-// Maximum resource request in millicores (CPU) or bytes (memory/GPU).
+// Maximum resource request in millicores (CPU) or bytes (memory/GPU). Example: 4000 (= 4 CPU cores), 1073741824 (= 1Gi memory).
 func (o VerticalScalingArgsPtrOutput) MaxRequest() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *VerticalScalingArgs) *int {
 		if v == nil {
@@ -4153,7 +4153,7 @@ func (o VerticalScalingArgsPtrOutput) MaxRequest() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
-// Maximum percentage decrease allowed in a single recommendation cycle.
+// Maximum percentage decrease allowed in a single recommendation cycle. Example: 20.0 allows up to 20% decrease. Default: 1.0.
 func (o VerticalScalingArgsPtrOutput) MaxScaleDownPercent() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v *VerticalScalingArgs) *float64 {
 		if v == nil {
@@ -4163,7 +4163,7 @@ func (o VerticalScalingArgsPtrOutput) MaxScaleDownPercent() pulumi.Float64PtrOut
 	}).(pulumi.Float64PtrOutput)
 }
 
-// Maximum percentage increase allowed in a single recommendation cycle.
+// Maximum percentage increase allowed in a single recommendation cycle. Example: 50.0 allows up to 50% increase. Default: 1000.0.
 func (o VerticalScalingArgsPtrOutput) MaxScaleUpPercent() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v *VerticalScalingArgs) *float64 {
 		if v == nil {
@@ -4173,7 +4173,7 @@ func (o VerticalScalingArgsPtrOutput) MaxScaleUpPercent() pulumi.Float64PtrOutpu
 	}).(pulumi.Float64PtrOutput)
 }
 
-// Minimum number of data points required before a recommendation is emitted.
+// Minimum number of data points required before a recommendation is emitted. Example: 20 (default).
 func (o VerticalScalingArgsPtrOutput) MinDataPoints() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *VerticalScalingArgs) *int {
 		if v == nil {
@@ -4183,7 +4183,7 @@ func (o VerticalScalingArgsPtrOutput) MinDataPoints() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
-// Minimum resource request in millicores (CPU) or bytes (memory/GPU).
+// Minimum resource request in millicores (CPU) or bytes (memory/GPU). Example: 100 (= 100m CPU), 134217728 (= 128Mi memory).
 func (o VerticalScalingArgsPtrOutput) MinRequest() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *VerticalScalingArgs) *int {
 		if v == nil {
@@ -4193,7 +4193,7 @@ func (o VerticalScalingArgsPtrOutput) MinRequest() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
-// Multiplier applied on top of the recommendation to add headroom.
+// Multiplier applied on top of the recommendation to add headroom. Example: 1.15 adds 15% overhead.
 func (o VerticalScalingArgsPtrOutput) OverheadMultiplier() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v *VerticalScalingArgs) *float64 {
 		if v == nil {
@@ -4203,7 +4203,7 @@ func (o VerticalScalingArgsPtrOutput) OverheadMultiplier() pulumi.Float64PtrOutp
 	}).(pulumi.Float64PtrOutput)
 }
 
-// Percentile of usage data used as the recommendation target (e.g. 0.95).
+// Percentile of usage data used as the recommendation target (0-1). Example: 0.95 targets the 95th percentile.
 func (o VerticalScalingArgsPtrOutput) TargetPercentile() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v *VerticalScalingArgs) *float64 {
 		if v == nil {

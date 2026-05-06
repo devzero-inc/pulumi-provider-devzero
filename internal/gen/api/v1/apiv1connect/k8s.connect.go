@@ -109,9 +109,6 @@ const (
 	// K8SServiceGetLatestOperatorVersionProcedure is the fully-qualified name of the K8SService's
 	// GetLatestOperatorVersion RPC.
 	K8SServiceGetLatestOperatorVersionProcedure = "/api.v1.K8SService/GetLatestOperatorVersion"
-	// K8SServiceGalaxyGetClusterPerspectiveProcedure is the fully-qualified name of the K8SService's
-	// GalaxyGetClusterPerspective RPC.
-	K8SServiceGalaxyGetClusterPerspectiveProcedure = "/api.v1.K8SService/GalaxyGetClusterPerspective"
 	// K8SServiceGalaxyGetWorkloadPerspectiveProcedure is the fully-qualified name of the K8SService's
 	// GalaxyGetWorkloadPerspective RPC.
 	K8SServiceGalaxyGetWorkloadPerspectiveProcedure = "/api.v1.K8SService/GalaxyGetWorkloadPerspective"
@@ -243,7 +240,6 @@ type K8SServiceClient interface {
 	// GetPods retrieves Pod resources and their details from db.
 	GetPods(context.Context, *connect.Request[v1.GetPodsRequest]) (*connect.Response[v1.GetPodsResponse], error)
 	GetLatestOperatorVersion(context.Context, *connect.Request[v1.GetLatestOperatorVersionRequest]) (*connect.Response[v1.GetLatestOperatorVersionResponse], error)
-	GalaxyGetClusterPerspective(context.Context, *connect.Request[v1.GalaxyGetClusterPerspectiveRequest]) (*connect.Response[v1.GalaxyGetClusterPerspectiveResponse], error)
 	GalaxyGetWorkloadPerspective(context.Context, *connect.Request[v1.GalaxyGetWorkloadPerspectiveRequest]) (*connect.Response[v1.GalaxyGetWorkloadPerspectiveResponse], error)
 	ListAuditLogs(context.Context, *connect.Request[v1.ListAuditLogsRequest]) (*connect.Response[v1.ListAuditLogsResponse], error)
 	ListAuditLogOriginators(context.Context, *connect.Request[v1.ListAuditLogOriginatorsRequest]) (*connect.Response[v1.ListAuditLogOriginatorsResponse], error)
@@ -415,11 +411,6 @@ func NewK8SServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			baseURL+K8SServiceGetLatestOperatorVersionProcedure,
 			opts...,
 		),
-		galaxyGetClusterPerspective: connect.NewClient[v1.GalaxyGetClusterPerspectiveRequest, v1.GalaxyGetClusterPerspectiveResponse](
-			httpClient,
-			baseURL+K8SServiceGalaxyGetClusterPerspectiveProcedure,
-			opts...,
-		),
 		galaxyGetWorkloadPerspective: connect.NewClient[v1.GalaxyGetWorkloadPerspectiveRequest, v1.GalaxyGetWorkloadPerspectiveResponse](
 			httpClient,
 			baseURL+K8SServiceGalaxyGetWorkloadPerspectiveProcedure,
@@ -527,7 +518,6 @@ type k8SServiceClient struct {
 	getResources                    *connect.Client[v1.GetResourcesRequest, v1.GetResourcesResponse]
 	getPods                         *connect.Client[v1.GetPodsRequest, v1.GetPodsResponse]
 	getLatestOperatorVersion        *connect.Client[v1.GetLatestOperatorVersionRequest, v1.GetLatestOperatorVersionResponse]
-	galaxyGetClusterPerspective     *connect.Client[v1.GalaxyGetClusterPerspectiveRequest, v1.GalaxyGetClusterPerspectiveResponse]
 	galaxyGetWorkloadPerspective    *connect.Client[v1.GalaxyGetWorkloadPerspectiveRequest, v1.GalaxyGetWorkloadPerspectiveResponse]
 	listAuditLogs                   *connect.Client[v1.ListAuditLogsRequest, v1.ListAuditLogsResponse]
 	listAuditLogOriginators         *connect.Client[v1.ListAuditLogOriginatorsRequest, v1.ListAuditLogOriginatorsResponse]
@@ -686,11 +676,6 @@ func (c *k8SServiceClient) GetLatestOperatorVersion(ctx context.Context, req *co
 	return c.getLatestOperatorVersion.CallUnary(ctx, req)
 }
 
-// GalaxyGetClusterPerspective calls api.v1.K8SService.GalaxyGetClusterPerspective.
-func (c *k8SServiceClient) GalaxyGetClusterPerspective(ctx context.Context, req *connect.Request[v1.GalaxyGetClusterPerspectiveRequest]) (*connect.Response[v1.GalaxyGetClusterPerspectiveResponse], error) {
-	return c.galaxyGetClusterPerspective.CallUnary(ctx, req)
-}
-
 // GalaxyGetWorkloadPerspective calls api.v1.K8SService.GalaxyGetWorkloadPerspective.
 func (c *k8SServiceClient) GalaxyGetWorkloadPerspective(ctx context.Context, req *connect.Request[v1.GalaxyGetWorkloadPerspectiveRequest]) (*connect.Response[v1.GalaxyGetWorkloadPerspectiveResponse], error) {
 	return c.galaxyGetWorkloadPerspective.CallUnary(ctx, req)
@@ -830,7 +815,6 @@ type K8SServiceHandler interface {
 	// GetPods retrieves Pod resources and their details from db.
 	GetPods(context.Context, *connect.Request[v1.GetPodsRequest]) (*connect.Response[v1.GetPodsResponse], error)
 	GetLatestOperatorVersion(context.Context, *connect.Request[v1.GetLatestOperatorVersionRequest]) (*connect.Response[v1.GetLatestOperatorVersionResponse], error)
-	GalaxyGetClusterPerspective(context.Context, *connect.Request[v1.GalaxyGetClusterPerspectiveRequest]) (*connect.Response[v1.GalaxyGetClusterPerspectiveResponse], error)
 	GalaxyGetWorkloadPerspective(context.Context, *connect.Request[v1.GalaxyGetWorkloadPerspectiveRequest]) (*connect.Response[v1.GalaxyGetWorkloadPerspectiveResponse], error)
 	ListAuditLogs(context.Context, *connect.Request[v1.ListAuditLogsRequest]) (*connect.Response[v1.ListAuditLogsResponse], error)
 	ListAuditLogOriginators(context.Context, *connect.Request[v1.ListAuditLogOriginatorsRequest]) (*connect.Response[v1.ListAuditLogOriginatorsResponse], error)
@@ -998,11 +982,6 @@ func NewK8SServiceHandler(svc K8SServiceHandler, opts ...connect.HandlerOption) 
 		svc.GetLatestOperatorVersion,
 		opts...,
 	)
-	k8SServiceGalaxyGetClusterPerspectiveHandler := connect.NewUnaryHandler(
-		K8SServiceGalaxyGetClusterPerspectiveProcedure,
-		svc.GalaxyGetClusterPerspective,
-		opts...,
-	)
 	k8SServiceGalaxyGetWorkloadPerspectiveHandler := connect.NewUnaryHandler(
 		K8SServiceGalaxyGetWorkloadPerspectiveProcedure,
 		svc.GalaxyGetWorkloadPerspective,
@@ -1134,8 +1113,6 @@ func NewK8SServiceHandler(svc K8SServiceHandler, opts ...connect.HandlerOption) 
 			k8SServiceGetPodsHandler.ServeHTTP(w, r)
 		case K8SServiceGetLatestOperatorVersionProcedure:
 			k8SServiceGetLatestOperatorVersionHandler.ServeHTTP(w, r)
-		case K8SServiceGalaxyGetClusterPerspectiveProcedure:
-			k8SServiceGalaxyGetClusterPerspectiveHandler.ServeHTTP(w, r)
 		case K8SServiceGalaxyGetWorkloadPerspectiveProcedure:
 			k8SServiceGalaxyGetWorkloadPerspectiveHandler.ServeHTTP(w, r)
 		case K8SServiceListAuditLogsProcedure:
@@ -1281,10 +1258,6 @@ func (UnimplementedK8SServiceHandler) GetPods(context.Context, *connect.Request[
 
 func (UnimplementedK8SServiceHandler) GetLatestOperatorVersion(context.Context, *connect.Request[v1.GetLatestOperatorVersionRequest]) (*connect.Response[v1.GetLatestOperatorVersionResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8SService.GetLatestOperatorVersion is not implemented"))
-}
-
-func (UnimplementedK8SServiceHandler) GalaxyGetClusterPerspective(context.Context, *connect.Request[v1.GalaxyGetClusterPerspectiveRequest]) (*connect.Response[v1.GalaxyGetClusterPerspectiveResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8SService.GalaxyGetClusterPerspective is not implemented"))
 }
 
 func (UnimplementedK8SServiceHandler) GalaxyGetWorkloadPerspective(context.Context, *connect.Request[v1.GalaxyGetWorkloadPerspectiveRequest]) (*connect.Response[v1.GalaxyGetWorkloadPerspectiveResponse], error) {

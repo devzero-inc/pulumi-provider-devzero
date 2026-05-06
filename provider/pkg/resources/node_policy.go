@@ -20,9 +20,9 @@ type TaintArgs struct {
 
 // Annotate provides SDK documentation for TaintArgs fields.
 func (t *TaintArgs) Annotate(a infer.Annotator) {
-	a.Describe(&t.Key, "Taint key to apply to provisioned nodes.")
-	a.Describe(&t.Value, "Taint value associated with the key.")
-	a.Describe(&t.Effect, "Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'.")
+	a.Describe(&t.Key, "Taint key to apply to provisioned nodes. Example: 'dedicated'.")
+	a.Describe(&t.Value, "Taint value associated with the key. Example: 'gpu'.")
+	a.Describe(&t.Effect, "Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'. Example: 'NoSchedule'.")
 }
 
 // DisruptionBudgetArgs represents a single disruption budget entry.
@@ -35,10 +35,10 @@ type DisruptionBudgetArgs struct {
 
 // Annotate provides SDK documentation for DisruptionBudgetArgs fields.
 func (d *DisruptionBudgetArgs) Annotate(a infer.Annotator) {
-	a.Describe(&d.Reasons, "Disruption reasons this budget applies to (e.g. 'Underutilized', 'Empty', 'Drifted').")
-	a.Describe(&d.Nodes, "Maximum nodes that may be disrupted, as an absolute count or percentage (e.g. '10%').")
-	a.Describe(&d.Schedule, "Cron schedule during which this budget is active (5-field format).")
-	a.Describe(&d.Duration, "Duration the budget window stays active (e.g. '1h', '30m').")
+	a.Describe(&d.Reasons, "Disruption reasons this budget applies to. Valid values: 'Underutilized', 'Empty', 'Drifted'. Example: [\"Underutilized\", \"Empty\"].")
+	a.Describe(&d.Nodes, "Maximum nodes that may be disrupted simultaneously, as an absolute count or percentage. Example: '10%' or '5'.")
+	a.Describe(&d.Schedule, "Cron schedule (5-field UTC) during which this budget is active. Example: '0 9 * * mon-fri' (weekday business hours).")
+	a.Describe(&d.Duration, "How long the budget window stays active after the cron fires. Example: '8h'.")
 }
 
 // DisruptionPolicyArgs configures how Karpenter disrupts nodes.
@@ -53,12 +53,12 @@ type DisruptionPolicyArgs struct {
 
 // Annotate provides SDK documentation for DisruptionPolicyArgs fields.
 func (d *DisruptionPolicyArgs) Annotate(a infer.Annotator) {
-	a.Describe(&d.ConsolidateAfter, "Duration to wait after a node becomes empty before consolidating (e.g. '30s').")
-	a.Describe(&d.ConsolidationPolicy, "When to consolidate nodes. One of: 'WhenEmpty', 'WhenUnderutilized'.")
-	a.Describe(&d.ExpireAfter, "Duration after which provisioned nodes are replaced regardless of load (e.g. '720h').")
-	a.Describe(&d.TtlSecondsAfterEmpty, "Seconds before an empty node is terminated (deprecated; prefer ConsolidateAfter).")
-	a.Describe(&d.TerminationGracePeriodSeconds, "Grace period in seconds before forcefully terminating a draining node.")
-	a.Describe(&d.Budgets, "Disruption budgets limiting how many nodes can be disrupted at once.")
+	a.Describe(&d.ConsolidateAfter, "Duration to wait after a node becomes empty before consolidating. Example: '30s'.")
+	a.Describe(&d.ConsolidationPolicy, "When to consolidate nodes. One of: 'WhenEmpty', 'WhenEmptyOrUnderutilized'. Example: 'WhenEmptyOrUnderutilized'.")
+	a.Describe(&d.ExpireAfter, "Duration after which provisioned nodes are replaced regardless of load. Example: '720h' (30 days).")
+	a.Describe(&d.TtlSecondsAfterEmpty, "Seconds before an empty node is terminated (deprecated; prefer consolidateAfter). Example: 30.")
+	a.Describe(&d.TerminationGracePeriodSeconds, "Grace period in seconds before forcefully terminating a draining node. Example: 600.")
+	a.Describe(&d.Budgets, "Disruption budgets controlling how many nodes can be disrupted simultaneously. Example: [{reasons: [\"Underutilized\"], nodes: \"10%\"}].")
 }
 
 // ResourceLimitsArgs sets resource limits on the node pool.
@@ -69,8 +69,8 @@ type ResourceLimitsArgs struct {
 
 // Annotate provides SDK documentation for ResourceLimitsArgs fields.
 func (r *ResourceLimitsArgs) Annotate(a infer.Annotator) {
-	a.Describe(&r.Cpu, "Maximum total CPU that may be provisioned (e.g. '1000' for 1000 vCPUs).")
-	a.Describe(&r.Memory, "Maximum total memory that may be provisioned (e.g. '1000Gi').")
+	a.Describe(&r.Cpu, "Maximum total vCPUs that may be provisioned across all nodes in this pool. Example: '1000'.")
+	a.Describe(&r.Memory, "Maximum total memory that may be provisioned across all nodes. Example: '1000Gi'.")
 }
 
 // SubnetSelectorTermArgs selects subnets by tag or ID.
@@ -81,8 +81,8 @@ type SubnetSelectorTermArgs struct {
 
 // Annotate provides SDK documentation for SubnetSelectorTermArgs fields.
 func (s *SubnetSelectorTermArgs) Annotate(a infer.Annotator) {
-	a.Describe(&s.Tags, "Map of AWS tags used to select subnets.")
-	a.Describe(&s.Id, "Explicit AWS subnet ID.")
+	a.Describe(&s.Tags, "Map of AWS tags used to select subnets. Example: {\"karpenter.sh/discovery\": \"my-cluster\"}.")
+	a.Describe(&s.Id, "Explicit AWS subnet ID (use instead of tags for a fixed subnet). Example: 'subnet-0a1b2c3d4e5f'.")
 }
 
 // SecurityGroupSelectorTermArgs selects security groups.
@@ -94,9 +94,9 @@ type SecurityGroupSelectorTermArgs struct {
 
 // Annotate provides SDK documentation for SecurityGroupSelectorTermArgs fields.
 func (s *SecurityGroupSelectorTermArgs) Annotate(a infer.Annotator) {
-	a.Describe(&s.Tags, "Map of AWS tags used to select security groups.")
-	a.Describe(&s.Id, "Explicit AWS security group ID.")
-	a.Describe(&s.Name, "Security group name filter.")
+	a.Describe(&s.Tags, "Map of AWS tags used to select security groups. Example: {\"karpenter.sh/discovery\": \"my-cluster\"}.")
+	a.Describe(&s.Id, "Explicit AWS security group ID. Example: 'sg-0a1b2c3d4e5f'.")
+	a.Describe(&s.Name, "Security group name filter (exact match). Example: 'my-cluster-node-sg'.")
 }
 
 // CapacityReservationSelectorTermArgs selects capacity reservations.
@@ -108,9 +108,9 @@ type CapacityReservationSelectorTermArgs struct {
 
 // Annotate provides SDK documentation for CapacityReservationSelectorTermArgs fields.
 func (c *CapacityReservationSelectorTermArgs) Annotate(a infer.Annotator) {
-	a.Describe(&c.Tags, "Map of AWS tags used to select capacity reservations.")
-	a.Describe(&c.Id, "Explicit capacity reservation ID.")
-	a.Describe(&c.OwnerId, "AWS account ID that owns the capacity reservation.")
+	a.Describe(&c.Tags, "Map of AWS tags used to select capacity reservations. Example: {\"aws:ec2:fleet-id\": \"fleet-123\"}.")
+	a.Describe(&c.Id, "Explicit capacity reservation ID. Example: 'cr-0a1b2c3d4e5f'.")
+	a.Describe(&c.OwnerId, "AWS account ID that owns the capacity reservation. Example: '123456789012'.")
 }
 
 // AMISelectorTermArgs selects AMIs for AWS nodes.
@@ -125,12 +125,12 @@ type AMISelectorTermArgs struct {
 
 // Annotate provides SDK documentation for AMISelectorTermArgs fields.
 func (a *AMISelectorTermArgs) Annotate(ann infer.Annotator) {
-	ann.Describe(&a.Alias, "Well-known alias for the AMI family (e.g. 'al2@latest').")
-	ann.Describe(&a.Tags, "Map of AWS tags used to select AMIs.")
-	ann.Describe(&a.Id, "Explicit AMI ID.")
-	ann.Describe(&a.Name, "AMI name filter (supports wildcards).")
-	ann.Describe(&a.Owner, "AWS account ID or alias that owns the AMI.")
-	ann.Describe(&a.SsmParameter, "SSM parameter path that stores the AMI ID.")
+	ann.Describe(&a.Alias, "Well-known alias for the AMI family. Example: 'al2@latest' or 'bottlerocket@latest'.")
+	ann.Describe(&a.Tags, "Map of AWS tags used to select AMIs. Example: {\"my-org/ami\": \"approved\"}.")
+	ann.Describe(&a.Id, "Explicit AMI ID. Example: 'ami-0a1b2c3d4e5f67890'.")
+	ann.Describe(&a.Name, "AMI name filter (supports wildcards). Example: 'my-org-eks-node-*'.")
+	ann.Describe(&a.Owner, "AWS account ID or alias that owns the AMI. Example: '123456789012' or 'amazon'.")
+	ann.Describe(&a.SsmParameter, "SSM parameter path that stores the AMI ID. Example: '/aws/service/eks/optimized-ami/1.29/amazon-linux-2/recommended/image_id'.")
 }
 
 // BlockDeviceArgs configures an EBS block device.
@@ -148,15 +148,15 @@ type BlockDeviceArgs struct {
 
 // Annotate provides SDK documentation for BlockDeviceArgs fields.
 func (b *BlockDeviceArgs) Annotate(a infer.Annotator) {
-	a.Describe(&b.DeleteOnTermination, "Whether to delete the EBS volume when the instance terminates.")
-	a.Describe(&b.Encrypted, "Whether to encrypt the EBS volume.")
-	a.Describe(&b.Iops, "IOPS to provision for io1/io2 volume types.")
-	a.Describe(&b.KmsKeyId, "KMS key ID or ARN used to encrypt the volume.")
-	a.Describe(&b.SnapshotId, "EBS snapshot ID to restore the volume from.")
-	a.Describe(&b.Throughput, "Throughput in MiB/s for gp3 volumes.")
-	a.Describe(&b.VolumeInitializationRate, "Rate in MiB/s for initializing volumes from snapshots.")
-	a.Describe(&b.VolumeSize, "Volume size (e.g. '20Gi').")
-	a.Describe(&b.VolumeType, "EBS volume type (e.g. 'gp3', 'io1', 'st1').")
+	a.Describe(&b.DeleteOnTermination, "Whether to delete the EBS volume when the instance terminates. Example: true.")
+	a.Describe(&b.Encrypted, "Whether to encrypt the EBS volume. Example: true.")
+	a.Describe(&b.Iops, "IOPS to provision for io1/io2 volume types. Example: 3000.")
+	a.Describe(&b.KmsKeyId, "KMS key ID or ARN used to encrypt the volume. Example: 'arn:aws:kms:us-east-1:123456789012:key/mrk-abc123'.")
+	a.Describe(&b.SnapshotId, "EBS snapshot ID to restore the volume from. Example: 'snap-0a1b2c3d4e5f'.")
+	a.Describe(&b.Throughput, "Throughput in MiB/s for gp3 volumes (125-1000). Example: 125.")
+	a.Describe(&b.VolumeInitializationRate, "Rate in MiB/s for initializing volumes from snapshots. Example: 300.")
+	a.Describe(&b.VolumeSize, "Volume size with unit suffix. Example: '20Gi'.")
+	a.Describe(&b.VolumeType, "EBS volume type. One of: 'gp2', 'gp3', 'io1', 'io2', 'st1', 'sc1'. Example: 'gp3'.")
 }
 
 // BlockDeviceMappingArgs maps an EBS block device to a device name.
@@ -168,9 +168,9 @@ type BlockDeviceMappingArgs struct {
 
 // Annotate provides SDK documentation for BlockDeviceMappingArgs fields.
 func (b *BlockDeviceMappingArgs) Annotate(a infer.Annotator) {
-	a.Describe(&b.DeviceName, "Device name to map the volume to (e.g. '/dev/xvda').")
-	a.Describe(&b.Ebs, "EBS volume configuration for this device.")
-	a.Describe(&b.RootVolume, "Whether this mapping is for the root volume.")
+	a.Describe(&b.DeviceName, "Device name to map the volume to. Example: '/dev/xvda' (root on AL2), '/dev/sdb' (data volume).")
+	a.Describe(&b.Ebs, "EBS volume configuration for this device mapping.")
+	a.Describe(&b.RootVolume, "Whether this mapping is for the root (boot) volume. Example: true.")
 }
 
 // KubeletConfigurationArgs configures kubelet on AWS nodes.
@@ -191,18 +191,18 @@ type KubeletConfigurationArgs struct {
 
 // Annotate provides SDK documentation for KubeletConfigurationArgs fields.
 func (k *KubeletConfigurationArgs) Annotate(a infer.Annotator) {
-	a.Describe(&k.ClusterDns, "List of DNS server IP addresses used by kubelet.")
-	a.Describe(&k.MaxPods, "Maximum number of pods per node.")
-	a.Describe(&k.PodsPerCore, "Maximum pods per CPU core (multiplied by core count for max pods).")
-	a.Describe(&k.SystemReserved, "Resources reserved for OS system daemons (e.g. {'cpu': '100m'}).")
-	a.Describe(&k.KubeReserved, "Resources reserved for Kubernetes system components.")
-	a.Describe(&k.EvictionHard, "Hard eviction thresholds that trigger immediate pod eviction.")
-	a.Describe(&k.EvictionSoft, "Soft eviction thresholds that trigger eviction after a grace period.")
-	a.Describe(&k.EvictionSoftGracePeriod, "Grace period for each soft eviction threshold.")
-	a.Describe(&k.EvictionMaxPodGracePeriod, "Maximum grace period in seconds when evicting pods.")
-	a.Describe(&k.ImageGcHighThresholdPercent, "Disk usage percentage that triggers image garbage collection.")
-	a.Describe(&k.ImageGcLowThresholdPercent, "Disk usage percentage below which image GC stops freeing space.")
-	a.Describe(&k.CpuCfsQuota, "Whether to enforce CPU CFS quota limits for containers.")
+	a.Describe(&k.ClusterDns, "DNS server IP addresses passed to kubelet. Example: [\"10.96.0.10\"].")
+	a.Describe(&k.MaxPods, "Maximum number of pods allowed per node. Example: 110.")
+	a.Describe(&k.PodsPerCore, "Maximum pods per CPU core; multiplied by node core count for effective max. Example: 10.")
+	a.Describe(&k.SystemReserved, "Resources reserved for OS system daemons (not Kubernetes). Example: {\"cpu\": \"100m\", \"memory\": \"100Mi\"}.")
+	a.Describe(&k.KubeReserved, "Resources reserved for Kubernetes system components (kubelet, kube-proxy). Example: {\"cpu\": \"100m\", \"memory\": \"100Mi\"}.")
+	a.Describe(&k.EvictionHard, "Hard eviction thresholds — pods are evicted immediately when crossed. Example: {\"memory.available\": \"100Mi\", \"nodefs.available\": \"10%\"}.")
+	a.Describe(&k.EvictionSoft, "Soft eviction thresholds — eviction begins after the grace period expires. Example: {\"memory.available\": \"200Mi\"}.")
+	a.Describe(&k.EvictionSoftGracePeriod, "Grace period before acting on a soft eviction threshold. Example: {\"memory.available\": \"90s\"}.")
+	a.Describe(&k.EvictionMaxPodGracePeriod, "Maximum pod termination grace period (seconds) during eviction. Example: 90.")
+	a.Describe(&k.ImageGcHighThresholdPercent, "Disk usage % that triggers image garbage collection. Example: 85.")
+	a.Describe(&k.ImageGcLowThresholdPercent, "Disk usage % at which image GC stops freeing space. Example: 70.")
+	a.Describe(&k.CpuCfsQuota, "Whether to enforce CPU CFS quota limits for containers. Example: true.")
 }
 
 // MetadataOptionsArgs configures EC2 instance metadata options.
@@ -215,10 +215,10 @@ type MetadataOptionsArgs struct {
 
 // Annotate provides SDK documentation for MetadataOptionsArgs fields.
 func (m *MetadataOptionsArgs) Annotate(a infer.Annotator) {
-	a.Describe(&m.HttpEndpoint, "Enable or disable the instance metadata endpoint. One of: 'enabled', 'disabled'.")
-	a.Describe(&m.HttpProtocolIpv6, "Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'.")
-	a.Describe(&m.HttpPutResponseHopLimit, "HTTP PUT response hop limit for metadata requests (1-64).")
-	a.Describe(&m.HttpTokens, "Whether to require IMDSv2 tokens. One of: 'optional', 'required'.")
+	a.Describe(&m.HttpEndpoint, "Enable or disable the EC2 instance metadata endpoint. One of: 'enabled', 'disabled'. Example: 'enabled'.")
+	a.Describe(&m.HttpProtocolIpv6, "Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'. Example: 'disabled'.")
+	a.Describe(&m.HttpPutResponseHopLimit, "HTTP PUT response hop limit for metadata requests (1-64). Set to 1 to block pod-level IMDS access. Example: 1.")
+	a.Describe(&m.HttpTokens, "Whether to require IMDSv2 session tokens (recommended). One of: 'optional', 'required'. Example: 'required'.")
 }
 
 // AWSNodeClassSpecArgs holds AWS-specific node class configuration.
@@ -243,22 +243,22 @@ type AWSNodeClassSpecArgs struct {
 
 // Annotate provides SDK documentation for AWSNodeClassSpecArgs fields.
 func (a *AWSNodeClassSpecArgs) Annotate(ann infer.Annotator) {
-	ann.Describe(&a.SubnetSelectorTerms, "Selectors for the subnets nodes will be launched into.")
-	ann.Describe(&a.SecurityGroupSelectorTerms, "Selectors for security groups attached to nodes.")
-	ann.Describe(&a.CapacityReservationSelectorTerms, "Selectors for EC2 capacity reservations to prioritize.")
-	ann.Describe(&a.AssociatePublicIpAddress, "Whether to assign a public IP address to provisioned nodes.")
-	ann.Describe(&a.AmiSelectorTerms, "Selectors for the AMIs used to launch nodes.")
-	ann.Describe(&a.AmiFamily, "AMI family shorthand (e.g. 'AL2', 'Bottlerocket', 'Windows2022').")
-	ann.Describe(&a.UserData, "Custom user data script injected into the node launch template.")
-	ann.Describe(&a.Role, "IAM role name assigned to nodes.")
-	ann.Describe(&a.InstanceProfile, "IAM instance profile name (use instead of Role when profile already exists).")
-	ann.Describe(&a.Tags, "AWS tags applied to all resources created by this node class.")
-	ann.Describe(&a.Kubelet, "Kubelet configuration overrides for AWS nodes.")
-	ann.Describe(&a.BlockDeviceMappings, "EBS block device mappings for nodes.")
-	ann.Describe(&a.InstanceStorePolicy, "Policy for handling instance store volumes. One of: 'RAID0'.")
-	ann.Describe(&a.DetailedMonitoring, "Enable detailed CloudWatch monitoring for instances.")
-	ann.Describe(&a.MetadataOptions, "EC2 instance metadata (IMDS) options.")
-	ann.Describe(&a.Context, "EC2 launch template context ARN.")
+	ann.Describe(&a.SubnetSelectorTerms, "Selectors for the subnets nodes will be launched into. Example: [{tags: {\"karpenter.sh/discovery\": \"my-cluster\"}}].")
+	ann.Describe(&a.SecurityGroupSelectorTerms, "Selectors for security groups attached to provisioned nodes. Example: [{tags: {\"karpenter.sh/discovery\": \"my-cluster\"}}].")
+	ann.Describe(&a.CapacityReservationSelectorTerms, "Selectors for EC2 capacity reservations to prioritize. Example: [{tags: {\"aws:ec2:fleet-id\": \"fleet-123\"}}].")
+	ann.Describe(&a.AssociatePublicIpAddress, "Whether to assign a public IP address to provisioned nodes. Example: false.")
+	ann.Describe(&a.AmiSelectorTerms, "Selectors for the AMIs used to launch nodes. Example: [{alias: \"al2@latest\"}].")
+	ann.Describe(&a.AmiFamily, "AMI family shorthand used when no amiSelectorTerms are specified. One of: 'AL2', 'AL2023', 'Bottlerocket', 'Windows2019', 'Windows2022'. Example: 'AL2'.")
+	ann.Describe(&a.UserData, "Custom user data script merged into the node launch template (base64 or plain text). Example: '#!/bin/bash\\necho hello'.")
+	ann.Describe(&a.Role, "IAM role name assigned to nodes (Karpenter creates the instance profile). Example: 'KarpenterNodeRole-my-cluster'.")
+	ann.Describe(&a.InstanceProfile, "IAM instance profile name to use directly (alternative to Role). Example: 'KarpenterNodeInstanceProfile-my-cluster'.")
+	ann.Describe(&a.Tags, "AWS tags applied to all resources (instances, volumes, ENIs) created by this node class. Example: {\"environment\": \"production\", \"team\": \"platform\"}.")
+	ann.Describe(&a.Kubelet, "Kubelet configuration overrides applied to all nodes in this class.")
+	ann.Describe(&a.BlockDeviceMappings, "EBS block device mappings for nodes. Example: [{deviceName: \"/dev/xvda\", rootVolume: true, ebs: {volumeSize: \"50Gi\", volumeType: \"gp3\"}}].")
+	ann.Describe(&a.InstanceStorePolicy, "Policy for handling NVMe instance store volumes. One of: 'INSTANCE_STORE_POLICY_RAID0'. Example: 'INSTANCE_STORE_POLICY_RAID0'.")
+	ann.Describe(&a.DetailedMonitoring, "Enable detailed (1-minute interval) CloudWatch monitoring for instances. Example: false.")
+	ann.Describe(&a.MetadataOptions, "EC2 instance metadata service (IMDS) configuration.")
+	ann.Describe(&a.Context, "Additional EC2 launch template context ARN for advanced customization. Example: 'arn:aws:ec2:us-east-1:123456789012:launch-template/lt-0abc123'.")
 }
 
 // AzureKubeletConfigurationArgs configures kubelet on Azure nodes.
@@ -277,16 +277,16 @@ type AzureKubeletConfigurationArgs struct {
 
 // Annotate provides SDK documentation for AzureKubeletConfigurationArgs fields.
 func (a *AzureKubeletConfigurationArgs) Annotate(ann infer.Annotator) {
-	ann.Describe(&a.CpuManagerPolicy, "CPU manager policy. One of: 'none', 'static'.")
-	ann.Describe(&a.CpuCfsQuota, "Whether to enforce CPU CFS quota for containers.")
-	ann.Describe(&a.CpuCfsQuotaPeriod, "CPU CFS quota period (e.g. '100ms').")
-	ann.Describe(&a.ImageGcHighThresholdPercent, "Disk usage percentage triggering image GC.")
-	ann.Describe(&a.ImageGcLowThresholdPercent, "Disk usage percentage below which image GC stops.")
-	ann.Describe(&a.TopologyManagerPolicy, "Topology manager policy for NUMA-aware scheduling.")
-	ann.Describe(&a.AllowedUnsafeSysctls, "Unsafe sysctl patterns that are allowed (e.g. 'net.ipv4.*').")
-	ann.Describe(&a.ContainerLogMaxSize, "Maximum container log file size before rotation (e.g. '10Mi').")
-	ann.Describe(&a.ContainerLogMaxFiles, "Maximum number of container log files to retain.")
-	ann.Describe(&a.PodPidsLimit, "Maximum number of process IDs per pod.")
+	ann.Describe(&a.CpuManagerPolicy, "CPU manager policy for CPU pinning. One of: 'none', 'static'. Example: 'static'.")
+	ann.Describe(&a.CpuCfsQuota, "Whether to enforce CPU CFS quota limits for containers. Example: true.")
+	ann.Describe(&a.CpuCfsQuotaPeriod, "CPU CFS quota period. Example: '100ms'.")
+	ann.Describe(&a.ImageGcHighThresholdPercent, "Disk usage % that triggers image garbage collection. Example: 85.")
+	ann.Describe(&a.ImageGcLowThresholdPercent, "Disk usage % at which image GC stops freeing space. Example: 70.")
+	ann.Describe(&a.TopologyManagerPolicy, "Topology manager policy for NUMA-aware workloads. One of: 'none', 'best-effort', 'restricted', 'single-numa-node'. Example: 'none'.")
+	ann.Describe(&a.AllowedUnsafeSysctls, "Unsafe sysctl patterns permitted on nodes. Example: [\"net.ipv4.*\", \"net.ipv6.*\"].")
+	ann.Describe(&a.ContainerLogMaxSize, "Maximum container log file size before rotation. Example: '10Mi'.")
+	ann.Describe(&a.ContainerLogMaxFiles, "Maximum number of container log files to retain per container. Example: 5.")
+	ann.Describe(&a.PodPidsLimit, "Maximum number of process IDs allowed per pod. Example: 1024.")
 }
 
 // AzureNodeClassSpecArgs holds Azure-specific node class configuration.
@@ -302,13 +302,13 @@ type AzureNodeClassSpecArgs struct {
 
 // Annotate provides SDK documentation for AzureNodeClassSpecArgs fields.
 func (a *AzureNodeClassSpecArgs) Annotate(ann infer.Annotator) {
-	ann.Describe(&a.VnetSubnetId, "Azure VNet subnet resource ID for node networking.")
-	ann.Describe(&a.OsDiskSizeGb, "OS disk size in GB.")
-	ann.Describe(&a.ImageFamily, "Azure node image family (e.g. 'AzureLinux', 'Ubuntu2204').")
-	ann.Describe(&a.FipsMode, "FIPS compliance mode. One of: 'Enabled', 'Disabled'.")
-	ann.Describe(&a.Tags, "Azure tags applied to all resources created by this node class.")
+	ann.Describe(&a.VnetSubnetId, "Azure VNet subnet resource ID where nodes will be placed. Example: '/subscriptions/sub-id/resourceGroups/my-rg/providers/Microsoft.Network/virtualNetworks/my-vnet/subnets/nodesubnet'.")
+	ann.Describe(&a.OsDiskSizeGb, "OS disk size in GB. Example: 128.")
+	ann.Describe(&a.ImageFamily, "Azure node image family. One of: 'AzureLinux', 'Ubuntu2204'. Example: 'AzureLinux'.")
+	ann.Describe(&a.FipsMode, "FIPS 140-2 compliance mode for the node. One of: 'Enabled', 'Disabled'. Example: 'Disabled'.")
+	ann.Describe(&a.Tags, "Azure tags applied to all resources created by this node class. Example: {\"environment\": \"production\"}.")
 	ann.Describe(&a.Kubelet, "Kubelet configuration overrides for Azure nodes.")
-	ann.Describe(&a.MaxPods, "Maximum pods per node (overrides AKS default).")
+	ann.Describe(&a.MaxPods, "Maximum pods per node, overrides the AKS cluster default. Example: 110.")
 }
 
 // RawKarpenterSpecArgs provides raw YAML for a custom Karpenter node pool / node class.
@@ -319,8 +319,8 @@ type RawKarpenterSpecArgs struct {
 
 // Annotate provides SDK documentation for RawKarpenterSpecArgs fields.
 func (r *RawKarpenterSpecArgs) Annotate(a infer.Annotator) {
-	a.Describe(&r.NodepoolYaml, "Raw YAML for a complete Karpenter NodePool resource (escape hatch).")
-	a.Describe(&r.NodeclassYaml, "Raw YAML for a complete Karpenter NodeClass resource (escape hatch).")
+	a.Describe(&r.NodepoolYaml, "Raw YAML for a complete Karpenter NodePool resource — use as an escape hatch when structured fields are insufficient. Example: 'apiVersion: karpenter.sh/v1\\nkind: NodePool\\nmetadata:\\n  name: default\\n...'.")
+	a.Describe(&r.NodeclassYaml, "Raw YAML for a complete Karpenter NodeClass resource — use as an escape hatch when structured fields are insufficient. Example: 'apiVersion: karpenter.k8s.aws/v1\\nkind: EC2NodeClass\\nmetadata:\\n  name: default\\n...'.")
 }
 
 // NodePolicyArgs are the user-configurable inputs for a NodePolicy resource.
@@ -371,29 +371,29 @@ type NodePolicyState struct {
 
 // Annotate provides SDK documentation for NodePolicy fields.
 func (s *NodePolicyState) Annotate(a infer.Annotator) {
-	a.Describe(&s.Name, "Human-friendly name for the node policy.")
-	a.Describe(&s.Description, "Free-form description of the node policy.")
-	a.Describe(&s.Weight, "Priority weight for this policy; higher values take precedence.")
-	a.Describe(&s.InstanceCategories, "Filter instances by category (e.g. general-purpose, compute-optimized).")
-	a.Describe(&s.InstanceFamilies, "Filter instances by family (e.g. m5, c6i).")
-	a.Describe(&s.InstanceCpus, "Filter instances by CPU count.")
-	a.Describe(&s.InstanceHypervisors, "Filter instances by hypervisor type.")
-	a.Describe(&s.InstanceGenerations, "Filter instances by generation.")
-	a.Describe(&s.InstanceSizes, "Filter instances by size (e.g. large, xlarge).")
-	a.Describe(&s.InstanceTypes, "Explicitly select specific instance types.")
-	a.Describe(&s.Zones, "Availability zones where nodes may be provisioned.")
-	a.Describe(&s.Architectures, "CPU architectures (e.g. amd64, arm64).")
-	a.Describe(&s.CapacityTypes, "Capacity types (e.g. on-demand, spot).")
-	a.Describe(&s.OperatingSystems, "Operating systems for nodes (e.g. linux, windows).")
-	a.Describe(&s.Labels, "Labels applied to provisioned nodes.")
-	a.Describe(&s.Taints, "Taints applied to provisioned nodes.")
-	a.Describe(&s.Disruption, "Karpenter disruption policy for consolidation and expiry.")
-	a.Describe(&s.Limits, "Resource limits on the total capacity managed by this policy.")
-	a.Describe(&s.NodePoolName, "Override name for the generated Karpenter NodePool.")
-	a.Describe(&s.NodeClassName, "Override name for the generated Karpenter NodeClass.")
-	a.Describe(&s.Aws, "AWS-specific node class configuration.")
-	a.Describe(&s.Azure, "Azure-specific node class configuration.")
-	a.Describe(&s.Raw, "Raw Karpenter YAML for full NodePool/NodeClass customization.")
+	a.Describe(&s.Name, "Human-friendly name for the node policy. Example: 'prod-spot-policy'.")
+	a.Describe(&s.Description, "Free-form description of the node policy. Example: 'Spot instance policy for production batch workloads'.")
+	a.Describe(&s.Weight, "Priority weight; higher values take precedence when multiple policies match. Example: 100.")
+	a.Describe(&s.InstanceCategories, "Filter instances by category letter (cloud-specific). Example: {in: [\"m\", \"c\", \"r\"]} for AWS, {in: [\"D\", \"E\"]} for Azure.")
+	a.Describe(&s.InstanceFamilies, "Filter instances by family. Example: {in: [\"m5\", \"c6i\", \"m6i\"]}.")
+	a.Describe(&s.InstanceCpus, "Filter instances by vCPU count. Example: {in: [\"4\", \"8\", \"16\"]}.")
+	a.Describe(&s.InstanceHypervisors, "Filter instances by hypervisor type. Example: {in: [\"nitro\"]}.")
+	a.Describe(&s.InstanceGenerations, "Filter instances by generation number. Example: {in: [\"2\", \"3\"]}.")
+	a.Describe(&s.InstanceSizes, "Filter instances by size label. Example: {in: [\"large\", \"xlarge\", \"2xlarge\"]}.")
+	a.Describe(&s.InstanceTypes, "Explicitly allow specific instance types. Example: {in: [\"m5.large\", \"c6i.large\"]}.")
+	a.Describe(&s.Zones, "Availability zones where nodes may be provisioned. Example: {in: [\"us-east-1a\", \"us-east-1b\"]}.")
+	a.Describe(&s.Architectures, "CPU architectures for nodes. Example: {in: [\"amd64\"]}.")
+	a.Describe(&s.CapacityTypes, "Capacity purchasing types. Valid values: 'spot', 'on-demand', 'reserved'. Example: {in: [\"spot\", \"on-demand\"]}.")
+	a.Describe(&s.OperatingSystems, "Operating systems for nodes. Example: {in: [\"linux\"]}.")
+	a.Describe(&s.Labels, "Labels applied to all provisioned nodes. Example: {\"team\": \"backend\", \"env\": \"prod\"}.")
+	a.Describe(&s.Taints, "Taints applied to provisioned nodes to control pod scheduling. Example: [{key: \"dedicated\", value: \"gpu\", effect: \"NoSchedule\"}].")
+	a.Describe(&s.Disruption, "Karpenter disruption policy controlling consolidation, expiry, and budgets.")
+	a.Describe(&s.Limits, "Resource limits on total capacity managed by this policy. Example: {cpu: \"1000\", memory: \"1000Gi\"}.")
+	a.Describe(&s.NodePoolName, "Override name for the generated Karpenter NodePool resource. Example: 'prod-spot-nodepool'.")
+	a.Describe(&s.NodeClassName, "Override name for the generated Karpenter NodeClass resource. Example: 'prod-aws-nodeclass'.")
+	a.Describe(&s.Aws, "AWS-specific EC2NodeClass configuration (subnets, AMIs, IAM role, EBS, etc.).")
+	a.Describe(&s.Azure, "Azure-specific AKSNodeClass configuration (VNet subnet, OS disk, image family, etc.).")
+	a.Describe(&s.Raw, "Raw Karpenter YAML for full NodePool/NodeClass customization — use only when structured fields are insufficient.")
 }
 
 // NodePolicy is the resource implementation.

@@ -22,8 +22,14 @@ func GetClusterIdByName(ctx *pulumi.Context, args *GetClusterIdByNameArgs, opts 
 }
 
 type GetClusterIdByNameArgs struct {
+	// Optional cloud provider filter. One of: 'AWS', 'GCP', 'AKS', 'OCI'.
+	CloudProvider *string `pulumi:"cloudProvider"`
+	// Controls liveness filtering: IGNORE, PREFER_LIVE, or REQUIRE_LIVE.
+	Liveness *string `pulumi:"liveness"`
 	// The cluster name to look up.
 	Name string `pulumi:"name"`
+	// Optional region filter, e.g. "us-east-1".
+	Region *string `pulumi:"region"`
 	// The team ID to search within.
 	TeamId string `pulumi:"teamId"`
 }
@@ -43,8 +49,14 @@ func GetClusterIdByNameOutput(ctx *pulumi.Context, args GetClusterIdByNameOutput
 }
 
 type GetClusterIdByNameOutputArgs struct {
+	// Optional cloud provider filter. One of: 'AWS', 'GCP', 'AKS', 'OCI'.
+	CloudProvider pulumi.StringPtrInput `pulumi:"cloudProvider"`
+	// Controls liveness filtering: IGNORE, PREFER_LIVE, or REQUIRE_LIVE.
+	Liveness pulumi.StringPtrInput `pulumi:"liveness"`
 	// The cluster name to look up.
 	Name pulumi.StringInput `pulumi:"name"`
+	// Optional region filter, e.g. "us-east-1".
+	Region pulumi.StringPtrInput `pulumi:"region"`
 	// The team ID to search within.
 	TeamId pulumi.StringInput `pulumi:"teamId"`
 }

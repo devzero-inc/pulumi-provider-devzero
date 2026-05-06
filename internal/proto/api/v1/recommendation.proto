@@ -10,7 +10,9 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 import "google/type/money.proto";
 import "api/v1/common.proto";
+import "api/v1/instance.proto";
 import "api/v1/k8s.proto";
+import "api/v1/profiling.proto";
 
 service K8sRecommendationService {
     // Cluster Stats
@@ -116,6 +118,7 @@ service K8sRecommendationService {
     rpc CreateNodePolicies(CreateNodePoliciesRequest) returns (CreateNodePoliciesResponse);
     rpc ListNodePolicies(ListNodePoliciesRequest) returns (ListNodePoliciesResponse);
     rpc UpdateNodePolicy(UpdateNodePolicyRequest) returns (UpdateNodePolicyResponse);
+    rpc DeleteNodePolicy(DeleteNodePolicyRequest) returns (DeleteNodePolicyResponse);
     rpc SuggestedNodePolicy(SuggestedNodePolicyRequest) returns (SuggestedNodePolicyResponse);
     rpc SuggestedKarpenterConfig(SuggestedKarpenterConfigRequest) returns (SuggestedKarpenterConfigResponse);
     // GenerateNodePoliciesFromKarpenter generates NodePolicy objects from existing Karpenter resources
@@ -124,6 +127,18 @@ service K8sRecommendationService {
     // GenerateNodePoliciesFromNodeGroups generates NodePolicy objects by inspecting
     // k8s_nodes metadata for clusters without Karpenter/dzkarp.
     rpc GenerateNodePoliciesFromNodeGroups(GenerateNodePoliciesFromNodeGroupsRequest) returns (GenerateNodePoliciesFromNodeGroupsResponse);
+
+    // GetNodeAnnotationReadiness checks how many nodes in a cluster have been
+    // annotated with AWS metadata by the Karpenter fork's node metadata controller.
+    rpc GetNodeAnnotationReadiness(GetNodeAnnotationReadinessRequest) returns (GetNodeAnnotationReadinessResponse);
+
+    // Migration wizard state management
+    rpc GetMigrationState(GetMigrationStateRequest) returns (GetMigrationStateResponse);
+    rpc UpdateMigrationState(UpdateMigrationStateRequest) returns (UpdateMigrationStateResponse);
+
+    // NodePool validation phone-home
+    rpc ReportNodePoolValidation(ReportNodePoolValidationRequest) returns (ReportNodePoolValidationResponse);
+    rpc GetNodePoolValidations(GetNodePoolValidationsRequest) returns (GetNodePoolValidationsResponse);
 
     rpc CreateNodePolicyTargets(CreateNodePolicyTargetsRequest) returns (CreateNodePolicyTargetsResponse);
     rpc ListNodePolicyTargets(ListNodePolicyTargetsRequest) returns (ListNodePolicyTargetsResponse);
@@ -187,6 +202,7 @@ service K8sRecommendationService {
     rpc GetWorkloadRulesByPolicy(GetWorkloadRulesByPolicyRequest) returns (GetWorkloadRulesByPolicyResponse);
     rpc ListWorkloadRules(ListWorkloadRulesRequest) returns (ListWorkloadRulesResponse);
     rpc GetWorkloadRuleByID(GetWorkloadRuleByIDRequest) returns (GetWorkloadRuleByIDResponse);
+    rpc GetWorkloadRuleByWorkload(GetWorkloadRuleByWorkloadRequest) returns (GetWorkloadRuleByWorkloadResponse);
     rpc DeleteWorkloadRule(DeleteWorkloadRuleRequest) returns (DeleteWorkloadRuleResponse);
     rpc GetWorkloadContainerNames(GetWorkloadContainerNamesRequest) returns (GetWorkloadContainerNamesResponse);
     rpc BatchAutoOptimizeWorkloads(BatchAutoOptimizeWorkloadsRequest) returns (BatchAutoOptimizeWorkloadsResponse);
@@ -1015,6 +1031,10 @@ message BalanceGetRecommendationsResponse {
         WorkloadWithActiveRecommendations kind_to_namespace_to_workloads = 31; // return {kind: namespace: [workloads]}
         ReconcileResponse workload_reconcile_response = 41;
 
+        // Workload profile snapshots (persisted profiling signal for in-cluster consumers)
+        WorkloadProfileManifest workload_profile_manifest = 51;
+        BatchWorkloadProfiles batch_workload_profiles = 52;
+
         HealthReport health_update_requested = 71;
 
         // Generic resource recommendations
@@ -1025,6 +1045,9 @@ message BalanceGetRecommendationsResponse {
 
         // MPA v2: WorkloadRules for in-cluster evaluation
         BatchWorkloadRules batch_workload_rules = 61;
+
+        // KarpenterSettings CRD push-down
+        KarpenterSettingsRecommendation karpenter_settings = 62;
     }
     string request_id = 99; // optional
 }
@@ -1109,6 +1132,20 @@ message ResourceRuleConfig {
     bool limits_removal_enabled = 13;
 }
 
+message HPAMetricTrigger {
+    string type = 1;                          // "CPU", "Memory", "NetworkIngress", "NetworkEgress"
+    optional string target_utilization = 2;    // "0.70" for resource metrics
+    optional string target_value = 3;          // "50000000" for absolute metrics (bytes/sec)
+    optional string weight = 4;                // "0.5" for composite formula
+}
+
+// HPABehavior, HPAScalingRules, HPAScalingPolicy are defined in common.proto
+message HPAFallback {
+    int32 replicas = 1;
+    string behavior = 2;                        // "static", "currentReplicas", "currentReplicasIfHigher", "currentReplicasIfLower"
+    int32 failure_threshold = 3;
+}
+
 // Per-container resource config (core subset: enabled + request bounds + limits).
 message ContainerResourceConfig {
     bool enabled = 1;
@@ -1135,6 +1172,14 @@ message HPARuleConfig {
     optional float target_utilization = 4;
     optional HPAMetricType primary_metric = 5;
     optional float max_replica_change_percent = 6;
+    repeated HPAMetricTrigger metrics = 7;
+    optional HPABehavior behavior = 8;
+    optional string composite_formula = 9;
+    optional HPAFallback fallback = 10;
+    optional int32 scale_down_cooldown_seconds = 11;
+    // Target memory utilization (0.0-1.0). Separate from target_utilization (CPU)
+    // to allow independent tuning per resource.
+    optional float target_memory_utilization = 12;
 }
 
 message EmergencyResponseConfig {
@@ -1626,6 +1671,21 @@ message HorizontalScalingOptimizationTarget {
     // Target network throughput per replica in bytes/sec
     // 0 = auto-detect from P95 + 15% headroom based on selected metric direction (ingress/egress)
     optional int64 network_target_throughput_bytes_per_sec = 41;
+
+    // Target memory utilization for HPA scaling (0.0-1.0, e.g. 0.80 = 80%)
+    // If unset, defaults to 0.80 (same as CPU default)
+    optional float target_memory_utilization = 51;
+
+    // Composite formula for multi-metric HPA scaling
+    // Available variables: "cpu", "memory", "networkingress", "networkegress"
+    // Each variable is the metric's current/target ratio (>1.0 = above target)
+    // Example: "cpu * 0.6 + memory * 0.4"
+    optional string composite_formula = 52;
+
+    // Scale-down cooldown in seconds. Overrides the default K8s stabilization
+    // window (300s). Use a higher value for workloads with slow drain or
+    // connection-draining requirements.
+    optional int32 scale_down_cooldown_seconds = 53;
 }
 
 message WorkloadRecommendationPolicy {
@@ -1702,7 +1762,9 @@ message WorkloadRecommendationPolicy {
     // Minutes to wait between applying recommendations (prevents thrashing)
     optional int32 cooldown_minutes = 96;
 
-    // Feature flag: Enable In-Cluster MPA (Fast Reaction) for this policy
+    // Deprecated: no longer used. The legacy policy flow no longer creates workload rules.
+    // Workload rules are created via auto-optimization or the new WorkloadOptimizationPolicy flow.
+    // Field retained for wire-compatibility; will be reserved in a future cleanup.
     bool enable_incluster_mpa = 97;
 
     // Feature flag: Enable In-Place Pod Vertical Scaling for this policy.
@@ -2083,6 +2145,76 @@ message GenerateNodePoliciesFromNodeGroupsResponse {
     repeated WorkloadCompatibilityWarning warnings = 3;
 }
 
+message GetNodeAnnotationReadinessRequest {
+    string team_id = 1;
+    string cluster_id = 2;
+}
+
+message GetNodeAnnotationReadinessResponse {
+    int32 total_nodes = 1;
+    int32 annotated_nodes = 2;
+    int32 unannotated_nodes = 3;
+    bool ready = 4;
+    repeated string unannotated_node_names = 5;
+}
+
+// Migration wizard state
+message GetMigrationStateRequest {
+    string team_id = 1;
+    string cluster_id = 2;
+}
+
+message GetMigrationStateResponse {
+    string id = 1;
+    string cluster_id = 2;
+    string status = 3;
+    int32 current_step = 4;
+    string state_json = 5;
+    google.protobuf.Timestamp created_at = 6;
+    google.protobuf.Timestamp updated_at = 7;
+}
+
+message UpdateMigrationStateRequest {
+    string team_id = 1;
+    string cluster_id = 2;
+    string status = 3;
+    int32 current_step = 4;
+    string state_json = 5;
+}
+
+message UpdateMigrationStateResponse {
+    string id = 1;
+}
+
+// NodePool validation
+message ReportNodePoolValidationRequest {
+    string cluster_id = 1;
+    string nodepool_name = 2;
+    string node_name = 3;
+    string instance_type = 4;
+    string zone = 5;
+    string team_id = 6;
+}
+
+message ReportNodePoolValidationResponse {}
+
+message GetNodePoolValidationsRequest {
+    string cluster_id = 1;
+    string team_id = 2;
+}
+
+message NodePoolValidationReport {
+    string nodepool_name = 1;
+    string node_name = 2;
+    string instance_type = 3;
+    string zone = 4;
+    google.protobuf.Timestamp reported_at = 5;
+}
+
+message GetNodePoolValidationsResponse {
+    repeated NodePoolValidationReport validations = 1;
+}
+
 message WorkloadCompatibilityWarning {
     string workload_name = 1;
     string workload_namespace = 2;
@@ -2107,6 +2239,17 @@ message UpdateNodePolicyRequest {
 
 message UpdateNodePolicyResponse {
     NodePolicy policy = 1;
+}
+
+message DeleteNodePolicyRequest {
+    string team_id = 1;
+    string policy_id = 2;
+}
+
+message DeleteNodePolicyResponse {
+    bool success = 1;
+    // Number of NodePolicyTargets that were cascade-deleted along with the policy.
+    int32 deleted_target_count = 2;
 }
 
 message NodePolicy {
@@ -2163,6 +2306,9 @@ message NodePolicy {
   GCPNodeClassSpec gcp = 82;
   AzureNodeClassSpec azure = 83;
   OCINodeClassSpec oci = 84;
+
+  optional int64 cloud_provider_id = 85;
+  CloudProvider cloud_provider = 86;
 
   // Raw escape hatch for node pool
   repeated RawKarpenterSpec raw = 100;
@@ -2305,6 +2451,7 @@ message NodePolicyTarget {
   string description = 3;
 
   string team_id = 4;
+  // Invariant: at most 1 entry. Server rejects >1. Will be narrowed to a scalar once all clients migrate.
   repeated string cluster_ids = 5; // uuid[]
   string policy_id = 6;
 
@@ -2603,6 +2750,12 @@ message OCINodeClassSpec {
   repeated string agent_list = 14;
 }
 
+message KarpenterSettingsRecommendation {
+    // contents is the full KarpenterSettings YAML (devzero.karpenter.sh/v1alpha1, name "default").
+    bytes contents = 1;
+    string recommendation_id = 2;
+}
+
 message RawKarpenterSpec {
   string nodepool_yaml = 1;
   string nodeclass_yaml = 2;
@@ -2702,6 +2855,7 @@ enum RecommendationType {
     RECOMMENDATION_TYPE_GENERIC_RESOURCE = 4;
     RECOMMENDATION_TYPE_PVC_STORAGE = 5;
     RECOMMENDATION_TYPE_WORKLOAD_RULE = 6;
+    RECOMMENDATION_TYPE_KARPENTER_SETTINGS = 7;
 }
 
 enum HPAMetricType {
@@ -3083,6 +3237,10 @@ message WorkloadOptimizationPolicyProto {
     optional string defragmentation_schedule = 16;
     bool live_migration_enabled = 17;
     bool use_in_place_vertical_scaling = 18;
+
+    // HPA: when true, WorkloadRules generated from this policy have HPA
+    // enabled. Two-way bound to HPARuleConfig.Enabled on the WorkloadRule CRD.
+    bool hpa_enabled = 19;
 }
 
 message CreateWorkloadOptimizationPolicyRequest {
@@ -3104,6 +3262,8 @@ message CreateWorkloadOptimizationPolicyRequest {
     optional string defragmentation_schedule = 12;
     bool live_migration_enabled = 13;
     bool use_in_place_vertical_scaling = 14;
+
+    bool hpa_enabled = 15;
 }
 
 message CreateWorkloadOptimizationPolicyResponse {
@@ -3147,6 +3307,8 @@ message UpdateWorkloadOptimizationPolicyRequest {
     optional string defragmentation_schedule = 13;
     optional bool live_migration_enabled = 14;
     optional bool use_in_place_vertical_scaling = 15;
+
+    optional bool hpa_enabled = 16;
 }
 
 message UpdateWorkloadOptimizationPolicyResponse {
@@ -3194,6 +3356,27 @@ message GetWorkloadRuleByIDRequest {
 
 message GetWorkloadRuleByIDResponse {
     WorkloadRule rule = 1;
+    string cluster_name = 2;   // display name of rule.cluster_id
+    string policy_name = 3;    // display name of rule.policy_id (empty if no policy attached)
+}
+
+// GetWorkloadRuleByWorkloadRequest looks up a single rule by workload coordinates.
+message GetWorkloadRuleByWorkloadRequest {
+    string team_id = 1;
+    string cluster_id = 2;
+    string namespace = 3;
+    string kind = 4;
+    string workload_name = 5;
+}
+
+// GetWorkloadRuleByWorkloadResponse returns the rule for a workload (if any) plus display metadata.
+// Returns found = false (with rule unset) when no rule exists for the given coordinates;
+// internal errors continue to surface as gRPC error statuses.
+message GetWorkloadRuleByWorkloadResponse {
+    WorkloadRule rule = 1;
+    string cluster_name = 2;   // display name of rule.cluster_id (when found)
+    string policy_name = 3;    // display name of rule.policy_id (empty if no policy attached)
+    bool found = 4;            // true when a matching rule exists
 }
 
 message DeleteWorkloadRuleRequest {
@@ -3272,4 +3455,31 @@ message BatchAutoOptimizeWorkloadResult {
 
 message BatchAutoOptimizeWorkloadsResponse {
     repeated BatchAutoOptimizeWorkloadResult results = 1;
+}
+
+// WorkloadProfileManifest is the authoritative key set for a single emit cycle
+// of profile snapshots for a (cluster, window) pair. The server sends exactly
+// one manifest followed by zero or more BatchWorkloadProfiles, all tagged with
+// the same emit_id. The operator uses the manifest's keys to GC local
+// WorkloadProfile CRs whose workload_uid is absent from `keys` once the emit
+// cycle finalizes.
+message WorkloadProfileManifest {
+    ProfileWindow window = 1;
+    repeated ProfileKey keys = 2;
+    google.protobuf.Timestamp issued_at = 3;
+    // emit_id is a UUID that identifies this emit cycle. Required. The operator
+    // buffers batches with a matching emit_id and finalizes the prior cycle
+    // when a manifest with a new emit_id arrives.
+    string emit_id = 4;
+}
+
+// BatchWorkloadProfiles is a chunk of WorkloadProfileSnapshot values for a
+// single emit cycle. Up to 128 profiles per batch. The emit_id MUST match the
+// manifest's emit_id for the same cycle; operators discard batches whose
+// emit_id does not match the currently-buffered cycle.
+message BatchWorkloadProfiles {
+    ProfileWindow window = 1;
+    repeated WorkloadProfileSnapshot profiles = 2;
+    // emit_id matches the manifest emit_id for this cycle. Required.
+    string emit_id = 3;
 }

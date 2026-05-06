@@ -62,27 +62,27 @@ __all__ = [
 class AMISelectorTermArgsArgsDict(TypedDict):
     alias: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Well-known alias for the AMI family (e.g. 'al2@latest').
+    Well-known alias for the AMI family. Example: 'al2@latest' or 'bottlerocket@latest'.
     """
     id: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Explicit AMI ID.
+    Explicit AMI ID. Example: 'ami-0a1b2c3d4e5f67890'.
     """
     name: NotRequired[pulumi.Input[_builtins.str]]
     """
-    AMI name filter (supports wildcards).
+    AMI name filter (supports wildcards). Example: 'my-org-eks-node-*'.
     """
     owner: NotRequired[pulumi.Input[_builtins.str]]
     """
-    AWS account ID or alias that owns the AMI.
+    AWS account ID or alias that owns the AMI. Example: '123456789012' or 'amazon'.
     """
     ssm_parameter: NotRequired[pulumi.Input[_builtins.str]]
     """
-    SSM parameter path that stores the AMI ID.
+    SSM parameter path that stores the AMI ID. Example: '/aws/service/eks/optimized-ami/1.29/amazon-linux-2/recommended/image_id'.
     """
     tags: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
     """
-    Map of AWS tags used to select AMIs.
+    Map of AWS tags used to select AMIs. Example: {"my-org/ami": "approved"}.
     """
 
 @pulumi.input_type
@@ -95,12 +95,12 @@ class AMISelectorTermArgsArgs:
                  ssm_parameter: Optional[pulumi.Input[_builtins.str]] = None,
                  tags: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None):
         """
-        :param pulumi.Input[_builtins.str] alias: Well-known alias for the AMI family (e.g. 'al2@latest').
-        :param pulumi.Input[_builtins.str] id: Explicit AMI ID.
-        :param pulumi.Input[_builtins.str] name: AMI name filter (supports wildcards).
-        :param pulumi.Input[_builtins.str] owner: AWS account ID or alias that owns the AMI.
-        :param pulumi.Input[_builtins.str] ssm_parameter: SSM parameter path that stores the AMI ID.
-        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] tags: Map of AWS tags used to select AMIs.
+        :param pulumi.Input[_builtins.str] alias: Well-known alias for the AMI family. Example: 'al2@latest' or 'bottlerocket@latest'.
+        :param pulumi.Input[_builtins.str] id: Explicit AMI ID. Example: 'ami-0a1b2c3d4e5f67890'.
+        :param pulumi.Input[_builtins.str] name: AMI name filter (supports wildcards). Example: 'my-org-eks-node-*'.
+        :param pulumi.Input[_builtins.str] owner: AWS account ID or alias that owns the AMI. Example: '123456789012' or 'amazon'.
+        :param pulumi.Input[_builtins.str] ssm_parameter: SSM parameter path that stores the AMI ID. Example: '/aws/service/eks/optimized-ami/1.29/amazon-linux-2/recommended/image_id'.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] tags: Map of AWS tags used to select AMIs. Example: {"my-org/ami": "approved"}.
         """
         if alias is not None:
             pulumi.set(__self__, "alias", alias)
@@ -119,7 +119,7 @@ class AMISelectorTermArgsArgs:
     @pulumi.getter
     def alias(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Well-known alias for the AMI family (e.g. 'al2@latest').
+        Well-known alias for the AMI family. Example: 'al2@latest' or 'bottlerocket@latest'.
         """
         return pulumi.get(self, "alias")
 
@@ -131,7 +131,7 @@ class AMISelectorTermArgsArgs:
     @pulumi.getter
     def id(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Explicit AMI ID.
+        Explicit AMI ID. Example: 'ami-0a1b2c3d4e5f67890'.
         """
         return pulumi.get(self, "id")
 
@@ -143,7 +143,7 @@ class AMISelectorTermArgsArgs:
     @pulumi.getter
     def name(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        AMI name filter (supports wildcards).
+        AMI name filter (supports wildcards). Example: 'my-org-eks-node-*'.
         """
         return pulumi.get(self, "name")
 
@@ -155,7 +155,7 @@ class AMISelectorTermArgsArgs:
     @pulumi.getter
     def owner(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        AWS account ID or alias that owns the AMI.
+        AWS account ID or alias that owns the AMI. Example: '123456789012' or 'amazon'.
         """
         return pulumi.get(self, "owner")
 
@@ -167,7 +167,7 @@ class AMISelectorTermArgsArgs:
     @pulumi.getter(name="ssmParameter")
     def ssm_parameter(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        SSM parameter path that stores the AMI ID.
+        SSM parameter path that stores the AMI ID. Example: '/aws/service/eks/optimized-ami/1.29/amazon-linux-2/recommended/image_id'.
         """
         return pulumi.get(self, "ssm_parameter")
 
@@ -179,7 +179,7 @@ class AMISelectorTermArgsArgs:
     @pulumi.getter
     def tags(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
         """
-        Map of AWS tags used to select AMIs.
+        Map of AWS tags used to select AMIs. Example: {"my-org/ami": "approved"}.
         """
         return pulumi.get(self, "tags")
 
@@ -191,67 +191,67 @@ class AMISelectorTermArgsArgs:
 class AWSNodeClassSpecArgsArgsDict(TypedDict):
     ami_family: NotRequired[pulumi.Input[_builtins.str]]
     """
-    AMI family shorthand (e.g. 'AL2', 'Bottlerocket', 'Windows2022').
+    AMI family shorthand used when no amiSelectorTerms are specified. One of: 'AL2', 'AL2023', 'Bottlerocket', 'Windows2019', 'Windows2022'. Example: 'AL2'.
     """
     ami_selector_terms: NotRequired[pulumi.Input[Sequence[pulumi.Input['AMISelectorTermArgsArgsDict']]]]
     """
-    Selectors for the AMIs used to launch nodes.
+    Selectors for the AMIs used to launch nodes. Example: [{alias: "al2@latest"}].
     """
     associate_public_ip_address: NotRequired[pulumi.Input[_builtins.bool]]
     """
-    Whether to assign a public IP address to provisioned nodes.
+    Whether to assign a public IP address to provisioned nodes. Example: false.
     """
     block_device_mappings: NotRequired[pulumi.Input[Sequence[pulumi.Input['BlockDeviceMappingArgsArgsDict']]]]
     """
-    EBS block device mappings for nodes.
+    EBS block device mappings for nodes. Example: [{deviceName: "/dev/xvda", rootVolume: true, ebs: {volumeSize: "50Gi", volumeType: "gp3"}}].
     """
     capacity_reservation_selector_terms: NotRequired[pulumi.Input[Sequence[pulumi.Input['CapacityReservationSelectorTermArgsArgsDict']]]]
     """
-    Selectors for EC2 capacity reservations to prioritize.
+    Selectors for EC2 capacity reservations to prioritize. Example: [{tags: {"aws:ec2:fleet-id": "fleet-123"}}].
     """
     context: NotRequired[pulumi.Input[_builtins.str]]
     """
-    EC2 launch template context ARN.
+    Additional EC2 launch template context ARN for advanced customization. Example: 'arn:aws:ec2:us-east-1:123456789012:launch-template/lt-0abc123'.
     """
     detailed_monitoring: NotRequired[pulumi.Input[_builtins.bool]]
     """
-    Enable detailed CloudWatch monitoring for instances.
+    Enable detailed (1-minute interval) CloudWatch monitoring for instances. Example: false.
     """
     instance_profile: NotRequired[pulumi.Input[_builtins.str]]
     """
-    IAM instance profile name (use instead of Role when profile already exists).
+    IAM instance profile name to use directly (alternative to Role). Example: 'KarpenterNodeInstanceProfile-my-cluster'.
     """
     instance_store_policy: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Policy for handling instance store volumes. One of: 'RAID0'.
+    Policy for handling NVMe instance store volumes. One of: 'INSTANCE_STORE_POLICY_RAID0'. Example: 'INSTANCE_STORE_POLICY_RAID0'.
     """
     kubelet: NotRequired[pulumi.Input['KubeletConfigurationArgsArgsDict']]
     """
-    Kubelet configuration overrides for AWS nodes.
+    Kubelet configuration overrides applied to all nodes in this class.
     """
     metadata_options: NotRequired[pulumi.Input['MetadataOptionsArgsArgsDict']]
     """
-    EC2 instance metadata (IMDS) options.
+    EC2 instance metadata service (IMDS) configuration.
     """
     role: NotRequired[pulumi.Input[_builtins.str]]
     """
-    IAM role name assigned to nodes.
+    IAM role name assigned to nodes (Karpenter creates the instance profile). Example: 'KarpenterNodeRole-my-cluster'.
     """
     security_group_selector_terms: NotRequired[pulumi.Input[Sequence[pulumi.Input['SecurityGroupSelectorTermArgsArgsDict']]]]
     """
-    Selectors for security groups attached to nodes.
+    Selectors for security groups attached to provisioned nodes. Example: [{tags: {"karpenter.sh/discovery": "my-cluster"}}].
     """
     subnet_selector_terms: NotRequired[pulumi.Input[Sequence[pulumi.Input['SubnetSelectorTermArgsArgsDict']]]]
     """
-    Selectors for the subnets nodes will be launched into.
+    Selectors for the subnets nodes will be launched into. Example: [{tags: {"karpenter.sh/discovery": "my-cluster"}}].
     """
     tags: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
     """
-    AWS tags applied to all resources created by this node class.
+    AWS tags applied to all resources (instances, volumes, ENIs) created by this node class. Example: {"environment": "production", "team": "platform"}.
     """
     user_data: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Custom user data script injected into the node launch template.
+    Custom user data script merged into the node launch template (base64 or plain text). Example: '#!/bin/bash\\necho hello'.
     """
 
 @pulumi.input_type
@@ -274,22 +274,22 @@ class AWSNodeClassSpecArgsArgs:
                  tags: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  user_data: Optional[pulumi.Input[_builtins.str]] = None):
         """
-        :param pulumi.Input[_builtins.str] ami_family: AMI family shorthand (e.g. 'AL2', 'Bottlerocket', 'Windows2022').
-        :param pulumi.Input[Sequence[pulumi.Input['AMISelectorTermArgsArgs']]] ami_selector_terms: Selectors for the AMIs used to launch nodes.
-        :param pulumi.Input[_builtins.bool] associate_public_ip_address: Whether to assign a public IP address to provisioned nodes.
-        :param pulumi.Input[Sequence[pulumi.Input['BlockDeviceMappingArgsArgs']]] block_device_mappings: EBS block device mappings for nodes.
-        :param pulumi.Input[Sequence[pulumi.Input['CapacityReservationSelectorTermArgsArgs']]] capacity_reservation_selector_terms: Selectors for EC2 capacity reservations to prioritize.
-        :param pulumi.Input[_builtins.str] context: EC2 launch template context ARN.
-        :param pulumi.Input[_builtins.bool] detailed_monitoring: Enable detailed CloudWatch monitoring for instances.
-        :param pulumi.Input[_builtins.str] instance_profile: IAM instance profile name (use instead of Role when profile already exists).
-        :param pulumi.Input[_builtins.str] instance_store_policy: Policy for handling instance store volumes. One of: 'RAID0'.
-        :param pulumi.Input['KubeletConfigurationArgsArgs'] kubelet: Kubelet configuration overrides for AWS nodes.
-        :param pulumi.Input['MetadataOptionsArgsArgs'] metadata_options: EC2 instance metadata (IMDS) options.
-        :param pulumi.Input[_builtins.str] role: IAM role name assigned to nodes.
-        :param pulumi.Input[Sequence[pulumi.Input['SecurityGroupSelectorTermArgsArgs']]] security_group_selector_terms: Selectors for security groups attached to nodes.
-        :param pulumi.Input[Sequence[pulumi.Input['SubnetSelectorTermArgsArgs']]] subnet_selector_terms: Selectors for the subnets nodes will be launched into.
-        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] tags: AWS tags applied to all resources created by this node class.
-        :param pulumi.Input[_builtins.str] user_data: Custom user data script injected into the node launch template.
+        :param pulumi.Input[_builtins.str] ami_family: AMI family shorthand used when no amiSelectorTerms are specified. One of: 'AL2', 'AL2023', 'Bottlerocket', 'Windows2019', 'Windows2022'. Example: 'AL2'.
+        :param pulumi.Input[Sequence[pulumi.Input['AMISelectorTermArgsArgs']]] ami_selector_terms: Selectors for the AMIs used to launch nodes. Example: [{alias: "al2@latest"}].
+        :param pulumi.Input[_builtins.bool] associate_public_ip_address: Whether to assign a public IP address to provisioned nodes. Example: false.
+        :param pulumi.Input[Sequence[pulumi.Input['BlockDeviceMappingArgsArgs']]] block_device_mappings: EBS block device mappings for nodes. Example: [{deviceName: "/dev/xvda", rootVolume: true, ebs: {volumeSize: "50Gi", volumeType: "gp3"}}].
+        :param pulumi.Input[Sequence[pulumi.Input['CapacityReservationSelectorTermArgsArgs']]] capacity_reservation_selector_terms: Selectors for EC2 capacity reservations to prioritize. Example: [{tags: {"aws:ec2:fleet-id": "fleet-123"}}].
+        :param pulumi.Input[_builtins.str] context: Additional EC2 launch template context ARN for advanced customization. Example: 'arn:aws:ec2:us-east-1:123456789012:launch-template/lt-0abc123'.
+        :param pulumi.Input[_builtins.bool] detailed_monitoring: Enable detailed (1-minute interval) CloudWatch monitoring for instances. Example: false.
+        :param pulumi.Input[_builtins.str] instance_profile: IAM instance profile name to use directly (alternative to Role). Example: 'KarpenterNodeInstanceProfile-my-cluster'.
+        :param pulumi.Input[_builtins.str] instance_store_policy: Policy for handling NVMe instance store volumes. One of: 'INSTANCE_STORE_POLICY_RAID0'. Example: 'INSTANCE_STORE_POLICY_RAID0'.
+        :param pulumi.Input['KubeletConfigurationArgsArgs'] kubelet: Kubelet configuration overrides applied to all nodes in this class.
+        :param pulumi.Input['MetadataOptionsArgsArgs'] metadata_options: EC2 instance metadata service (IMDS) configuration.
+        :param pulumi.Input[_builtins.str] role: IAM role name assigned to nodes (Karpenter creates the instance profile). Example: 'KarpenterNodeRole-my-cluster'.
+        :param pulumi.Input[Sequence[pulumi.Input['SecurityGroupSelectorTermArgsArgs']]] security_group_selector_terms: Selectors for security groups attached to provisioned nodes. Example: [{tags: {"karpenter.sh/discovery": "my-cluster"}}].
+        :param pulumi.Input[Sequence[pulumi.Input['SubnetSelectorTermArgsArgs']]] subnet_selector_terms: Selectors for the subnets nodes will be launched into. Example: [{tags: {"karpenter.sh/discovery": "my-cluster"}}].
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] tags: AWS tags applied to all resources (instances, volumes, ENIs) created by this node class. Example: {"environment": "production", "team": "platform"}.
+        :param pulumi.Input[_builtins.str] user_data: Custom user data script merged into the node launch template (base64 or plain text). Example: '#!/bin/bash\\necho hello'.
         """
         if ami_family is not None:
             pulumi.set(__self__, "ami_family", ami_family)
@@ -328,7 +328,7 @@ class AWSNodeClassSpecArgsArgs:
     @pulumi.getter(name="amiFamily")
     def ami_family(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        AMI family shorthand (e.g. 'AL2', 'Bottlerocket', 'Windows2022').
+        AMI family shorthand used when no amiSelectorTerms are specified. One of: 'AL2', 'AL2023', 'Bottlerocket', 'Windows2019', 'Windows2022'. Example: 'AL2'.
         """
         return pulumi.get(self, "ami_family")
 
@@ -340,7 +340,7 @@ class AWSNodeClassSpecArgsArgs:
     @pulumi.getter(name="amiSelectorTerms")
     def ami_selector_terms(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['AMISelectorTermArgsArgs']]]]:
         """
-        Selectors for the AMIs used to launch nodes.
+        Selectors for the AMIs used to launch nodes. Example: [{alias: "al2@latest"}].
         """
         return pulumi.get(self, "ami_selector_terms")
 
@@ -352,7 +352,7 @@ class AWSNodeClassSpecArgsArgs:
     @pulumi.getter(name="associatePublicIpAddress")
     def associate_public_ip_address(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Whether to assign a public IP address to provisioned nodes.
+        Whether to assign a public IP address to provisioned nodes. Example: false.
         """
         return pulumi.get(self, "associate_public_ip_address")
 
@@ -364,7 +364,7 @@ class AWSNodeClassSpecArgsArgs:
     @pulumi.getter(name="blockDeviceMappings")
     def block_device_mappings(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['BlockDeviceMappingArgsArgs']]]]:
         """
-        EBS block device mappings for nodes.
+        EBS block device mappings for nodes. Example: [{deviceName: "/dev/xvda", rootVolume: true, ebs: {volumeSize: "50Gi", volumeType: "gp3"}}].
         """
         return pulumi.get(self, "block_device_mappings")
 
@@ -376,7 +376,7 @@ class AWSNodeClassSpecArgsArgs:
     @pulumi.getter(name="capacityReservationSelectorTerms")
     def capacity_reservation_selector_terms(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['CapacityReservationSelectorTermArgsArgs']]]]:
         """
-        Selectors for EC2 capacity reservations to prioritize.
+        Selectors for EC2 capacity reservations to prioritize. Example: [{tags: {"aws:ec2:fleet-id": "fleet-123"}}].
         """
         return pulumi.get(self, "capacity_reservation_selector_terms")
 
@@ -388,7 +388,7 @@ class AWSNodeClassSpecArgsArgs:
     @pulumi.getter
     def context(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        EC2 launch template context ARN.
+        Additional EC2 launch template context ARN for advanced customization. Example: 'arn:aws:ec2:us-east-1:123456789012:launch-template/lt-0abc123'.
         """
         return pulumi.get(self, "context")
 
@@ -400,7 +400,7 @@ class AWSNodeClassSpecArgsArgs:
     @pulumi.getter(name="detailedMonitoring")
     def detailed_monitoring(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Enable detailed CloudWatch monitoring for instances.
+        Enable detailed (1-minute interval) CloudWatch monitoring for instances. Example: false.
         """
         return pulumi.get(self, "detailed_monitoring")
 
@@ -412,7 +412,7 @@ class AWSNodeClassSpecArgsArgs:
     @pulumi.getter(name="instanceProfile")
     def instance_profile(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        IAM instance profile name (use instead of Role when profile already exists).
+        IAM instance profile name to use directly (alternative to Role). Example: 'KarpenterNodeInstanceProfile-my-cluster'.
         """
         return pulumi.get(self, "instance_profile")
 
@@ -424,7 +424,7 @@ class AWSNodeClassSpecArgsArgs:
     @pulumi.getter(name="instanceStorePolicy")
     def instance_store_policy(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Policy for handling instance store volumes. One of: 'RAID0'.
+        Policy for handling NVMe instance store volumes. One of: 'INSTANCE_STORE_POLICY_RAID0'. Example: 'INSTANCE_STORE_POLICY_RAID0'.
         """
         return pulumi.get(self, "instance_store_policy")
 
@@ -436,7 +436,7 @@ class AWSNodeClassSpecArgsArgs:
     @pulumi.getter
     def kubelet(self) -> Optional[pulumi.Input['KubeletConfigurationArgsArgs']]:
         """
-        Kubelet configuration overrides for AWS nodes.
+        Kubelet configuration overrides applied to all nodes in this class.
         """
         return pulumi.get(self, "kubelet")
 
@@ -448,7 +448,7 @@ class AWSNodeClassSpecArgsArgs:
     @pulumi.getter(name="metadataOptions")
     def metadata_options(self) -> Optional[pulumi.Input['MetadataOptionsArgsArgs']]:
         """
-        EC2 instance metadata (IMDS) options.
+        EC2 instance metadata service (IMDS) configuration.
         """
         return pulumi.get(self, "metadata_options")
 
@@ -460,7 +460,7 @@ class AWSNodeClassSpecArgsArgs:
     @pulumi.getter
     def role(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        IAM role name assigned to nodes.
+        IAM role name assigned to nodes (Karpenter creates the instance profile). Example: 'KarpenterNodeRole-my-cluster'.
         """
         return pulumi.get(self, "role")
 
@@ -472,7 +472,7 @@ class AWSNodeClassSpecArgsArgs:
     @pulumi.getter(name="securityGroupSelectorTerms")
     def security_group_selector_terms(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['SecurityGroupSelectorTermArgsArgs']]]]:
         """
-        Selectors for security groups attached to nodes.
+        Selectors for security groups attached to provisioned nodes. Example: [{tags: {"karpenter.sh/discovery": "my-cluster"}}].
         """
         return pulumi.get(self, "security_group_selector_terms")
 
@@ -484,7 +484,7 @@ class AWSNodeClassSpecArgsArgs:
     @pulumi.getter(name="subnetSelectorTerms")
     def subnet_selector_terms(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['SubnetSelectorTermArgsArgs']]]]:
         """
-        Selectors for the subnets nodes will be launched into.
+        Selectors for the subnets nodes will be launched into. Example: [{tags: {"karpenter.sh/discovery": "my-cluster"}}].
         """
         return pulumi.get(self, "subnet_selector_terms")
 
@@ -496,7 +496,7 @@ class AWSNodeClassSpecArgsArgs:
     @pulumi.getter
     def tags(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
         """
-        AWS tags applied to all resources created by this node class.
+        AWS tags applied to all resources (instances, volumes, ENIs) created by this node class. Example: {"environment": "production", "team": "platform"}.
         """
         return pulumi.get(self, "tags")
 
@@ -508,7 +508,7 @@ class AWSNodeClassSpecArgsArgs:
     @pulumi.getter(name="userData")
     def user_data(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Custom user data script injected into the node launch template.
+        Custom user data script merged into the node launch template (base64 or plain text). Example: '#!/bin/bash\\necho hello'.
         """
         return pulumi.get(self, "user_data")
 
@@ -520,43 +520,43 @@ class AWSNodeClassSpecArgsArgs:
 class AzureKubeletConfigurationArgsArgsDict(TypedDict):
     allowed_unsafe_sysctls: NotRequired[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]
     """
-    Unsafe sysctl patterns that are allowed (e.g. 'net.ipv4.*').
+    Unsafe sysctl patterns permitted on nodes. Example: ["net.ipv4.*", "net.ipv6.*"].
     """
     container_log_max_files: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Maximum number of container log files to retain.
+    Maximum number of container log files to retain per container. Example: 5.
     """
     container_log_max_size: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Maximum container log file size before rotation (e.g. '10Mi').
+    Maximum container log file size before rotation. Example: '10Mi'.
     """
     cpu_cfs_quota: NotRequired[pulumi.Input[_builtins.bool]]
     """
-    Whether to enforce CPU CFS quota for containers.
+    Whether to enforce CPU CFS quota limits for containers. Example: true.
     """
     cpu_cfs_quota_period: NotRequired[pulumi.Input[_builtins.str]]
     """
-    CPU CFS quota period (e.g. '100ms').
+    CPU CFS quota period. Example: '100ms'.
     """
     cpu_manager_policy: NotRequired[pulumi.Input[_builtins.str]]
     """
-    CPU manager policy. One of: 'none', 'static'.
+    CPU manager policy for CPU pinning. One of: 'none', 'static'. Example: 'static'.
     """
     image_gc_high_threshold_percent: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Disk usage percentage triggering image GC.
+    Disk usage % that triggers image garbage collection. Example: 85.
     """
     image_gc_low_threshold_percent: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Disk usage percentage below which image GC stops.
+    Disk usage % at which image GC stops freeing space. Example: 70.
     """
     pod_pids_limit: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Maximum number of process IDs per pod.
+    Maximum number of process IDs allowed per pod. Example: 1024.
     """
     topology_manager_policy: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Topology manager policy for NUMA-aware scheduling.
+    Topology manager policy for NUMA-aware workloads. One of: 'none', 'best-effort', 'restricted', 'single-numa-node'. Example: 'none'.
     """
 
 @pulumi.input_type
@@ -573,16 +573,16 @@ class AzureKubeletConfigurationArgsArgs:
                  pod_pids_limit: Optional[pulumi.Input[_builtins.int]] = None,
                  topology_manager_policy: Optional[pulumi.Input[_builtins.str]] = None):
         """
-        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] allowed_unsafe_sysctls: Unsafe sysctl patterns that are allowed (e.g. 'net.ipv4.*').
-        :param pulumi.Input[_builtins.int] container_log_max_files: Maximum number of container log files to retain.
-        :param pulumi.Input[_builtins.str] container_log_max_size: Maximum container log file size before rotation (e.g. '10Mi').
-        :param pulumi.Input[_builtins.bool] cpu_cfs_quota: Whether to enforce CPU CFS quota for containers.
-        :param pulumi.Input[_builtins.str] cpu_cfs_quota_period: CPU CFS quota period (e.g. '100ms').
-        :param pulumi.Input[_builtins.str] cpu_manager_policy: CPU manager policy. One of: 'none', 'static'.
-        :param pulumi.Input[_builtins.int] image_gc_high_threshold_percent: Disk usage percentage triggering image GC.
-        :param pulumi.Input[_builtins.int] image_gc_low_threshold_percent: Disk usage percentage below which image GC stops.
-        :param pulumi.Input[_builtins.int] pod_pids_limit: Maximum number of process IDs per pod.
-        :param pulumi.Input[_builtins.str] topology_manager_policy: Topology manager policy for NUMA-aware scheduling.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] allowed_unsafe_sysctls: Unsafe sysctl patterns permitted on nodes. Example: ["net.ipv4.*", "net.ipv6.*"].
+        :param pulumi.Input[_builtins.int] container_log_max_files: Maximum number of container log files to retain per container. Example: 5.
+        :param pulumi.Input[_builtins.str] container_log_max_size: Maximum container log file size before rotation. Example: '10Mi'.
+        :param pulumi.Input[_builtins.bool] cpu_cfs_quota: Whether to enforce CPU CFS quota limits for containers. Example: true.
+        :param pulumi.Input[_builtins.str] cpu_cfs_quota_period: CPU CFS quota period. Example: '100ms'.
+        :param pulumi.Input[_builtins.str] cpu_manager_policy: CPU manager policy for CPU pinning. One of: 'none', 'static'. Example: 'static'.
+        :param pulumi.Input[_builtins.int] image_gc_high_threshold_percent: Disk usage % that triggers image garbage collection. Example: 85.
+        :param pulumi.Input[_builtins.int] image_gc_low_threshold_percent: Disk usage % at which image GC stops freeing space. Example: 70.
+        :param pulumi.Input[_builtins.int] pod_pids_limit: Maximum number of process IDs allowed per pod. Example: 1024.
+        :param pulumi.Input[_builtins.str] topology_manager_policy: Topology manager policy for NUMA-aware workloads. One of: 'none', 'best-effort', 'restricted', 'single-numa-node'. Example: 'none'.
         """
         if allowed_unsafe_sysctls is not None:
             pulumi.set(__self__, "allowed_unsafe_sysctls", allowed_unsafe_sysctls)
@@ -609,7 +609,7 @@ class AzureKubeletConfigurationArgsArgs:
     @pulumi.getter(name="allowedUnsafeSysctls")
     def allowed_unsafe_sysctls(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
         """
-        Unsafe sysctl patterns that are allowed (e.g. 'net.ipv4.*').
+        Unsafe sysctl patterns permitted on nodes. Example: ["net.ipv4.*", "net.ipv6.*"].
         """
         return pulumi.get(self, "allowed_unsafe_sysctls")
 
@@ -621,7 +621,7 @@ class AzureKubeletConfigurationArgsArgs:
     @pulumi.getter(name="containerLogMaxFiles")
     def container_log_max_files(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Maximum number of container log files to retain.
+        Maximum number of container log files to retain per container. Example: 5.
         """
         return pulumi.get(self, "container_log_max_files")
 
@@ -633,7 +633,7 @@ class AzureKubeletConfigurationArgsArgs:
     @pulumi.getter(name="containerLogMaxSize")
     def container_log_max_size(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Maximum container log file size before rotation (e.g. '10Mi').
+        Maximum container log file size before rotation. Example: '10Mi'.
         """
         return pulumi.get(self, "container_log_max_size")
 
@@ -645,7 +645,7 @@ class AzureKubeletConfigurationArgsArgs:
     @pulumi.getter(name="cpuCfsQuota")
     def cpu_cfs_quota(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Whether to enforce CPU CFS quota for containers.
+        Whether to enforce CPU CFS quota limits for containers. Example: true.
         """
         return pulumi.get(self, "cpu_cfs_quota")
 
@@ -657,7 +657,7 @@ class AzureKubeletConfigurationArgsArgs:
     @pulumi.getter(name="cpuCfsQuotaPeriod")
     def cpu_cfs_quota_period(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        CPU CFS quota period (e.g. '100ms').
+        CPU CFS quota period. Example: '100ms'.
         """
         return pulumi.get(self, "cpu_cfs_quota_period")
 
@@ -669,7 +669,7 @@ class AzureKubeletConfigurationArgsArgs:
     @pulumi.getter(name="cpuManagerPolicy")
     def cpu_manager_policy(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        CPU manager policy. One of: 'none', 'static'.
+        CPU manager policy for CPU pinning. One of: 'none', 'static'. Example: 'static'.
         """
         return pulumi.get(self, "cpu_manager_policy")
 
@@ -681,7 +681,7 @@ class AzureKubeletConfigurationArgsArgs:
     @pulumi.getter(name="imageGcHighThresholdPercent")
     def image_gc_high_threshold_percent(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Disk usage percentage triggering image GC.
+        Disk usage % that triggers image garbage collection. Example: 85.
         """
         return pulumi.get(self, "image_gc_high_threshold_percent")
 
@@ -693,7 +693,7 @@ class AzureKubeletConfigurationArgsArgs:
     @pulumi.getter(name="imageGcLowThresholdPercent")
     def image_gc_low_threshold_percent(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Disk usage percentage below which image GC stops.
+        Disk usage % at which image GC stops freeing space. Example: 70.
         """
         return pulumi.get(self, "image_gc_low_threshold_percent")
 
@@ -705,7 +705,7 @@ class AzureKubeletConfigurationArgsArgs:
     @pulumi.getter(name="podPidsLimit")
     def pod_pids_limit(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Maximum number of process IDs per pod.
+        Maximum number of process IDs allowed per pod. Example: 1024.
         """
         return pulumi.get(self, "pod_pids_limit")
 
@@ -717,7 +717,7 @@ class AzureKubeletConfigurationArgsArgs:
     @pulumi.getter(name="topologyManagerPolicy")
     def topology_manager_policy(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Topology manager policy for NUMA-aware scheduling.
+        Topology manager policy for NUMA-aware workloads. One of: 'none', 'best-effort', 'restricted', 'single-numa-node'. Example: 'none'.
         """
         return pulumi.get(self, "topology_manager_policy")
 
@@ -729,11 +729,11 @@ class AzureKubeletConfigurationArgsArgs:
 class AzureNodeClassSpecArgsArgsDict(TypedDict):
     fips_mode: NotRequired[pulumi.Input[_builtins.str]]
     """
-    FIPS compliance mode. One of: 'Enabled', 'Disabled'.
+    FIPS 140-2 compliance mode for the node. One of: 'Enabled', 'Disabled'. Example: 'Disabled'.
     """
     image_family: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Azure node image family (e.g. 'AzureLinux', 'Ubuntu2204').
+    Azure node image family. One of: 'AzureLinux', 'Ubuntu2204'. Example: 'AzureLinux'.
     """
     kubelet: NotRequired[pulumi.Input['AzureKubeletConfigurationArgsArgsDict']]
     """
@@ -741,19 +741,19 @@ class AzureNodeClassSpecArgsArgsDict(TypedDict):
     """
     max_pods: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Maximum pods per node (overrides AKS default).
+    Maximum pods per node, overrides the AKS cluster default. Example: 110.
     """
     os_disk_size_gb: NotRequired[pulumi.Input[_builtins.int]]
     """
-    OS disk size in GB.
+    OS disk size in GB. Example: 128.
     """
     tags: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
     """
-    Azure tags applied to all resources created by this node class.
+    Azure tags applied to all resources created by this node class. Example: {"environment": "production"}.
     """
     vnet_subnet_id: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Azure VNet subnet resource ID for node networking.
+    Azure VNet subnet resource ID where nodes will be placed. Example: '/subscriptions/sub-id/resourceGroups/my-rg/providers/Microsoft.Network/virtualNetworks/my-vnet/subnets/nodesubnet'.
     """
 
 @pulumi.input_type
@@ -767,13 +767,13 @@ class AzureNodeClassSpecArgsArgs:
                  tags: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  vnet_subnet_id: Optional[pulumi.Input[_builtins.str]] = None):
         """
-        :param pulumi.Input[_builtins.str] fips_mode: FIPS compliance mode. One of: 'Enabled', 'Disabled'.
-        :param pulumi.Input[_builtins.str] image_family: Azure node image family (e.g. 'AzureLinux', 'Ubuntu2204').
+        :param pulumi.Input[_builtins.str] fips_mode: FIPS 140-2 compliance mode for the node. One of: 'Enabled', 'Disabled'. Example: 'Disabled'.
+        :param pulumi.Input[_builtins.str] image_family: Azure node image family. One of: 'AzureLinux', 'Ubuntu2204'. Example: 'AzureLinux'.
         :param pulumi.Input['AzureKubeletConfigurationArgsArgs'] kubelet: Kubelet configuration overrides for Azure nodes.
-        :param pulumi.Input[_builtins.int] max_pods: Maximum pods per node (overrides AKS default).
-        :param pulumi.Input[_builtins.int] os_disk_size_gb: OS disk size in GB.
-        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] tags: Azure tags applied to all resources created by this node class.
-        :param pulumi.Input[_builtins.str] vnet_subnet_id: Azure VNet subnet resource ID for node networking.
+        :param pulumi.Input[_builtins.int] max_pods: Maximum pods per node, overrides the AKS cluster default. Example: 110.
+        :param pulumi.Input[_builtins.int] os_disk_size_gb: OS disk size in GB. Example: 128.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] tags: Azure tags applied to all resources created by this node class. Example: {"environment": "production"}.
+        :param pulumi.Input[_builtins.str] vnet_subnet_id: Azure VNet subnet resource ID where nodes will be placed. Example: '/subscriptions/sub-id/resourceGroups/my-rg/providers/Microsoft.Network/virtualNetworks/my-vnet/subnets/nodesubnet'.
         """
         if fips_mode is not None:
             pulumi.set(__self__, "fips_mode", fips_mode)
@@ -794,7 +794,7 @@ class AzureNodeClassSpecArgsArgs:
     @pulumi.getter(name="fipsMode")
     def fips_mode(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        FIPS compliance mode. One of: 'Enabled', 'Disabled'.
+        FIPS 140-2 compliance mode for the node. One of: 'Enabled', 'Disabled'. Example: 'Disabled'.
         """
         return pulumi.get(self, "fips_mode")
 
@@ -806,7 +806,7 @@ class AzureNodeClassSpecArgsArgs:
     @pulumi.getter(name="imageFamily")
     def image_family(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Azure node image family (e.g. 'AzureLinux', 'Ubuntu2204').
+        Azure node image family. One of: 'AzureLinux', 'Ubuntu2204'. Example: 'AzureLinux'.
         """
         return pulumi.get(self, "image_family")
 
@@ -830,7 +830,7 @@ class AzureNodeClassSpecArgsArgs:
     @pulumi.getter(name="maxPods")
     def max_pods(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Maximum pods per node (overrides AKS default).
+        Maximum pods per node, overrides the AKS cluster default. Example: 110.
         """
         return pulumi.get(self, "max_pods")
 
@@ -842,7 +842,7 @@ class AzureNodeClassSpecArgsArgs:
     @pulumi.getter(name="osDiskSizeGb")
     def os_disk_size_gb(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        OS disk size in GB.
+        OS disk size in GB. Example: 128.
         """
         return pulumi.get(self, "os_disk_size_gb")
 
@@ -854,7 +854,7 @@ class AzureNodeClassSpecArgsArgs:
     @pulumi.getter
     def tags(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
         """
-        Azure tags applied to all resources created by this node class.
+        Azure tags applied to all resources created by this node class. Example: {"environment": "production"}.
         """
         return pulumi.get(self, "tags")
 
@@ -866,7 +866,7 @@ class AzureNodeClassSpecArgsArgs:
     @pulumi.getter(name="vnetSubnetId")
     def vnet_subnet_id(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Azure VNet subnet resource ID for node networking.
+        Azure VNet subnet resource ID where nodes will be placed. Example: '/subscriptions/sub-id/resourceGroups/my-rg/providers/Microsoft.Network/virtualNetworks/my-vnet/subnets/nodesubnet'.
         """
         return pulumi.get(self, "vnet_subnet_id")
 
@@ -878,39 +878,39 @@ class AzureNodeClassSpecArgsArgs:
 class BlockDeviceArgsArgsDict(TypedDict):
     delete_on_termination: NotRequired[pulumi.Input[_builtins.bool]]
     """
-    Whether to delete the EBS volume when the instance terminates.
+    Whether to delete the EBS volume when the instance terminates. Example: true.
     """
     encrypted: NotRequired[pulumi.Input[_builtins.bool]]
     """
-    Whether to encrypt the EBS volume.
+    Whether to encrypt the EBS volume. Example: true.
     """
     iops: NotRequired[pulumi.Input[_builtins.int]]
     """
-    IOPS to provision for io1/io2 volume types.
+    IOPS to provision for io1/io2 volume types. Example: 3000.
     """
     kms_key_id: NotRequired[pulumi.Input[_builtins.str]]
     """
-    KMS key ID or ARN used to encrypt the volume.
+    KMS key ID or ARN used to encrypt the volume. Example: 'arn:aws:kms:us-east-1:123456789012:key/mrk-abc123'.
     """
     snapshot_id: NotRequired[pulumi.Input[_builtins.str]]
     """
-    EBS snapshot ID to restore the volume from.
+    EBS snapshot ID to restore the volume from. Example: 'snap-0a1b2c3d4e5f'.
     """
     throughput: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Throughput in MiB/s for gp3 volumes.
+    Throughput in MiB/s for gp3 volumes (125-1000). Example: 125.
     """
     volume_initialization_rate: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Rate in MiB/s for initializing volumes from snapshots.
+    Rate in MiB/s for initializing volumes from snapshots. Example: 300.
     """
     volume_size: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Volume size (e.g. '20Gi').
+    Volume size with unit suffix. Example: '20Gi'.
     """
     volume_type: NotRequired[pulumi.Input[_builtins.str]]
     """
-    EBS volume type (e.g. 'gp3', 'io1', 'st1').
+    EBS volume type. One of: 'gp2', 'gp3', 'io1', 'io2', 'st1', 'sc1'. Example: 'gp3'.
     """
 
 @pulumi.input_type
@@ -926,15 +926,15 @@ class BlockDeviceArgsArgs:
                  volume_size: Optional[pulumi.Input[_builtins.str]] = None,
                  volume_type: Optional[pulumi.Input[_builtins.str]] = None):
         """
-        :param pulumi.Input[_builtins.bool] delete_on_termination: Whether to delete the EBS volume when the instance terminates.
-        :param pulumi.Input[_builtins.bool] encrypted: Whether to encrypt the EBS volume.
-        :param pulumi.Input[_builtins.int] iops: IOPS to provision for io1/io2 volume types.
-        :param pulumi.Input[_builtins.str] kms_key_id: KMS key ID or ARN used to encrypt the volume.
-        :param pulumi.Input[_builtins.str] snapshot_id: EBS snapshot ID to restore the volume from.
-        :param pulumi.Input[_builtins.int] throughput: Throughput in MiB/s for gp3 volumes.
-        :param pulumi.Input[_builtins.int] volume_initialization_rate: Rate in MiB/s for initializing volumes from snapshots.
-        :param pulumi.Input[_builtins.str] volume_size: Volume size (e.g. '20Gi').
-        :param pulumi.Input[_builtins.str] volume_type: EBS volume type (e.g. 'gp3', 'io1', 'st1').
+        :param pulumi.Input[_builtins.bool] delete_on_termination: Whether to delete the EBS volume when the instance terminates. Example: true.
+        :param pulumi.Input[_builtins.bool] encrypted: Whether to encrypt the EBS volume. Example: true.
+        :param pulumi.Input[_builtins.int] iops: IOPS to provision for io1/io2 volume types. Example: 3000.
+        :param pulumi.Input[_builtins.str] kms_key_id: KMS key ID or ARN used to encrypt the volume. Example: 'arn:aws:kms:us-east-1:123456789012:key/mrk-abc123'.
+        :param pulumi.Input[_builtins.str] snapshot_id: EBS snapshot ID to restore the volume from. Example: 'snap-0a1b2c3d4e5f'.
+        :param pulumi.Input[_builtins.int] throughput: Throughput in MiB/s for gp3 volumes (125-1000). Example: 125.
+        :param pulumi.Input[_builtins.int] volume_initialization_rate: Rate in MiB/s for initializing volumes from snapshots. Example: 300.
+        :param pulumi.Input[_builtins.str] volume_size: Volume size with unit suffix. Example: '20Gi'.
+        :param pulumi.Input[_builtins.str] volume_type: EBS volume type. One of: 'gp2', 'gp3', 'io1', 'io2', 'st1', 'sc1'. Example: 'gp3'.
         """
         if delete_on_termination is not None:
             pulumi.set(__self__, "delete_on_termination", delete_on_termination)
@@ -959,7 +959,7 @@ class BlockDeviceArgsArgs:
     @pulumi.getter(name="deleteOnTermination")
     def delete_on_termination(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Whether to delete the EBS volume when the instance terminates.
+        Whether to delete the EBS volume when the instance terminates. Example: true.
         """
         return pulumi.get(self, "delete_on_termination")
 
@@ -971,7 +971,7 @@ class BlockDeviceArgsArgs:
     @pulumi.getter
     def encrypted(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Whether to encrypt the EBS volume.
+        Whether to encrypt the EBS volume. Example: true.
         """
         return pulumi.get(self, "encrypted")
 
@@ -983,7 +983,7 @@ class BlockDeviceArgsArgs:
     @pulumi.getter
     def iops(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        IOPS to provision for io1/io2 volume types.
+        IOPS to provision for io1/io2 volume types. Example: 3000.
         """
         return pulumi.get(self, "iops")
 
@@ -995,7 +995,7 @@ class BlockDeviceArgsArgs:
     @pulumi.getter(name="kmsKeyId")
     def kms_key_id(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        KMS key ID or ARN used to encrypt the volume.
+        KMS key ID or ARN used to encrypt the volume. Example: 'arn:aws:kms:us-east-1:123456789012:key/mrk-abc123'.
         """
         return pulumi.get(self, "kms_key_id")
 
@@ -1007,7 +1007,7 @@ class BlockDeviceArgsArgs:
     @pulumi.getter(name="snapshotId")
     def snapshot_id(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        EBS snapshot ID to restore the volume from.
+        EBS snapshot ID to restore the volume from. Example: 'snap-0a1b2c3d4e5f'.
         """
         return pulumi.get(self, "snapshot_id")
 
@@ -1019,7 +1019,7 @@ class BlockDeviceArgsArgs:
     @pulumi.getter
     def throughput(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Throughput in MiB/s for gp3 volumes.
+        Throughput in MiB/s for gp3 volumes (125-1000). Example: 125.
         """
         return pulumi.get(self, "throughput")
 
@@ -1031,7 +1031,7 @@ class BlockDeviceArgsArgs:
     @pulumi.getter(name="volumeInitializationRate")
     def volume_initialization_rate(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Rate in MiB/s for initializing volumes from snapshots.
+        Rate in MiB/s for initializing volumes from snapshots. Example: 300.
         """
         return pulumi.get(self, "volume_initialization_rate")
 
@@ -1043,7 +1043,7 @@ class BlockDeviceArgsArgs:
     @pulumi.getter(name="volumeSize")
     def volume_size(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Volume size (e.g. '20Gi').
+        Volume size with unit suffix. Example: '20Gi'.
         """
         return pulumi.get(self, "volume_size")
 
@@ -1055,7 +1055,7 @@ class BlockDeviceArgsArgs:
     @pulumi.getter(name="volumeType")
     def volume_type(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        EBS volume type (e.g. 'gp3', 'io1', 'st1').
+        EBS volume type. One of: 'gp2', 'gp3', 'io1', 'io2', 'st1', 'sc1'. Example: 'gp3'.
         """
         return pulumi.get(self, "volume_type")
 
@@ -1067,15 +1067,15 @@ class BlockDeviceArgsArgs:
 class BlockDeviceMappingArgsArgsDict(TypedDict):
     device_name: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Device name to map the volume to (e.g. '/dev/xvda').
+    Device name to map the volume to. Example: '/dev/xvda' (root on AL2), '/dev/sdb' (data volume).
     """
     ebs: NotRequired[pulumi.Input['BlockDeviceArgsArgsDict']]
     """
-    EBS volume configuration for this device.
+    EBS volume configuration for this device mapping.
     """
     root_volume: NotRequired[pulumi.Input[_builtins.bool]]
     """
-    Whether this mapping is for the root volume.
+    Whether this mapping is for the root (boot) volume. Example: true.
     """
 
 @pulumi.input_type
@@ -1085,9 +1085,9 @@ class BlockDeviceMappingArgsArgs:
                  ebs: Optional[pulumi.Input['BlockDeviceArgsArgs']] = None,
                  root_volume: Optional[pulumi.Input[_builtins.bool]] = None):
         """
-        :param pulumi.Input[_builtins.str] device_name: Device name to map the volume to (e.g. '/dev/xvda').
-        :param pulumi.Input['BlockDeviceArgsArgs'] ebs: EBS volume configuration for this device.
-        :param pulumi.Input[_builtins.bool] root_volume: Whether this mapping is for the root volume.
+        :param pulumi.Input[_builtins.str] device_name: Device name to map the volume to. Example: '/dev/xvda' (root on AL2), '/dev/sdb' (data volume).
+        :param pulumi.Input['BlockDeviceArgsArgs'] ebs: EBS volume configuration for this device mapping.
+        :param pulumi.Input[_builtins.bool] root_volume: Whether this mapping is for the root (boot) volume. Example: true.
         """
         if device_name is not None:
             pulumi.set(__self__, "device_name", device_name)
@@ -1100,7 +1100,7 @@ class BlockDeviceMappingArgsArgs:
     @pulumi.getter(name="deviceName")
     def device_name(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Device name to map the volume to (e.g. '/dev/xvda').
+        Device name to map the volume to. Example: '/dev/xvda' (root on AL2), '/dev/sdb' (data volume).
         """
         return pulumi.get(self, "device_name")
 
@@ -1112,7 +1112,7 @@ class BlockDeviceMappingArgsArgs:
     @pulumi.getter
     def ebs(self) -> Optional[pulumi.Input['BlockDeviceArgsArgs']]:
         """
-        EBS volume configuration for this device.
+        EBS volume configuration for this device mapping.
         """
         return pulumi.get(self, "ebs")
 
@@ -1124,7 +1124,7 @@ class BlockDeviceMappingArgsArgs:
     @pulumi.getter(name="rootVolume")
     def root_volume(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Whether this mapping is for the root volume.
+        Whether this mapping is for the root (boot) volume. Example: true.
         """
         return pulumi.get(self, "root_volume")
 
@@ -1136,15 +1136,15 @@ class BlockDeviceMappingArgsArgs:
 class CapacityReservationSelectorTermArgsArgsDict(TypedDict):
     id: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Explicit capacity reservation ID.
+    Explicit capacity reservation ID. Example: 'cr-0a1b2c3d4e5f'.
     """
     owner_id: NotRequired[pulumi.Input[_builtins.str]]
     """
-    AWS account ID that owns the capacity reservation.
+    AWS account ID that owns the capacity reservation. Example: '123456789012'.
     """
     tags: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
     """
-    Map of AWS tags used to select capacity reservations.
+    Map of AWS tags used to select capacity reservations. Example: {"aws:ec2:fleet-id": "fleet-123"}.
     """
 
 @pulumi.input_type
@@ -1154,9 +1154,9 @@ class CapacityReservationSelectorTermArgsArgs:
                  owner_id: Optional[pulumi.Input[_builtins.str]] = None,
                  tags: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None):
         """
-        :param pulumi.Input[_builtins.str] id: Explicit capacity reservation ID.
-        :param pulumi.Input[_builtins.str] owner_id: AWS account ID that owns the capacity reservation.
-        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] tags: Map of AWS tags used to select capacity reservations.
+        :param pulumi.Input[_builtins.str] id: Explicit capacity reservation ID. Example: 'cr-0a1b2c3d4e5f'.
+        :param pulumi.Input[_builtins.str] owner_id: AWS account ID that owns the capacity reservation. Example: '123456789012'.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] tags: Map of AWS tags used to select capacity reservations. Example: {"aws:ec2:fleet-id": "fleet-123"}.
         """
         if id is not None:
             pulumi.set(__self__, "id", id)
@@ -1169,7 +1169,7 @@ class CapacityReservationSelectorTermArgsArgs:
     @pulumi.getter
     def id(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Explicit capacity reservation ID.
+        Explicit capacity reservation ID. Example: 'cr-0a1b2c3d4e5f'.
         """
         return pulumi.get(self, "id")
 
@@ -1181,7 +1181,7 @@ class CapacityReservationSelectorTermArgsArgs:
     @pulumi.getter(name="ownerId")
     def owner_id(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        AWS account ID that owns the capacity reservation.
+        AWS account ID that owns the capacity reservation. Example: '123456789012'.
         """
         return pulumi.get(self, "owner_id")
 
@@ -1193,7 +1193,7 @@ class CapacityReservationSelectorTermArgsArgs:
     @pulumi.getter
     def tags(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
         """
-        Map of AWS tags used to select capacity reservations.
+        Map of AWS tags used to select capacity reservations. Example: {"aws:ec2:fleet-id": "fleet-123"}.
         """
         return pulumi.get(self, "tags")
 
@@ -1205,19 +1205,19 @@ class CapacityReservationSelectorTermArgsArgs:
 class DisruptionBudgetArgsArgsDict(TypedDict):
     duration: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Duration the budget window stays active (e.g. '1h', '30m').
+    How long the budget window stays active after the cron fires. Example: '8h'.
     """
     nodes: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Maximum nodes that may be disrupted, as an absolute count or percentage (e.g. '10%').
+    Maximum nodes that may be disrupted simultaneously, as an absolute count or percentage. Example: '10%' or '5'.
     """
     reasons: NotRequired[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]
     """
-    Disruption reasons this budget applies to (e.g. 'Underutilized', 'Empty', 'Drifted').
+    Disruption reasons this budget applies to. Valid values: 'Underutilized', 'Empty', 'Drifted'. Example: ["Underutilized", "Empty"].
     """
     schedule: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Cron schedule during which this budget is active (5-field format).
+    Cron schedule (5-field UTC) during which this budget is active. Example: '0 9 * * mon-fri' (weekday business hours).
     """
 
 @pulumi.input_type
@@ -1228,10 +1228,10 @@ class DisruptionBudgetArgsArgs:
                  reasons: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  schedule: Optional[pulumi.Input[_builtins.str]] = None):
         """
-        :param pulumi.Input[_builtins.str] duration: Duration the budget window stays active (e.g. '1h', '30m').
-        :param pulumi.Input[_builtins.str] nodes: Maximum nodes that may be disrupted, as an absolute count or percentage (e.g. '10%').
-        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] reasons: Disruption reasons this budget applies to (e.g. 'Underutilized', 'Empty', 'Drifted').
-        :param pulumi.Input[_builtins.str] schedule: Cron schedule during which this budget is active (5-field format).
+        :param pulumi.Input[_builtins.str] duration: How long the budget window stays active after the cron fires. Example: '8h'.
+        :param pulumi.Input[_builtins.str] nodes: Maximum nodes that may be disrupted simultaneously, as an absolute count or percentage. Example: '10%' or '5'.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] reasons: Disruption reasons this budget applies to. Valid values: 'Underutilized', 'Empty', 'Drifted'. Example: ["Underutilized", "Empty"].
+        :param pulumi.Input[_builtins.str] schedule: Cron schedule (5-field UTC) during which this budget is active. Example: '0 9 * * mon-fri' (weekday business hours).
         """
         if duration is not None:
             pulumi.set(__self__, "duration", duration)
@@ -1246,7 +1246,7 @@ class DisruptionBudgetArgsArgs:
     @pulumi.getter
     def duration(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Duration the budget window stays active (e.g. '1h', '30m').
+        How long the budget window stays active after the cron fires. Example: '8h'.
         """
         return pulumi.get(self, "duration")
 
@@ -1258,7 +1258,7 @@ class DisruptionBudgetArgsArgs:
     @pulumi.getter
     def nodes(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Maximum nodes that may be disrupted, as an absolute count or percentage (e.g. '10%').
+        Maximum nodes that may be disrupted simultaneously, as an absolute count or percentage. Example: '10%' or '5'.
         """
         return pulumi.get(self, "nodes")
 
@@ -1270,7 +1270,7 @@ class DisruptionBudgetArgsArgs:
     @pulumi.getter
     def reasons(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
         """
-        Disruption reasons this budget applies to (e.g. 'Underutilized', 'Empty', 'Drifted').
+        Disruption reasons this budget applies to. Valid values: 'Underutilized', 'Empty', 'Drifted'. Example: ["Underutilized", "Empty"].
         """
         return pulumi.get(self, "reasons")
 
@@ -1282,7 +1282,7 @@ class DisruptionBudgetArgsArgs:
     @pulumi.getter
     def schedule(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Cron schedule during which this budget is active (5-field format).
+        Cron schedule (5-field UTC) during which this budget is active. Example: '0 9 * * mon-fri' (weekday business hours).
         """
         return pulumi.get(self, "schedule")
 
@@ -1294,27 +1294,27 @@ class DisruptionBudgetArgsArgs:
 class DisruptionPolicyArgsArgsDict(TypedDict):
     budgets: NotRequired[pulumi.Input[Sequence[pulumi.Input['DisruptionBudgetArgsArgsDict']]]]
     """
-    Disruption budgets limiting how many nodes can be disrupted at once.
+    Disruption budgets controlling how many nodes can be disrupted simultaneously. Example: [{reasons: ["Underutilized"], nodes: "10%"}].
     """
     consolidate_after: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Duration to wait after a node becomes empty before consolidating (e.g. '30s').
+    Duration to wait after a node becomes empty before consolidating. Example: '30s'.
     """
     consolidation_policy: NotRequired[pulumi.Input[_builtins.str]]
     """
-    When to consolidate nodes. One of: 'WhenEmpty', 'WhenUnderutilized'.
+    When to consolidate nodes. One of: 'WhenEmpty', 'WhenEmptyOrUnderutilized'. Example: 'WhenEmptyOrUnderutilized'.
     """
     expire_after: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Duration after which provisioned nodes are replaced regardless of load (e.g. '720h').
+    Duration after which provisioned nodes are replaced regardless of load. Example: '720h' (30 days).
     """
     termination_grace_period_seconds: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Grace period in seconds before forcefully terminating a draining node.
+    Grace period in seconds before forcefully terminating a draining node. Example: 600.
     """
     ttl_seconds_after_empty: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Seconds before an empty node is terminated (deprecated; prefer ConsolidateAfter).
+    Seconds before an empty node is terminated (deprecated; prefer consolidateAfter). Example: 30.
     """
 
 @pulumi.input_type
@@ -1327,12 +1327,12 @@ class DisruptionPolicyArgsArgs:
                  termination_grace_period_seconds: Optional[pulumi.Input[_builtins.int]] = None,
                  ttl_seconds_after_empty: Optional[pulumi.Input[_builtins.int]] = None):
         """
-        :param pulumi.Input[Sequence[pulumi.Input['DisruptionBudgetArgsArgs']]] budgets: Disruption budgets limiting how many nodes can be disrupted at once.
-        :param pulumi.Input[_builtins.str] consolidate_after: Duration to wait after a node becomes empty before consolidating (e.g. '30s').
-        :param pulumi.Input[_builtins.str] consolidation_policy: When to consolidate nodes. One of: 'WhenEmpty', 'WhenUnderutilized'.
-        :param pulumi.Input[_builtins.str] expire_after: Duration after which provisioned nodes are replaced regardless of load (e.g. '720h').
-        :param pulumi.Input[_builtins.int] termination_grace_period_seconds: Grace period in seconds before forcefully terminating a draining node.
-        :param pulumi.Input[_builtins.int] ttl_seconds_after_empty: Seconds before an empty node is terminated (deprecated; prefer ConsolidateAfter).
+        :param pulumi.Input[Sequence[pulumi.Input['DisruptionBudgetArgsArgs']]] budgets: Disruption budgets controlling how many nodes can be disrupted simultaneously. Example: [{reasons: ["Underutilized"], nodes: "10%"}].
+        :param pulumi.Input[_builtins.str] consolidate_after: Duration to wait after a node becomes empty before consolidating. Example: '30s'.
+        :param pulumi.Input[_builtins.str] consolidation_policy: When to consolidate nodes. One of: 'WhenEmpty', 'WhenEmptyOrUnderutilized'. Example: 'WhenEmptyOrUnderutilized'.
+        :param pulumi.Input[_builtins.str] expire_after: Duration after which provisioned nodes are replaced regardless of load. Example: '720h' (30 days).
+        :param pulumi.Input[_builtins.int] termination_grace_period_seconds: Grace period in seconds before forcefully terminating a draining node. Example: 600.
+        :param pulumi.Input[_builtins.int] ttl_seconds_after_empty: Seconds before an empty node is terminated (deprecated; prefer consolidateAfter). Example: 30.
         """
         if budgets is not None:
             pulumi.set(__self__, "budgets", budgets)
@@ -1351,7 +1351,7 @@ class DisruptionPolicyArgsArgs:
     @pulumi.getter
     def budgets(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['DisruptionBudgetArgsArgs']]]]:
         """
-        Disruption budgets limiting how many nodes can be disrupted at once.
+        Disruption budgets controlling how many nodes can be disrupted simultaneously. Example: [{reasons: ["Underutilized"], nodes: "10%"}].
         """
         return pulumi.get(self, "budgets")
 
@@ -1363,7 +1363,7 @@ class DisruptionPolicyArgsArgs:
     @pulumi.getter(name="consolidateAfter")
     def consolidate_after(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Duration to wait after a node becomes empty before consolidating (e.g. '30s').
+        Duration to wait after a node becomes empty before consolidating. Example: '30s'.
         """
         return pulumi.get(self, "consolidate_after")
 
@@ -1375,7 +1375,7 @@ class DisruptionPolicyArgsArgs:
     @pulumi.getter(name="consolidationPolicy")
     def consolidation_policy(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        When to consolidate nodes. One of: 'WhenEmpty', 'WhenUnderutilized'.
+        When to consolidate nodes. One of: 'WhenEmpty', 'WhenEmptyOrUnderutilized'. Example: 'WhenEmptyOrUnderutilized'.
         """
         return pulumi.get(self, "consolidation_policy")
 
@@ -1387,7 +1387,7 @@ class DisruptionPolicyArgsArgs:
     @pulumi.getter(name="expireAfter")
     def expire_after(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Duration after which provisioned nodes are replaced regardless of load (e.g. '720h').
+        Duration after which provisioned nodes are replaced regardless of load. Example: '720h' (30 days).
         """
         return pulumi.get(self, "expire_after")
 
@@ -1399,7 +1399,7 @@ class DisruptionPolicyArgsArgs:
     @pulumi.getter(name="terminationGracePeriodSeconds")
     def termination_grace_period_seconds(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Grace period in seconds before forcefully terminating a draining node.
+        Grace period in seconds before forcefully terminating a draining node. Example: 600.
         """
         return pulumi.get(self, "termination_grace_period_seconds")
 
@@ -1411,7 +1411,7 @@ class DisruptionPolicyArgsArgs:
     @pulumi.getter(name="ttlSecondsAfterEmpty")
     def ttl_seconds_after_empty(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Seconds before an empty node is terminated (deprecated; prefer ConsolidateAfter).
+        Seconds before an empty node is terminated (deprecated; prefer consolidateAfter). Example: 30.
         """
         return pulumi.get(self, "ttl_seconds_after_empty")
 
@@ -1423,31 +1423,31 @@ class DisruptionPolicyArgsArgs:
 class HorizontalScalingArgsArgsDict(TypedDict):
     enabled: NotRequired[pulumi.Input[_builtins.bool]]
     """
-    Enable horizontal (replica) scaling.
+    Enable horizontal (replica) scaling. Example: true.
     """
     max_replica_change_percent: NotRequired[pulumi.Input[_builtins.float]]
     """
-    Maximum percentage change in replica count per recommendation cycle.
+    Maximum percentage change in replica count per recommendation cycle. Example: 50.0 allows up to 50% change.
     """
     max_replicas: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Maximum number of replicas to scale up to.
+    Maximum number of replicas to scale up to. Example: 10.
     """
     min_data_points: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Minimum data points required before a recommendation is emitted.
+    Minimum data points required before a recommendation is emitted. Example: 20.
     """
     min_replicas: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Minimum number of replicas to maintain.
+    Minimum number of replicas to maintain. Example: 2.
     """
     primary_metric: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'.
+    Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
     """
     target_utilization: NotRequired[pulumi.Input[_builtins.float]]
     """
-    Target utilization ratio (0-1) for the primary metric.
+    Target utilization ratio (0-1) for the primary metric. Example: 0.7 targets 70% utilization.
     """
 
 @pulumi.input_type
@@ -1461,13 +1461,13 @@ class HorizontalScalingArgsArgs:
                  primary_metric: Optional[pulumi.Input[_builtins.str]] = None,
                  target_utilization: Optional[pulumi.Input[_builtins.float]] = None):
         """
-        :param pulumi.Input[_builtins.bool] enabled: Enable horizontal (replica) scaling.
-        :param pulumi.Input[_builtins.float] max_replica_change_percent: Maximum percentage change in replica count per recommendation cycle.
-        :param pulumi.Input[_builtins.int] max_replicas: Maximum number of replicas to scale up to.
-        :param pulumi.Input[_builtins.int] min_data_points: Minimum data points required before a recommendation is emitted.
-        :param pulumi.Input[_builtins.int] min_replicas: Minimum number of replicas to maintain.
-        :param pulumi.Input[_builtins.str] primary_metric: Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'.
-        :param pulumi.Input[_builtins.float] target_utilization: Target utilization ratio (0-1) for the primary metric.
+        :param pulumi.Input[_builtins.bool] enabled: Enable horizontal (replica) scaling. Example: true.
+        :param pulumi.Input[_builtins.float] max_replica_change_percent: Maximum percentage change in replica count per recommendation cycle. Example: 50.0 allows up to 50% change.
+        :param pulumi.Input[_builtins.int] max_replicas: Maximum number of replicas to scale up to. Example: 10.
+        :param pulumi.Input[_builtins.int] min_data_points: Minimum data points required before a recommendation is emitted. Example: 20.
+        :param pulumi.Input[_builtins.int] min_replicas: Minimum number of replicas to maintain. Example: 2.
+        :param pulumi.Input[_builtins.str] primary_metric: Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
+        :param pulumi.Input[_builtins.float] target_utilization: Target utilization ratio (0-1) for the primary metric. Example: 0.7 targets 70% utilization.
         """
         if enabled is not None:
             pulumi.set(__self__, "enabled", enabled)
@@ -1488,7 +1488,7 @@ class HorizontalScalingArgsArgs:
     @pulumi.getter
     def enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Enable horizontal (replica) scaling.
+        Enable horizontal (replica) scaling. Example: true.
         """
         return pulumi.get(self, "enabled")
 
@@ -1500,7 +1500,7 @@ class HorizontalScalingArgsArgs:
     @pulumi.getter(name="maxReplicaChangePercent")
     def max_replica_change_percent(self) -> Optional[pulumi.Input[_builtins.float]]:
         """
-        Maximum percentage change in replica count per recommendation cycle.
+        Maximum percentage change in replica count per recommendation cycle. Example: 50.0 allows up to 50% change.
         """
         return pulumi.get(self, "max_replica_change_percent")
 
@@ -1512,7 +1512,7 @@ class HorizontalScalingArgsArgs:
     @pulumi.getter(name="maxReplicas")
     def max_replicas(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Maximum number of replicas to scale up to.
+        Maximum number of replicas to scale up to. Example: 10.
         """
         return pulumi.get(self, "max_replicas")
 
@@ -1524,7 +1524,7 @@ class HorizontalScalingArgsArgs:
     @pulumi.getter(name="minDataPoints")
     def min_data_points(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Minimum data points required before a recommendation is emitted.
+        Minimum data points required before a recommendation is emitted. Example: 20.
         """
         return pulumi.get(self, "min_data_points")
 
@@ -1536,7 +1536,7 @@ class HorizontalScalingArgsArgs:
     @pulumi.getter(name="minReplicas")
     def min_replicas(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Minimum number of replicas to maintain.
+        Minimum number of replicas to maintain. Example: 2.
         """
         return pulumi.get(self, "min_replicas")
 
@@ -1548,7 +1548,7 @@ class HorizontalScalingArgsArgs:
     @pulumi.getter(name="primaryMetric")
     def primary_metric(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'.
+        Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
         """
         return pulumi.get(self, "primary_metric")
 
@@ -1560,7 +1560,7 @@ class HorizontalScalingArgsArgs:
     @pulumi.getter(name="targetUtilization")
     def target_utilization(self) -> Optional[pulumi.Input[_builtins.float]]:
         """
-        Target utilization ratio (0-1) for the primary metric.
+        Target utilization ratio (0-1) for the primary metric. Example: 0.7 targets 70% utilization.
         """
         return pulumi.get(self, "target_utilization")
 
@@ -1572,51 +1572,51 @@ class HorizontalScalingArgsArgs:
 class KubeletConfigurationArgsArgsDict(TypedDict):
     cluster_dns: NotRequired[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]
     """
-    List of DNS server IP addresses used by kubelet.
+    DNS server IP addresses passed to kubelet. Example: ["10.96.0.10"].
     """
     cpu_cfs_quota: NotRequired[pulumi.Input[_builtins.bool]]
     """
-    Whether to enforce CPU CFS quota limits for containers.
+    Whether to enforce CPU CFS quota limits for containers. Example: true.
     """
     eviction_hard: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
     """
-    Hard eviction thresholds that trigger immediate pod eviction.
+    Hard eviction thresholds — pods are evicted immediately when crossed. Example: {"memory.available": "100Mi", "nodefs.available": "10%"}.
     """
     eviction_max_pod_grace_period: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Maximum grace period in seconds when evicting pods.
+    Maximum pod termination grace period (seconds) during eviction. Example: 90.
     """
     eviction_soft: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
     """
-    Soft eviction thresholds that trigger eviction after a grace period.
+    Soft eviction thresholds — eviction begins after the grace period expires. Example: {"memory.available": "200Mi"}.
     """
     eviction_soft_grace_period: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
     """
-    Grace period for each soft eviction threshold.
+    Grace period before acting on a soft eviction threshold. Example: {"memory.available": "90s"}.
     """
     image_gc_high_threshold_percent: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Disk usage percentage that triggers image garbage collection.
+    Disk usage % that triggers image garbage collection. Example: 85.
     """
     image_gc_low_threshold_percent: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Disk usage percentage below which image GC stops freeing space.
+    Disk usage % at which image GC stops freeing space. Example: 70.
     """
     kube_reserved: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
     """
-    Resources reserved for Kubernetes system components.
+    Resources reserved for Kubernetes system components (kubelet, kube-proxy). Example: {"cpu": "100m", "memory": "100Mi"}.
     """
     max_pods: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Maximum number of pods per node.
+    Maximum number of pods allowed per node. Example: 110.
     """
     pods_per_core: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Maximum pods per CPU core (multiplied by core count for max pods).
+    Maximum pods per CPU core; multiplied by node core count for effective max. Example: 10.
     """
     system_reserved: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
     """
-    Resources reserved for OS system daemons (e.g. {'cpu': '100m'}).
+    Resources reserved for OS system daemons (not Kubernetes). Example: {"cpu": "100m", "memory": "100Mi"}.
     """
 
 @pulumi.input_type
@@ -1635,18 +1635,18 @@ class KubeletConfigurationArgsArgs:
                  pods_per_core: Optional[pulumi.Input[_builtins.int]] = None,
                  system_reserved: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None):
         """
-        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] cluster_dns: List of DNS server IP addresses used by kubelet.
-        :param pulumi.Input[_builtins.bool] cpu_cfs_quota: Whether to enforce CPU CFS quota limits for containers.
-        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] eviction_hard: Hard eviction thresholds that trigger immediate pod eviction.
-        :param pulumi.Input[_builtins.int] eviction_max_pod_grace_period: Maximum grace period in seconds when evicting pods.
-        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] eviction_soft: Soft eviction thresholds that trigger eviction after a grace period.
-        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] eviction_soft_grace_period: Grace period for each soft eviction threshold.
-        :param pulumi.Input[_builtins.int] image_gc_high_threshold_percent: Disk usage percentage that triggers image garbage collection.
-        :param pulumi.Input[_builtins.int] image_gc_low_threshold_percent: Disk usage percentage below which image GC stops freeing space.
-        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] kube_reserved: Resources reserved for Kubernetes system components.
-        :param pulumi.Input[_builtins.int] max_pods: Maximum number of pods per node.
-        :param pulumi.Input[_builtins.int] pods_per_core: Maximum pods per CPU core (multiplied by core count for max pods).
-        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] system_reserved: Resources reserved for OS system daemons (e.g. {'cpu': '100m'}).
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] cluster_dns: DNS server IP addresses passed to kubelet. Example: ["10.96.0.10"].
+        :param pulumi.Input[_builtins.bool] cpu_cfs_quota: Whether to enforce CPU CFS quota limits for containers. Example: true.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] eviction_hard: Hard eviction thresholds — pods are evicted immediately when crossed. Example: {"memory.available": "100Mi", "nodefs.available": "10%"}.
+        :param pulumi.Input[_builtins.int] eviction_max_pod_grace_period: Maximum pod termination grace period (seconds) during eviction. Example: 90.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] eviction_soft: Soft eviction thresholds — eviction begins after the grace period expires. Example: {"memory.available": "200Mi"}.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] eviction_soft_grace_period: Grace period before acting on a soft eviction threshold. Example: {"memory.available": "90s"}.
+        :param pulumi.Input[_builtins.int] image_gc_high_threshold_percent: Disk usage % that triggers image garbage collection. Example: 85.
+        :param pulumi.Input[_builtins.int] image_gc_low_threshold_percent: Disk usage % at which image GC stops freeing space. Example: 70.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] kube_reserved: Resources reserved for Kubernetes system components (kubelet, kube-proxy). Example: {"cpu": "100m", "memory": "100Mi"}.
+        :param pulumi.Input[_builtins.int] max_pods: Maximum number of pods allowed per node. Example: 110.
+        :param pulumi.Input[_builtins.int] pods_per_core: Maximum pods per CPU core; multiplied by node core count for effective max. Example: 10.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] system_reserved: Resources reserved for OS system daemons (not Kubernetes). Example: {"cpu": "100m", "memory": "100Mi"}.
         """
         if cluster_dns is not None:
             pulumi.set(__self__, "cluster_dns", cluster_dns)
@@ -1677,7 +1677,7 @@ class KubeletConfigurationArgsArgs:
     @pulumi.getter(name="clusterDns")
     def cluster_dns(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
         """
-        List of DNS server IP addresses used by kubelet.
+        DNS server IP addresses passed to kubelet. Example: ["10.96.0.10"].
         """
         return pulumi.get(self, "cluster_dns")
 
@@ -1689,7 +1689,7 @@ class KubeletConfigurationArgsArgs:
     @pulumi.getter(name="cpuCfsQuota")
     def cpu_cfs_quota(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Whether to enforce CPU CFS quota limits for containers.
+        Whether to enforce CPU CFS quota limits for containers. Example: true.
         """
         return pulumi.get(self, "cpu_cfs_quota")
 
@@ -1701,7 +1701,7 @@ class KubeletConfigurationArgsArgs:
     @pulumi.getter(name="evictionHard")
     def eviction_hard(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
         """
-        Hard eviction thresholds that trigger immediate pod eviction.
+        Hard eviction thresholds — pods are evicted immediately when crossed. Example: {"memory.available": "100Mi", "nodefs.available": "10%"}.
         """
         return pulumi.get(self, "eviction_hard")
 
@@ -1713,7 +1713,7 @@ class KubeletConfigurationArgsArgs:
     @pulumi.getter(name="evictionMaxPodGracePeriod")
     def eviction_max_pod_grace_period(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Maximum grace period in seconds when evicting pods.
+        Maximum pod termination grace period (seconds) during eviction. Example: 90.
         """
         return pulumi.get(self, "eviction_max_pod_grace_period")
 
@@ -1725,7 +1725,7 @@ class KubeletConfigurationArgsArgs:
     @pulumi.getter(name="evictionSoft")
     def eviction_soft(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
         """
-        Soft eviction thresholds that trigger eviction after a grace period.
+        Soft eviction thresholds — eviction begins after the grace period expires. Example: {"memory.available": "200Mi"}.
         """
         return pulumi.get(self, "eviction_soft")
 
@@ -1737,7 +1737,7 @@ class KubeletConfigurationArgsArgs:
     @pulumi.getter(name="evictionSoftGracePeriod")
     def eviction_soft_grace_period(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
         """
-        Grace period for each soft eviction threshold.
+        Grace period before acting on a soft eviction threshold. Example: {"memory.available": "90s"}.
         """
         return pulumi.get(self, "eviction_soft_grace_period")
 
@@ -1749,7 +1749,7 @@ class KubeletConfigurationArgsArgs:
     @pulumi.getter(name="imageGcHighThresholdPercent")
     def image_gc_high_threshold_percent(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Disk usage percentage that triggers image garbage collection.
+        Disk usage % that triggers image garbage collection. Example: 85.
         """
         return pulumi.get(self, "image_gc_high_threshold_percent")
 
@@ -1761,7 +1761,7 @@ class KubeletConfigurationArgsArgs:
     @pulumi.getter(name="imageGcLowThresholdPercent")
     def image_gc_low_threshold_percent(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Disk usage percentage below which image GC stops freeing space.
+        Disk usage % at which image GC stops freeing space. Example: 70.
         """
         return pulumi.get(self, "image_gc_low_threshold_percent")
 
@@ -1773,7 +1773,7 @@ class KubeletConfigurationArgsArgs:
     @pulumi.getter(name="kubeReserved")
     def kube_reserved(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
         """
-        Resources reserved for Kubernetes system components.
+        Resources reserved for Kubernetes system components (kubelet, kube-proxy). Example: {"cpu": "100m", "memory": "100Mi"}.
         """
         return pulumi.get(self, "kube_reserved")
 
@@ -1785,7 +1785,7 @@ class KubeletConfigurationArgsArgs:
     @pulumi.getter(name="maxPods")
     def max_pods(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Maximum number of pods per node.
+        Maximum number of pods allowed per node. Example: 110.
         """
         return pulumi.get(self, "max_pods")
 
@@ -1797,7 +1797,7 @@ class KubeletConfigurationArgsArgs:
     @pulumi.getter(name="podsPerCore")
     def pods_per_core(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Maximum pods per CPU core (multiplied by core count for max pods).
+        Maximum pods per CPU core; multiplied by node core count for effective max. Example: 10.
         """
         return pulumi.get(self, "pods_per_core")
 
@@ -1809,7 +1809,7 @@ class KubeletConfigurationArgsArgs:
     @pulumi.getter(name="systemReserved")
     def system_reserved(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
         """
-        Resources reserved for OS system daemons (e.g. {'cpu': '100m'}).
+        Resources reserved for OS system daemons (not Kubernetes). Example: {"cpu": "100m", "memory": "100Mi"}.
         """
         return pulumi.get(self, "system_reserved")
 
@@ -1939,19 +1939,19 @@ class LabelSelectorRequirementArgsArgs:
 class MetadataOptionsArgsArgsDict(TypedDict):
     http_endpoint: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Enable or disable the instance metadata endpoint. One of: 'enabled', 'disabled'.
+    Enable or disable the EC2 instance metadata endpoint. One of: 'enabled', 'disabled'. Example: 'enabled'.
     """
     http_protocol_ipv6: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'.
+    Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'. Example: 'disabled'.
     """
     http_put_response_hop_limit: NotRequired[pulumi.Input[_builtins.int]]
     """
-    HTTP PUT response hop limit for metadata requests (1-64).
+    HTTP PUT response hop limit for metadata requests (1-64). Set to 1 to block pod-level IMDS access. Example: 1.
     """
     http_tokens: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Whether to require IMDSv2 tokens. One of: 'optional', 'required'.
+    Whether to require IMDSv2 session tokens (recommended). One of: 'optional', 'required'. Example: 'required'.
     """
 
 @pulumi.input_type
@@ -1962,10 +1962,10 @@ class MetadataOptionsArgsArgs:
                  http_put_response_hop_limit: Optional[pulumi.Input[_builtins.int]] = None,
                  http_tokens: Optional[pulumi.Input[_builtins.str]] = None):
         """
-        :param pulumi.Input[_builtins.str] http_endpoint: Enable or disable the instance metadata endpoint. One of: 'enabled', 'disabled'.
-        :param pulumi.Input[_builtins.str] http_protocol_ipv6: Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'.
-        :param pulumi.Input[_builtins.int] http_put_response_hop_limit: HTTP PUT response hop limit for metadata requests (1-64).
-        :param pulumi.Input[_builtins.str] http_tokens: Whether to require IMDSv2 tokens. One of: 'optional', 'required'.
+        :param pulumi.Input[_builtins.str] http_endpoint: Enable or disable the EC2 instance metadata endpoint. One of: 'enabled', 'disabled'. Example: 'enabled'.
+        :param pulumi.Input[_builtins.str] http_protocol_ipv6: Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'. Example: 'disabled'.
+        :param pulumi.Input[_builtins.int] http_put_response_hop_limit: HTTP PUT response hop limit for metadata requests (1-64). Set to 1 to block pod-level IMDS access. Example: 1.
+        :param pulumi.Input[_builtins.str] http_tokens: Whether to require IMDSv2 session tokens (recommended). One of: 'optional', 'required'. Example: 'required'.
         """
         if http_endpoint is not None:
             pulumi.set(__self__, "http_endpoint", http_endpoint)
@@ -1980,7 +1980,7 @@ class MetadataOptionsArgsArgs:
     @pulumi.getter(name="httpEndpoint")
     def http_endpoint(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Enable or disable the instance metadata endpoint. One of: 'enabled', 'disabled'.
+        Enable or disable the EC2 instance metadata endpoint. One of: 'enabled', 'disabled'. Example: 'enabled'.
         """
         return pulumi.get(self, "http_endpoint")
 
@@ -1992,7 +1992,7 @@ class MetadataOptionsArgsArgs:
     @pulumi.getter(name="httpProtocolIpv6")
     def http_protocol_ipv6(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'.
+        Enable IPv6 for the metadata endpoint. One of: 'enabled', 'disabled'. Example: 'disabled'.
         """
         return pulumi.get(self, "http_protocol_ipv6")
 
@@ -2004,7 +2004,7 @@ class MetadataOptionsArgsArgs:
     @pulumi.getter(name="httpPutResponseHopLimit")
     def http_put_response_hop_limit(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        HTTP PUT response hop limit for metadata requests (1-64).
+        HTTP PUT response hop limit for metadata requests (1-64). Set to 1 to block pod-level IMDS access. Example: 1.
         """
         return pulumi.get(self, "http_put_response_hop_limit")
 
@@ -2016,7 +2016,7 @@ class MetadataOptionsArgsArgs:
     @pulumi.getter(name="httpTokens")
     def http_tokens(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Whether to require IMDSv2 tokens. One of: 'optional', 'required'.
+        Whether to require IMDSv2 session tokens (recommended). One of: 'optional', 'required'. Example: 'required'.
         """
         return pulumi.get(self, "http_tokens")
 
@@ -2077,11 +2077,11 @@ class NamePatternArgsArgs:
 class RawKarpenterSpecArgsArgsDict(TypedDict):
     nodeclass_yaml: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Raw YAML for a complete Karpenter NodeClass resource (escape hatch).
+    Raw YAML for a complete Karpenter NodeClass resource — use as an escape hatch when structured fields are insufficient. Example: 'apiVersion: karpenter.k8s.aws/v1\\nkind: EC2NodeClass\\nmetadata:\\n  name: default\\n...'.
     """
     nodepool_yaml: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Raw YAML for a complete Karpenter NodePool resource (escape hatch).
+    Raw YAML for a complete Karpenter NodePool resource — use as an escape hatch when structured fields are insufficient. Example: 'apiVersion: karpenter.sh/v1\\nkind: NodePool\\nmetadata:\\n  name: default\\n...'.
     """
 
 @pulumi.input_type
@@ -2090,8 +2090,8 @@ class RawKarpenterSpecArgsArgs:
                  nodeclass_yaml: Optional[pulumi.Input[_builtins.str]] = None,
                  nodepool_yaml: Optional[pulumi.Input[_builtins.str]] = None):
         """
-        :param pulumi.Input[_builtins.str] nodeclass_yaml: Raw YAML for a complete Karpenter NodeClass resource (escape hatch).
-        :param pulumi.Input[_builtins.str] nodepool_yaml: Raw YAML for a complete Karpenter NodePool resource (escape hatch).
+        :param pulumi.Input[_builtins.str] nodeclass_yaml: Raw YAML for a complete Karpenter NodeClass resource — use as an escape hatch when structured fields are insufficient. Example: 'apiVersion: karpenter.k8s.aws/v1\\nkind: EC2NodeClass\\nmetadata:\\n  name: default\\n...'.
+        :param pulumi.Input[_builtins.str] nodepool_yaml: Raw YAML for a complete Karpenter NodePool resource — use as an escape hatch when structured fields are insufficient. Example: 'apiVersion: karpenter.sh/v1\\nkind: NodePool\\nmetadata:\\n  name: default\\n...'.
         """
         if nodeclass_yaml is not None:
             pulumi.set(__self__, "nodeclass_yaml", nodeclass_yaml)
@@ -2102,7 +2102,7 @@ class RawKarpenterSpecArgsArgs:
     @pulumi.getter(name="nodeclassYaml")
     def nodeclass_yaml(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Raw YAML for a complete Karpenter NodeClass resource (escape hatch).
+        Raw YAML for a complete Karpenter NodeClass resource — use as an escape hatch when structured fields are insufficient. Example: 'apiVersion: karpenter.k8s.aws/v1\\nkind: EC2NodeClass\\nmetadata:\\n  name: default\\n...'.
         """
         return pulumi.get(self, "nodeclass_yaml")
 
@@ -2114,7 +2114,7 @@ class RawKarpenterSpecArgsArgs:
     @pulumi.getter(name="nodepoolYaml")
     def nodepool_yaml(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Raw YAML for a complete Karpenter NodePool resource (escape hatch).
+        Raw YAML for a complete Karpenter NodePool resource — use as an escape hatch when structured fields are insufficient. Example: 'apiVersion: karpenter.sh/v1\\nkind: NodePool\\nmetadata:\\n  name: default\\n...'.
         """
         return pulumi.get(self, "nodepool_yaml")
 
@@ -2126,11 +2126,11 @@ class RawKarpenterSpecArgsArgs:
 class ResourceLimitsArgsArgsDict(TypedDict):
     cpu: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Maximum total CPU that may be provisioned (e.g. '1000' for 1000 vCPUs).
+    Maximum total vCPUs that may be provisioned across all nodes in this pool. Example: '1000'.
     """
     memory: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Maximum total memory that may be provisioned (e.g. '1000Gi').
+    Maximum total memory that may be provisioned across all nodes. Example: '1000Gi'.
     """
 
 @pulumi.input_type
@@ -2139,8 +2139,8 @@ class ResourceLimitsArgsArgs:
                  cpu: Optional[pulumi.Input[_builtins.str]] = None,
                  memory: Optional[pulumi.Input[_builtins.str]] = None):
         """
-        :param pulumi.Input[_builtins.str] cpu: Maximum total CPU that may be provisioned (e.g. '1000' for 1000 vCPUs).
-        :param pulumi.Input[_builtins.str] memory: Maximum total memory that may be provisioned (e.g. '1000Gi').
+        :param pulumi.Input[_builtins.str] cpu: Maximum total vCPUs that may be provisioned across all nodes in this pool. Example: '1000'.
+        :param pulumi.Input[_builtins.str] memory: Maximum total memory that may be provisioned across all nodes. Example: '1000Gi'.
         """
         if cpu is not None:
             pulumi.set(__self__, "cpu", cpu)
@@ -2151,7 +2151,7 @@ class ResourceLimitsArgsArgs:
     @pulumi.getter
     def cpu(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Maximum total CPU that may be provisioned (e.g. '1000' for 1000 vCPUs).
+        Maximum total vCPUs that may be provisioned across all nodes in this pool. Example: '1000'.
         """
         return pulumi.get(self, "cpu")
 
@@ -2163,7 +2163,7 @@ class ResourceLimitsArgsArgs:
     @pulumi.getter
     def memory(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Maximum total memory that may be provisioned (e.g. '1000Gi').
+        Maximum total memory that may be provisioned across all nodes. Example: '1000Gi'.
         """
         return pulumi.get(self, "memory")
 
@@ -2175,15 +2175,15 @@ class ResourceLimitsArgsArgs:
 class SecurityGroupSelectorTermArgsArgsDict(TypedDict):
     id: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Explicit AWS security group ID.
+    Explicit AWS security group ID. Example: 'sg-0a1b2c3d4e5f'.
     """
     name: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Security group name filter.
+    Security group name filter (exact match). Example: 'my-cluster-node-sg'.
     """
     tags: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
     """
-    Map of AWS tags used to select security groups.
+    Map of AWS tags used to select security groups. Example: {"karpenter.sh/discovery": "my-cluster"}.
     """
 
 @pulumi.input_type
@@ -2193,9 +2193,9 @@ class SecurityGroupSelectorTermArgsArgs:
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  tags: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None):
         """
-        :param pulumi.Input[_builtins.str] id: Explicit AWS security group ID.
-        :param pulumi.Input[_builtins.str] name: Security group name filter.
-        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] tags: Map of AWS tags used to select security groups.
+        :param pulumi.Input[_builtins.str] id: Explicit AWS security group ID. Example: 'sg-0a1b2c3d4e5f'.
+        :param pulumi.Input[_builtins.str] name: Security group name filter (exact match). Example: 'my-cluster-node-sg'.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] tags: Map of AWS tags used to select security groups. Example: {"karpenter.sh/discovery": "my-cluster"}.
         """
         if id is not None:
             pulumi.set(__self__, "id", id)
@@ -2208,7 +2208,7 @@ class SecurityGroupSelectorTermArgsArgs:
     @pulumi.getter
     def id(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Explicit AWS security group ID.
+        Explicit AWS security group ID. Example: 'sg-0a1b2c3d4e5f'.
         """
         return pulumi.get(self, "id")
 
@@ -2220,7 +2220,7 @@ class SecurityGroupSelectorTermArgsArgs:
     @pulumi.getter
     def name(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Security group name filter.
+        Security group name filter (exact match). Example: 'my-cluster-node-sg'.
         """
         return pulumi.get(self, "name")
 
@@ -2232,7 +2232,7 @@ class SecurityGroupSelectorTermArgsArgs:
     @pulumi.getter
     def tags(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
         """
-        Map of AWS tags used to select security groups.
+        Map of AWS tags used to select security groups. Example: {"karpenter.sh/discovery": "my-cluster"}.
         """
         return pulumi.get(self, "tags")
 
@@ -2244,11 +2244,11 @@ class SecurityGroupSelectorTermArgsArgs:
 class SubnetSelectorTermArgsArgsDict(TypedDict):
     id: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Explicit AWS subnet ID.
+    Explicit AWS subnet ID (use instead of tags for a fixed subnet). Example: 'subnet-0a1b2c3d4e5f'.
     """
     tags: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
     """
-    Map of AWS tags used to select subnets.
+    Map of AWS tags used to select subnets. Example: {"karpenter.sh/discovery": "my-cluster"}.
     """
 
 @pulumi.input_type
@@ -2257,8 +2257,8 @@ class SubnetSelectorTermArgsArgs:
                  id: Optional[pulumi.Input[_builtins.str]] = None,
                  tags: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None):
         """
-        :param pulumi.Input[_builtins.str] id: Explicit AWS subnet ID.
-        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] tags: Map of AWS tags used to select subnets.
+        :param pulumi.Input[_builtins.str] id: Explicit AWS subnet ID (use instead of tags for a fixed subnet). Example: 'subnet-0a1b2c3d4e5f'.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] tags: Map of AWS tags used to select subnets. Example: {"karpenter.sh/discovery": "my-cluster"}.
         """
         if id is not None:
             pulumi.set(__self__, "id", id)
@@ -2269,7 +2269,7 @@ class SubnetSelectorTermArgsArgs:
     @pulumi.getter
     def id(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Explicit AWS subnet ID.
+        Explicit AWS subnet ID (use instead of tags for a fixed subnet). Example: 'subnet-0a1b2c3d4e5f'.
         """
         return pulumi.get(self, "id")
 
@@ -2281,7 +2281,7 @@ class SubnetSelectorTermArgsArgs:
     @pulumi.getter
     def tags(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
         """
-        Map of AWS tags used to select subnets.
+        Map of AWS tags used to select subnets. Example: {"karpenter.sh/discovery": "my-cluster"}.
         """
         return pulumi.get(self, "tags")
 
@@ -2293,15 +2293,15 @@ class SubnetSelectorTermArgsArgs:
 class TaintArgsArgsDict(TypedDict):
     effect: pulumi.Input[_builtins.str]
     """
-    Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'.
+    Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'. Example: 'NoSchedule'.
     """
     key: pulumi.Input[_builtins.str]
     """
-    Taint key to apply to provisioned nodes.
+    Taint key to apply to provisioned nodes. Example: 'dedicated'.
     """
     value: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Taint value associated with the key.
+    Taint value associated with the key. Example: 'gpu'.
     """
 
 @pulumi.input_type
@@ -2311,9 +2311,9 @@ class TaintArgsArgs:
                  key: pulumi.Input[_builtins.str],
                  value: Optional[pulumi.Input[_builtins.str]] = None):
         """
-        :param pulumi.Input[_builtins.str] effect: Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'.
-        :param pulumi.Input[_builtins.str] key: Taint key to apply to provisioned nodes.
-        :param pulumi.Input[_builtins.str] value: Taint value associated with the key.
+        :param pulumi.Input[_builtins.str] effect: Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'. Example: 'NoSchedule'.
+        :param pulumi.Input[_builtins.str] key: Taint key to apply to provisioned nodes. Example: 'dedicated'.
+        :param pulumi.Input[_builtins.str] value: Taint value associated with the key. Example: 'gpu'.
         """
         pulumi.set(__self__, "effect", effect)
         pulumi.set(__self__, "key", key)
@@ -2324,7 +2324,7 @@ class TaintArgsArgs:
     @pulumi.getter
     def effect(self) -> pulumi.Input[_builtins.str]:
         """
-        Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'.
+        Taint effect. One of: 'NoSchedule', 'PreferNoSchedule', 'NoExecute'. Example: 'NoSchedule'.
         """
         return pulumi.get(self, "effect")
 
@@ -2336,7 +2336,7 @@ class TaintArgsArgs:
     @pulumi.getter
     def key(self) -> pulumi.Input[_builtins.str]:
         """
-        Taint key to apply to provisioned nodes.
+        Taint key to apply to provisioned nodes. Example: 'dedicated'.
         """
         return pulumi.get(self, "key")
 
@@ -2348,7 +2348,7 @@ class TaintArgsArgs:
     @pulumi.getter
     def value(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Taint value associated with the key.
+        Taint value associated with the key. Example: 'gpu'.
         """
         return pulumi.get(self, "value")
 
@@ -2360,51 +2360,51 @@ class TaintArgsArgs:
 class VerticalScalingArgsArgsDict(TypedDict):
     adjust_req_even_if_not_set: NotRequired[pulumi.Input[_builtins.bool]]
     """
-    Recommend requests even when the workload has no existing requests set. Server/web default: true.
+    Recommend requests even when the workload has no existing requests set. Default: false.
     """
     enabled: NotRequired[pulumi.Input[_builtins.bool]]
     """
-    Enable vertical scaling for this resource type.
+    Enable vertical scaling for this resource type. Example: true
     """
     limit_multiplier: NotRequired[pulumi.Input[_builtins.float]]
     """
-    Multiplier applied to the request to derive the resource limit.
+    Multiplier applied to the request to derive the resource limit. Example: 1.5 sets limit to 150% of request.
     """
     limits_adjustment_enabled: NotRequired[pulumi.Input[_builtins.bool]]
     """
-    Whether to also adjust resource limits alongside requests.
+    Whether to also adjust resource limits alongside requests. Example: true.
     """
     limits_removal_enabled: NotRequired[pulumi.Input[_builtins.bool]]
     """
-    Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Web default: true for CPU, false for Memory.
+    Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over limitsAdjustmentEnabled when set. Default: false.
     """
     max_request: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Maximum resource request in millicores (CPU) or bytes (memory/GPU).
+    Maximum resource request in millicores (CPU) or bytes (memory/GPU). Example: 4000 (= 4 CPU cores), 1073741824 (= 1Gi memory).
     """
     max_scale_down_percent: NotRequired[pulumi.Input[_builtins.float]]
     """
-    Maximum percentage decrease allowed in a single recommendation cycle.
+    Maximum percentage decrease allowed in a single recommendation cycle. Example: 20.0 allows up to 20% decrease. Default: 1.0.
     """
     max_scale_up_percent: NotRequired[pulumi.Input[_builtins.float]]
     """
-    Maximum percentage increase allowed in a single recommendation cycle.
+    Maximum percentage increase allowed in a single recommendation cycle. Example: 50.0 allows up to 50% increase. Default: 1000.0.
     """
     min_data_points: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Minimum number of data points required before a recommendation is emitted.
+    Minimum number of data points required before a recommendation is emitted. Example: 20 (default).
     """
     min_request: NotRequired[pulumi.Input[_builtins.int]]
     """
-    Minimum resource request in millicores (CPU) or bytes (memory/GPU).
+    Minimum resource request in millicores (CPU) or bytes (memory/GPU). Example: 100 (= 100m CPU), 134217728 (= 128Mi memory).
     """
     overhead_multiplier: NotRequired[pulumi.Input[_builtins.float]]
     """
-    Multiplier applied on top of the recommendation to add headroom.
+    Multiplier applied on top of the recommendation to add headroom. Example: 1.15 adds 15% overhead.
     """
     target_percentile: NotRequired[pulumi.Input[_builtins.float]]
     """
-    Percentile of usage data used as the recommendation target (e.g. 0.95).
+    Percentile of usage data used as the recommendation target (0-1). Example: 0.95 targets the 95th percentile.
     """
 
 @pulumi.input_type
@@ -2423,18 +2423,18 @@ class VerticalScalingArgsArgs:
                  overhead_multiplier: Optional[pulumi.Input[_builtins.float]] = None,
                  target_percentile: Optional[pulumi.Input[_builtins.float]] = None):
         """
-        :param pulumi.Input[_builtins.bool] adjust_req_even_if_not_set: Recommend requests even when the workload has no existing requests set. Server/web default: true.
-        :param pulumi.Input[_builtins.bool] enabled: Enable vertical scaling for this resource type.
-        :param pulumi.Input[_builtins.float] limit_multiplier: Multiplier applied to the request to derive the resource limit.
-        :param pulumi.Input[_builtins.bool] limits_adjustment_enabled: Whether to also adjust resource limits alongside requests.
-        :param pulumi.Input[_builtins.bool] limits_removal_enabled: Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Web default: true for CPU, false for Memory.
-        :param pulumi.Input[_builtins.int] max_request: Maximum resource request in millicores (CPU) or bytes (memory/GPU).
-        :param pulumi.Input[_builtins.float] max_scale_down_percent: Maximum percentage decrease allowed in a single recommendation cycle.
-        :param pulumi.Input[_builtins.float] max_scale_up_percent: Maximum percentage increase allowed in a single recommendation cycle.
-        :param pulumi.Input[_builtins.int] min_data_points: Minimum number of data points required before a recommendation is emitted.
-        :param pulumi.Input[_builtins.int] min_request: Minimum resource request in millicores (CPU) or bytes (memory/GPU).
-        :param pulumi.Input[_builtins.float] overhead_multiplier: Multiplier applied on top of the recommendation to add headroom.
-        :param pulumi.Input[_builtins.float] target_percentile: Percentile of usage data used as the recommendation target (e.g. 0.95).
+        :param pulumi.Input[_builtins.bool] adjust_req_even_if_not_set: Recommend requests even when the workload has no existing requests set. Default: false.
+        :param pulumi.Input[_builtins.bool] enabled: Enable vertical scaling for this resource type. Example: true
+        :param pulumi.Input[_builtins.float] limit_multiplier: Multiplier applied to the request to derive the resource limit. Example: 1.5 sets limit to 150% of request.
+        :param pulumi.Input[_builtins.bool] limits_adjustment_enabled: Whether to also adjust resource limits alongside requests. Example: true.
+        :param pulumi.Input[_builtins.bool] limits_removal_enabled: Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over limitsAdjustmentEnabled when set. Default: false.
+        :param pulumi.Input[_builtins.int] max_request: Maximum resource request in millicores (CPU) or bytes (memory/GPU). Example: 4000 (= 4 CPU cores), 1073741824 (= 1Gi memory).
+        :param pulumi.Input[_builtins.float] max_scale_down_percent: Maximum percentage decrease allowed in a single recommendation cycle. Example: 20.0 allows up to 20% decrease. Default: 1.0.
+        :param pulumi.Input[_builtins.float] max_scale_up_percent: Maximum percentage increase allowed in a single recommendation cycle. Example: 50.0 allows up to 50% increase. Default: 1000.0.
+        :param pulumi.Input[_builtins.int] min_data_points: Minimum number of data points required before a recommendation is emitted. Example: 20 (default).
+        :param pulumi.Input[_builtins.int] min_request: Minimum resource request in millicores (CPU) or bytes (memory/GPU). Example: 100 (= 100m CPU), 134217728 (= 128Mi memory).
+        :param pulumi.Input[_builtins.float] overhead_multiplier: Multiplier applied on top of the recommendation to add headroom. Example: 1.15 adds 15% overhead.
+        :param pulumi.Input[_builtins.float] target_percentile: Percentile of usage data used as the recommendation target (0-1). Example: 0.95 targets the 95th percentile.
         """
         if adjust_req_even_if_not_set is not None:
             pulumi.set(__self__, "adjust_req_even_if_not_set", adjust_req_even_if_not_set)
@@ -2471,7 +2471,7 @@ class VerticalScalingArgsArgs:
     @pulumi.getter(name="adjustReqEvenIfNotSet")
     def adjust_req_even_if_not_set(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Recommend requests even when the workload has no existing requests set. Server/web default: true.
+        Recommend requests even when the workload has no existing requests set. Default: false.
         """
         return pulumi.get(self, "adjust_req_even_if_not_set")
 
@@ -2483,7 +2483,7 @@ class VerticalScalingArgsArgs:
     @pulumi.getter
     def enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Enable vertical scaling for this resource type.
+        Enable vertical scaling for this resource type. Example: true
         """
         return pulumi.get(self, "enabled")
 
@@ -2495,7 +2495,7 @@ class VerticalScalingArgsArgs:
     @pulumi.getter(name="limitMultiplier")
     def limit_multiplier(self) -> Optional[pulumi.Input[_builtins.float]]:
         """
-        Multiplier applied to the request to derive the resource limit.
+        Multiplier applied to the request to derive the resource limit. Example: 1.5 sets limit to 150% of request.
         """
         return pulumi.get(self, "limit_multiplier")
 
@@ -2507,7 +2507,7 @@ class VerticalScalingArgsArgs:
     @pulumi.getter(name="limitsAdjustmentEnabled")
     def limits_adjustment_enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Whether to also adjust resource limits alongside requests.
+        Whether to also adjust resource limits alongside requests. Example: true.
         """
         return pulumi.get(self, "limits_adjustment_enabled")
 
@@ -2519,7 +2519,7 @@ class VerticalScalingArgsArgs:
     @pulumi.getter(name="limitsRemovalEnabled")
     def limits_removal_enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Actively remove limits from workloads (CPU only). Takes precedence over limitsAdjustmentEnabled. Web default: true for CPU, false for Memory.
+        Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over limitsAdjustmentEnabled when set. Default: false.
         """
         return pulumi.get(self, "limits_removal_enabled")
 
@@ -2531,7 +2531,7 @@ class VerticalScalingArgsArgs:
     @pulumi.getter(name="maxRequest")
     def max_request(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Maximum resource request in millicores (CPU) or bytes (memory/GPU).
+        Maximum resource request in millicores (CPU) or bytes (memory/GPU). Example: 4000 (= 4 CPU cores), 1073741824 (= 1Gi memory).
         """
         return pulumi.get(self, "max_request")
 
@@ -2543,7 +2543,7 @@ class VerticalScalingArgsArgs:
     @pulumi.getter(name="maxScaleDownPercent")
     def max_scale_down_percent(self) -> Optional[pulumi.Input[_builtins.float]]:
         """
-        Maximum percentage decrease allowed in a single recommendation cycle.
+        Maximum percentage decrease allowed in a single recommendation cycle. Example: 20.0 allows up to 20% decrease. Default: 1.0.
         """
         return pulumi.get(self, "max_scale_down_percent")
 
@@ -2555,7 +2555,7 @@ class VerticalScalingArgsArgs:
     @pulumi.getter(name="maxScaleUpPercent")
     def max_scale_up_percent(self) -> Optional[pulumi.Input[_builtins.float]]:
         """
-        Maximum percentage increase allowed in a single recommendation cycle.
+        Maximum percentage increase allowed in a single recommendation cycle. Example: 50.0 allows up to 50% increase. Default: 1000.0.
         """
         return pulumi.get(self, "max_scale_up_percent")
 
@@ -2567,7 +2567,7 @@ class VerticalScalingArgsArgs:
     @pulumi.getter(name="minDataPoints")
     def min_data_points(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Minimum number of data points required before a recommendation is emitted.
+        Minimum number of data points required before a recommendation is emitted. Example: 20 (default).
         """
         return pulumi.get(self, "min_data_points")
 
@@ -2579,7 +2579,7 @@ class VerticalScalingArgsArgs:
     @pulumi.getter(name="minRequest")
     def min_request(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        Minimum resource request in millicores (CPU) or bytes (memory/GPU).
+        Minimum resource request in millicores (CPU) or bytes (memory/GPU). Example: 100 (= 100m CPU), 134217728 (= 128Mi memory).
         """
         return pulumi.get(self, "min_request")
 
@@ -2591,7 +2591,7 @@ class VerticalScalingArgsArgs:
     @pulumi.getter(name="overheadMultiplier")
     def overhead_multiplier(self) -> Optional[pulumi.Input[_builtins.float]]:
         """
-        Multiplier applied on top of the recommendation to add headroom.
+        Multiplier applied on top of the recommendation to add headroom. Example: 1.15 adds 15% overhead.
         """
         return pulumi.get(self, "overhead_multiplier")
 
@@ -2603,7 +2603,7 @@ class VerticalScalingArgsArgs:
     @pulumi.getter(name="targetPercentile")
     def target_percentile(self) -> Optional[pulumi.Input[_builtins.float]]:
         """
-        Percentile of usage data used as the recommendation target (e.g. 0.95).
+        Percentile of usage data used as the recommendation target (0-1). Example: 0.95 targets the 95th percentile.
         """
         return pulumi.get(self, "target_percentile")
 

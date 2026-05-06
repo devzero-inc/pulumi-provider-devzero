@@ -194,6 +194,9 @@ const (
 	// K8SRecommendationServiceUpdateNodePolicyProcedure is the fully-qualified name of the
 	// K8sRecommendationService's UpdateNodePolicy RPC.
 	K8SRecommendationServiceUpdateNodePolicyProcedure = "/api.v1.K8sRecommendationService/UpdateNodePolicy"
+	// K8SRecommendationServiceDeleteNodePolicyProcedure is the fully-qualified name of the
+	// K8sRecommendationService's DeleteNodePolicy RPC.
+	K8SRecommendationServiceDeleteNodePolicyProcedure = "/api.v1.K8sRecommendationService/DeleteNodePolicy"
 	// K8SRecommendationServiceSuggestedNodePolicyProcedure is the fully-qualified name of the
 	// K8sRecommendationService's SuggestedNodePolicy RPC.
 	K8SRecommendationServiceSuggestedNodePolicyProcedure = "/api.v1.K8sRecommendationService/SuggestedNodePolicy"
@@ -206,6 +209,21 @@ const (
 	// K8SRecommendationServiceGenerateNodePoliciesFromNodeGroupsProcedure is the fully-qualified name
 	// of the K8sRecommendationService's GenerateNodePoliciesFromNodeGroups RPC.
 	K8SRecommendationServiceGenerateNodePoliciesFromNodeGroupsProcedure = "/api.v1.K8sRecommendationService/GenerateNodePoliciesFromNodeGroups"
+	// K8SRecommendationServiceGetNodeAnnotationReadinessProcedure is the fully-qualified name of the
+	// K8sRecommendationService's GetNodeAnnotationReadiness RPC.
+	K8SRecommendationServiceGetNodeAnnotationReadinessProcedure = "/api.v1.K8sRecommendationService/GetNodeAnnotationReadiness"
+	// K8SRecommendationServiceGetMigrationStateProcedure is the fully-qualified name of the
+	// K8sRecommendationService's GetMigrationState RPC.
+	K8SRecommendationServiceGetMigrationStateProcedure = "/api.v1.K8sRecommendationService/GetMigrationState"
+	// K8SRecommendationServiceUpdateMigrationStateProcedure is the fully-qualified name of the
+	// K8sRecommendationService's UpdateMigrationState RPC.
+	K8SRecommendationServiceUpdateMigrationStateProcedure = "/api.v1.K8sRecommendationService/UpdateMigrationState"
+	// K8SRecommendationServiceReportNodePoolValidationProcedure is the fully-qualified name of the
+	// K8sRecommendationService's ReportNodePoolValidation RPC.
+	K8SRecommendationServiceReportNodePoolValidationProcedure = "/api.v1.K8sRecommendationService/ReportNodePoolValidation"
+	// K8SRecommendationServiceGetNodePoolValidationsProcedure is the fully-qualified name of the
+	// K8sRecommendationService's GetNodePoolValidations RPC.
+	K8SRecommendationServiceGetNodePoolValidationsProcedure = "/api.v1.K8sRecommendationService/GetNodePoolValidations"
 	// K8SRecommendationServiceCreateNodePolicyTargetsProcedure is the fully-qualified name of the
 	// K8sRecommendationService's CreateNodePolicyTargets RPC.
 	K8SRecommendationServiceCreateNodePolicyTargetsProcedure = "/api.v1.K8sRecommendationService/CreateNodePolicyTargets"
@@ -326,6 +344,9 @@ const (
 	// K8SRecommendationServiceGetWorkloadRuleByIDProcedure is the fully-qualified name of the
 	// K8sRecommendationService's GetWorkloadRuleByID RPC.
 	K8SRecommendationServiceGetWorkloadRuleByIDProcedure = "/api.v1.K8sRecommendationService/GetWorkloadRuleByID"
+	// K8SRecommendationServiceGetWorkloadRuleByWorkloadProcedure is the fully-qualified name of the
+	// K8sRecommendationService's GetWorkloadRuleByWorkload RPC.
+	K8SRecommendationServiceGetWorkloadRuleByWorkloadProcedure = "/api.v1.K8sRecommendationService/GetWorkloadRuleByWorkload"
 	// K8SRecommendationServiceDeleteWorkloadRuleProcedure is the fully-qualified name of the
 	// K8sRecommendationService's DeleteWorkloadRule RPC.
 	K8SRecommendationServiceDeleteWorkloadRuleProcedure = "/api.v1.K8sRecommendationService/DeleteWorkloadRule"
@@ -434,6 +455,7 @@ type K8SRecommendationServiceClient interface {
 	CreateNodePolicies(context.Context, *connect.Request[v1.CreateNodePoliciesRequest]) (*connect.Response[v1.CreateNodePoliciesResponse], error)
 	ListNodePolicies(context.Context, *connect.Request[v1.ListNodePoliciesRequest]) (*connect.Response[v1.ListNodePoliciesResponse], error)
 	UpdateNodePolicy(context.Context, *connect.Request[v1.UpdateNodePolicyRequest]) (*connect.Response[v1.UpdateNodePolicyResponse], error)
+	DeleteNodePolicy(context.Context, *connect.Request[v1.DeleteNodePolicyRequest]) (*connect.Response[v1.DeleteNodePolicyResponse], error)
 	SuggestedNodePolicy(context.Context, *connect.Request[v1.SuggestedNodePolicyRequest]) (*connect.Response[v1.SuggestedNodePolicyResponse], error)
 	SuggestedKarpenterConfig(context.Context, *connect.Request[v1.SuggestedKarpenterConfigRequest]) (*connect.Response[v1.SuggestedKarpenterConfigResponse], error)
 	// GenerateNodePoliciesFromKarpenter generates NodePolicy objects from existing Karpenter resources
@@ -442,6 +464,15 @@ type K8SRecommendationServiceClient interface {
 	// GenerateNodePoliciesFromNodeGroups generates NodePolicy objects by inspecting
 	// k8s_nodes metadata for clusters without Karpenter/dzkarp.
 	GenerateNodePoliciesFromNodeGroups(context.Context, *connect.Request[v1.GenerateNodePoliciesFromNodeGroupsRequest]) (*connect.Response[v1.GenerateNodePoliciesFromNodeGroupsResponse], error)
+	// GetNodeAnnotationReadiness checks how many nodes in a cluster have been
+	// annotated with AWS metadata by the Karpenter fork's node metadata controller.
+	GetNodeAnnotationReadiness(context.Context, *connect.Request[v1.GetNodeAnnotationReadinessRequest]) (*connect.Response[v1.GetNodeAnnotationReadinessResponse], error)
+	// Migration wizard state management
+	GetMigrationState(context.Context, *connect.Request[v1.GetMigrationStateRequest]) (*connect.Response[v1.GetMigrationStateResponse], error)
+	UpdateMigrationState(context.Context, *connect.Request[v1.UpdateMigrationStateRequest]) (*connect.Response[v1.UpdateMigrationStateResponse], error)
+	// NodePool validation phone-home
+	ReportNodePoolValidation(context.Context, *connect.Request[v1.ReportNodePoolValidationRequest]) (*connect.Response[v1.ReportNodePoolValidationResponse], error)
+	GetNodePoolValidations(context.Context, *connect.Request[v1.GetNodePoolValidationsRequest]) (*connect.Response[v1.GetNodePoolValidationsResponse], error)
 	CreateNodePolicyTargets(context.Context, *connect.Request[v1.CreateNodePolicyTargetsRequest]) (*connect.Response[v1.CreateNodePolicyTargetsResponse], error)
 	ListNodePolicyTargets(context.Context, *connect.Request[v1.ListNodePolicyTargetsRequest]) (*connect.Response[v1.ListNodePolicyTargetsResponse], error)
 	UpdateNodePolicyTarget(context.Context, *connect.Request[v1.UpdateNodePolicyTargetRequest]) (*connect.Response[v1.UpdateNodePolicyTargetResponse], error)
@@ -492,6 +523,7 @@ type K8SRecommendationServiceClient interface {
 	GetWorkloadRulesByPolicy(context.Context, *connect.Request[v1.GetWorkloadRulesByPolicyRequest]) (*connect.Response[v1.GetWorkloadRulesByPolicyResponse], error)
 	ListWorkloadRules(context.Context, *connect.Request[v1.ListWorkloadRulesRequest]) (*connect.Response[v1.ListWorkloadRulesResponse], error)
 	GetWorkloadRuleByID(context.Context, *connect.Request[v1.GetWorkloadRuleByIDRequest]) (*connect.Response[v1.GetWorkloadRuleByIDResponse], error)
+	GetWorkloadRuleByWorkload(context.Context, *connect.Request[v1.GetWorkloadRuleByWorkloadRequest]) (*connect.Response[v1.GetWorkloadRuleByWorkloadResponse], error)
 	DeleteWorkloadRule(context.Context, *connect.Request[v1.DeleteWorkloadRuleRequest]) (*connect.Response[v1.DeleteWorkloadRuleResponse], error)
 	GetWorkloadContainerNames(context.Context, *connect.Request[v1.GetWorkloadContainerNamesRequest]) (*connect.Response[v1.GetWorkloadContainerNamesResponse], error)
 	BatchAutoOptimizeWorkloads(context.Context, *connect.Request[v1.BatchAutoOptimizeWorkloadsRequest]) (*connect.Response[v1.BatchAutoOptimizeWorkloadsResponse], error)
@@ -772,6 +804,11 @@ func NewK8SRecommendationServiceClient(httpClient connect.HTTPClient, baseURL st
 			baseURL+K8SRecommendationServiceUpdateNodePolicyProcedure,
 			opts...,
 		),
+		deleteNodePolicy: connect.NewClient[v1.DeleteNodePolicyRequest, v1.DeleteNodePolicyResponse](
+			httpClient,
+			baseURL+K8SRecommendationServiceDeleteNodePolicyProcedure,
+			opts...,
+		),
 		suggestedNodePolicy: connect.NewClient[v1.SuggestedNodePolicyRequest, v1.SuggestedNodePolicyResponse](
 			httpClient,
 			baseURL+K8SRecommendationServiceSuggestedNodePolicyProcedure,
@@ -790,6 +827,31 @@ func NewK8SRecommendationServiceClient(httpClient connect.HTTPClient, baseURL st
 		generateNodePoliciesFromNodeGroups: connect.NewClient[v1.GenerateNodePoliciesFromNodeGroupsRequest, v1.GenerateNodePoliciesFromNodeGroupsResponse](
 			httpClient,
 			baseURL+K8SRecommendationServiceGenerateNodePoliciesFromNodeGroupsProcedure,
+			opts...,
+		),
+		getNodeAnnotationReadiness: connect.NewClient[v1.GetNodeAnnotationReadinessRequest, v1.GetNodeAnnotationReadinessResponse](
+			httpClient,
+			baseURL+K8SRecommendationServiceGetNodeAnnotationReadinessProcedure,
+			opts...,
+		),
+		getMigrationState: connect.NewClient[v1.GetMigrationStateRequest, v1.GetMigrationStateResponse](
+			httpClient,
+			baseURL+K8SRecommendationServiceGetMigrationStateProcedure,
+			opts...,
+		),
+		updateMigrationState: connect.NewClient[v1.UpdateMigrationStateRequest, v1.UpdateMigrationStateResponse](
+			httpClient,
+			baseURL+K8SRecommendationServiceUpdateMigrationStateProcedure,
+			opts...,
+		),
+		reportNodePoolValidation: connect.NewClient[v1.ReportNodePoolValidationRequest, v1.ReportNodePoolValidationResponse](
+			httpClient,
+			baseURL+K8SRecommendationServiceReportNodePoolValidationProcedure,
+			opts...,
+		),
+		getNodePoolValidations: connect.NewClient[v1.GetNodePoolValidationsRequest, v1.GetNodePoolValidationsResponse](
+			httpClient,
+			baseURL+K8SRecommendationServiceGetNodePoolValidationsProcedure,
 			opts...,
 		),
 		createNodePolicyTargets: connect.NewClient[v1.CreateNodePolicyTargetsRequest, v1.CreateNodePolicyTargetsResponse](
@@ -992,6 +1054,11 @@ func NewK8SRecommendationServiceClient(httpClient connect.HTTPClient, baseURL st
 			baseURL+K8SRecommendationServiceGetWorkloadRuleByIDProcedure,
 			opts...,
 		),
+		getWorkloadRuleByWorkload: connect.NewClient[v1.GetWorkloadRuleByWorkloadRequest, v1.GetWorkloadRuleByWorkloadResponse](
+			httpClient,
+			baseURL+K8SRecommendationServiceGetWorkloadRuleByWorkloadProcedure,
+			opts...,
+		),
 		deleteWorkloadRule: connect.NewClient[v1.DeleteWorkloadRuleRequest, v1.DeleteWorkloadRuleResponse](
 			httpClient,
 			baseURL+K8SRecommendationServiceDeleteWorkloadRuleProcedure,
@@ -1065,10 +1132,16 @@ type k8SRecommendationServiceClient struct {
 	createNodePolicies                             *connect.Client[v1.CreateNodePoliciesRequest, v1.CreateNodePoliciesResponse]
 	listNodePolicies                               *connect.Client[v1.ListNodePoliciesRequest, v1.ListNodePoliciesResponse]
 	updateNodePolicy                               *connect.Client[v1.UpdateNodePolicyRequest, v1.UpdateNodePolicyResponse]
+	deleteNodePolicy                               *connect.Client[v1.DeleteNodePolicyRequest, v1.DeleteNodePolicyResponse]
 	suggestedNodePolicy                            *connect.Client[v1.SuggestedNodePolicyRequest, v1.SuggestedNodePolicyResponse]
 	suggestedKarpenterConfig                       *connect.Client[v1.SuggestedKarpenterConfigRequest, v1.SuggestedKarpenterConfigResponse]
 	generateNodePoliciesFromKarpenter              *connect.Client[v1.GenerateNodePoliciesFromKarpenterRequest, v1.GenerateNodePoliciesFromKarpenterResponse]
 	generateNodePoliciesFromNodeGroups             *connect.Client[v1.GenerateNodePoliciesFromNodeGroupsRequest, v1.GenerateNodePoliciesFromNodeGroupsResponse]
+	getNodeAnnotationReadiness                     *connect.Client[v1.GetNodeAnnotationReadinessRequest, v1.GetNodeAnnotationReadinessResponse]
+	getMigrationState                              *connect.Client[v1.GetMigrationStateRequest, v1.GetMigrationStateResponse]
+	updateMigrationState                           *connect.Client[v1.UpdateMigrationStateRequest, v1.UpdateMigrationStateResponse]
+	reportNodePoolValidation                       *connect.Client[v1.ReportNodePoolValidationRequest, v1.ReportNodePoolValidationResponse]
+	getNodePoolValidations                         *connect.Client[v1.GetNodePoolValidationsRequest, v1.GetNodePoolValidationsResponse]
 	createNodePolicyTargets                        *connect.Client[v1.CreateNodePolicyTargetsRequest, v1.CreateNodePolicyTargetsResponse]
 	listNodePolicyTargets                          *connect.Client[v1.ListNodePolicyTargetsRequest, v1.ListNodePolicyTargetsResponse]
 	updateNodePolicyTarget                         *connect.Client[v1.UpdateNodePolicyTargetRequest, v1.UpdateNodePolicyTargetResponse]
@@ -1109,6 +1182,7 @@ type k8SRecommendationServiceClient struct {
 	getWorkloadRulesByPolicy                       *connect.Client[v1.GetWorkloadRulesByPolicyRequest, v1.GetWorkloadRulesByPolicyResponse]
 	listWorkloadRules                              *connect.Client[v1.ListWorkloadRulesRequest, v1.ListWorkloadRulesResponse]
 	getWorkloadRuleByID                            *connect.Client[v1.GetWorkloadRuleByIDRequest, v1.GetWorkloadRuleByIDResponse]
+	getWorkloadRuleByWorkload                      *connect.Client[v1.GetWorkloadRuleByWorkloadRequest, v1.GetWorkloadRuleByWorkloadResponse]
 	deleteWorkloadRule                             *connect.Client[v1.DeleteWorkloadRuleRequest, v1.DeleteWorkloadRuleResponse]
 	getWorkloadContainerNames                      *connect.Client[v1.GetWorkloadContainerNamesRequest, v1.GetWorkloadContainerNamesResponse]
 	batchAutoOptimizeWorkloads                     *connect.Client[v1.BatchAutoOptimizeWorkloadsRequest, v1.BatchAutoOptimizeWorkloadsResponse]
@@ -1442,6 +1516,11 @@ func (c *k8SRecommendationServiceClient) UpdateNodePolicy(ctx context.Context, r
 	return c.updateNodePolicy.CallUnary(ctx, req)
 }
 
+// DeleteNodePolicy calls api.v1.K8sRecommendationService.DeleteNodePolicy.
+func (c *k8SRecommendationServiceClient) DeleteNodePolicy(ctx context.Context, req *connect.Request[v1.DeleteNodePolicyRequest]) (*connect.Response[v1.DeleteNodePolicyResponse], error) {
+	return c.deleteNodePolicy.CallUnary(ctx, req)
+}
+
 // SuggestedNodePolicy calls api.v1.K8sRecommendationService.SuggestedNodePolicy.
 func (c *k8SRecommendationServiceClient) SuggestedNodePolicy(ctx context.Context, req *connect.Request[v1.SuggestedNodePolicyRequest]) (*connect.Response[v1.SuggestedNodePolicyResponse], error) {
 	return c.suggestedNodePolicy.CallUnary(ctx, req)
@@ -1462,6 +1541,31 @@ func (c *k8SRecommendationServiceClient) GenerateNodePoliciesFromKarpenter(ctx c
 // api.v1.K8sRecommendationService.GenerateNodePoliciesFromNodeGroups.
 func (c *k8SRecommendationServiceClient) GenerateNodePoliciesFromNodeGroups(ctx context.Context, req *connect.Request[v1.GenerateNodePoliciesFromNodeGroupsRequest]) (*connect.Response[v1.GenerateNodePoliciesFromNodeGroupsResponse], error) {
 	return c.generateNodePoliciesFromNodeGroups.CallUnary(ctx, req)
+}
+
+// GetNodeAnnotationReadiness calls api.v1.K8sRecommendationService.GetNodeAnnotationReadiness.
+func (c *k8SRecommendationServiceClient) GetNodeAnnotationReadiness(ctx context.Context, req *connect.Request[v1.GetNodeAnnotationReadinessRequest]) (*connect.Response[v1.GetNodeAnnotationReadinessResponse], error) {
+	return c.getNodeAnnotationReadiness.CallUnary(ctx, req)
+}
+
+// GetMigrationState calls api.v1.K8sRecommendationService.GetMigrationState.
+func (c *k8SRecommendationServiceClient) GetMigrationState(ctx context.Context, req *connect.Request[v1.GetMigrationStateRequest]) (*connect.Response[v1.GetMigrationStateResponse], error) {
+	return c.getMigrationState.CallUnary(ctx, req)
+}
+
+// UpdateMigrationState calls api.v1.K8sRecommendationService.UpdateMigrationState.
+func (c *k8SRecommendationServiceClient) UpdateMigrationState(ctx context.Context, req *connect.Request[v1.UpdateMigrationStateRequest]) (*connect.Response[v1.UpdateMigrationStateResponse], error) {
+	return c.updateMigrationState.CallUnary(ctx, req)
+}
+
+// ReportNodePoolValidation calls api.v1.K8sRecommendationService.ReportNodePoolValidation.
+func (c *k8SRecommendationServiceClient) ReportNodePoolValidation(ctx context.Context, req *connect.Request[v1.ReportNodePoolValidationRequest]) (*connect.Response[v1.ReportNodePoolValidationResponse], error) {
+	return c.reportNodePoolValidation.CallUnary(ctx, req)
+}
+
+// GetNodePoolValidations calls api.v1.K8sRecommendationService.GetNodePoolValidations.
+func (c *k8SRecommendationServiceClient) GetNodePoolValidations(ctx context.Context, req *connect.Request[v1.GetNodePoolValidationsRequest]) (*connect.Response[v1.GetNodePoolValidationsResponse], error) {
+	return c.getNodePoolValidations.CallUnary(ctx, req)
 }
 
 // CreateNodePolicyTargets calls api.v1.K8sRecommendationService.CreateNodePolicyTargets.
@@ -1682,6 +1786,11 @@ func (c *k8SRecommendationServiceClient) GetWorkloadRuleByID(ctx context.Context
 	return c.getWorkloadRuleByID.CallUnary(ctx, req)
 }
 
+// GetWorkloadRuleByWorkload calls api.v1.K8sRecommendationService.GetWorkloadRuleByWorkload.
+func (c *k8SRecommendationServiceClient) GetWorkloadRuleByWorkload(ctx context.Context, req *connect.Request[v1.GetWorkloadRuleByWorkloadRequest]) (*connect.Response[v1.GetWorkloadRuleByWorkloadResponse], error) {
+	return c.getWorkloadRuleByWorkload.CallUnary(ctx, req)
+}
+
 // DeleteWorkloadRule calls api.v1.K8sRecommendationService.DeleteWorkloadRule.
 func (c *k8SRecommendationServiceClient) DeleteWorkloadRule(ctx context.Context, req *connect.Request[v1.DeleteWorkloadRuleRequest]) (*connect.Response[v1.DeleteWorkloadRuleResponse], error) {
 	return c.deleteWorkloadRule.CallUnary(ctx, req)
@@ -1795,6 +1904,7 @@ type K8SRecommendationServiceHandler interface {
 	CreateNodePolicies(context.Context, *connect.Request[v1.CreateNodePoliciesRequest]) (*connect.Response[v1.CreateNodePoliciesResponse], error)
 	ListNodePolicies(context.Context, *connect.Request[v1.ListNodePoliciesRequest]) (*connect.Response[v1.ListNodePoliciesResponse], error)
 	UpdateNodePolicy(context.Context, *connect.Request[v1.UpdateNodePolicyRequest]) (*connect.Response[v1.UpdateNodePolicyResponse], error)
+	DeleteNodePolicy(context.Context, *connect.Request[v1.DeleteNodePolicyRequest]) (*connect.Response[v1.DeleteNodePolicyResponse], error)
 	SuggestedNodePolicy(context.Context, *connect.Request[v1.SuggestedNodePolicyRequest]) (*connect.Response[v1.SuggestedNodePolicyResponse], error)
 	SuggestedKarpenterConfig(context.Context, *connect.Request[v1.SuggestedKarpenterConfigRequest]) (*connect.Response[v1.SuggestedKarpenterConfigResponse], error)
 	// GenerateNodePoliciesFromKarpenter generates NodePolicy objects from existing Karpenter resources
@@ -1803,6 +1913,15 @@ type K8SRecommendationServiceHandler interface {
 	// GenerateNodePoliciesFromNodeGroups generates NodePolicy objects by inspecting
 	// k8s_nodes metadata for clusters without Karpenter/dzkarp.
 	GenerateNodePoliciesFromNodeGroups(context.Context, *connect.Request[v1.GenerateNodePoliciesFromNodeGroupsRequest]) (*connect.Response[v1.GenerateNodePoliciesFromNodeGroupsResponse], error)
+	// GetNodeAnnotationReadiness checks how many nodes in a cluster have been
+	// annotated with AWS metadata by the Karpenter fork's node metadata controller.
+	GetNodeAnnotationReadiness(context.Context, *connect.Request[v1.GetNodeAnnotationReadinessRequest]) (*connect.Response[v1.GetNodeAnnotationReadinessResponse], error)
+	// Migration wizard state management
+	GetMigrationState(context.Context, *connect.Request[v1.GetMigrationStateRequest]) (*connect.Response[v1.GetMigrationStateResponse], error)
+	UpdateMigrationState(context.Context, *connect.Request[v1.UpdateMigrationStateRequest]) (*connect.Response[v1.UpdateMigrationStateResponse], error)
+	// NodePool validation phone-home
+	ReportNodePoolValidation(context.Context, *connect.Request[v1.ReportNodePoolValidationRequest]) (*connect.Response[v1.ReportNodePoolValidationResponse], error)
+	GetNodePoolValidations(context.Context, *connect.Request[v1.GetNodePoolValidationsRequest]) (*connect.Response[v1.GetNodePoolValidationsResponse], error)
 	CreateNodePolicyTargets(context.Context, *connect.Request[v1.CreateNodePolicyTargetsRequest]) (*connect.Response[v1.CreateNodePolicyTargetsResponse], error)
 	ListNodePolicyTargets(context.Context, *connect.Request[v1.ListNodePolicyTargetsRequest]) (*connect.Response[v1.ListNodePolicyTargetsResponse], error)
 	UpdateNodePolicyTarget(context.Context, *connect.Request[v1.UpdateNodePolicyTargetRequest]) (*connect.Response[v1.UpdateNodePolicyTargetResponse], error)
@@ -1853,6 +1972,7 @@ type K8SRecommendationServiceHandler interface {
 	GetWorkloadRulesByPolicy(context.Context, *connect.Request[v1.GetWorkloadRulesByPolicyRequest]) (*connect.Response[v1.GetWorkloadRulesByPolicyResponse], error)
 	ListWorkloadRules(context.Context, *connect.Request[v1.ListWorkloadRulesRequest]) (*connect.Response[v1.ListWorkloadRulesResponse], error)
 	GetWorkloadRuleByID(context.Context, *connect.Request[v1.GetWorkloadRuleByIDRequest]) (*connect.Response[v1.GetWorkloadRuleByIDResponse], error)
+	GetWorkloadRuleByWorkload(context.Context, *connect.Request[v1.GetWorkloadRuleByWorkloadRequest]) (*connect.Response[v1.GetWorkloadRuleByWorkloadResponse], error)
 	DeleteWorkloadRule(context.Context, *connect.Request[v1.DeleteWorkloadRuleRequest]) (*connect.Response[v1.DeleteWorkloadRuleResponse], error)
 	GetWorkloadContainerNames(context.Context, *connect.Request[v1.GetWorkloadContainerNamesRequest]) (*connect.Response[v1.GetWorkloadContainerNamesResponse], error)
 	BatchAutoOptimizeWorkloads(context.Context, *connect.Request[v1.BatchAutoOptimizeWorkloadsRequest]) (*connect.Response[v1.BatchAutoOptimizeWorkloadsResponse], error)
@@ -2129,6 +2249,11 @@ func NewK8SRecommendationServiceHandler(svc K8SRecommendationServiceHandler, opt
 		svc.UpdateNodePolicy,
 		opts...,
 	)
+	k8SRecommendationServiceDeleteNodePolicyHandler := connect.NewUnaryHandler(
+		K8SRecommendationServiceDeleteNodePolicyProcedure,
+		svc.DeleteNodePolicy,
+		opts...,
+	)
 	k8SRecommendationServiceSuggestedNodePolicyHandler := connect.NewUnaryHandler(
 		K8SRecommendationServiceSuggestedNodePolicyProcedure,
 		svc.SuggestedNodePolicy,
@@ -2147,6 +2272,31 @@ func NewK8SRecommendationServiceHandler(svc K8SRecommendationServiceHandler, opt
 	k8SRecommendationServiceGenerateNodePoliciesFromNodeGroupsHandler := connect.NewUnaryHandler(
 		K8SRecommendationServiceGenerateNodePoliciesFromNodeGroupsProcedure,
 		svc.GenerateNodePoliciesFromNodeGroups,
+		opts...,
+	)
+	k8SRecommendationServiceGetNodeAnnotationReadinessHandler := connect.NewUnaryHandler(
+		K8SRecommendationServiceGetNodeAnnotationReadinessProcedure,
+		svc.GetNodeAnnotationReadiness,
+		opts...,
+	)
+	k8SRecommendationServiceGetMigrationStateHandler := connect.NewUnaryHandler(
+		K8SRecommendationServiceGetMigrationStateProcedure,
+		svc.GetMigrationState,
+		opts...,
+	)
+	k8SRecommendationServiceUpdateMigrationStateHandler := connect.NewUnaryHandler(
+		K8SRecommendationServiceUpdateMigrationStateProcedure,
+		svc.UpdateMigrationState,
+		opts...,
+	)
+	k8SRecommendationServiceReportNodePoolValidationHandler := connect.NewUnaryHandler(
+		K8SRecommendationServiceReportNodePoolValidationProcedure,
+		svc.ReportNodePoolValidation,
+		opts...,
+	)
+	k8SRecommendationServiceGetNodePoolValidationsHandler := connect.NewUnaryHandler(
+		K8SRecommendationServiceGetNodePoolValidationsProcedure,
+		svc.GetNodePoolValidations,
 		opts...,
 	)
 	k8SRecommendationServiceCreateNodePolicyTargetsHandler := connect.NewUnaryHandler(
@@ -2349,6 +2499,11 @@ func NewK8SRecommendationServiceHandler(svc K8SRecommendationServiceHandler, opt
 		svc.GetWorkloadRuleByID,
 		opts...,
 	)
+	k8SRecommendationServiceGetWorkloadRuleByWorkloadHandler := connect.NewUnaryHandler(
+		K8SRecommendationServiceGetWorkloadRuleByWorkloadProcedure,
+		svc.GetWorkloadRuleByWorkload,
+		opts...,
+	)
 	k8SRecommendationServiceDeleteWorkloadRuleHandler := connect.NewUnaryHandler(
 		K8SRecommendationServiceDeleteWorkloadRuleProcedure,
 		svc.DeleteWorkloadRule,
@@ -2472,6 +2627,8 @@ func NewK8SRecommendationServiceHandler(svc K8SRecommendationServiceHandler, opt
 			k8SRecommendationServiceListNodePoliciesHandler.ServeHTTP(w, r)
 		case K8SRecommendationServiceUpdateNodePolicyProcedure:
 			k8SRecommendationServiceUpdateNodePolicyHandler.ServeHTTP(w, r)
+		case K8SRecommendationServiceDeleteNodePolicyProcedure:
+			k8SRecommendationServiceDeleteNodePolicyHandler.ServeHTTP(w, r)
 		case K8SRecommendationServiceSuggestedNodePolicyProcedure:
 			k8SRecommendationServiceSuggestedNodePolicyHandler.ServeHTTP(w, r)
 		case K8SRecommendationServiceSuggestedKarpenterConfigProcedure:
@@ -2480,6 +2637,16 @@ func NewK8SRecommendationServiceHandler(svc K8SRecommendationServiceHandler, opt
 			k8SRecommendationServiceGenerateNodePoliciesFromKarpenterHandler.ServeHTTP(w, r)
 		case K8SRecommendationServiceGenerateNodePoliciesFromNodeGroupsProcedure:
 			k8SRecommendationServiceGenerateNodePoliciesFromNodeGroupsHandler.ServeHTTP(w, r)
+		case K8SRecommendationServiceGetNodeAnnotationReadinessProcedure:
+			k8SRecommendationServiceGetNodeAnnotationReadinessHandler.ServeHTTP(w, r)
+		case K8SRecommendationServiceGetMigrationStateProcedure:
+			k8SRecommendationServiceGetMigrationStateHandler.ServeHTTP(w, r)
+		case K8SRecommendationServiceUpdateMigrationStateProcedure:
+			k8SRecommendationServiceUpdateMigrationStateHandler.ServeHTTP(w, r)
+		case K8SRecommendationServiceReportNodePoolValidationProcedure:
+			k8SRecommendationServiceReportNodePoolValidationHandler.ServeHTTP(w, r)
+		case K8SRecommendationServiceGetNodePoolValidationsProcedure:
+			k8SRecommendationServiceGetNodePoolValidationsHandler.ServeHTTP(w, r)
 		case K8SRecommendationServiceCreateNodePolicyTargetsProcedure:
 			k8SRecommendationServiceCreateNodePolicyTargetsHandler.ServeHTTP(w, r)
 		case K8SRecommendationServiceListNodePolicyTargetsProcedure:
@@ -2560,6 +2727,8 @@ func NewK8SRecommendationServiceHandler(svc K8SRecommendationServiceHandler, opt
 			k8SRecommendationServiceListWorkloadRulesHandler.ServeHTTP(w, r)
 		case K8SRecommendationServiceGetWorkloadRuleByIDProcedure:
 			k8SRecommendationServiceGetWorkloadRuleByIDHandler.ServeHTTP(w, r)
+		case K8SRecommendationServiceGetWorkloadRuleByWorkloadProcedure:
+			k8SRecommendationServiceGetWorkloadRuleByWorkloadHandler.ServeHTTP(w, r)
 		case K8SRecommendationServiceDeleteWorkloadRuleProcedure:
 			k8SRecommendationServiceDeleteWorkloadRuleHandler.ServeHTTP(w, r)
 		case K8SRecommendationServiceGetWorkloadContainerNamesProcedure:
@@ -2787,6 +2956,10 @@ func (UnimplementedK8SRecommendationServiceHandler) UpdateNodePolicy(context.Con
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.UpdateNodePolicy is not implemented"))
 }
 
+func (UnimplementedK8SRecommendationServiceHandler) DeleteNodePolicy(context.Context, *connect.Request[v1.DeleteNodePolicyRequest]) (*connect.Response[v1.DeleteNodePolicyResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.DeleteNodePolicy is not implemented"))
+}
+
 func (UnimplementedK8SRecommendationServiceHandler) SuggestedNodePolicy(context.Context, *connect.Request[v1.SuggestedNodePolicyRequest]) (*connect.Response[v1.SuggestedNodePolicyResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.SuggestedNodePolicy is not implemented"))
 }
@@ -2801,6 +2974,26 @@ func (UnimplementedK8SRecommendationServiceHandler) GenerateNodePoliciesFromKarp
 
 func (UnimplementedK8SRecommendationServiceHandler) GenerateNodePoliciesFromNodeGroups(context.Context, *connect.Request[v1.GenerateNodePoliciesFromNodeGroupsRequest]) (*connect.Response[v1.GenerateNodePoliciesFromNodeGroupsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.GenerateNodePoliciesFromNodeGroups is not implemented"))
+}
+
+func (UnimplementedK8SRecommendationServiceHandler) GetNodeAnnotationReadiness(context.Context, *connect.Request[v1.GetNodeAnnotationReadinessRequest]) (*connect.Response[v1.GetNodeAnnotationReadinessResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.GetNodeAnnotationReadiness is not implemented"))
+}
+
+func (UnimplementedK8SRecommendationServiceHandler) GetMigrationState(context.Context, *connect.Request[v1.GetMigrationStateRequest]) (*connect.Response[v1.GetMigrationStateResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.GetMigrationState is not implemented"))
+}
+
+func (UnimplementedK8SRecommendationServiceHandler) UpdateMigrationState(context.Context, *connect.Request[v1.UpdateMigrationStateRequest]) (*connect.Response[v1.UpdateMigrationStateResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.UpdateMigrationState is not implemented"))
+}
+
+func (UnimplementedK8SRecommendationServiceHandler) ReportNodePoolValidation(context.Context, *connect.Request[v1.ReportNodePoolValidationRequest]) (*connect.Response[v1.ReportNodePoolValidationResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.ReportNodePoolValidation is not implemented"))
+}
+
+func (UnimplementedK8SRecommendationServiceHandler) GetNodePoolValidations(context.Context, *connect.Request[v1.GetNodePoolValidationsRequest]) (*connect.Response[v1.GetNodePoolValidationsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.GetNodePoolValidations is not implemented"))
 }
 
 func (UnimplementedK8SRecommendationServiceHandler) CreateNodePolicyTargets(context.Context, *connect.Request[v1.CreateNodePolicyTargetsRequest]) (*connect.Response[v1.CreateNodePolicyTargetsResponse], error) {
@@ -2961,6 +3154,10 @@ func (UnimplementedK8SRecommendationServiceHandler) ListWorkloadRules(context.Co
 
 func (UnimplementedK8SRecommendationServiceHandler) GetWorkloadRuleByID(context.Context, *connect.Request[v1.GetWorkloadRuleByIDRequest]) (*connect.Response[v1.GetWorkloadRuleByIDResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.GetWorkloadRuleByID is not implemented"))
+}
+
+func (UnimplementedK8SRecommendationServiceHandler) GetWorkloadRuleByWorkload(context.Context, *connect.Request[v1.GetWorkloadRuleByWorkloadRequest]) (*connect.Response[v1.GetWorkloadRuleByWorkloadResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.GetWorkloadRuleByWorkload is not implemented"))
 }
 
 func (UnimplementedK8SRecommendationServiceHandler) DeleteWorkloadRule(context.Context, *connect.Request[v1.DeleteWorkloadRuleRequest]) (*connect.Response[v1.DeleteWorkloadRuleResponse], error) {

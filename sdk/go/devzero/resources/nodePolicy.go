@@ -15,51 +15,51 @@ import (
 type NodePolicy struct {
 	pulumi.CustomResourceState
 
-	// CPU architectures (e.g. amd64, arm64).
+	// CPU architectures for nodes. Example: {in: ["amd64"]}.
 	Architectures LabelSelectorArgsPtrOutput `pulumi:"architectures"`
-	// AWS-specific node class configuration.
+	// AWS-specific EC2NodeClass configuration (subnets, AMIs, IAM role, EBS, etc.).
 	Aws AWSNodeClassSpecArgsPtrOutput `pulumi:"aws"`
-	// Azure-specific node class configuration.
+	// Azure-specific AKSNodeClass configuration (VNet subnet, OS disk, image family, etc.).
 	Azure AzureNodeClassSpecArgsPtrOutput `pulumi:"azure"`
-	// Capacity types (e.g. on-demand, spot).
+	// Capacity purchasing types. Valid values: 'spot', 'on-demand', 'reserved'. Example: {in: ["spot", "on-demand"]}.
 	CapacityTypes LabelSelectorArgsPtrOutput `pulumi:"capacityTypes"`
-	// Free-form description of the node policy.
+	// Free-form description of the node policy. Example: 'Spot instance policy for production batch workloads'.
 	Description pulumi.StringPtrOutput `pulumi:"description"`
-	// Karpenter disruption policy for consolidation and expiry.
+	// Karpenter disruption policy controlling consolidation, expiry, and budgets.
 	Disruption DisruptionPolicyArgsPtrOutput `pulumi:"disruption"`
-	// Filter instances by category (e.g. general-purpose, compute-optimized).
+	// Filter instances by category letter (cloud-specific). Example: {in: ["m", "c", "r"]} for AWS, {in: ["D", "E"]} for Azure.
 	InstanceCategories LabelSelectorArgsPtrOutput `pulumi:"instanceCategories"`
-	// Filter instances by CPU count.
+	// Filter instances by vCPU count. Example: {in: ["4", "8", "16"]}.
 	InstanceCpus LabelSelectorArgsPtrOutput `pulumi:"instanceCpus"`
-	// Filter instances by family (e.g. m5, c6i).
+	// Filter instances by family. Example: {in: ["m5", "c6i", "m6i"]}.
 	InstanceFamilies LabelSelectorArgsPtrOutput `pulumi:"instanceFamilies"`
-	// Filter instances by generation.
+	// Filter instances by generation number. Example: {in: ["2", "3"]}.
 	InstanceGenerations LabelSelectorArgsPtrOutput `pulumi:"instanceGenerations"`
-	// Filter instances by hypervisor type.
+	// Filter instances by hypervisor type. Example: {in: ["nitro"]}.
 	InstanceHypervisors LabelSelectorArgsPtrOutput `pulumi:"instanceHypervisors"`
-	// Filter instances by size (e.g. large, xlarge).
+	// Filter instances by size label. Example: {in: ["large", "xlarge", "2xlarge"]}.
 	InstanceSizes LabelSelectorArgsPtrOutput `pulumi:"instanceSizes"`
-	// Explicitly select specific instance types.
+	// Explicitly allow specific instance types. Example: {in: ["m5.large", "c6i.large"]}.
 	InstanceTypes LabelSelectorArgsPtrOutput `pulumi:"instanceTypes"`
-	// Labels applied to provisioned nodes.
+	// Labels applied to all provisioned nodes. Example: {"team": "backend", "env": "prod"}.
 	Labels pulumi.StringMapOutput `pulumi:"labels"`
-	// Resource limits on the total capacity managed by this policy.
+	// Resource limits on total capacity managed by this policy. Example: {cpu: "1000", memory: "1000Gi"}.
 	Limits ResourceLimitsArgsPtrOutput `pulumi:"limits"`
-	// Human-friendly name for the node policy.
+	// Human-friendly name for the node policy. Example: 'prod-spot-policy'.
 	Name pulumi.StringOutput `pulumi:"name"`
-	// Override name for the generated Karpenter NodeClass.
+	// Override name for the generated Karpenter NodeClass resource. Example: 'prod-aws-nodeclass'.
 	NodeClassName pulumi.StringPtrOutput `pulumi:"nodeClassName"`
-	// Override name for the generated Karpenter NodePool.
+	// Override name for the generated Karpenter NodePool resource. Example: 'prod-spot-nodepool'.
 	NodePoolName pulumi.StringPtrOutput `pulumi:"nodePoolName"`
-	// Operating systems for nodes (e.g. linux, windows).
+	// Operating systems for nodes. Example: {in: ["linux"]}.
 	OperatingSystems LabelSelectorArgsPtrOutput `pulumi:"operatingSystems"`
-	// Raw Karpenter YAML for full NodePool/NodeClass customization.
+	// Raw Karpenter YAML for full NodePool/NodeClass customization — use only when structured fields are insufficient.
 	Raw RawKarpenterSpecArgsArrayOutput `pulumi:"raw"`
-	// Taints applied to provisioned nodes.
+	// Taints applied to provisioned nodes to control pod scheduling. Example: [{key: "dedicated", value: "gpu", effect: "NoSchedule"}].
 	Taints TaintArgsArrayOutput `pulumi:"taints"`
-	// Priority weight for this policy; higher values take precedence.
+	// Priority weight; higher values take precedence when multiple policies match. Example: 100.
 	Weight pulumi.IntPtrOutput `pulumi:"weight"`
-	// Availability zones where nodes may be provisioned.
+	// Availability zones where nodes may be provisioned. Example: {in: ["us-east-1a", "us-east-1b"]}.
 	Zones LabelSelectorArgsPtrOutput `pulumi:"zones"`
 }
 
@@ -245,117 +245,117 @@ func (o NodePolicyOutput) ToNodePolicyOutputWithContext(ctx context.Context) Nod
 	return o
 }
 
-// CPU architectures (e.g. amd64, arm64).
+// CPU architectures for nodes. Example: {in: ["amd64"]}.
 func (o NodePolicyOutput) Architectures() LabelSelectorArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) LabelSelectorArgsPtrOutput { return v.Architectures }).(LabelSelectorArgsPtrOutput)
 }
 
-// AWS-specific node class configuration.
+// AWS-specific EC2NodeClass configuration (subnets, AMIs, IAM role, EBS, etc.).
 func (o NodePolicyOutput) Aws() AWSNodeClassSpecArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) AWSNodeClassSpecArgsPtrOutput { return v.Aws }).(AWSNodeClassSpecArgsPtrOutput)
 }
 
-// Azure-specific node class configuration.
+// Azure-specific AKSNodeClass configuration (VNet subnet, OS disk, image family, etc.).
 func (o NodePolicyOutput) Azure() AzureNodeClassSpecArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) AzureNodeClassSpecArgsPtrOutput { return v.Azure }).(AzureNodeClassSpecArgsPtrOutput)
 }
 
-// Capacity types (e.g. on-demand, spot).
+// Capacity purchasing types. Valid values: 'spot', 'on-demand', 'reserved'. Example: {in: ["spot", "on-demand"]}.
 func (o NodePolicyOutput) CapacityTypes() LabelSelectorArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) LabelSelectorArgsPtrOutput { return v.CapacityTypes }).(LabelSelectorArgsPtrOutput)
 }
 
-// Free-form description of the node policy.
+// Free-form description of the node policy. Example: 'Spot instance policy for production batch workloads'.
 func (o NodePolicyOutput) Description() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
 }
 
-// Karpenter disruption policy for consolidation and expiry.
+// Karpenter disruption policy controlling consolidation, expiry, and budgets.
 func (o NodePolicyOutput) Disruption() DisruptionPolicyArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) DisruptionPolicyArgsPtrOutput { return v.Disruption }).(DisruptionPolicyArgsPtrOutput)
 }
 
-// Filter instances by category (e.g. general-purpose, compute-optimized).
+// Filter instances by category letter (cloud-specific). Example: {in: ["m", "c", "r"]} for AWS, {in: ["D", "E"]} for Azure.
 func (o NodePolicyOutput) InstanceCategories() LabelSelectorArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) LabelSelectorArgsPtrOutput { return v.InstanceCategories }).(LabelSelectorArgsPtrOutput)
 }
 
-// Filter instances by CPU count.
+// Filter instances by vCPU count. Example: {in: ["4", "8", "16"]}.
 func (o NodePolicyOutput) InstanceCpus() LabelSelectorArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) LabelSelectorArgsPtrOutput { return v.InstanceCpus }).(LabelSelectorArgsPtrOutput)
 }
 
-// Filter instances by family (e.g. m5, c6i).
+// Filter instances by family. Example: {in: ["m5", "c6i", "m6i"]}.
 func (o NodePolicyOutput) InstanceFamilies() LabelSelectorArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) LabelSelectorArgsPtrOutput { return v.InstanceFamilies }).(LabelSelectorArgsPtrOutput)
 }
 
-// Filter instances by generation.
+// Filter instances by generation number. Example: {in: ["2", "3"]}.
 func (o NodePolicyOutput) InstanceGenerations() LabelSelectorArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) LabelSelectorArgsPtrOutput { return v.InstanceGenerations }).(LabelSelectorArgsPtrOutput)
 }
 
-// Filter instances by hypervisor type.
+// Filter instances by hypervisor type. Example: {in: ["nitro"]}.
 func (o NodePolicyOutput) InstanceHypervisors() LabelSelectorArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) LabelSelectorArgsPtrOutput { return v.InstanceHypervisors }).(LabelSelectorArgsPtrOutput)
 }
 
-// Filter instances by size (e.g. large, xlarge).
+// Filter instances by size label. Example: {in: ["large", "xlarge", "2xlarge"]}.
 func (o NodePolicyOutput) InstanceSizes() LabelSelectorArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) LabelSelectorArgsPtrOutput { return v.InstanceSizes }).(LabelSelectorArgsPtrOutput)
 }
 
-// Explicitly select specific instance types.
+// Explicitly allow specific instance types. Example: {in: ["m5.large", "c6i.large"]}.
 func (o NodePolicyOutput) InstanceTypes() LabelSelectorArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) LabelSelectorArgsPtrOutput { return v.InstanceTypes }).(LabelSelectorArgsPtrOutput)
 }
 
-// Labels applied to provisioned nodes.
+// Labels applied to all provisioned nodes. Example: {"team": "backend", "env": "prod"}.
 func (o NodePolicyOutput) Labels() pulumi.StringMapOutput {
 	return o.ApplyT(func(v *NodePolicy) pulumi.StringMapOutput { return v.Labels }).(pulumi.StringMapOutput)
 }
 
-// Resource limits on the total capacity managed by this policy.
+// Resource limits on total capacity managed by this policy. Example: {cpu: "1000", memory: "1000Gi"}.
 func (o NodePolicyOutput) Limits() ResourceLimitsArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) ResourceLimitsArgsPtrOutput { return v.Limits }).(ResourceLimitsArgsPtrOutput)
 }
 
-// Human-friendly name for the node policy.
+// Human-friendly name for the node policy. Example: 'prod-spot-policy'.
 func (o NodePolicyOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *NodePolicy) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }
 
-// Override name for the generated Karpenter NodeClass.
+// Override name for the generated Karpenter NodeClass resource. Example: 'prod-aws-nodeclass'.
 func (o NodePolicyOutput) NodeClassName() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) pulumi.StringPtrOutput { return v.NodeClassName }).(pulumi.StringPtrOutput)
 }
 
-// Override name for the generated Karpenter NodePool.
+// Override name for the generated Karpenter NodePool resource. Example: 'prod-spot-nodepool'.
 func (o NodePolicyOutput) NodePoolName() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) pulumi.StringPtrOutput { return v.NodePoolName }).(pulumi.StringPtrOutput)
 }
 
-// Operating systems for nodes (e.g. linux, windows).
+// Operating systems for nodes. Example: {in: ["linux"]}.
 func (o NodePolicyOutput) OperatingSystems() LabelSelectorArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) LabelSelectorArgsPtrOutput { return v.OperatingSystems }).(LabelSelectorArgsPtrOutput)
 }
 
-// Raw Karpenter YAML for full NodePool/NodeClass customization.
+// Raw Karpenter YAML for full NodePool/NodeClass customization — use only when structured fields are insufficient.
 func (o NodePolicyOutput) Raw() RawKarpenterSpecArgsArrayOutput {
 	return o.ApplyT(func(v *NodePolicy) RawKarpenterSpecArgsArrayOutput { return v.Raw }).(RawKarpenterSpecArgsArrayOutput)
 }
 
-// Taints applied to provisioned nodes.
+// Taints applied to provisioned nodes to control pod scheduling. Example: [{key: "dedicated", value: "gpu", effect: "NoSchedule"}].
 func (o NodePolicyOutput) Taints() TaintArgsArrayOutput {
 	return o.ApplyT(func(v *NodePolicy) TaintArgsArrayOutput { return v.Taints }).(TaintArgsArrayOutput)
 }
 
-// Priority weight for this policy; higher values take precedence.
+// Priority weight; higher values take precedence when multiple policies match. Example: 100.
 func (o NodePolicyOutput) Weight() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) pulumi.IntPtrOutput { return v.Weight }).(pulumi.IntPtrOutput)
 }
 
-// Availability zones where nodes may be provisioned.
+// Availability zones where nodes may be provisioned. Example: {in: ["us-east-1a", "us-east-1b"]}.
 func (o NodePolicyOutput) Zones() LabelSelectorArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) LabelSelectorArgsPtrOutput { return v.Zones }).(LabelSelectorArgsPtrOutput)
 }

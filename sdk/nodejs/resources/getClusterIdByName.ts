@@ -7,16 +7,31 @@ import * as utilities from "../utilities";
 export function getClusterIdByName(args: GetClusterIdByNameArgs, opts?: pulumi.InvokeOptions): Promise<GetClusterIdByNameResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invoke("devzero:resources:getClusterIdByName", {
+        "cloudProvider": args.cloudProvider,
+        "liveness": args.liveness,
         "name": args.name,
+        "region": args.region,
         "teamId": args.teamId,
     }, opts);
 }
 
 export interface GetClusterIdByNameArgs {
     /**
+     * Optional cloud provider filter. One of: 'AWS', 'GCP', 'AKS', 'OCI'.
+     */
+    cloudProvider?: string;
+    /**
+     * Controls liveness filtering: IGNORE, PREFER_LIVE, or REQUIRE_LIVE.
+     */
+    liveness?: string;
+    /**
      * The cluster name to look up.
      */
     name: string;
+    /**
+     * Optional region filter, e.g. "us-east-1".
+     */
+    region?: string;
     /**
      * The team ID to search within.
      */
@@ -32,16 +47,31 @@ export interface GetClusterIdByNameResult {
 export function getClusterIdByNameOutput(args: GetClusterIdByNameOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<GetClusterIdByNameResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invokeOutput("devzero:resources:getClusterIdByName", {
+        "cloudProvider": args.cloudProvider,
+        "liveness": args.liveness,
         "name": args.name,
+        "region": args.region,
         "teamId": args.teamId,
     }, opts);
 }
 
 export interface GetClusterIdByNameOutputArgs {
     /**
+     * Optional cloud provider filter. One of: 'AWS', 'GCP', 'AKS', 'OCI'.
+     */
+    cloudProvider?: pulumi.Input<string>;
+    /**
+     * Controls liveness filtering: IGNORE, PREFER_LIVE, or REQUIRE_LIVE.
+     */
+    liveness?: pulumi.Input<string>;
+    /**
      * The cluster name to look up.
      */
     name: pulumi.Input<string>;
+    /**
+     * Optional region filter, e.g. "us-east-1".
+     */
+    region?: pulumi.Input<string>;
     /**
      * The team ID to search within.
      */
