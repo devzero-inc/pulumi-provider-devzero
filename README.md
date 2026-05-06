@@ -79,6 +79,9 @@ const cluster = new resources.Cluster("prod-cluster", {
 const policy = new resources.WorkloadPolicy("cpu-scaling-policy", {
     name: "cpu-scaling-policy",
     description: "Policy with CPU vertical scaling enabled",
+    actionTriggers: ["on_detection", "on_schedule"],  // apply on pod events AND on schedule
+    cronSchedule: "0 2 * * *",                        // daily at 2 am UTC (required for on_schedule)
+    detectionTriggers: ["pod_creation", "pod_reschedule"],
     cpuVerticalScaling: {
         enabled: true,
         targetPercentile: 0.95,
@@ -150,6 +153,9 @@ policy = WorkloadPolicy(
     args=WorkloadPolicyArgs(
         name="cpu-scaling-policy",
         description="Workload policy with CPU vertical scaling for production cluster",
+        action_triggers=["on_detection", "on_schedule"],  # apply on pod events AND on schedule
+        cron_schedule="0 2 * * *",                        # daily at 2 am UTC (required for on_schedule)
+        detection_triggers=["pod_creation", "pod_reschedule"],
         cpu_vertical_scaling=VerticalScalingArgsArgs(
             enabled=True,
             target_percentile=0.95,
@@ -224,6 +230,10 @@ func main() {
         policy, err := resources.NewWorkloadPolicy(ctx, "cpu-scaling-policy", &resources.WorkloadPolicyArgs{
             Name:        pulumi.String("cpu-scaling-policy"),
             Description: pulumi.StringPtr("Policy with CPU vertical scaling enabled"),
+            // Apply on pod events AND on a daily schedule
+            ActionTriggers:    pulumi.StringArray{pulumi.String("on_detection"), pulumi.String("on_schedule")},
+            CronSchedule:      pulumi.StringPtr("0 2 * * *"), // daily at 2 am UTC (required for on_schedule)
+            DetectionTriggers: pulumi.StringArray{pulumi.String("pod_creation"), pulumi.String("pod_reschedule")},
             CpuVerticalScaling: resources.VerticalScalingArgsArgs{
                 Enabled:                 pulumi.BoolPtr(true),
                 TargetPercentile:        pulumi.Float64Ptr(0.95),
@@ -405,7 +415,7 @@ pulumi stack rm <stack-name>
 | `gpuVerticalScaling` | `VerticalScalingArgs` | GPU core vertical scaling configuration (same fields as `cpuVerticalScaling`; units: GPU millicores) |
 | `gpuVramVerticalScaling` | `VerticalScalingArgs` | GPU VRAM vertical scaling configuration (same fields as `cpuVerticalScaling`; units: bytes) |
 | `horizontalScaling` | `HorizontalScalingArgs` | Horizontal (replica) scaling configuration |
-| `actionTriggers` | string[] | When to apply recommendations: `on_detection` \| `on_schedule` |
+| `actionTriggers` | string[] | When to apply recommendations: `on_detection` \| `on_schedule` \| `manual` |
 | `cronSchedule` | string | Cron expression for scheduled application (5-field UTC). Required when `actionTriggers` includes `on_schedule`. Example: `0 2 * * *` |
 | `detectionTriggers` | string[] | Events that trigger a recommendation: `pod_creation` \| `pod_update` \| `pod_reschedule` |
 | `loopbackPeriodSeconds` | int | Seconds of historical usage data to consider. Default: `86400` (24 h) |

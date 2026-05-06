@@ -76,6 +76,9 @@ const cluster = new resources.Cluster("prod-cluster", {
 const policy = new resources.WorkloadPolicy("cpu-scaling-policy", {
     name: "cpu-scaling-policy",
     description: "Policy with CPU vertical scaling enabled",
+    actionTriggers: ["on_detection", "on_schedule"],  // apply on pod events AND on schedule
+    cronSchedule: "0 2 * * *",                        // daily at 2 am UTC (required for on_schedule)
+    detectionTriggers: ["pod_creation", "pod_reschedule"],
     cpuVerticalScaling: {
         enabled: true,
         targetPercentile: 0.95,
