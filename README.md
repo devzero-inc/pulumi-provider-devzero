@@ -48,9 +48,11 @@ pulumi config set devzero:teamId <TEAM_ID>
 pulumi config set devzero:url https://dakr.devzero.io  # optional, this is the default
 ```
 
+---
+
 ## Quick Start
 
-Pick your language below. Each example creates a **Cluster**, a **WorkloadPolicy** with CPU vertical scaling, and a **WorkloadPolicyTarget** that applies the policy to all `Deployment` workloads in that cluster.
+Pick your language below. Each example creates a **Cluster**, a **WorkloadPolicy** with CPU/memory vertical scaling, a **WorkloadPolicyTarget**, a **NodePolicy**, and a **NodePolicyTarget**.
 
 ---
 
@@ -75,28 +77,42 @@ const cluster = new resources.Cluster("prod-cluster", {
     name: "prod-cluster",
 });
 
-// 2. Create a workload policy with CPU vertical scaling
+// 2. Create a workload policy with CPU and memory vertical scaling
 const policy = new resources.WorkloadPolicy("cpu-scaling-policy", {
     name: "cpu-scaling-policy",
-    description: "Policy with CPU vertical scaling enabled",
+    description: "Policy with CPU and memory vertical scaling enabled",
     actionTriggers: ["on_detection", "on_schedule"],  // apply on pod events AND on schedule
     cronSchedule: "0 2 * * *",                        // daily at 2 am UTC (required for on_schedule)
     detectionTriggers: ["pod_creation", "pod_reschedule"],
     cpuVerticalScaling: {
-        enabled: true,
-        targetPercentile: 0.95,
-        minRequest: 50,
-        maxRequest: 4000,
-        maxScaleUpPercent: 100,
-        maxScaleDownPercent: 25,
-        overheadMultiplier: 1.1,
-        limitsAdjustmentEnabled: true,
-        limitMultiplier: 1.5,
-    },
-});
+                enabled: true,
+                targetPercentile: 0.75,        // P75 of observed usage
+                minRequest: 25,                // millicores; hard floor
+                maxScaleUpPercent: 1000,       // % per step
+                maxScaleDownPercent: 1,        // % per step
+                minDataPoints: 20,             // min CPU samples
+                adjustReqEvenIfNotSet: true,   // set requests even if workload has none
+                limitsRemovalEnabled: true,    // strip CPU limits (cycles compress safely)
+            },
+    memoryVerticalScaling: {
+                enabled: true,
+                targetPercentile: 1,           // P100 — guard against OOMKills
+                minRequest: 134217728,         // 128 MiB in bytes; hard floor
+                maxScaleUpPercent: 1000,       // % per step
+                maxScaleDownPercent: 1,        // % per step
+                overheadMultiplier: 0.3,       // extra headroom over the recommendation
+                limitsAdjustmentEnabled: true, // adjust limits alongside requests
+                limitMultiplier: 1,            // limits = request × this
+                minDataPoints: 20,             // min memory samples
+                adjustReqEvenIfNotSet: true,   // set requests even if workload has none
+            },
+            enablePmaxProtection: true,                        // guard against spike-induced OOMKills
+            pmaxRatioThreshold: 3,                             // raise requests 3× on an OOM event
+            minChangePercent: 0.2,                             // apply only if change > 20%
+        });
 
-// 3. Apply the policy to the cluster for all Deployments
-const target = new resources.WorkloadPolicyTarget("prod-cluster-deployments-target", {
+// 3. Apply the workload policy to the cluster for all Deployments
+const workloadTarget = new resources.WorkloadPolicyTarget("prod-cluster-deployments-target", {
     name: "prod-cluster-deployments-target",
     description: "Apply cpu-scaling-policy to all Deployments in prod-cluster",
     policyId: policy.id,
@@ -105,10 +121,76 @@ const target = new resources.WorkloadPolicyTarget("prod-cluster-deployments-targ
     enabled: true,
 });
 
+// 4. Create a node policy for Karpenter-based node provisioning
+const nodePolicy = new resources.NodePolicy("prod-node-policy", {
+    name: "prod-node-policy",
+    description: "Cost-efficient node provisioning for production workloads",
+    weight: 10,
+    instanceCategories: {
+        matchExpressions: [{
+            key: "instanceCategories",
+            operator: "In",
+            values: ["c", "m", "r", "t"],
+        }],
+    },
+    instanceGenerations: {
+        matchExpressions: [{
+            key: "instanceGenerations",
+            operator: "In",
+            values: ["3", "4", "5", "6"],
+        }],
+    },
+    architectures: {
+        matchExpressions: [{ operator: "In", values: ["amd64"] }],
+    },
+    capacityTypes: {
+        matchExpressions: [{ operator: "In", values: ["spot", "on-demand"] }],
+    },
+    operatingSystems: {
+        matchExpressions: [{ operator: "In", values: ["linux"] }],
+    },
+    disruption: {
+        consolidationPolicy: "WhenEmptyOrUnderutilized",
+        consolidateAfter: "2h0m0s",
+        expireAfter: "168h",
+        budgets: [
+            {
+                reasons: ["Empty", "Drifted", "Underutilized"],
+                nodes: "10%",
+            },
+            {
+                nodes: "1",
+            },
+        ],
+    },
+    nodePoolName: "prod-nodepool",
+    nodeClassName: "prod-nodeclass",
+    aws: {
+        subnetSelectorTerms: [{
+            tags: { "karpenter.sh/discovery": "my-prod-cluster" },
+        }],
+        securityGroupSelectorTerms: [{
+            tags: { "karpenter.sh/discovery": "my-prod-cluster" },
+        }],
+        amiSelectorTerms: [{ alias: "al2023@latest" }],
+        role: "KarpenterNodeRole-my-prod-cluster",
+    },
+});
+
+// 5. Attach the node policy to the cluster
+const nodePolicyTarget = new resources.NodePolicyTarget("prod-node-policy-target", {
+    name: "prod-node-policy-target",
+    description: "Apply prod-node-policy to prod-cluster",
+    policyId: nodePolicy.id,
+    clusterIds: [cluster.id],
+    enabled: true,
+});
+
 export const clusterId    = cluster.id;
 export const clusterToken = pulumi.secret(cluster.token);
 export const policyId     = policy.id;
-export const targetId     = target.id;
+export const targetId     = workloadTarget.id;
+export const nodePolicyId = nodePolicy.id;
 ```
 
 **Deploy**
@@ -138,7 +220,19 @@ from pulumi_devzero.resources import (
     Cluster, ClusterArgs,
     WorkloadPolicy, WorkloadPolicyArgs,
     WorkloadPolicyTarget, WorkloadPolicyTargetArgs,
-    VerticalScalingArgsArgs,
+    NodePolicy, NodePolicyArgs,
+    NodePolicyTarget, NodePolicyTargetArgs,
+)
+from pulumi_devzero.resources.types import (
+    VerticalScalingArgs,
+    LabelSelectorArgs,
+    MatchExpressionArgs,
+    DisruptionPolicyArgs,
+    DisruptionBudgetArgs,
+    AWSNodeClassSpecArgs,
+    AMISelectorTermArgs,
+    SubnetSelectorTermArgs,
+    SecurityGroupSelectorTermArgs,
 )
 
 # 1. Create a cluster
@@ -147,31 +241,45 @@ cluster = Cluster(
     args=ClusterArgs(name="prod-cluster"),
 )
 
-# 2. Create a workload policy with CPU vertical scaling
+# 2. Create a workload policy with CPU and memory vertical scaling
 policy = WorkloadPolicy(
     "cpu-scaling-policy",
     args=WorkloadPolicyArgs(
         name="cpu-scaling-policy",
-        description="Workload policy with CPU vertical scaling for production cluster",
+        description="Policy with CPU and memory vertical scaling enabled",
         action_triggers=["on_detection", "on_schedule"],  # apply on pod events AND on schedule
         cron_schedule="0 2 * * *",                        # daily at 2 am UTC (required for on_schedule)
         detection_triggers=["pod_creation", "pod_reschedule"],
-        cpu_vertical_scaling=VerticalScalingArgsArgs(
+        cpu_vertical_scaling=VerticalScalingArgs(
             enabled=True,
-            target_percentile=0.95,
-            min_request=50,
-            max_request=4000,
-            max_scale_up_percent=100,
-            max_scale_down_percent=25,
-            overhead_multiplier=1.1,
-            limits_adjustment_enabled=True,
-            limit_multiplier=1.5,
+            target_percentile=0.75,          # P75 of observed usage
+            min_request=25,                  # millicores; hard floor
+            max_scale_up_percent=1000,       # % per step
+            max_scale_down_percent=1,        # % per step
+            min_data_points=20,              # min CPU samples
+            adjust_req_even_if_not_set=True, # set requests even if workload has none
+            limits_removal_enabled=True,     # strip CPU limits (cycles compress safely)
         ),
+        memory_vertical_scaling=VerticalScalingArgs(
+            enabled=True,
+            target_percentile=1,             # P100 — guard against OOMKills
+            min_request=134217728,           # 128 MiB in bytes; hard floor
+            max_scale_up_percent=1000,       # % per step
+            max_scale_down_percent=1,        # % per step
+            overhead_multiplier=0.3,         # extra headroom over the recommendation
+            limits_adjustment_enabled=True,  # adjust limits alongside requests
+            limit_multiplier=1,              # limits = request × this
+            min_data_points=20,              # min memory samples
+            adjust_req_even_if_not_set=True, # set requests even if workload has none
+        ),
+        enable_pmax_protection=True,         # guard against spike-induced OOMKills
+        pmax_ratio_threshold=3,              # raise requests 3× on an OOM event
+        min_change_percent=0.2,              # apply only if change > 20%
     ),
 )
 
-# 3. Apply the policy to the cluster for all Deployments
-target = WorkloadPolicyTarget(
+# 3. Apply the workload policy to the cluster for all Deployments
+workload_target = WorkloadPolicyTarget(
     "prod-cluster-deployments-target",
     args=WorkloadPolicyTargetArgs(
         name="prod-cluster-deployments-target",
@@ -182,10 +290,74 @@ target = WorkloadPolicyTarget(
     ),
 )
 
-pulumi.export("cluster_id",    cluster.id)
-pulumi.export("cluster_token", pulumi.Output.secret(cluster.token))
-pulumi.export("policy_id",     policy.id)
-pulumi.export("target_id",     target.id)
+# 4. Create a node policy for Karpenter-based node provisioning
+node_policy = NodePolicy("prod-node-policy", args=NodePolicyArgs(
+    name="prod-node-policy",
+    description="Cost-efficient node provisioning for production workloads",
+    weight=10,
+    instance_categories=LabelSelectorArgs(
+        match_expressions=[MatchExpressionArgs(
+            key="instanceCategories",
+            operator="In",
+            values=["c", "m", "r", "t"],
+        )],
+    ),
+    instance_generations=LabelSelectorArgs(
+        match_expressions=[MatchExpressionArgs(
+            key="instanceGenerations",
+            operator="In",
+            values=["3", "4", "5", "6"],
+        )],
+    ),
+    architectures=LabelSelectorArgs(
+        match_expressions=[MatchExpressionArgs(operator="In", values=["amd64"])],
+    ),
+    capacity_types=LabelSelectorArgs(
+        match_expressions=[MatchExpressionArgs(operator="In", values=["spot", "on-demand"])],
+    ),
+    operating_systems=LabelSelectorArgs(
+        match_expressions=[MatchExpressionArgs(operator="In", values=["linux"])],
+    ),
+    disruption=DisruptionPolicyArgs(
+        consolidation_policy="WhenEmptyOrUnderutilized",
+        consolidate_after="2h0m0s",
+        expire_after="168h",
+        budgets=[
+            DisruptionBudgetArgs(
+                reasons=["Empty", "Drifted", "Underutilized"],
+                nodes="10%",
+            ),
+            DisruptionBudgetArgs(nodes="1"),
+        ],
+    ),
+    node_pool_name="prod-nodepool",
+    node_class_name="prod-nodeclass",
+    aws=AWSNodeClassSpecArgs(
+        subnet_selector_terms=[SubnetSelectorTermArgs(
+            tags={"karpenter.sh/discovery": "my-prod-cluster"},
+        )],
+        security_group_selector_terms=[SecurityGroupSelectorTermArgs(
+            tags={"karpenter.sh/discovery": "my-prod-cluster"},
+        )],
+        ami_selector_terms=[AMISelectorTermArgs(alias="al2023@latest")],
+        role="KarpenterNodeRole-my-prod-cluster",
+    ),
+))
+
+# 5. Attach the node policy to the cluster
+node_policy_target = NodePolicyTarget("prod-node-policy-target", args=NodePolicyTargetArgs(
+    name="prod-node-policy-target",
+    description="Apply prod-node-policy to prod-cluster",
+    policy_id=node_policy.id,
+    cluster_ids=[cluster.id],
+    enabled=True,
+))
+
+pulumi.export("cluster_id",     cluster.id)
+pulumi.export("cluster_token",  pulumi.Output.secret(cluster.token))
+pulumi.export("policy_id",      policy.id)
+pulumi.export("target_id",      workload_target.id)
+pulumi.export("node_policy_id", node_policy.id)
 ```
 
 **Deploy**
@@ -226,32 +398,45 @@ func main() {
             return err
         }
 
-        // 2. Create a workload policy with CPU vertical scaling
+        // 2. Create a workload policy with CPU and memory vertical scaling
         policy, err := resources.NewWorkloadPolicy(ctx, "cpu-scaling-policy", &resources.WorkloadPolicyArgs{
-            Name:        pulumi.String("cpu-scaling-policy"),
-            Description: pulumi.StringPtr("Policy with CPU vertical scaling enabled"),
-            // Apply on pod events AND on a daily schedule
+            Name:              pulumi.String("cpu-scaling-policy"),
+            Description:       pulumi.StringPtr("Policy with CPU and memory vertical scaling enabled"),
             ActionTriggers:    pulumi.StringArray{pulumi.String("on_detection"), pulumi.String("on_schedule")},
             CronSchedule:      pulumi.StringPtr("0 2 * * *"), // daily at 2 am UTC (required for on_schedule)
             DetectionTriggers: pulumi.StringArray{pulumi.String("pod_creation"), pulumi.String("pod_reschedule")},
             CpuVerticalScaling: resources.VerticalScalingArgsArgs{
-                Enabled:                 pulumi.BoolPtr(true),
-                TargetPercentile:        pulumi.Float64Ptr(0.95),
-                MinRequest:              pulumi.IntPtr(50),
-                MaxRequest:              pulumi.IntPtr(4000),
-                MaxScaleUpPercent:       pulumi.Float64Ptr(100),
-                MaxScaleDownPercent:     pulumi.Float64Ptr(25),
-                OverheadMultiplier:      pulumi.Float64Ptr(1.1),
-                LimitsAdjustmentEnabled: pulumi.BoolPtr(true),
-                LimitMultiplier:         pulumi.Float64Ptr(1.5),
+                Enabled:               pulumi.BoolPtr(true),
+                TargetPercentile:      pulumi.Float64Ptr(0.75),  // P75 of observed usage
+                MinRequest:            pulumi.IntPtr(25),         // millicores; hard floor
+                MaxScaleUpPercent:     pulumi.Float64Ptr(1000),  // % per step
+                MaxScaleDownPercent:   pulumi.Float64Ptr(1),     // % per step
+                MinDataPoints:         pulumi.IntPtr(20),         // min CPU samples
+                AdjustReqEvenIfNotSet: pulumi.BoolPtr(true),     // set requests even if workload has none
+                LimitsRemovalEnabled:  pulumi.BoolPtr(true),     // strip CPU limits (cycles compress safely)
             }.ToVerticalScalingArgsPtrOutput(),
+            MemoryVerticalScaling: resources.VerticalScalingArgsArgs{
+                Enabled:                 pulumi.BoolPtr(true),
+                TargetPercentile:        pulumi.Float64Ptr(1.0),      // P100 — guard against OOMKills
+                MinRequest:              pulumi.IntPtr(134217728),     // 128 MiB in bytes; hard floor
+                MaxScaleUpPercent:       pulumi.Float64Ptr(1000),     // % per step
+                MaxScaleDownPercent:     pulumi.Float64Ptr(1),        // % per step
+                OverheadMultiplier:      pulumi.Float64Ptr(0.3),      // extra headroom over the recommendation
+                LimitsAdjustmentEnabled: pulumi.BoolPtr(true),        // adjust limits alongside requests
+                LimitMultiplier:         pulumi.Float64Ptr(1),        // limits = request × this
+                MinDataPoints:           pulumi.IntPtr(20),            // min memory samples
+                AdjustReqEvenIfNotSet:   pulumi.BoolPtr(true),        // set requests even if workload has none
+            }.ToVerticalScalingArgsPtrOutput(),
+            EnablePmaxProtection: pulumi.BoolPtr(true),       // guard against spike-induced OOMKills
+            PmaxRatioThreshold:   pulumi.Float64Ptr(3),       // raise requests 3× on an OOM event
+            MinChangePercent:     pulumi.Float64Ptr(0.2),     // apply only if change > 20%
         })
         if err != nil {
             return err
         }
 
-        // 3. Apply the policy to the cluster for all Deployments
-        _, err = resources.NewWorkloadPolicyTarget(ctx, "prod-cluster-deployments-target", &resources.WorkloadPolicyTargetArgs{
+        // 3. Apply the workload policy to the cluster for all Deployments
+        workloadTarget, err := resources.NewWorkloadPolicyTarget(ctx, "prod-cluster-deployments-target", &resources.WorkloadPolicyTargetArgs{
             Name:       pulumi.String("prod-cluster-deployments-target"),
             PolicyId:   policy.ID(),
             ClusterIds: pulumi.StringArray{cluster.ID()},
@@ -262,9 +447,88 @@ func main() {
             return err
         }
 
+        // 4. Create a node policy for Karpenter-based node provisioning
+        nodePolicy, err := resources.NewNodePolicy(ctx, "prod-node-policy", &resources.NodePolicyArgs{
+            Name:        pulumi.String("prod-node-policy"),
+            Description: pulumi.StringPtr("Cost-efficient node provisioning for production workloads"),
+            Weight:      pulumi.IntPtr(10),
+            InstanceCategories: &resources.LabelSelectorArgs{
+                MatchExpressions: resources.MatchExpressionArray{
+                    {Key: pulumi.StringPtr("instanceCategories"), Operator: pulumi.String("In"),
+                        Values: pulumi.StringArray{pulumi.String("c"), pulumi.String("m"), pulumi.String("r"), pulumi.String("t")}},
+                },
+            },
+            InstanceGenerations: &resources.LabelSelectorArgs{
+                MatchExpressions: resources.MatchExpressionArray{
+                    {Key: pulumi.StringPtr("instanceGenerations"), Operator: pulumi.String("In"),
+                        Values: pulumi.StringArray{pulumi.String("3"), pulumi.String("4"), pulumi.String("5"), pulumi.String("6")}},
+                },
+            },
+            Architectures: &resources.LabelSelectorArgs{
+                MatchExpressions: resources.MatchExpressionArray{
+                    {Operator: pulumi.String("In"), Values: pulumi.StringArray{pulumi.String("amd64")}},
+                },
+            },
+            CapacityTypes: &resources.LabelSelectorArgs{
+                MatchExpressions: resources.MatchExpressionArray{
+                    {Operator: pulumi.String("In"), Values: pulumi.StringArray{pulumi.String("spot"), pulumi.String("on-demand")}},
+                },
+            },
+            OperatingSystems: &resources.LabelSelectorArgs{
+                MatchExpressions: resources.MatchExpressionArray{
+                    {Operator: pulumi.String("In"), Values: pulumi.StringArray{pulumi.String("linux")}},
+                },
+            },
+            Disruption: &resources.DisruptionPolicyArgs{
+                ConsolidationPolicy: pulumi.StringPtr("WhenEmptyOrUnderutilized"),
+                ConsolidateAfter:    pulumi.StringPtr("2h0m0s"),
+                ExpireAfter:         pulumi.StringPtr("168h"),
+                Budgets: resources.DisruptionBudgetArray{
+                    {
+                        Reasons: pulumi.StringArray{pulumi.String("Empty"), pulumi.String("Drifted"), pulumi.String("Underutilized")},
+                        Nodes:   pulumi.StringPtr("10%"),
+                    },
+                    {
+                        Nodes: pulumi.StringPtr("1"),
+                    },
+                },
+            },
+            NodePoolName:  pulumi.StringPtr("prod-nodepool"),
+            NodeClassName: pulumi.StringPtr("prod-nodeclass"),
+            Aws: &resources.AWSNodeClassSpecArgs{
+                SubnetSelectorTerms: resources.SubnetSelectorTermArray{
+                    {Tags: pulumi.StringMap{"karpenter.sh/discovery": pulumi.String("my-prod-cluster")}},
+                },
+                SecurityGroupSelectorTerms: resources.SecurityGroupSelectorTermArray{
+                    {Tags: pulumi.StringMap{"karpenter.sh/discovery": pulumi.String("my-prod-cluster")}},
+                },
+                AmiSelectorTerms: resources.AMISelectorTermArray{
+                    {Alias: pulumi.StringPtr("al2023@latest")},
+                },
+                Role: pulumi.StringPtr("KarpenterNodeRole-my-prod-cluster"),
+            },
+        })
+        if err != nil {
+            return err
+        }
+
+        // 5. Attach the node policy to the cluster
+        _, err = resources.NewNodePolicyTarget(ctx, "prod-node-policy-target", &resources.NodePolicyTargetArgs{
+            Name:        pulumi.String("prod-node-policy-target"),
+            Description: pulumi.StringPtr("Apply prod-node-policy to prod-cluster"),
+            PolicyId:    nodePolicy.ID(),
+            ClusterIds:  pulumi.StringArray{cluster.ID()},
+            Enabled:     pulumi.BoolPtr(true),
+        })
+        if err != nil {
+            return err
+        }
+
         ctx.Export("clusterId",    cluster.ID())
         ctx.Export("clusterToken", cluster.Token)
         ctx.Export("policyId",     policy.ID())
+        ctx.Export("targetId",     workloadTarget.ID())
+        ctx.Export("nodePolicyId", nodePolicy.ID())
 
         return nil
     })
@@ -293,16 +557,14 @@ Look up an existing cluster by name and return its ID. Use this when a cluster w
 ```typescript
 import { resources } from "@devzero/pulumi-devzero";
 
-// Look up a manually registered cluster by name
 const existing = await resources.getClusterIdByName({
     name: "my-existing-cluster",
-    // teamId is optional — defaults to devzero:teamId from provider config
-    // region: "us-east-1",        // optional: filter by region
-    // cloudProvider: "AWS",       // optional: filter by cloud provider (AWS | GCP | AKS | OCI)
-    // liveness: "PREFER_LIVE",    // optional: IGNORE | PREFER_LIVE | REQUIRE_LIVE
+    // teamId: "my-team-id",      // optional — defaults to devzero:teamId from provider config
+    // region: "us-east-1",       // optional: filter by region
+    // cloudProvider: "AWS",      // optional: filter by cloud provider (AWS | GCP | AKS | OCI)
+    // liveness: "PREFER_LIVE",   // optional: IGNORE | PREFER_LIVE | REQUIRE_LIVE
 });
 
-// Attach a policy to the existing cluster
 const target = new resources.WorkloadPolicyTarget("my-target", {
     name: "my-target",
     policyId: policy.id,
@@ -320,16 +582,14 @@ export const existingClusterId = existing.clusterId;
 import pulumi
 import pulumi_devzero as devzero
 
-# Look up a manually registered cluster by name
 existing = devzero.resources.get_cluster_id_by_name(
     name="my-existing-cluster",
-    # team_id is optional — defaults to devzero:teamId from provider config
+    # team_id="my-team-id",      # optional — defaults to devzero:teamId from provider config
     # region="us-east-1",        # optional: filter by region
     # cloud_provider="AWS",      # optional: filter by cloud provider (AWS | GCP | AKS | OCI)
     # liveness="PREFER_LIVE",    # optional: IGNORE | PREFER_LIVE | REQUIRE_LIVE
 )
 
-# Attach a policy to the existing cluster
 target = devzero.resources.WorkloadPolicyTarget("my-target",
     name="my-target",
     policy_id=policy.id,
@@ -344,10 +604,9 @@ pulumi.export("existing_cluster_id", existing.cluster_id)
 #### Go
 
 ```go
-// Look up a manually registered cluster by name
 existing, err := resources.GetClusterIdByName(ctx, &resources.GetClusterIdByNameArgs{
     Name: "my-existing-cluster",
-    // TeamId is optional — defaults to devzero:teamId from provider config
+    // TeamId:        pulumi.StringRef("my-team-id"),    // optional — defaults to devzero:teamId from provider config
     // Region:        pulumi.StringRef("us-east-1"),     // optional: filter by region
     // CloudProvider: pulumi.StringRef("AWS"),           // optional: filter by cloud provider (AWS | GCP | AKS | OCI)
     // Liveness:      pulumi.StringRef("PREFER_LIVE"),   // optional: IGNORE | PREFER_LIVE | REQUIRE_LIVE
@@ -356,7 +615,6 @@ if err != nil {
     return err
 }
 
-// Attach a policy to the existing cluster using its looked-up ID
 _, err = resources.NewWorkloadPolicyTarget(ctx, "my-target", &resources.WorkloadPolicyTargetArgs{
     Name:       pulumi.String("my-target"),
     PolicyId:   policy.ID(),
@@ -368,7 +626,6 @@ if err != nil {
     return err
 }
 
-// Or inject the ID into a Kubernetes secret / values.yaml
 ctx.Export("existingClusterId", pulumi.String(existing.ClusterId))
 ```
 
@@ -379,8 +636,8 @@ ctx.Export("existingClusterId", pulumi.String(existing.ClusterId))
 | `name` | string | yes | Cluster name to look up |
 | `teamId` | string | no | Team to search within. Defaults to `devzero:teamId` from provider config |
 | `region` | string | no | Filter by region name (e.g. `us-east-1`) |
-| `cloudProvider` | string | no | Filter by cloud provider (e.g. `AWS`, `GCP`,`AKS`,`OCI`) |
-| `liveness` | string | no | Heartbeat filter. One of: `IGNORE` (default — newest by `created_at`), `PREFER_LIVE` (live clusters first, fallback to newest), `REQUIRE_LIVE` (404 if no heartbeat within 60 min) |
+| `cloudProvider` | string | no | Filter by cloud provider: `AWS`, `GCP`, `AKS`, `OCI` |
+| `liveness` | string | no | Heartbeat filter: `IGNORE` (default), `PREFER_LIVE`, `REQUIRE_LIVE` |
 
 **Outputs:**
 
@@ -390,20 +647,6 @@ ctx.Export("existingClusterId", pulumi.String(existing.ClusterId))
 
 ---
 
-## Destroying Resources
-
-To tear down all resources managed by your stack:
-
-```bash
-pulumi destroy
-```
-
-To also remove the stack itself:
-
-```bash
-pulumi stack rm <stack-name>
-```
-
 ## WorkloadPolicy — Key Fields
 
 | Field | Type | Description |
@@ -412,11 +655,11 @@ pulumi stack rm <stack-name>
 | `description` | string | Human-readable description |
 | `cpuVerticalScaling` | `VerticalScalingArgs` | CPU vertical scaling configuration |
 | `memoryVerticalScaling` | `VerticalScalingArgs` | Memory vertical scaling configuration |
-| `gpuVerticalScaling` | `VerticalScalingArgs` | GPU core vertical scaling configuration (same fields as `cpuVerticalScaling`; units: GPU millicores) |
-| `gpuVramVerticalScaling` | `VerticalScalingArgs` | GPU VRAM vertical scaling configuration (same fields as `cpuVerticalScaling`; units: bytes) |
+| `gpuVerticalScaling` | `VerticalScalingArgs` | GPU core vertical scaling configuration (units: GPU millicores) |
+| `gpuVramVerticalScaling` | `VerticalScalingArgs` | GPU VRAM vertical scaling configuration (units: bytes) |
 | `horizontalScaling` | `HorizontalScalingArgs` | Horizontal (replica) scaling configuration |
-| `actionTriggers` | string[] | When to apply recommendations: `on_detection` \| `on_schedule` \| `manual` |
-| `cronSchedule` | string | Cron expression for scheduled application (5-field UTC). Required when `actionTriggers` includes `on_schedule`. Example: `0 2 * * *` |
+| `actionTriggers` | string[] | When to apply recommendations: `on_detection` \| `on_schedule`. Both can be used together. |
+| `cronSchedule` | string | 5-field UTC cron expression for scheduled application. Required when `actionTriggers` includes `on_schedule`. Example: `0 2 * * *` |
 | `detectionTriggers` | string[] | Events that trigger a recommendation: `pod_creation` \| `pod_update` \| `pod_reschedule` |
 | `loopbackPeriodSeconds` | int | Seconds of historical usage data to consider. Default: `86400` (24 h) |
 | `startupPeriodSeconds` | int | Seconds after workload start to exclude from usage data (avoids cold-start spikes). Example: `300` |
@@ -433,22 +676,26 @@ pulumi stack rm <stack-name>
 | `minVpaWindowDataPoints` | int | Minimum data points in VPA analysis window. Default: `30` |
 | `cooldownMinutes` | int | Minutes to wait between applying recommendations. Default: `300` (5 h) |
 
+Python uses snake_case for all fields (e.g. `cpu_vertical_scaling`, `action_triggers`, `cron_schedule`, `detection_triggers`, `enable_pmax_protection`, `loopback_period_seconds`, `min_data_points`, `min_change_percent`, `cooldown_minutes`). Go uses PascalCase equivalents.
+
 ### VerticalScalingArgs
 
 | Field | Type | Description |
 |---|---|---|
 | `enabled` | bool | Enable this scaling axis |
 | `targetPercentile` | float | Percentile of observed usage to target (e.g. `0.95`) |
-| `minRequest` | int | Minimum resource request (millicores / MiB) |
-| `maxRequest` | int | Maximum resource request (millicores / MiB) |
+| `minRequest` | int | Minimum resource request (millicores for CPU, bytes for memory) |
+| `maxRequest` | int | Maximum resource request |
 | `maxScaleUpPercent` | float | Maximum percentage to scale up in one step. Default: `1000` |
 | `maxScaleDownPercent` | float | Maximum percentage to scale down in one step. Default: `1.0` |
-| `overheadMultiplier` | float | Multiplier added on top of the recommendation |
-| `limitsAdjustmentEnabled` | bool | Whether to also adjust resource limits |
+| `overheadMultiplier` | float | Safety margin multiplier applied on top of the recommendation |
+| `limitsAdjustmentEnabled` | bool | Whether to also adjust resource limits alongside requests |
 | `limitMultiplier` | float | Limits = request × limitMultiplier |
 | `minDataPoints` | int | Minimum data points required before a recommendation is emitted. Default: `20` |
 | `adjustReqEvenIfNotSet` | bool | Recommend requests even when the workload has no existing requests set. Default: `false` |
 | `limitsRemovalEnabled` | bool | Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over `limitsAdjustmentEnabled`. Default: `false` |
+
+Python: `target_percentile`, `min_request`, `max_request`, `max_scale_up_percent`, `max_scale_down_percent`, `overhead_multiplier`, `limits_adjustment_enabled`, `limit_multiplier`, `min_data_points`, `adjust_req_even_if_not_set`, `limits_removal_enabled`. Go uses PascalCase equivalents.
 
 ### HorizontalScalingArgs
 
@@ -461,6 +708,10 @@ pulumi stack rm <stack-name>
 | `primaryMetric` | string | Metric driving HPA: `cpu` \| `memory` \| `gpu` \| `network_ingress` \| `network_egress` |
 | `minDataPoints` | int | Minimum data points before a recommendation is emitted |
 | `maxReplicaChangePercent` | float | Maximum % change in replica count per cycle. Example: `50.0` |
+
+Python: `min_replicas`, `max_replicas`, `target_utilization`, `primary_metric`, `min_data_points`, `max_replica_change_percent`. Go uses PascalCase equivalents.
+
+---
 
 ## WorkloadPolicyTarget — Key Fields
 
@@ -475,11 +726,17 @@ pulumi stack rm <stack-name>
 | `workloadNames` | string[] | Explicit list of workload names to include |
 | `nodeGroupNames` | string[] | Restrict matching to specific node groups by name |
 | `namePattern` | `NamePatternArgs` | Regex pattern to match workload names |
-| `namespaceSelector` | `LabelSelectorArgs` | Select namespaces by labels (matchLabels / matchExpressions) |
+| `namespaceSelector` | `LabelSelectorArgs` | Select namespaces by labels (`matchLabels` / `matchExpressions`) |
 | `workloadSelector` | `LabelSelectorArgs` | Select workloads by labels |
-| `enabled` | bool | Activate the target |
+| `enabled` | bool | Activate the target. Default: `true` |
+
+Python: `policy_id`, `cluster_ids`, `kind_filter`, `workload_names`, `node_group_names`, `name_pattern`, `namespace_selector`, `workload_selector`. Go uses PascalCase equivalents.
+
+---
 
 ## NodePolicy — Key Fields
+
+`NodePolicy` configures Karpenter-based node provisioning rules. Ensure Karpenter is installed on your target clusters before attaching node policies.
 
 | Field | Type | Description |
 |---|---|---|
@@ -499,24 +756,35 @@ pulumi stack rm <stack-name>
 | `operatingSystems` | `LabelSelectorArgs` | OS filter (e.g. `linux`, `windows`) |
 | `labels` | map[string]string | Labels applied to provisioned nodes |
 | `taints` | `TaintArgs[]` | Taints applied to provisioned nodes |
-| `disruption` | `DisruptionPolicyArgs` | Node disruption / consolidation settings |
+| `disruption` | `DisruptionPolicyArgs` | Node disruption and consolidation settings |
 | `limits` | `ResourceLimitsArgs` | Max total CPU/memory this policy may provision |
-| `nodePoolName` | string | Override name for the generated Karpenter NodePool resource |
-| `nodeClassName` | string | Override name for the generated Karpenter NodeClass resource |
+| `nodePoolName` | string | Override name for the generated Karpenter NodePool CR |
+| `nodeClassName` | string | Override name for the generated Karpenter NodeClass CR |
 | `aws` | `AWSNodeClassSpecArgs` | AWS-specific configuration (AMI, subnets, IAM role, EBS, etc.) |
 | `azure` | `AzureNodeClassSpecArgs` | Azure-specific configuration (subnet, image family, disk, etc.) |
 | `raw` | `RawKarpenterSpecArgs[]` | Raw Karpenter NodePool/NodeClass YAML (escape hatch) |
+
+Python uses snake_case (e.g. `capacity_types`, `instance_categories`, `instance_families`, `instance_cpus`, `instance_sizes`, `instance_types`, `operating_systems`, `node_pool_name`, `node_class_name`). Go uses PascalCase equivalents.
 
 ### DisruptionPolicyArgs
 
 | Field | Type | Description |
 |---|---|---|
 | `consolidationPolicy` | string | `WhenEmpty` \| `WhenEmptyOrUnderutilized` |
-| `consolidateAfter` | string | Wait time after node is empty before consolidating (e.g. `30s`) |
+| `consolidateAfter` | string | Wait time after a node is empty before consolidating (e.g. `30s`) |
 | `expireAfter` | string | Force-replace nodes after this duration (e.g. `720h`) |
-| `ttlSecondsAfterEmpty` | int | Seconds before an empty node is terminated (deprecated; prefer `consolidateAfter`) |
+| `ttlSecondsAfterEmpty` | int | Seconds before an empty node is terminated. Deprecated — prefer `consolidateAfter` |
 | `terminationGracePeriodSeconds` | int | Grace period before forcefully terminating a draining node |
 | `budgets` | `DisruptionBudgetArgs[]` | Limits on how many nodes may be disrupted at once |
+
+### DisruptionBudgetArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `nodes` | string | Max nodes that can be disrupted at once. Absolute (e.g. `"1"`) or percentage (e.g. `"10%"`) |
+| `reasons` | string[] | Disruption reasons this budget applies to: `Empty`, `Drifted`, `Underutilized`. Omit to apply to all. |
+| `schedule` | string | Cron expression restricting when this budget is active |
+| `duration` | string | Duration the budget is active per schedule cycle (e.g. `"1h"`) |
 
 ### AWSNodeClassSpecArgs
 
@@ -531,13 +799,15 @@ pulumi stack rm <stack-name>
 | `amiSelectorTerms` | `AMISelectorTermArgs[]` | AMI selectors (by alias, tag, or ID) |
 | `blockDeviceMappings` | `BlockDeviceMappingArgs[]` | EBS volume configuration |
 | `instanceStorePolicy` | string | NVMe instance store policy. Value: `INSTANCE_STORE_POLICY_RAID0` |
-| `tags` | map[string]string | AWS tags on all provisioned resources |
+| `tags` | map[string]string | AWS tags applied to all provisioned resources |
 | `associatePublicIpAddress` | bool | Assign a public IP to nodes |
 | `detailedMonitoring` | bool | Enable CloudWatch detailed monitoring |
 | `metadataOptions` | `MetadataOptionsArgs` | EC2 IMDS options (IMDSv2, hop limit, etc.) |
 | `kubelet` | `KubeletConfigurationArgs` | Kubelet overrides (maxPods, eviction thresholds, etc.) |
 | `userData` | string | Custom launch template user data |
 | `context` | string | Additional EC2 launch template context ARN for advanced customization |
+
+Python: `ami_family`, `instance_profile`, `subnet_selector_terms`, `security_group_selector_terms`, `capacity_reservation_selector_terms`, `ami_selector_terms`, `block_device_mappings`, `instance_store_policy`, `associate_public_ip_address`, `detailed_monitoring`, `metadata_options`. Go uses PascalCase equivalents.
 
 ### AzureNodeClassSpecArgs
 
@@ -551,12 +821,20 @@ pulumi stack rm <stack-name>
 | `tags` | map[string]string | Azure tags on provisioned resources |
 | `kubelet` | `AzureKubeletConfigurationArgs` | Kubelet overrides for Azure nodes |
 
+Python: `vnet_subnet_id`, `image_family`, `os_disk_size_gb`, `fips_mode`, `max_pods`. Go uses PascalCase equivalents.
+
 ### RawKarpenterSpecArgs
+
+Use this as an escape hatch when the structured fields don't cover your use case and you need full control over the Karpenter NodePool/NodeClass resources.
 
 | Field | Type | Description |
 |---|---|---|
 | `nodepoolYaml` | string | Raw YAML for a complete Karpenter NodePool resource |
 | `nodeclassYaml` | string | Raw YAML for a complete Karpenter NodeClass resource |
+
+Python: `nodepool_yaml`, `nodeclass_yaml`. Go: `NodepoolYaml`, `NodeclassYaml`.
+
+---
 
 ## NodePolicyTarget — Key Fields
 
@@ -566,9 +844,29 @@ pulumi stack rm <stack-name>
 | `policyId` | string | ID of the `NodePolicy` to apply |
 | `clusterIds` | string[] | Cluster IDs to target. **At most 1 entry** — the backend rejects more than one. |
 | `description` | string | Human-readable description (optional) |
-| `enabled` | bool | Activate the target |
+| `enabled` | bool | Activate the target. Default: `true` |
 
-> **Note:** `pulumi destroy` removes this resource from Pulumi state but does **not** delete it on the DevZero backend — no delete RPC exists for NodePolicyTarget.
+Python: `policy_id`, `cluster_ids`. Go: `PolicyId`, `ClusterIds`.
+
+> **Note:** `pulumi destroy` removes this resource from Pulumi state but does **not** delete it on the DevZero backend. You must remove it manually via the dashboard or API if needed.
+
+---
+
+## Destroying Resources
+
+To tear down all resources managed by your stack:
+
+```bash
+pulumi destroy
+```
+
+To also remove the stack itself:
+
+```bash
+pulumi stack rm <stack-name>
+```
+
+---
 
 ## Building from Source
 
@@ -588,6 +886,8 @@ make install
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for full development instructions.
 
+---
+
 ## Examples
 
 Ready-to-run examples live in [`examples/`](examples/):
@@ -597,6 +897,8 @@ Ready-to-run examples live in [`examples/`](examples/):
 | TypeScript | [`examples/typescript/`](examples/typescript/) |
 | Python | [`examples/python/`](examples/python/) |
 | Go | [`examples/go/`](examples/go/) |
+
+---
 
 ## License
 
