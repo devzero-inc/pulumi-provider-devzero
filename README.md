@@ -125,54 +125,77 @@ const workloadTarget = new resources.WorkloadPolicyTarget("prod-cluster-deployme
 const nodePolicy = new resources.NodePolicy("prod-node-policy", {
     name: "prod-node-policy",
     description: "Cost-efficient node provisioning for production workloads",
+
+    // Higher weight wins when multiple policies match the same node request.
     weight: 10,
+
+    // Instance categories: c (compute), m (general), r (memory), t (burstable).
+    // Kept broad to maximise the instance pool and minimise cost.
     instanceCategories: {
         matchExpressions: [{
-            key: "instanceCategories",
             operator: "In",
             values: ["c", "m", "r", "t"],
         }],
     },
+
+    // Instance generation: prefer modern hardware (gen 3+) for better performance/cost ratio.
     instanceGenerations: {
         matchExpressions: [{
-            key: "instanceGenerations",
             operator: "In",
             values: ["3", "4", "5", "6"],
         }],
     },
+
+    // CPU architecture: amd64 (x86_64) — derived from active nodes in the cluster.
     architectures: {
         matchExpressions: [{ operator: "In", values: ["amd64"] }],
     },
+
+    // Capacity types: prefer spot for savings, fall back to on-demand for availability.
     capacityTypes: {
         matchExpressions: [{ operator: "In", values: ["spot", "on-demand"] }],
     },
+
+    // Operating system: linux only.
     operatingSystems: {
         matchExpressions: [{ operator: "In", values: ["linux"] }],
     },
+
+    // Disruption: how Karpenter consolidates and rotates nodes.
     disruption: {
-        consolidationPolicy: "WhenEmptyOrUnderutilized",
-        consolidateAfter: "2h0m0s",
-        expireAfter: "168h",
+        consolidationPolicy: "WhenEmptyOrUnderutilized", // reclaim empty and underused nodes
+        consolidateAfter: "2h0m0s",                      // wait 2 h before consolidating
+        expireAfter: "168h",                             // rotate nodes after 7 days
         budgets: [
             {
+                // Disrupt up to 10% of nodes at once for these reasons.
                 reasons: ["Empty", "Drifted", "Underutilized"],
                 nodes: "10%",
             },
             {
+                // Always protect at least 1 node from disruption at any time.
                 nodes: "1",
             },
         ],
     },
-    nodePoolName: "prod-nodepool",
-    nodeClassName: "prod-nodeclass",
+
+    // Override the generated Karpenter CRD names (helps avoid collisions in shared clusters).
+    nodePoolName: "prod-nodepool",   // name of the Karpenter NodePool CR
+    nodeClassName: "prod-nodeclass", // name of the Karpenter NodeClass CR
+
+    // AWS-specific EC2 configuration.
     aws: {
+        // Subnets where nodes will launch — discovered via the cluster tag.
         subnetSelectorTerms: [{
             tags: { "karpenter.sh/discovery": "my-prod-cluster" },
         }],
+        // Security groups for node instances — same discovery tag pattern.
         securityGroupSelectorTerms: [{
             tags: { "karpenter.sh/discovery": "my-prod-cluster" },
         }],
+        // AMI: latest Amazon Linux 2023 managed alias (Karpenter keeps it up to date).
         amiSelectorTerms: [{ alias: "al2023@latest" }],
+        // IAM role Karpenter uses to launch and manage nodes (must already exist in AWS).
         role: "KarpenterNodeRole-my-prod-cluster",
     },
 });
@@ -294,52 +317,74 @@ workload_target = WorkloadPolicyTarget(
 node_policy = NodePolicy("prod-node-policy", args=NodePolicyArgs(
     name="prod-node-policy",
     description="Cost-efficient node provisioning for production workloads",
+
+    # Higher weight wins when multiple policies match the same node request.
     weight=10,
+
+    # Instance categories: c (compute), m (general), r (memory), t (burstable).
+    # Kept broad to maximise the instance pool and minimise cost.
     instance_categories=LabelSelectorArgs(
         match_expressions=[MatchExpressionArgs(
-            key="instanceCategories",
             operator="In",
             values=["c", "m", "r", "t"],
         )],
     ),
+
+    # Instance generation: prefer modern hardware (gen 3+) for better performance/cost ratio.
     instance_generations=LabelSelectorArgs(
         match_expressions=[MatchExpressionArgs(
-            key="instanceGenerations",
             operator="In",
             values=["3", "4", "5", "6"],
         )],
     ),
+
+    # CPU architecture: amd64 (x86_64) — derived from active nodes in the cluster.
     architectures=LabelSelectorArgs(
         match_expressions=[MatchExpressionArgs(operator="In", values=["amd64"])],
     ),
+
+    # Capacity types: prefer spot for savings, fall back to on-demand for availability.
     capacity_types=LabelSelectorArgs(
         match_expressions=[MatchExpressionArgs(operator="In", values=["spot", "on-demand"])],
     ),
+
+    # Operating system: linux only.
     operating_systems=LabelSelectorArgs(
         match_expressions=[MatchExpressionArgs(operator="In", values=["linux"])],
     ),
+
+    # Disruption: how Karpenter consolidates and rotates nodes.
     disruption=DisruptionPolicyArgs(
-        consolidation_policy="WhenEmptyOrUnderutilized",
-        consolidate_after="2h0m0s",
-        expire_after="168h",
+        consolidation_policy="WhenEmptyOrUnderutilized", # reclaim empty and underused nodes
+        consolidate_after="2h0m0s",                      # wait 2 h before consolidating
+        expire_after="168h",                             # rotate nodes after 7 days
         budgets=[
             DisruptionBudgetArgs(
+                # Disrupt up to 10% of nodes at once for these reasons.
                 reasons=["Empty", "Drifted", "Underutilized"],
                 nodes="10%",
             ),
-            DisruptionBudgetArgs(nodes="1"),
+            DisruptionBudgetArgs(nodes="1"),  # always protect at least 1 node
         ],
     ),
-    node_pool_name="prod-nodepool",
-    node_class_name="prod-nodeclass",
+
+    # Override the generated Karpenter CRD names (helps avoid collisions in shared clusters).
+    node_pool_name="prod-nodepool",   # name of the Karpenter NodePool CR
+    node_class_name="prod-nodeclass", # name of the Karpenter NodeClass CR
+
+    # AWS-specific EC2 configuration.
     aws=AWSNodeClassSpecArgs(
+        # Subnets where nodes will launch — discovered via the cluster tag.
         subnet_selector_terms=[SubnetSelectorTermArgs(
             tags={"karpenter.sh/discovery": "my-prod-cluster"},
         )],
+        # Security groups for node instances — same discovery tag pattern.
         security_group_selector_terms=[SecurityGroupSelectorTermArgs(
             tags={"karpenter.sh/discovery": "my-prod-cluster"},
         )],
+        # AMI: latest Amazon Linux 2023 managed alias (Karpenter keeps it up to date).
         ami_selector_terms=[AMISelectorTermArgs(alias="al2023@latest")],
+        # IAM role Karpenter uses to launch and manage nodes (must already exist in AWS).
         role="KarpenterNodeRole-my-prod-cluster",
     ),
 ))
@@ -451,60 +496,75 @@ func main() {
         nodePolicy, err := resources.NewNodePolicy(ctx, "prod-node-policy", &resources.NodePolicyArgs{
             Name:        pulumi.String("prod-node-policy"),
             Description: pulumi.StringPtr("Cost-efficient node provisioning for production workloads"),
-            Weight:      pulumi.IntPtr(10),
+            // Higher weight wins when multiple policies match the same node request.
+            Weight: pulumi.IntPtr(10),
+            // Instance categories: c (compute), m (general), r (memory), t (burstable).
+            // Kept broad to maximise the instance pool and minimise cost.
             InstanceCategories: &resources.LabelSelectorArgs{
                 MatchExpressions: resources.MatchExpressionArray{
-                    {Key: pulumi.StringPtr("instanceCategories"), Operator: pulumi.String("In"),
+                    {Operator: pulumi.String("In"),
                         Values: pulumi.StringArray{pulumi.String("c"), pulumi.String("m"), pulumi.String("r"), pulumi.String("t")}},
                 },
             },
+            // Instance generation: prefer modern hardware (gen 3+) for better performance/cost ratio.
             InstanceGenerations: &resources.LabelSelectorArgs{
                 MatchExpressions: resources.MatchExpressionArray{
-                    {Key: pulumi.StringPtr("instanceGenerations"), Operator: pulumi.String("In"),
+                    {Operator: pulumi.String("In"),
                         Values: pulumi.StringArray{pulumi.String("3"), pulumi.String("4"), pulumi.String("5"), pulumi.String("6")}},
                 },
             },
+            // CPU architecture: amd64 (x86_64) — derived from active nodes in the cluster.
             Architectures: &resources.LabelSelectorArgs{
                 MatchExpressions: resources.MatchExpressionArray{
                     {Operator: pulumi.String("In"), Values: pulumi.StringArray{pulumi.String("amd64")}},
                 },
             },
+            // Capacity types: prefer spot for savings, fall back to on-demand for availability.
             CapacityTypes: &resources.LabelSelectorArgs{
                 MatchExpressions: resources.MatchExpressionArray{
                     {Operator: pulumi.String("In"), Values: pulumi.StringArray{pulumi.String("spot"), pulumi.String("on-demand")}},
                 },
             },
+            // Operating system: linux only.
             OperatingSystems: &resources.LabelSelectorArgs{
                 MatchExpressions: resources.MatchExpressionArray{
                     {Operator: pulumi.String("In"), Values: pulumi.StringArray{pulumi.String("linux")}},
                 },
             },
+            // Disruption: how Karpenter consolidates and rotates nodes.
             Disruption: &resources.DisruptionPolicyArgs{
-                ConsolidationPolicy: pulumi.StringPtr("WhenEmptyOrUnderutilized"),
-                ConsolidateAfter:    pulumi.StringPtr("2h0m0s"),
-                ExpireAfter:         pulumi.StringPtr("168h"),
+                ConsolidationPolicy: pulumi.StringPtr("WhenEmptyOrUnderutilized"), // reclaim empty and underused nodes
+                ConsolidateAfter:    pulumi.StringPtr("2h0m0s"),                   // wait 2 h before consolidating
+                ExpireAfter:         pulumi.StringPtr("168h"),                     // rotate nodes after 7 days
                 Budgets: resources.DisruptionBudgetArray{
                     {
+                        // Disrupt up to 10% of nodes at once for these reasons.
                         Reasons: pulumi.StringArray{pulumi.String("Empty"), pulumi.String("Drifted"), pulumi.String("Underutilized")},
                         Nodes:   pulumi.StringPtr("10%"),
                     },
                     {
-                        Nodes: pulumi.StringPtr("1"),
+                        Nodes: pulumi.StringPtr("1"), // always protect at least 1 node
                     },
                 },
             },
-            NodePoolName:  pulumi.StringPtr("prod-nodepool"),
-            NodeClassName: pulumi.StringPtr("prod-nodeclass"),
+            // Override the generated Karpenter CRD names (helps avoid collisions in shared clusters).
+            NodePoolName:  pulumi.StringPtr("prod-nodepool"),   // name of the Karpenter NodePool CR
+            NodeClassName: pulumi.StringPtr("prod-nodeclass"),  // name of the Karpenter NodeClass CR
+            // AWS-specific EC2 configuration.
             Aws: &resources.AWSNodeClassSpecArgs{
+                // Subnets where nodes will launch — discovered via the cluster tag.
                 SubnetSelectorTerms: resources.SubnetSelectorTermArray{
                     {Tags: pulumi.StringMap{"karpenter.sh/discovery": pulumi.String("my-prod-cluster")}},
                 },
+                // Security groups for node instances — same discovery tag pattern.
                 SecurityGroupSelectorTerms: resources.SecurityGroupSelectorTermArray{
                     {Tags: pulumi.StringMap{"karpenter.sh/discovery": pulumi.String("my-prod-cluster")}},
                 },
+                // AMI: latest Amazon Linux 2023 managed alias (Karpenter keeps it up to date).
                 AmiSelectorTerms: resources.AMISelectorTermArray{
                     {Alias: pulumi.StringPtr("al2023@latest")},
                 },
+                // IAM role Karpenter uses to launch and manage nodes (must already exist in AWS).
                 Role: pulumi.StringPtr("KarpenterNodeRole-my-prod-cluster"),
             },
         })
