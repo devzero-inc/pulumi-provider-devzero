@@ -242,7 +242,7 @@ target = devzero.resources.WorkloadPolicyTarget("my-target",
 
 ### `NodePolicy`
 
-Configure node provisioning and pooling (AWS / Azure) using Karpenter under the hood.
+Configure node provisioning and pooling (AWS / Azure) using dzkarp under the hood.
 
 ```python
 import pulumi_devzero as devzero
@@ -290,7 +290,7 @@ node_policy = devzero.resources.NodePolicy("prod-node-policy",
         )],
     ),
 
-    # Disruption: how Karpenter consolidates and rotates nodes.
+    # Disruption: how dzkarp consolidates and rotates nodes.
     disruption=devzero.resources.DisruptionPolicyArgsArgs(
         consolidation_policy="WhenEmptyOrUnderutilized", # reclaim empty and underused nodes
         consolidate_after="2h0m0s",                      # wait 2 h before consolidating
@@ -307,9 +307,9 @@ node_policy = devzero.resources.NodePolicy("prod-node-policy",
         ],
     ),
 
-    # Override the generated Karpenter CRD names (helps avoid collisions in shared clusters).
-    node_pool_name="prod-nodepool",   # name of the Karpenter NodePool CR
-    node_class_name="prod-nodeclass", # name of the Karpenter NodeClass CR
+    # Override the generated dzkarp CRD names (helps avoid collisions in shared clusters).
+    node_pool_name="prod-nodepool",   # name of the dzkarp NodePool CR
+    node_class_name="prod-nodeclass", # name of the dzkarp NodeClass CR
 
     # AWS-specific EC2 configuration.
     aws=devzero.resources.AWSNodeClassSpecArgsArgs(
@@ -321,9 +321,9 @@ node_policy = devzero.resources.NodePolicy("prod-node-policy",
         security_group_selector_terms=[devzero.resources.SecurityGroupSelectorTermArgsArgs(
             tags={"karpenter.sh/discovery": "my-prod-cluster"},
         )],
-        # AMI: latest Amazon Linux 2023 managed alias (Karpenter keeps it up to date).
+        # AMI: latest Amazon Linux 2023 managed alias (dzkarp keeps it up to date).
         ami_selector_terms=[devzero.resources.AMISelectorTermArgsArgs(alias="al2023@latest")],
-        # IAM role Karpenter uses to launch and manage nodes (must already exist in AWS).
+        # IAM role dzkarp uses to launch and manage nodes (must already exist in AWS).
         role="KarpenterNodeRole-my-prod-cluster",
     ),
 )
@@ -351,8 +351,8 @@ node_policy = devzero.resources.NodePolicy("prod-node-policy",
 | `taints` | `list[TaintArgsArgs]` | Taints applied to provisioned nodes |
 | `disruption` | `DisruptionPolicyArgsArgs` | Node disruption / consolidation settings |
 | `limits` | `ResourceLimitsArgsArgs` | Max total CPU/memory this policy may provision |
-| `node_pool_name` | `str` | Override the Karpenter NodePool name |
-| `node_class_name` | `str` | Override the Karpenter NodeClass name |
+| `node_pool_name` | `str` | Override the dzkarp NodePool name |
+| `node_class_name` | `str` | Override the dzkarp NodeClass name |
 | `aws` | `AWSNodeClassSpecArgsArgs` | AWS-specific node class configuration |
 | `azure` | `AzureNodeClassSpecArgsArgs` | Azure-specific node class configuration |
 | `raw` | `list[RawKarpenterSpecArgsArgs]` | Raw Karpenter YAML (escape hatch) |
@@ -361,8 +361,8 @@ node_policy = devzero.resources.NodePolicy("prod-node-policy",
 
 | Field | Type | Description |
 |---|---|---|
-| `nodepool_yaml` | `str` | Raw YAML for a complete Karpenter NodePool resource |
-| `nodeclass_yaml` | `str` | Raw YAML for a complete Karpenter NodeClass resource |
+| `nodepool_yaml` | `str` | Raw YAML for a complete dzkarp NodePool resource |
+| `nodeclass_yaml` | `str` | Raw YAML for a complete dzkarp NodeClass resource |
 
 **`DisruptionPolicyArgsArgs` fields:**
 

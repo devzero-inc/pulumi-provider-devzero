@@ -121,7 +121,7 @@ const workloadTarget = new resources.WorkloadPolicyTarget("prod-cluster-deployme
     enabled: true,
 });
 
-// 4. Create a node policy for Karpenter-based node provisioning
+// 4. Create a node policy for dzkarp-based node provisioning
 const nodePolicy = new resources.NodePolicy("prod-node-policy", {
     name: "prod-node-policy",
     description: "Cost-efficient node provisioning for production workloads",
@@ -161,7 +161,7 @@ const nodePolicy = new resources.NodePolicy("prod-node-policy", {
         matchExpressions: [{ operator: "In", values: ["linux"] }],
     },
 
-    // Disruption: how Karpenter consolidates and rotates nodes.
+    // Disruption: how dzkarp consolidates and rotates nodes.
     disruption: {
         consolidationPolicy: "WhenEmptyOrUnderutilized", // reclaim empty and underused nodes
         consolidateAfter: "2h0m0s",                      // wait 2 h before consolidating
@@ -179,9 +179,9 @@ const nodePolicy = new resources.NodePolicy("prod-node-policy", {
         ],
     },
 
-    // Override the generated Karpenter CRD names (helps avoid collisions in shared clusters).
-    nodePoolName: "prod-nodepool",   // name of the Karpenter NodePool CR
-    nodeClassName: "prod-nodeclass", // name of the Karpenter NodeClass CR
+    // Override the generated dzkarp CRD names (helps avoid collisions in shared clusters).
+    nodePoolName: "prod-nodepool",   // name of the dzkarp NodePool CR
+    nodeClassName: "prod-nodeclass", // name of the dzkarp NodeClass CR
 
     // AWS-specific EC2 configuration.
     aws: {
@@ -193,9 +193,9 @@ const nodePolicy = new resources.NodePolicy("prod-node-policy", {
         securityGroupSelectorTerms: [{
             tags: { "karpenter.sh/discovery": "my-prod-cluster" },
         }],
-        // AMI: latest Amazon Linux 2023 managed alias (Karpenter keeps it up to date).
+        // AMI: latest Amazon Linux 2023 managed alias (dzkarp keeps it up to date).
         amiSelectorTerms: [{ alias: "al2023@latest" }],
-        // IAM role Karpenter uses to launch and manage nodes (must already exist in AWS).
+        // IAM role dzkarp uses to launch and manage nodes (must already exist in AWS).
         role: "KarpenterNodeRole-my-prod-cluster",
     },
 });
@@ -313,7 +313,7 @@ workload_target = WorkloadPolicyTarget(
     ),
 )
 
-# 4. Create a node policy for Karpenter-based node provisioning
+# 4. Create a node policy for dzkarp-based node provisioning
 node_policy = NodePolicy("prod-node-policy", args=NodePolicyArgs(
     name="prod-node-policy",
     description="Cost-efficient node provisioning for production workloads",
@@ -353,7 +353,7 @@ node_policy = NodePolicy("prod-node-policy", args=NodePolicyArgs(
         match_expressions=[MatchExpressionArgs(operator="In", values=["linux"])],
     ),
 
-    # Disruption: how Karpenter consolidates and rotates nodes.
+    # Disruption: how dzkarp consolidates and rotates nodes.
     disruption=DisruptionPolicyArgs(
         consolidation_policy="WhenEmptyOrUnderutilized", # reclaim empty and underused nodes
         consolidate_after="2h0m0s",                      # wait 2 h before consolidating
@@ -368,9 +368,9 @@ node_policy = NodePolicy("prod-node-policy", args=NodePolicyArgs(
         ],
     ),
 
-    # Override the generated Karpenter CRD names (helps avoid collisions in shared clusters).
-    node_pool_name="prod-nodepool",   # name of the Karpenter NodePool CR
-    node_class_name="prod-nodeclass", # name of the Karpenter NodeClass CR
+    # Override the generated dzkarp CRD names (helps avoid collisions in shared clusters).
+    node_pool_name="prod-nodepool",   # name of the dzkarp NodePool CR
+    node_class_name="prod-nodeclass", # name of the dzkarp NodeClass CR
 
     # AWS-specific EC2 configuration.
     aws=AWSNodeClassSpecArgs(
@@ -382,9 +382,9 @@ node_policy = NodePolicy("prod-node-policy", args=NodePolicyArgs(
         security_group_selector_terms=[SecurityGroupSelectorTermArgs(
             tags={"karpenter.sh/discovery": "my-prod-cluster"},
         )],
-        # AMI: latest Amazon Linux 2023 managed alias (Karpenter keeps it up to date).
+        # AMI: latest Amazon Linux 2023 managed alias (dzkarp keeps it up to date).
         ami_selector_terms=[AMISelectorTermArgs(alias="al2023@latest")],
-        # IAM role Karpenter uses to launch and manage nodes (must already exist in AWS).
+        # IAM role dzkarp uses to launch and manage nodes (must already exist in AWS).
         role="KarpenterNodeRole-my-prod-cluster",
     ),
 ))
@@ -492,7 +492,7 @@ func main() {
             return err
         }
 
-        // 4. Create a node policy for Karpenter-based node provisioning
+        // 4. Create a node policy for dzkarp-based node provisioning
         nodePolicy, err := resources.NewNodePolicy(ctx, "prod-node-policy", &resources.NodePolicyArgs{
             Name:        pulumi.String("prod-node-policy"),
             Description: pulumi.StringPtr("Cost-efficient node provisioning for production workloads"),
@@ -531,7 +531,7 @@ func main() {
                     {Operator: pulumi.String("In"), Values: pulumi.StringArray{pulumi.String("linux")}},
                 },
             },
-            // Disruption: how Karpenter consolidates and rotates nodes.
+            // Disruption: how dzkarp consolidates and rotates nodes.
             Disruption: &resources.DisruptionPolicyArgs{
                 ConsolidationPolicy: pulumi.StringPtr("WhenEmptyOrUnderutilized"), // reclaim empty and underused nodes
                 ConsolidateAfter:    pulumi.StringPtr("2h0m0s"),                   // wait 2 h before consolidating
@@ -547,9 +547,9 @@ func main() {
                     },
                 },
             },
-            // Override the generated Karpenter CRD names (helps avoid collisions in shared clusters).
-            NodePoolName:  pulumi.StringPtr("prod-nodepool"),   // name of the Karpenter NodePool CR
-            NodeClassName: pulumi.StringPtr("prod-nodeclass"),  // name of the Karpenter NodeClass CR
+            // Override the generated dzkarp CRD names (helps avoid collisions in shared clusters).
+            NodePoolName:  pulumi.StringPtr("prod-nodepool"),   // name of the dzkarp NodePool CR
+            NodeClassName: pulumi.StringPtr("prod-nodeclass"),  // name of the dzkarp NodeClass CR
             // AWS-specific EC2 configuration.
             Aws: &resources.AWSNodeClassSpecArgs{
                 // Subnets where nodes will launch — discovered via the cluster tag.
@@ -560,11 +560,11 @@ func main() {
                 SecurityGroupSelectorTerms: resources.SecurityGroupSelectorTermArray{
                     {Tags: pulumi.StringMap{"karpenter.sh/discovery": pulumi.String("my-prod-cluster")}},
                 },
-                // AMI: latest Amazon Linux 2023 managed alias (Karpenter keeps it up to date).
+                // AMI: latest Amazon Linux 2023 managed alias (dzkarp keeps it up to date).
                 AmiSelectorTerms: resources.AMISelectorTermArray{
                     {Alias: pulumi.StringPtr("al2023@latest")},
                 },
-                // IAM role Karpenter uses to launch and manage nodes (must already exist in AWS).
+                // IAM role dzkarp uses to launch and manage nodes (must already exist in AWS).
                 Role: pulumi.StringPtr("KarpenterNodeRole-my-prod-cluster"),
             },
         })
@@ -796,7 +796,7 @@ Python: `policy_id`, `cluster_ids`, `kind_filter`, `workload_names`, `node_group
 
 ## NodePolicy — Key Fields
 
-`NodePolicy` configures Karpenter-based node provisioning rules. Ensure Karpenter is installed on your target clusters before attaching node policies.
+`NodePolicy` configures dzkarp-based node provisioning rules. Ensure dzkarp is installed on your target clusters before attaching node policies.
 
 | Field | Type | Description |
 |---|---|---|
@@ -818,8 +818,8 @@ Python: `policy_id`, `cluster_ids`, `kind_filter`, `workload_names`, `node_group
 | `taints` | `TaintArgs[]` | Taints applied to provisioned nodes |
 | `disruption` | `DisruptionPolicyArgs` | Node disruption and consolidation settings |
 | `limits` | `ResourceLimitsArgs` | Max total CPU/memory this policy may provision |
-| `nodePoolName` | string | Override name for the generated Karpenter NodePool CR |
-| `nodeClassName` | string | Override name for the generated Karpenter NodeClass CR |
+| `nodePoolName` | string | Override name for the generated dzkarp NodePool CR |
+| `nodeClassName` | string | Override name for the generated dzkarp NodeClass CR |
 | `aws` | `AWSNodeClassSpecArgs` | AWS-specific configuration (AMI, subnets, IAM role, EBS, etc.) |
 | `azure` | `AzureNodeClassSpecArgs` | Azure-specific configuration (subnet, image family, disk, etc.) |
 | `raw` | `RawKarpenterSpecArgs[]` | Raw Karpenter NodePool/NodeClass YAML (escape hatch) |
@@ -851,7 +851,7 @@ Python uses snake_case (e.g. `capacity_types`, `instance_categories`, `instance_
 | Field | Type | Description |
 |---|---|---|
 | `amiFamily` | string | AMI family: `AL2`, `AL2023`, `Bottlerocket`, `Windows2019`, `Windows2022` |
-| `role` | string | IAM role name for nodes (Karpenter creates the instance profile) |
+| `role` | string | IAM role name for nodes (dzkarp creates the instance profile) |
 | `instanceProfile` | string | IAM instance profile name (alternative to `role`) |
 | `subnetSelectorTerms` | `SubnetSelectorTermArgs[]` | Subnet selectors (by tag or ID) |
 | `securityGroupSelectorTerms` | `SecurityGroupSelectorTermArgs[]` | Security group selectors |
@@ -889,8 +889,8 @@ Use this as an escape hatch when the structured fields don't cover your use case
 
 | Field | Type | Description |
 |---|---|---|
-| `nodepoolYaml` | string | Raw YAML for a complete Karpenter NodePool resource |
-| `nodeclassYaml` | string | Raw YAML for a complete Karpenter NodeClass resource |
+| `nodepoolYaml` | string | Raw YAML for a complete dzkarp NodePool resource |
+| `nodeclassYaml` | string | Raw YAML for a complete dzkarp NodeClass resource |
 
 Python: `nodepool_yaml`, `nodeclass_yaml`. Go: `NodepoolYaml`, `NodeclassYaml`.
 

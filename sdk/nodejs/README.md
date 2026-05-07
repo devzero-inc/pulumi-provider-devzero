@@ -231,7 +231,7 @@ const target = new resources.WorkloadPolicyTarget("my-target", {
 
 ### `NodePolicy`
 
-Configure node provisioning and pooling (AWS / Azure) using Karpenter under the hood.
+Configure node provisioning and pooling (AWS / Azure) using dzkarp under the hood.
 
 ```typescript
 const nodePolicy = new resources.NodePolicy("prod-node-policy", {
@@ -267,7 +267,7 @@ const nodePolicy = new resources.NodePolicy("prod-node-policy", {
         matchExpressions: [{ operator: "In", values: ["linux"] }],
     },
 
-    // Disruption: how Karpenter consolidates and rotates nodes.
+    // Disruption: how dzkarp consolidates and rotates nodes.
     disruption: {
         consolidationPolicy: "WhenEmptyOrUnderutilized", // reclaim empty and underused nodes
         consolidateAfter: "2h0m0s",                      // wait 2 h before consolidating
@@ -285,9 +285,9 @@ const nodePolicy = new resources.NodePolicy("prod-node-policy", {
         ],
     },
 
-    // Override the generated Karpenter CRD names (helps avoid collisions in shared clusters).
-    nodePoolName: "prod-nodepool",   // name of the Karpenter NodePool CR
-    nodeClassName: "prod-nodeclass", // name of the Karpenter NodeClass CR
+    // Override the generated dzkarp CRD names (helps avoid collisions in shared clusters).
+    nodePoolName: "prod-nodepool",   // name of the dzkarp NodePool CR
+    nodeClassName: "prod-nodeclass", // name of the dzkarp NodeClass CR
 
     // AWS-specific EC2 configuration.
     aws: {
@@ -295,9 +295,9 @@ const nodePolicy = new resources.NodePolicy("prod-node-policy", {
         subnetSelectorTerms: [{ tags: { "karpenter.sh/discovery": "my-prod-cluster" } }],
         // Security groups for node instances — same discovery tag pattern.
         securityGroupSelectorTerms: [{ tags: { "karpenter.sh/discovery": "my-prod-cluster" } }],
-        // AMI: latest Amazon Linux 2023 managed alias (Karpenter keeps it up to date).
+        // AMI: latest Amazon Linux 2023 managed alias (dzkarp keeps it up to date).
         amiSelectorTerms: [{ alias: "al2023@latest" }],
-        // IAM role Karpenter uses to launch and manage nodes (must already exist in AWS).
+        // IAM role dzkarp uses to launch and manage nodes (must already exist in AWS).
         role: "KarpenterNodeRole-my-prod-cluster",
     },
 });
@@ -325,8 +325,8 @@ const nodePolicy = new resources.NodePolicy("prod-node-policy", {
 | `taints` | `TaintArgs[]` | Taints applied to provisioned nodes |
 | `disruption` | `DisruptionPolicyArgs` | Node disruption / consolidation settings |
 | `limits` | `ResourceLimitsArgs` | Max total CPU/memory this policy may provision |
-| `nodePoolName` | `string` | Override the Karpenter NodePool name |
-| `nodeClassName` | `string` | Override the Karpenter NodeClass name |
+| `nodePoolName` | `string` | Override the dzkarp NodePool name |
+| `nodeClassName` | `string` | Override the dzkarp NodeClass name |
 | `aws` | `AWSNodeClassSpecArgs` | AWS-specific node class configuration |
 | `azure` | `AzureNodeClassSpecArgs` | Azure-specific node class configuration |
 | `raw` | `RawKarpenterSpecArgs[]` | Raw Karpenter YAML (escape hatch) |
@@ -335,8 +335,8 @@ const nodePolicy = new resources.NodePolicy("prod-node-policy", {
 
 | Field | Type | Description |
 |---|---|---|
-| `nodepoolYaml` | `string` | Raw YAML for a complete Karpenter NodePool resource |
-| `nodeclassYaml` | `string` | Raw YAML for a complete Karpenter NodeClass resource |
+| `nodepoolYaml` | `string` | Raw YAML for a complete dzkarp NodePool resource |
+| `nodeclassYaml` | `string` | Raw YAML for a complete dzkarp NodeClass resource |
 
 **`DisruptionPolicyArgs` fields:**
 
@@ -354,7 +354,7 @@ const nodePolicy = new resources.NodePolicy("prod-node-policy", {
 | Field | Type | Description |
 |---|---|---|
 | `amiFamily` | `string` | AMI family: `AL2`, `AL2023`, `Bottlerocket`, `Windows2019`, `Windows2022` |
-| `role` | `string` | IAM role name for nodes (Karpenter creates the instance profile) |
+| `role` | `string` | IAM role name for nodes (dzkarp creates the instance profile) |
 | `instanceProfile` | `string` | IAM instance profile name (alternative to `role`) |
 | `subnetSelectorTerms` | `SubnetSelectorTermArgs[]` | Subnet selectors (by tag or ID) |
 | `securityGroupSelectorTerms` | `SecurityGroupSelectorTermArgs[]` | Security group selectors |
