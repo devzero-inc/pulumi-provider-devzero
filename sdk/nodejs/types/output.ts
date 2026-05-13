@@ -245,6 +245,25 @@ export namespace resources {
         tags?: {[key: string]: string};
     }
 
+    export interface ContainerResourceRuleConfigArgs {
+        /**
+         * Name of the container this config applies to. Example: 'main'.
+         */
+        containerName: string;
+        /**
+         * CPU resource rule for this container.
+         */
+        cpuRule?: outputs.resources.ResourceRuleConfigArgs;
+        /**
+         * GPU resource rule for this container.
+         */
+        gpuRule?: outputs.resources.ResourceRuleConfigArgs;
+        /**
+         * Memory resource rule for this container.
+         */
+        memoryRule?: outputs.resources.ResourceRuleConfigArgs;
+    }
+
     export interface DisruptionBudgetArgs {
         /**
          * How long the budget window stays active after the cron fires. Example: '8h'.
@@ -289,6 +308,64 @@ export namespace resources {
          * Seconds before an empty node is terminated (deprecated; prefer consolidateAfter). Example: 30.
          */
         ttlSecondsAfterEmpty?: number;
+    }
+
+    export interface EmergencyResponseConfigArgs {
+        /**
+         * React to CPU throttling by increasing CPU request. Example: true.
+         */
+        cpuThrottlingEnabled?: boolean;
+        /**
+         * Multiplier applied to CPU request on throttle reaction. Example: 1.5.
+         */
+        cpuThrottlingMultiplier?: number;
+        /**
+         * Throttle ratio threshold that triggers a reaction (0-1). Example: 0.8.
+         */
+        cpuThrottlingThreshold?: number;
+        /**
+         * Seconds to wait between OOM reactions. Example: 60.
+         */
+        oomCooldownSeconds?: number;
+        /**
+         * React to OOM kills by increasing memory. Example: true.
+         */
+        oomEnabled?: boolean;
+        /**
+         * Maximum number of OOM reactions before giving up. Example: 3.
+         */
+        oomMaxReactions?: number;
+        /**
+         * Multiplier applied to memory on OOM. Example: 2.0.
+         */
+        oomMemoryMultiplier?: number;
+    }
+
+    export interface HPARuleConfigArgs {
+        /**
+         * Enable horizontal (replica) scaling. Example: true.
+         */
+        enabled?: boolean;
+        /**
+         * Maximum percentage change in replica count per cycle. Example: 50.0.
+         */
+        maxReplicaChangePercent?: number;
+        /**
+         * Maximum number of replicas. Example: 10.
+         */
+        maxReplicas?: number;
+        /**
+         * Minimum number of replicas. Example: 2.
+         */
+        minReplicas?: number;
+        /**
+         * Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
+         */
+        primaryMetric?: string;
+        /**
+         * Target utilization ratio (0-1) for the primary metric. Example: 0.7.
+         */
+        targetUtilization?: number;
     }
 
     export interface HorizontalScalingArgs {
@@ -449,6 +526,45 @@ export namespace resources {
          * Maximum total memory that may be provisioned across all nodes. Example: '1000Gi'.
          */
         memory?: string;
+    }
+
+    export interface ResourceRuleConfigArgs {
+        /**
+         * Enable this resource axis rule. Example: true.
+         */
+        enabled?: boolean;
+        /**
+         * Multiplier applied to the request to derive the resource limit. Example: 1.5.
+         */
+        limitMultiplier?: number;
+        /**
+         * Whether to also adjust resource limits alongside requests. Example: true.
+         */
+        limitsAdjustmentEnabled?: boolean;
+        /**
+         * Actively remove limits from workloads. Example: false.
+         */
+        limitsRemovalEnabled?: boolean;
+        /**
+         * Maximum resource request (millicores for CPU, bytes for memory/GPU). Example: 4000.
+         */
+        maxRequest?: number;
+        /**
+         * Maximum percentage decrease allowed in a single cycle. Example: 20.0.
+         */
+        maxScaleDownPercent?: number;
+        /**
+         * Maximum percentage increase allowed in a single cycle. Example: 50.0.
+         */
+        maxScaleUpPercent?: number;
+        /**
+         * Minimum resource request (millicores for CPU, bytes for memory/GPU). Example: 100.
+         */
+        minRequest?: number;
+        /**
+         * Percentile of usage data used as the recommendation target (0-1). Example: 0.95.
+         */
+        targetPercentile?: number;
     }
 
     export interface SecurityGroupSelectorTermArgs {

@@ -381,6 +381,30 @@
             },
             "type": "object"
         },
+        "devzero:resources:ContainerResourceRuleConfigArgs": {
+            "properties": {
+                "containerName": {
+                    "type": "string",
+                    "description": "Name of the container this config applies to. Example: 'main'."
+                },
+                "cpuRule": {
+                    "$ref": "#/types/devzero:resources:ResourceRuleConfigArgs",
+                    "description": "CPU resource rule for this container."
+                },
+                "gpuRule": {
+                    "$ref": "#/types/devzero:resources:ResourceRuleConfigArgs",
+                    "description": "GPU resource rule for this container."
+                },
+                "memoryRule": {
+                    "$ref": "#/types/devzero:resources:ResourceRuleConfigArgs",
+                    "description": "Memory resource rule for this container."
+                }
+            },
+            "type": "object",
+            "required": [
+                "containerName"
+            ]
+        },
         "devzero:resources:DisruptionBudgetArgs": {
             "properties": {
                 "duration": {
@@ -437,6 +461,68 @@
                 "ttlSecondsAfterEmpty": {
                     "type": "integer",
                     "description": "Seconds before an empty node is terminated (deprecated; prefer consolidateAfter). Example: 30."
+                }
+            },
+            "type": "object"
+        },
+        "devzero:resources:EmergencyResponseConfigArgs": {
+            "properties": {
+                "cpuThrottlingEnabled": {
+                    "type": "boolean",
+                    "description": "React to CPU throttling by increasing CPU request. Example: true."
+                },
+                "cpuThrottlingMultiplier": {
+                    "type": "number",
+                    "description": "Multiplier applied to CPU request on throttle reaction. Example: 1.5."
+                },
+                "cpuThrottlingThreshold": {
+                    "type": "number",
+                    "description": "Throttle ratio threshold that triggers a reaction (0-1). Example: 0.8."
+                },
+                "oomCooldownSeconds": {
+                    "type": "integer",
+                    "description": "Seconds to wait between OOM reactions. Example: 60."
+                },
+                "oomEnabled": {
+                    "type": "boolean",
+                    "description": "React to OOM kills by increasing memory. Example: true."
+                },
+                "oomMaxReactions": {
+                    "type": "integer",
+                    "description": "Maximum number of OOM reactions before giving up. Example: 3."
+                },
+                "oomMemoryMultiplier": {
+                    "type": "number",
+                    "description": "Multiplier applied to memory on OOM. Example: 2.0."
+                }
+            },
+            "type": "object"
+        },
+        "devzero:resources:HPARuleConfigArgs": {
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable horizontal (replica) scaling. Example: true."
+                },
+                "maxReplicaChangePercent": {
+                    "type": "number",
+                    "description": "Maximum percentage change in replica count per cycle. Example: 50.0."
+                },
+                "maxReplicas": {
+                    "type": "integer",
+                    "description": "Maximum number of replicas. Example: 10."
+                },
+                "minReplicas": {
+                    "type": "integer",
+                    "description": "Minimum number of replicas. Example: 2."
+                },
+                "primaryMetric": {
+                    "type": "string",
+                    "description": "Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'."
+                },
+                "targetUtilization": {
+                    "type": "number",
+                    "description": "Target utilization ratio (0-1) for the primary metric. Example: 0.7."
                 }
             },
             "type": "object"
@@ -653,6 +739,47 @@
                 "memory": {
                     "type": "string",
                     "description": "Maximum total memory that may be provisioned across all nodes. Example: '1000Gi'."
+                }
+            },
+            "type": "object"
+        },
+        "devzero:resources:ResourceRuleConfigArgs": {
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable this resource axis rule. Example: true."
+                },
+                "limitMultiplier": {
+                    "type": "number",
+                    "description": "Multiplier applied to the request to derive the resource limit. Example: 1.5."
+                },
+                "limitsAdjustmentEnabled": {
+                    "type": "boolean",
+                    "description": "Whether to also adjust resource limits alongside requests. Example: true."
+                },
+                "limitsRemovalEnabled": {
+                    "type": "boolean",
+                    "description": "Actively remove limits from workloads. Example: false."
+                },
+                "maxRequest": {
+                    "type": "integer",
+                    "description": "Maximum resource request (millicores for CPU, bytes for memory/GPU). Example: 4000."
+                },
+                "maxScaleDownPercent": {
+                    "type": "number",
+                    "description": "Maximum percentage decrease allowed in a single cycle. Example: 20.0."
+                },
+                "maxScaleUpPercent": {
+                    "type": "number",
+                    "description": "Maximum percentage increase allowed in a single cycle. Example: 50.0."
+                },
+                "minRequest": {
+                    "type": "integer",
+                    "description": "Minimum resource request (millicores for CPU, bytes for memory/GPU). Example: 100."
+                },
+                "targetPercentile": {
+                    "type": "number",
+                    "description": "Percentile of usage data used as the recommendation target (0-1). Example: 0.95."
                 }
             },
             "type": "object"
@@ -1420,6 +1547,208 @@
                 "name",
                 "policyId",
                 "clusterIds"
+            ]
+        },
+        "devzero:resources:WorkloadRule": {
+            "properties": {
+                "actionTriggers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: [\"on_detection\"]."
+                },
+                "autoGenerate": {
+                    "type": "boolean",
+                    "description": "When true the engine generates all rule fields automatically; manual field overrides are ignored. Example: false."
+                },
+                "clusterId": {
+                    "type": "string",
+                    "description": "ID of the cluster this rule targets. Example: 'cluster-abc123'."
+                },
+                "containers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/types/devzero:resources:ContainerResourceRuleConfigArgs"
+                    },
+                    "description": "Per-container resource rule configurations. When empty, workload-level rules apply to all containers."
+                },
+                "cooldownMinutes": {
+                    "type": "integer",
+                    "description": "Minimum minutes between consecutive recommendation applications. Example: 60."
+                },
+                "cpuRule": {
+                    "$ref": "#/types/devzero:resources:ResourceRuleConfigArgs",
+                    "description": "CPU vertical scaling rule configuration."
+                },
+                "cronSchedule": {
+                    "type": "string",
+                    "description": "Cron expression for scheduled application (5-field UTC). Example: '0 2 * * *'."
+                },
+                "defragmentationSchedule": {
+                    "type": "string",
+                    "description": "Cron expression for node defragmentation. Example: '0 3 * * 0'."
+                },
+                "detectionTriggers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Events that trigger a recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: [\"pod_creation\"]."
+                },
+                "emergencyResponse": {
+                    "$ref": "#/types/devzero:resources:EmergencyResponseConfigArgs",
+                    "description": "Emergency response configuration for OOM and CPU throttle events."
+                },
+                "gpuRule": {
+                    "$ref": "#/types/devzero:resources:ResourceRuleConfigArgs",
+                    "description": "GPU vertical scaling rule configuration."
+                },
+                "hpaRule": {
+                    "$ref": "#/types/devzero:resources:HPARuleConfigArgs",
+                    "description": "Horizontal (replica) scaling rule configuration."
+                },
+                "kind": {
+                    "type": "string",
+                    "description": "Kubernetes workload kind. One of: 'Deployment', 'StatefulSet', 'DaemonSet', 'CronJob', 'Job'. Example: 'Deployment'."
+                },
+                "liveMigrationEnabled": {
+                    "type": "boolean",
+                    "description": "Allow live pod migration when applying recommendations. Example: false."
+                },
+                "memoryRule": {
+                    "$ref": "#/types/devzero:resources:ResourceRuleConfigArgs",
+                    "description": "Memory vertical scaling rule configuration."
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Name of the Kubernetes workload. Example: 'my-api'."
+                },
+                "namespace": {
+                    "type": "string",
+                    "description": "Kubernetes namespace of the workload. Example: 'production'."
+                },
+                "schedulerPlugins": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Kubernetes scheduler plugins to activate. Example: [\"binpacking\"]."
+                },
+                "startupPeriodSeconds": {
+                    "type": "integer",
+                    "description": "Seconds after workload start to exclude from usage data. Example: 300."
+                },
+                "useInPlaceVerticalScaling": {
+                    "type": "boolean",
+                    "description": "Use in-place pod vertical scaling instead of pod restarts. Example: false."
+                }
+            },
+            "required": [
+                "clusterId",
+                "namespace",
+                "kind",
+                "name"
+            ],
+            "inputProperties": {
+                "actionTriggers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: [\"on_detection\"]."
+                },
+                "autoGenerate": {
+                    "type": "boolean",
+                    "description": "When true the engine generates all rule fields automatically; manual field overrides are ignored. Example: false."
+                },
+                "clusterId": {
+                    "type": "string",
+                    "description": "ID of the cluster this rule targets. Example: 'cluster-abc123'."
+                },
+                "containers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/types/devzero:resources:ContainerResourceRuleConfigArgs"
+                    },
+                    "description": "Per-container resource rule configurations. When empty, workload-level rules apply to all containers."
+                },
+                "cooldownMinutes": {
+                    "type": "integer",
+                    "description": "Minimum minutes between consecutive recommendation applications. Example: 60."
+                },
+                "cpuRule": {
+                    "$ref": "#/types/devzero:resources:ResourceRuleConfigArgs",
+                    "description": "CPU vertical scaling rule configuration."
+                },
+                "cronSchedule": {
+                    "type": "string",
+                    "description": "Cron expression for scheduled application (5-field UTC). Example: '0 2 * * *'."
+                },
+                "defragmentationSchedule": {
+                    "type": "string",
+                    "description": "Cron expression for node defragmentation. Example: '0 3 * * 0'."
+                },
+                "detectionTriggers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Events that trigger a recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: [\"pod_creation\"]."
+                },
+                "emergencyResponse": {
+                    "$ref": "#/types/devzero:resources:EmergencyResponseConfigArgs",
+                    "description": "Emergency response configuration for OOM and CPU throttle events."
+                },
+                "gpuRule": {
+                    "$ref": "#/types/devzero:resources:ResourceRuleConfigArgs",
+                    "description": "GPU vertical scaling rule configuration."
+                },
+                "hpaRule": {
+                    "$ref": "#/types/devzero:resources:HPARuleConfigArgs",
+                    "description": "Horizontal (replica) scaling rule configuration."
+                },
+                "kind": {
+                    "type": "string",
+                    "description": "Kubernetes workload kind. One of: 'Deployment', 'StatefulSet', 'DaemonSet', 'CronJob', 'Job'. Example: 'Deployment'."
+                },
+                "liveMigrationEnabled": {
+                    "type": "boolean",
+                    "description": "Allow live pod migration when applying recommendations. Example: false."
+                },
+                "memoryRule": {
+                    "$ref": "#/types/devzero:resources:ResourceRuleConfigArgs",
+                    "description": "Memory vertical scaling rule configuration."
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Name of the Kubernetes workload. Example: 'my-api'."
+                },
+                "namespace": {
+                    "type": "string",
+                    "description": "Kubernetes namespace of the workload. Example: 'production'."
+                },
+                "schedulerPlugins": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Kubernetes scheduler plugins to activate. Example: [\"binpacking\"]."
+                },
+                "startupPeriodSeconds": {
+                    "type": "integer",
+                    "description": "Seconds after workload start to exclude from usage data. Example: 300."
+                },
+                "useInPlaceVerticalScaling": {
+                    "type": "boolean",
+                    "description": "Use in-place pod vertical scaling instead of pod restarts. Example: false."
+                }
+            },
+            "requiredInputs": [
+                "clusterId",
+                "namespace",
+                "kind",
+                "name"
             ]
         }
     },

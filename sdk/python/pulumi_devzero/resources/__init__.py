@@ -12,5 +12,6 @@ from .node_policy import *
 from .node_policy_target import *
 from .workload_policy import *
 from .workload_policy_target import *
+from .workload_rule import *
 from ._inputs import *
 from . import outputs

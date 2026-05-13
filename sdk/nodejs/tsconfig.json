@@ -24,6 +24,7 @@
         "resources/nodePolicyTarget.ts",
         "resources/workloadPolicy.ts",
         "resources/workloadPolicyTarget.ts",
+        "resources/workloadRule.ts",
         "types/index.ts",
         "types/input.ts",
         "types/output.ts",

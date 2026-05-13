@@ -30,7 +30,8 @@ _utilities.register(
    "devzero:resources:NodePolicy": "NodePolicy",
    "devzero:resources:NodePolicyTarget": "NodePolicyTarget",
    "devzero:resources:WorkloadPolicy": "WorkloadPolicy",
-   "devzero:resources:WorkloadPolicyTarget": "WorkloadPolicyTarget"
+   "devzero:resources:WorkloadPolicyTarget": "WorkloadPolicyTarget",
+   "devzero:resources:WorkloadRule": "WorkloadRule"
   }
  }
 ]

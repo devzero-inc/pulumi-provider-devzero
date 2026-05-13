@@ -245,6 +245,25 @@ export namespace resources {
         tags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
     }
 
+    export interface ContainerResourceRuleConfigArgsArgs {
+        /**
+         * Name of the container this config applies to. Example: 'main'.
+         */
+        containerName: pulumi.Input<string>;
+        /**
+         * CPU resource rule for this container.
+         */
+        cpuRule?: pulumi.Input<inputs.resources.ResourceRuleConfigArgsArgs>;
+        /**
+         * GPU resource rule for this container.
+         */
+        gpuRule?: pulumi.Input<inputs.resources.ResourceRuleConfigArgsArgs>;
+        /**
+         * Memory resource rule for this container.
+         */
+        memoryRule?: pulumi.Input<inputs.resources.ResourceRuleConfigArgsArgs>;
+    }
+
     export interface DisruptionBudgetArgsArgs {
         /**
          * How long the budget window stays active after the cron fires. Example: '8h'.
@@ -289,6 +308,64 @@ export namespace resources {
          * Seconds before an empty node is terminated (deprecated; prefer consolidateAfter). Example: 30.
          */
         ttlSecondsAfterEmpty?: pulumi.Input<number>;
+    }
+
+    export interface EmergencyResponseConfigArgsArgs {
+        /**
+         * React to CPU throttling by increasing CPU request. Example: true.
+         */
+        cpuThrottlingEnabled?: pulumi.Input<boolean>;
+        /**
+         * Multiplier applied to CPU request on throttle reaction. Example: 1.5.
+         */
+        cpuThrottlingMultiplier?: pulumi.Input<number>;
+        /**
+         * Throttle ratio threshold that triggers a reaction (0-1). Example: 0.8.
+         */
+        cpuThrottlingThreshold?: pulumi.Input<number>;
+        /**
+         * Seconds to wait between OOM reactions. Example: 60.
+         */
+        oomCooldownSeconds?: pulumi.Input<number>;
+        /**
+         * React to OOM kills by increasing memory. Example: true.
+         */
+        oomEnabled?: pulumi.Input<boolean>;
+        /**
+         * Maximum number of OOM reactions before giving up. Example: 3.
+         */
+        oomMaxReactions?: pulumi.Input<number>;
+        /**
+         * Multiplier applied to memory on OOM. Example: 2.0.
+         */
+        oomMemoryMultiplier?: pulumi.Input<number>;
+    }
+
+    export interface HPARuleConfigArgsArgs {
+        /**
+         * Enable horizontal (replica) scaling. Example: true.
+         */
+        enabled?: pulumi.Input<boolean>;
+        /**
+         * Maximum percentage change in replica count per cycle. Example: 50.0.
+         */
+        maxReplicaChangePercent?: pulumi.Input<number>;
+        /**
+         * Maximum number of replicas. Example: 10.
+         */
+        maxReplicas?: pulumi.Input<number>;
+        /**
+         * Minimum number of replicas. Example: 2.
+         */
+        minReplicas?: pulumi.Input<number>;
+        /**
+         * Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
+         */
+        primaryMetric?: pulumi.Input<string>;
+        /**
+         * Target utilization ratio (0-1) for the primary metric. Example: 0.7.
+         */
+        targetUtilization?: pulumi.Input<number>;
     }
 
     export interface HorizontalScalingArgsArgs {
@@ -449,6 +526,45 @@ export namespace resources {
          * Maximum total memory that may be provisioned across all nodes. Example: '1000Gi'.
          */
         memory?: pulumi.Input<string>;
+    }
+
+    export interface ResourceRuleConfigArgsArgs {
+        /**
+         * Enable this resource axis rule. Example: true.
+         */
+        enabled?: pulumi.Input<boolean>;
+        /**
+         * Multiplier applied to the request to derive the resource limit. Example: 1.5.
+         */
+        limitMultiplier?: pulumi.Input<number>;
+        /**
+         * Whether to also adjust resource limits alongside requests. Example: true.
+         */
+        limitsAdjustmentEnabled?: pulumi.Input<boolean>;
+        /**
+         * Actively remove limits from workloads. Example: false.
+         */
+        limitsRemovalEnabled?: pulumi.Input<boolean>;
+        /**
+         * Maximum resource request (millicores for CPU, bytes for memory/GPU). Example: 4000.
+         */
+        maxRequest?: pulumi.Input<number>;
+        /**
+         * Maximum percentage decrease allowed in a single cycle. Example: 20.0.
+         */
+        maxScaleDownPercent?: pulumi.Input<number>;
+        /**
+         * Maximum percentage increase allowed in a single cycle. Example: 50.0.
+         */
+        maxScaleUpPercent?: pulumi.Input<number>;
+        /**
+         * Minimum resource request (millicores for CPU, bytes for memory/GPU). Example: 100.
+         */
+        minRequest?: pulumi.Input<number>;
+        /**
+         * Percentile of usage data used as the recommendation target (0-1). Example: 0.95.
+         */
+        targetPercentile?: pulumi.Input<number>;
     }
 
     export interface SecurityGroupSelectorTermArgsArgs {
