@@ -13,6 +13,7 @@ export PULUMI_BACKEND_URL=file://~
 #   ./scripts/test-packages.sh
 : "${DEVZERO_TEAM_ID:?DEVZERO_TEAM_ID is required}"
 : "${DEVZERO_TOKEN:?DEVZERO_TOKEN is required}"
+#better to test against dev
 DEVZERO_URL="${DEVZERO_URL:-https://dakr.devzero.dev}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -56,6 +57,17 @@ run_language_test() {
     log "[${lang}] Installing Python dependencies..."
     if ! python3 -m pip install -r requirements.txt -q ; then
       log_fail "[${lang}] pip install failed"
+      return 1
+    fi
+  elif [[ "${lang}" == "typescript" ]]; then
+    log "[${lang}] Installing Node dependencies..."
+    if ! npm install ; then
+      log_fail "[${lang}] npm install failed"
+      return 1
+    fi
+    log "[${lang}] Building TypeScript..."
+    if ! npm run build ; then
+      log_fail "[${lang}] npm run build failed"
       return 1
     fi
   fi
