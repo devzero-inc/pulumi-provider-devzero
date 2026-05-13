@@ -76,6 +76,9 @@ const cluster = new resources.Cluster("prod-cluster", {
 const policy = new resources.WorkloadPolicy("cpu-scaling-policy", {
     name: "cpu-scaling-policy",
     description: "Policy with CPU vertical scaling enabled",
+    actionTriggers: ["on_detection", "on_schedule"],  // apply on pod events AND on schedule
+    cronSchedule: "0 2 * * *",                        // daily at 2 am UTC (required for on_schedule)
+    detectionTriggers: ["pod_creation", "pod_reschedule"],
     cpuVerticalScaling: {
         enabled: true,
         targetPercentile: 0.95,
@@ -228,37 +231,74 @@ const target = new resources.WorkloadPolicyTarget("my-target", {
 
 ### `NodePolicy`
 
-Configure node provisioning and pooling (AWS / Azure) using Karpenter under the hood.
+Configure node provisioning and pooling (AWS / Azure) using dzkarp under the hood.
 
 ```typescript
-const nodePolicy = new resources.NodePolicy("my-node-policy", {
-    name: "my-node-policy",
-    description: "AWS node policy with on-demand and spot capacity",
+const nodePolicy = new resources.NodePolicy("prod-node-policy", {
+    name: "prod-node-policy",
+    description: "Cost-efficient node provisioning for production workloads",
+
+    // Higher weight wins when multiple policies match the same node request.
     weight: 10,
-    capacityTypes: {
-        matchExpressions: [{ key: "<capacity-type-label>", operator: "In", values: ["<value>"] }],
-    },
+
+    // Instance categories: c (compute), m (general), r (memory), t (burstable).
+    // Kept broad to maximise the instance pool and minimise cost.
     instanceCategories: {
-        matchLabels: { "<label-key>": "<label-value>" },
+        matchExpressions: [{ operator: "In", values: ["c", "m", "r", "t"] }],
     },
-    labels: { "<key>": "<value>" },
-    taints: [{ key: "<taint-key>", value: "<taint-value>", effect: "NoSchedule" }],
+
+    // Instance generation: prefer modern hardware (gen 3+) for better performance/cost ratio.
+    instanceGenerations: {
+        matchExpressions: [{ operator: "In", values: ["3", "4", "5", "6"] }],
+    },
+
+    // CPU architecture: amd64 (x86_64) — derived from active nodes in the cluster.
+    architectures: {
+        matchExpressions: [{ operator: "In", values: ["amd64"] }],
+    },
+
+    // Capacity types: prefer spot for savings, fall back to on-demand for availability.
+    capacityTypes: {
+        matchExpressions: [{ operator: "In", values: ["spot", "on-demand"] }],
+    },
+
+    // Operating system: linux only.
+    operatingSystems: {
+        matchExpressions: [{ operator: "In", values: ["linux"] }],
+    },
+
+    // Disruption: how dzkarp consolidates and rotates nodes.
     disruption: {
-        consolidationPolicy: "WhenEmptyOrUnderutilized",
-        consolidateAfter: "30s",
-        expireAfter: "720h",
+        consolidationPolicy: "WhenEmptyOrUnderutilized", // reclaim empty and underused nodes
+        consolidateAfter: "2h0m0s",                      // wait 2 h before consolidating
+        expireAfter: "168h",                             // rotate nodes after 7 days
+        budgets: [
+            {
+                // Disrupt up to 10% of nodes at once for these reasons.
+                reasons: ["Empty", "Drifted", "Underutilized"],
+                nodes: "10%",
+            },
+            {
+                // Always protect at least 1 node from disruption at any time.
+                nodes: "1",
+            },
+        ],
     },
-    limits: { cpu: "1000", memory: "1000Gi" },
+
+    // Override the generated dzkarp CRD names (helps avoid collisions in shared clusters).
+    nodePoolName: "prod-nodepool",   // name of the dzkarp NodePool CR
+    nodeClassName: "prod-nodeclass", // name of the dzkarp NodeClass CR
+
+    // AWS-specific EC2 configuration.
     aws: {
-        amiFamily: "AL2",
-        role: "<iam-role-name>",
-        subnetSelectorTerms: [{ tags: { "<tag-key>": "<tag-value>" } }],
-        securityGroupSelectorTerms: [{ tags: { "<tag-key>": "<tag-value>" } }],
-        blockDeviceMappings: [{
-            deviceName: "/dev/xvda",
-            rootVolume: true,
-            ebs: { volumeSize: "100Gi", volumeType: "gp3", encrypted: true },
-        }],
+        // Subnets where nodes will launch — discovered via the cluster tag.
+        subnetSelectorTerms: [{ tags: { "karpenter.sh/discovery": "my-prod-cluster" } }],
+        // Security groups for node instances — same discovery tag pattern.
+        securityGroupSelectorTerms: [{ tags: { "karpenter.sh/discovery": "my-prod-cluster" } }],
+        // AMI: latest Amazon Linux 2023 managed alias (dzkarp keeps it up to date).
+        amiSelectorTerms: [{ alias: "al2023@latest" }],
+        // IAM role dzkarp uses to launch and manage nodes (must already exist in AWS).
+        role: "KarpenterNodeRole-my-prod-cluster",
     },
 });
 ```
@@ -285,8 +325,8 @@ const nodePolicy = new resources.NodePolicy("my-node-policy", {
 | `taints` | `TaintArgs[]` | Taints applied to provisioned nodes |
 | `disruption` | `DisruptionPolicyArgs` | Node disruption / consolidation settings |
 | `limits` | `ResourceLimitsArgs` | Max total CPU/memory this policy may provision |
-| `nodePoolName` | `string` | Override the Karpenter NodePool name |
-| `nodeClassName` | `string` | Override the Karpenter NodeClass name |
+| `nodePoolName` | `string` | Override the dzkarp NodePool name |
+| `nodeClassName` | `string` | Override the dzkarp NodeClass name |
 | `aws` | `AWSNodeClassSpecArgs` | AWS-specific node class configuration |
 | `azure` | `AzureNodeClassSpecArgs` | Azure-specific node class configuration |
 | `raw` | `RawKarpenterSpecArgs[]` | Raw Karpenter YAML (escape hatch) |
@@ -295,8 +335,8 @@ const nodePolicy = new resources.NodePolicy("my-node-policy", {
 
 | Field | Type | Description |
 |---|---|---|
-| `nodepoolYaml` | `string` | Raw YAML for a complete Karpenter NodePool resource |
-| `nodeclassYaml` | `string` | Raw YAML for a complete Karpenter NodeClass resource |
+| `nodepoolYaml` | `string` | Raw YAML for a complete dzkarp NodePool resource |
+| `nodeclassYaml` | `string` | Raw YAML for a complete dzkarp NodeClass resource |
 
 **`DisruptionPolicyArgs` fields:**
 
@@ -314,7 +354,7 @@ const nodePolicy = new resources.NodePolicy("my-node-policy", {
 | Field | Type | Description |
 |---|---|---|
 | `amiFamily` | `string` | AMI family: `AL2`, `AL2023`, `Bottlerocket`, `Windows2019`, `Windows2022` |
-| `role` | `string` | IAM role name for nodes (Karpenter creates the instance profile) |
+| `role` | `string` | IAM role name for nodes (dzkarp creates the instance profile) |
 | `instanceProfile` | `string` | IAM instance profile name (alternative to `role`) |
 | `subnetSelectorTerms` | `SubnetSelectorTermArgs[]` | Subnet selectors (by tag or ID) |
 | `securityGroupSelectorTerms` | `SecurityGroupSelectorTermArgs[]` | Security group selectors |

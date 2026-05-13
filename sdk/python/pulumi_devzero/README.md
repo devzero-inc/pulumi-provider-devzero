@@ -74,6 +74,9 @@ cluster = devzero.resources.Cluster("prod-cluster",
 policy = devzero.resources.WorkloadPolicy("cpu-scaling-policy",
     name="cpu-scaling-policy",
     description="Policy with CPU vertical scaling enabled",
+    action_triggers=["on_detection", "on_schedule"],  # apply on pod events AND on schedule
+    cron_schedule="0 2 * * *",                        # daily at 2 am UTC (required for on_schedule)
+    detection_triggers=["pod_creation", "pod_reschedule"],
     cpu_vertical_scaling=devzero.resources.VerticalScalingArgsArgs(
         enabled=True,
         target_percentile=0.95,
@@ -233,35 +236,89 @@ target = devzero.resources.WorkloadPolicyTarget("my-target",
 
 ### `NodePolicy`
 
-Configure node provisioning and pooling (AWS / Azure) using Karpenter under the hood.
+Configure node provisioning and pooling (AWS / Azure) using dzkarp under the hood.
 
 ```python
 import pulumi_devzero as devzero
 
-node_policy = devzero.resources.NodePolicy("my-node-policy",
-    name="my-node-policy",
-    description="AWS node policy with on-demand and spot capacity",
+node_policy = devzero.resources.NodePolicy("prod-node-policy",
+    name="prod-node-policy",
+    description="Cost-efficient node provisioning for production workloads",
+
+    # Higher weight wins when multiple policies match the same node request.
     weight=10,
-    capacity_types=devzero.resources.LabelSelectorArgsArgs(match_expressions=[devzero.resources.LabelSelectorRequirementArgsArgs(key="<label-key>", operator="In", values=["<value>"])]),
-    instance_categories=devzero.resources.LabelSelectorArgsArgs(match_labels={"<label-key>": "<label-value>"}),
-    labels={"environment": "production"},
-    taints=[devzero.resources.TaintArgsArgs(key="dedicated", value="gpu", effect="NoSchedule")],
-    disruption=devzero.resources.DisruptionPolicyArgsArgs(
-        consolidation_policy="WhenEmptyOrUnderutilized",
-        consolidate_after="30s",
-        expire_after="720h",
-    ),
-    limits=devzero.resources.ResourceLimitsArgsArgs(cpu="1000", memory="1000Gi"),
-    aws=devzero.resources.AWSNodeClassSpecArgsArgs(
-        ami_family="AL2",
-        role="KarpenterNodeRole",
-        subnet_selector_terms=[devzero.resources.SubnetSelectorTermArgsArgs(tags={"karpenter.sh/discovery": "my-cluster"})],
-        security_group_selector_terms=[devzero.resources.SecurityGroupSelectorTermArgsArgs(tags={"karpenter.sh/discovery": "my-cluster"})],
-        block_device_mappings=[devzero.resources.BlockDeviceMappingArgsArgs(
-            device_name="/dev/xvda",
-            root_volume=True,
-            ebs=devzero.resources.BlockDeviceArgsArgs(volume_size="100Gi", volume_type="gp3", encrypted=True),
+
+    # Instance categories: c (compute), m (general), r (memory), t (burstable).
+    # Kept broad to maximise the instance pool and minimise cost.
+    instance_categories=devzero.resources.LabelSelectorArgsArgs(
+        match_expressions=[devzero.resources.LabelSelectorRequirementArgsArgs(
+            operator="In", values=["c", "m", "r", "t"],
         )],
+    ),
+
+    # Instance generation: prefer modern hardware (gen 3+) for better performance/cost ratio.
+    instance_generations=devzero.resources.LabelSelectorArgsArgs(
+        match_expressions=[devzero.resources.LabelSelectorRequirementArgsArgs(
+            operator="In", values=["3", "4", "5", "6"],
+        )],
+    ),
+
+    # CPU architecture: amd64 (x86_64) — derived from active nodes in the cluster.
+    architectures=devzero.resources.LabelSelectorArgsArgs(
+        match_expressions=[devzero.resources.LabelSelectorRequirementArgsArgs(
+            operator="In", values=["amd64"],
+        )],
+    ),
+
+    # Capacity types: prefer spot for savings, fall back to on-demand for availability.
+    capacity_types=devzero.resources.LabelSelectorArgsArgs(
+        match_expressions=[devzero.resources.LabelSelectorRequirementArgsArgs(
+            operator="In", values=["spot", "on-demand"],
+        )],
+    ),
+
+    # Operating system: linux only.
+    operating_systems=devzero.resources.LabelSelectorArgsArgs(
+        match_expressions=[devzero.resources.LabelSelectorRequirementArgsArgs(
+            operator="In", values=["linux"],
+        )],
+    ),
+
+    # Disruption: how dzkarp consolidates and rotates nodes.
+    disruption=devzero.resources.DisruptionPolicyArgsArgs(
+        consolidation_policy="WhenEmptyOrUnderutilized", # reclaim empty and underused nodes
+        consolidate_after="2h0m0s",                      # wait 2 h before consolidating
+        expire_after="168h",                             # rotate nodes after 7 days
+        budgets=[
+            devzero.resources.DisruptionBudgetArgsArgs(
+                # Disrupt up to 10% of nodes at once for these reasons.
+                reasons=["Empty", "Drifted", "Underutilized"],
+                nodes="10%",
+            ),
+            devzero.resources.DisruptionBudgetArgsArgs(
+                nodes="1",  # always protect at least 1 node
+            ),
+        ],
+    ),
+
+    # Override the generated dzkarp CRD names (helps avoid collisions in shared clusters).
+    node_pool_name="prod-nodepool",   # name of the dzkarp NodePool CR
+    node_class_name="prod-nodeclass", # name of the dzkarp NodeClass CR
+
+    # AWS-specific EC2 configuration.
+    aws=devzero.resources.AWSNodeClassSpecArgsArgs(
+        # Subnets where nodes will launch — discovered via the cluster tag.
+        subnet_selector_terms=[devzero.resources.SubnetSelectorTermArgsArgs(
+            tags={"karpenter.sh/discovery": "my-prod-cluster"},
+        )],
+        # Security groups for node instances — same discovery tag pattern.
+        security_group_selector_terms=[devzero.resources.SecurityGroupSelectorTermArgsArgs(
+            tags={"karpenter.sh/discovery": "my-prod-cluster"},
+        )],
+        # AMI: latest Amazon Linux 2023 managed alias (dzkarp keeps it up to date).
+        ami_selector_terms=[devzero.resources.AMISelectorTermArgsArgs(alias="al2023@latest")],
+        # IAM role dzkarp uses to launch and manage nodes (must already exist in AWS).
+        role="KarpenterNodeRole-my-prod-cluster",
     ),
 )
 ```
@@ -288,8 +345,8 @@ node_policy = devzero.resources.NodePolicy("my-node-policy",
 | `taints` | `list[TaintArgsArgs]` | Taints applied to provisioned nodes |
 | `disruption` | `DisruptionPolicyArgsArgs` | Node disruption / consolidation settings |
 | `limits` | `ResourceLimitsArgsArgs` | Max total CPU/memory this policy may provision |
-| `node_pool_name` | `str` | Override the Karpenter NodePool name |
-| `node_class_name` | `str` | Override the Karpenter NodeClass name |
+| `node_pool_name` | `str` | Override the dzkarp NodePool name |
+| `node_class_name` | `str` | Override the dzkarp NodeClass name |
 | `aws` | `AWSNodeClassSpecArgsArgs` | AWS-specific node class configuration |
 | `azure` | `AzureNodeClassSpecArgsArgs` | Azure-specific node class configuration |
 | `raw` | `list[RawKarpenterSpecArgsArgs]` | Raw Karpenter YAML (escape hatch) |
@@ -298,8 +355,8 @@ node_policy = devzero.resources.NodePolicy("my-node-policy",
 
 | Field | Type | Description |
 |---|---|---|
-| `nodepool_yaml` | `str` | Raw YAML for a complete Karpenter NodePool resource |
-| `nodeclass_yaml` | `str` | Raw YAML for a complete Karpenter NodeClass resource |
+| `nodepool_yaml` | `str` | Raw YAML for a complete dzkarp NodePool resource |
+| `nodeclass_yaml` | `str` | Raw YAML for a complete dzkarp NodeClass resource |
 
 **`DisruptionPolicyArgsArgs` fields:**
 
@@ -317,7 +374,7 @@ node_policy = devzero.resources.NodePolicy("my-node-policy",
 | Field | Type | Description |
 |---|---|---|
 | `ami_family` | `str` | AMI family: `AL2`, `AL2023`, `Bottlerocket`, `Windows2019`, `Windows2022` |
-| `role` | `str` | IAM role name for nodes (Karpenter creates the instance profile) |
+| `role` | `str` | IAM role name for nodes (dzkarp creates the instance profile) |
 | `instance_profile` | `str` | IAM instance profile name (alternative to `role`) |
 | `subnet_selector_terms` | `list[SubnetSelectorTermArgsArgs]` | Subnet selectors (by tag or ID) |
 | `security_group_selector_terms` | `list[SecurityGroupSelectorTermArgsArgs]` | Security group selectors |
