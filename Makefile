@@ -157,6 +157,7 @@ print('package.json patched')"
 	@echo "Copying README.md into SDK directories..."
 	cp README.md sdk/nodejs/README.md
 	cp README.md sdk/python/README.md
+	cp README.md sdk/go/devzero/README.md
 	@echo "All SDKs generated."
 
 .PHONY: sdk
