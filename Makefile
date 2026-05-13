@@ -118,13 +118,6 @@ json.dump(ex, open('$(SCHEMA_FILE)','w'), indent=4); \
 print(f'Merged: {len(ex[\"resources\"])} resources, {len(ex[\"types\"])} types, {len(ex[\"functions\"])} functions')"
 	@echo "Applying enum patches..."
 	python3 scripts/patch-schema-enums.py
-	@echo "Injecting README.md into schema..."
-	python3 -c "\
-import json; \
-schema=json.load(open('$(SCHEMA_FILE)')); \
-schema['readme']=open('README.md').read(); \
-json.dump(schema, open('$(SCHEMA_FILE)','w'), indent=4); \
-print('README.md injected into schema readme field')"
 
 .PHONY: gen-sdk
 gen-sdk: gen-schema
