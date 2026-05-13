@@ -622,6 +622,159 @@ func TestEmergencyResponseConfig_Nil(t *testing.T) {
 	}
 }
 
+// ---------- Bug fixes ----------
+
+func TestWorkloadRule_Create_AutoGenerate_RoundTrips(t *testing.T) {
+	rec := &mockWorkloadRuleClient{
+		upsertFn: func(_ context.Context, _ *connect.Request[apiv1.UpsertManualWorkloadRuleRequest]) (*connect.Response[apiv1.UpsertManualWorkloadRuleResponse], error) {
+			// Server returns rule without auto_generate field — it only has current_source.
+			return connect.NewResponse(&apiv1.UpsertManualWorkloadRuleResponse{
+				Rule: &apiv1.WorkloadRule{
+					RuleId:        "rule-ag",
+					ClusterId:     "c",
+					Namespace:     "ns",
+					Kind:          "Deployment",
+					Name:          "app",
+					CurrentSource: "auto_optimization",
+				},
+			}), nil
+		},
+	}
+	withMockWorkloadRuleClientSet(t, rec)
+
+	autoGen := true
+	w := &WorkloadRule{}
+	resp, err := w.Create(context.Background(), infer.CreateRequest[WorkloadRuleArgs]{
+		Inputs: WorkloadRuleArgs{
+			ClusterID:    "c",
+			Namespace:    "ns",
+			Kind:         "Deployment",
+			Name:         "app",
+			AutoGenerate: &autoGen,
+		},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.Output.AutoGenerate == nil || !*resp.Output.AutoGenerate {
+		t.Error("AutoGenerate should be true in output state to avoid perpetual diff")
+	}
+}
+
+func TestWorkloadRule_Read_AutoGenerate_InferredFromCurrentSource(t *testing.T) {
+	rec := &mockWorkloadRuleClient{
+		getFn: func(_ context.Context, _ *connect.Request[apiv1.GetWorkloadRuleByIDRequest]) (*connect.Response[apiv1.GetWorkloadRuleByIDResponse], error) {
+			return connect.NewResponse(&apiv1.GetWorkloadRuleByIDResponse{
+				Rule: &apiv1.WorkloadRule{
+					RuleId:        "rule-ag",
+					ClusterId:     "c",
+					Namespace:     "ns",
+					Kind:          "Deployment",
+					Name:          "app",
+					CurrentSource: "auto_optimization",
+				},
+			}), nil
+		},
+	}
+	withMockWorkloadRuleClientSet(t, rec)
+
+	w := &WorkloadRule{}
+	resp, err := w.Read(context.Background(), infer.ReadRequest[WorkloadRuleArgs, WorkloadRuleState]{
+		ID: "rule-ag",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.Inputs.AutoGenerate == nil || !*resp.Inputs.AutoGenerate {
+		t.Error("AutoGenerate should be inferred true from current_source=auto_optimization")
+	}
+}
+
+func TestWorkloadRule_Read_AutoGenerate_NilWhenNotAutoOpt(t *testing.T) {
+	rec := &mockWorkloadRuleClient{
+		getFn: func(_ context.Context, _ *connect.Request[apiv1.GetWorkloadRuleByIDRequest]) (*connect.Response[apiv1.GetWorkloadRuleByIDResponse], error) {
+			return connect.NewResponse(&apiv1.GetWorkloadRuleByIDResponse{
+				Rule: &apiv1.WorkloadRule{
+					RuleId:        "rule-manual",
+					ClusterId:     "c",
+					Namespace:     "ns",
+					Kind:          "Deployment",
+					Name:          "app",
+					CurrentSource: "manual",
+				},
+			}), nil
+		},
+	}
+	withMockWorkloadRuleClientSet(t, rec)
+
+	w := &WorkloadRule{}
+	resp, err := w.Read(context.Background(), infer.ReadRequest[WorkloadRuleArgs, WorkloadRuleState]{
+		ID: "rule-manual",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.Inputs.AutoGenerate != nil {
+		t.Errorf("AutoGenerate should be nil for manual source, got %v", *resp.Inputs.AutoGenerate)
+	}
+}
+
+func TestWorkloadRule_Create_ContainerMaxScalePercent_Rejected(t *testing.T) {
+	maxUp := 50.0
+	w := &WorkloadRule{}
+	prev := clientset.Get()
+	clientset.Set(&clientset.ClientSet{TeamID: "team-test", RecommendationClient: &mockWorkloadRuleClient{}})
+	defer clientset.Set(prev)
+
+	_, err := w.Create(context.Background(), infer.CreateRequest[WorkloadRuleArgs]{
+		Inputs: WorkloadRuleArgs{
+			ClusterID: "c",
+			Namespace: "ns",
+			Kind:      "Deployment",
+			Name:      "app",
+			Containers: []ContainerResourceRuleConfigArgs{
+				{
+					ContainerName: "main",
+					CpuRule: &ResourceRuleConfigArgs{
+						MaxScaleUpPercent: &maxUp,
+					},
+				},
+			},
+		},
+	})
+	if err == nil {
+		t.Fatal("expected error when MaxScaleUpPercent is set on a container rule")
+	}
+}
+
+func TestWorkloadRule_Create_ContainerMaxScaleDownPercent_Rejected(t *testing.T) {
+	maxDown := 20.0
+	w := &WorkloadRule{}
+	prev := clientset.Get()
+	clientset.Set(&clientset.ClientSet{TeamID: "team-test", RecommendationClient: &mockWorkloadRuleClient{}})
+	defer clientset.Set(prev)
+
+	_, err := w.Create(context.Background(), infer.CreateRequest[WorkloadRuleArgs]{
+		Inputs: WorkloadRuleArgs{
+			ClusterID: "c",
+			Namespace: "ns",
+			Kind:      "Deployment",
+			Name:      "app",
+			Containers: []ContainerResourceRuleConfigArgs{
+				{
+					ContainerName: "main",
+					MemoryRule: &ResourceRuleConfigArgs{
+						MaxScaleDownPercent: &maxDown,
+					},
+				},
+			},
+		},
+	})
+	if err == nil {
+		t.Fatal("expected error when MaxScaleDownPercent is set on a container rule")
+	}
+}
+
 func ptrVal(f *float64) float64 {
 	if f == nil {
 		return 0

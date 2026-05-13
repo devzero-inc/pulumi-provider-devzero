@@ -154,6 +154,9 @@ type WorkloadRule struct{}
 // ---------- CRUD ----------
 
 func (w *WorkloadRule) Create(ctx context.Context, req infer.CreateRequest[WorkloadRuleArgs]) (infer.CreateResponse[WorkloadRuleState], error) {
+	if err := validateContainerRules(req.Inputs.Containers); err != nil {
+		return infer.CreateResponse[WorkloadRuleState]{}, err
+	}
 	if req.DryRun {
 		return infer.CreateResponse[WorkloadRuleState]{Output: WorkloadRuleState{WorkloadRuleArgs: req.Inputs}}, nil
 	}
@@ -171,9 +174,11 @@ func (w *WorkloadRule) Create(ctx context.Context, req infer.CreateRequest[Workl
 		return infer.CreateResponse[WorkloadRuleState]{}, fmt.Errorf("UpsertManualWorkloadRule: empty response from server")
 	}
 
+	out := ruleProtoToArgs(resp.Msg.Rule)
+	out.AutoGenerate = req.Inputs.AutoGenerate
 	return infer.CreateResponse[WorkloadRuleState]{
 		ID:     resp.Msg.Rule.RuleId,
-		Output: WorkloadRuleState{WorkloadRuleArgs: ruleProtoToArgs(resp.Msg.Rule)},
+		Output: WorkloadRuleState{WorkloadRuleArgs: out},
 	}, nil
 }
 
@@ -206,6 +211,9 @@ func (w *WorkloadRule) Read(ctx context.Context, req infer.ReadRequest[WorkloadR
 }
 
 func (w *WorkloadRule) Update(ctx context.Context, req infer.UpdateRequest[WorkloadRuleArgs, WorkloadRuleState]) (infer.UpdateResponse[WorkloadRuleState], error) {
+	if err := validateContainerRules(req.Inputs.Containers); err != nil {
+		return infer.UpdateResponse[WorkloadRuleState]{}, err
+	}
 	if req.DryRun {
 		return infer.UpdateResponse[WorkloadRuleState]{Output: WorkloadRuleState{WorkloadRuleArgs: req.Inputs}}, nil
 	}
@@ -223,8 +231,10 @@ func (w *WorkloadRule) Update(ctx context.Context, req infer.UpdateRequest[Workl
 		return infer.UpdateResponse[WorkloadRuleState]{}, fmt.Errorf("UpsertManualWorkloadRule: empty response from server")
 	}
 
+	out := ruleProtoToArgs(resp.Msg.Rule)
+	out.AutoGenerate = req.Inputs.AutoGenerate
 	return infer.UpdateResponse[WorkloadRuleState]{
-		Output: WorkloadRuleState{WorkloadRuleArgs: ruleProtoToArgs(resp.Msg.Rule)},
+		Output: WorkloadRuleState{WorkloadRuleArgs: out},
 	}, nil
 }
 
@@ -320,7 +330,31 @@ func ruleProtoToArgs(r *apiv1.WorkloadRule) WorkloadRuleArgs {
 	if r.DefragmentationSchedule != nil {
 		a.DefragmentationSchedule = r.DefragmentationSchedule
 	}
+	if r.CurrentSource == "auto_optimization" {
+		autoGen := true
+		a.AutoGenerate = &autoGen
+	}
 	return a
+}
+
+// validateContainerRules returns an error if any container rule uses fields that the
+// ContainerResourceConfig proto does not support (MaxScaleUpPercent, MaxScaleDownPercent).
+// Setting these would silently discard the values rather than applying them.
+func validateContainerRules(containers []ContainerResourceRuleConfigArgs) error {
+	for _, c := range containers {
+		for _, r := range []*ResourceRuleConfigArgs{c.CpuRule, c.MemoryRule, c.GpuRule} {
+			if r == nil {
+				continue
+			}
+			if r.MaxScaleUpPercent != nil {
+				return fmt.Errorf("devzero: maxScaleUpPercent is not supported on container-level rules (container %q) — set it on the workload-level cpuRule/memoryRule/gpuRule instead", c.ContainerName)
+			}
+			if r.MaxScaleDownPercent != nil {
+				return fmt.Errorf("devzero: maxScaleDownPercent is not supported on container-level rules (container %q) — set it on the workload-level cpuRule/memoryRule/gpuRule instead", c.ContainerName)
+			}
+		}
+	}
+	return nil
 }
 
 func resourceRuleConfigToProto(r *ResourceRuleConfigArgs) *apiv1.ResourceRuleConfig {
