@@ -9,7 +9,7 @@ SDK_GO       := sdk/go
 
 # VERSION is injected into the provider binary via ldflags. Falls back to
 # the latest git tag (stripped of a leading `v`), or "dev" when no tags exist.
-GIT_TAG      := $(shell git describe --tags --abbrev=0 2>/dev/null)
+GIT_TAG      := $(shell git describe --tags --abbrev=0 --match "v[0-9]*" 2>/dev/null)
 VERSION      ?= $(if $(GIT_TAG),$(patsubst v%,%,$(GIT_TAG)),dev)
 LDFLAGS      := -ldflags "-X main.version=$(VERSION)"
 
@@ -128,11 +128,12 @@ print('README.md injected into schema readme field')"
 
 .PHONY: gen-sdk
 gen-sdk: gen-schema
-	@echo "Backing up SDK files that gen-sdk deletes..."
-	@cp sdk/go/devzero/go.mod   /tmp/devzero-go.mod   2>/dev/null || true
-	@cp sdk/go/devzero/go.sum   /tmp/devzero-go.sum   2>/dev/null || true
-	@cp sdk/nodejs/.npmignore   /tmp/devzero-.npmignore 2>/dev/null || true
-	@cp sdk/nodejs/package-lock.json /tmp/devzero-package-lock.json 2>/dev/null || true
+	$(eval BACKUP_DIR := $(shell mktemp -d))
+	@echo "Backing up SDK files to $(BACKUP_DIR)..."
+	@cp sdk/go/devzero/go.mod            $(BACKUP_DIR)/go.mod            2>/dev/null || true
+	@cp sdk/go/devzero/go.sum            $(BACKUP_DIR)/go.sum            2>/dev/null || true
+	@cp sdk/nodejs/.npmignore            $(BACKUP_DIR)/.npmignore        2>/dev/null || true
+	@cp sdk/nodejs/package-lock.json     $(BACKUP_DIR)/package-lock.json 2>/dev/null || true
 	@echo "Generating TypeScript SDK..."
 	pulumi package gen-sdk --language nodejs --out sdk $(SCHEMA_FILE)
 	@echo "Patching sdk/nodejs/package.json..."
@@ -155,10 +156,11 @@ print('package.json patched')"
 	@echo "Generating Go SDK..."
 	pulumi package gen-sdk --language go     --out sdk $(SCHEMA_FILE)
 	@echo "Restoring SDK files deleted by gen-sdk..."
-	@cp /tmp/devzero-go.mod   sdk/go/devzero/go.mod   2>/dev/null || true
-	@cp /tmp/devzero-go.sum   sdk/go/devzero/go.sum   2>/dev/null || true
-	@cp /tmp/devzero-.npmignore sdk/nodejs/.npmignore  2>/dev/null || true
-	@cp /tmp/devzero-package-lock.json sdk/nodejs/package-lock.json 2>/dev/null || true
+	@cp $(BACKUP_DIR)/go.mod            sdk/go/devzero/go.mod        2>/dev/null || true
+	@cp $(BACKUP_DIR)/go.sum            sdk/go/devzero/go.sum        2>/dev/null || true
+	@cp $(BACKUP_DIR)/.npmignore        sdk/nodejs/.npmignore        2>/dev/null || true
+	@cp $(BACKUP_DIR)/package-lock.json sdk/nodejs/package-lock.json 2>/dev/null || true
+	@rm -rf $(BACKUP_DIR)
 	@echo "Copying README.md into SDK directories..."
 	cp README.md sdk/nodejs/README.md
 	cp README.md sdk/python/README.md
