@@ -121,12 +121,42 @@ print(f'Merged: {len(ex[\"resources\"])} resources, {len(ex[\"types\"])} types, 
 
 .PHONY: gen-sdk
 gen-sdk: gen-schema
+	$(eval BACKUP_DIR := $(shell mktemp -d))
+	@echo "Backing up SDK files to $(BACKUP_DIR)..."
+	@cp sdk/go/devzero/go.mod            $(BACKUP_DIR)/go.mod            2>/dev/null || true
+	@cp sdk/go/devzero/go.sum            $(BACKUP_DIR)/go.sum            2>/dev/null || true
+	@cp sdk/nodejs/.npmignore            $(BACKUP_DIR)/.npmignore        2>/dev/null || true
+	@cp sdk/nodejs/package-lock.json     $(BACKUP_DIR)/package-lock.json 2>/dev/null || true
 	@echo "Generating TypeScript SDK..."
 	pulumi package gen-sdk --language nodejs --out sdk $(SCHEMA_FILE)
+	@echo "Patching sdk/nodejs/package.json..."
+	python3 -c "\
+import json; \
+pkg=json.load(open('sdk/nodejs/package.json')); \
+ordered={}; \
+[ordered.update({k: pkg[k]}) for k in ['name','version','keywords','homepage','repository','license'] if k in pkg]; \
+ordered['main']='bin/index.js'; \
+ordered['types']='bin/index.d.ts'; \
+ordered['files']=['bin/', 'README.md']; \
+ordered['scripts']={'build': 'tsc && cp package.json bin/package.json'}; \
+ordered['dependencies']=pkg.get('dependencies',{}); \
+ordered['devDependencies']=dict(pkg.get('devDependencies',{}), **{'@types/node': '^18'}); \
+[ordered.update({k: pkg[k]}) for k in pkg if k not in ordered]; \
+f=open('sdk/nodejs/package.json','w'); f.write(json.dumps(ordered, indent=4)+'\n'); f.close(); \
+print('package.json patched')"
 	@echo "Generating Python SDK..."
 	pulumi package gen-sdk --language python --out sdk $(SCHEMA_FILE)
 	@echo "Generating Go SDK..."
 	pulumi package gen-sdk --language go     --out sdk $(SCHEMA_FILE)
+	@echo "Restoring SDK files deleted by gen-sdk..."
+	@cp $(BACKUP_DIR)/go.mod            sdk/go/devzero/go.mod        2>/dev/null || true
+	@cp $(BACKUP_DIR)/go.sum            sdk/go/devzero/go.sum        2>/dev/null || true
+	@cp $(BACKUP_DIR)/.npmignore        sdk/nodejs/.npmignore        2>/dev/null || true
+	@cp $(BACKUP_DIR)/package-lock.json sdk/nodejs/package-lock.json 2>/dev/null || true
+	@rm -rf $(BACKUP_DIR)
+	@echo "Copying README.md into SDK directories..."
+	cp README.md sdk/nodejs/README.md
+	cp README.md sdk/python/README.md
 	@echo "All SDKs generated."
 
 .PHONY: sdk
