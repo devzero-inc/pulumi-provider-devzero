@@ -199,13 +199,18 @@ service K8sRecommendationService {
 
     // MPA V3: Workload Rules (CRUD)
     rpc UpsertManualWorkloadRule(UpsertManualWorkloadRuleRequest) returns (UpsertManualWorkloadRuleResponse);
+    rpc PreviewWorkloadRule(PreviewWorkloadRuleRequest) returns (PreviewWorkloadRuleResponse);
     rpc GetWorkloadRulesByPolicy(GetWorkloadRulesByPolicyRequest) returns (GetWorkloadRulesByPolicyResponse);
     rpc ListWorkloadRules(ListWorkloadRulesRequest) returns (ListWorkloadRulesResponse);
     rpc GetWorkloadRuleByID(GetWorkloadRuleByIDRequest) returns (GetWorkloadRuleByIDResponse);
     rpc GetWorkloadRuleByWorkload(GetWorkloadRuleByWorkloadRequest) returns (GetWorkloadRuleByWorkloadResponse);
+    rpc GetWorkloadByWorkloadRule(GetWorkloadByWorkloadRuleRequest) returns (GetWorkloadByWorkloadRuleResponse);
     rpc DeleteWorkloadRule(DeleteWorkloadRuleRequest) returns (DeleteWorkloadRuleResponse);
     rpc GetWorkloadContainerNames(GetWorkloadContainerNamesRequest) returns (GetWorkloadContainerNamesResponse);
     rpc BatchAutoOptimizeWorkloads(BatchAutoOptimizeWorkloadsRequest) returns (BatchAutoOptimizeWorkloadsResponse);
+
+    // Get current node pool config status and recent apply history for a cluster
+    rpc GetNodeRecommendationStatus(GetNodeRecommendationStatusRequest) returns (GetNodeRecommendationStatusResponse);
 }
 
 message GetRecommendationsRequest {
@@ -719,11 +724,12 @@ message WorkloadPolicyTarget {
     optional RegexPattern name_pattern = 14;          // Target workloads by name pattern
     optional LabelSelector annotation_selector = 15;  // Target workloads by annotations
     repeated string workload_names = 16;              // Target specific workload kinds
+    optional RegexPattern namespace_pattern = 17;     // Target namespaces by name pattern
 
     repeated string node_group_names = 21;            // target workloads running on specific nodes
 
     repeated string cluster_ids = 31;
-    
+
     google.protobuf.Timestamp created_at = 51;
     google.protobuf.Timestamp updated_at = 52;
 }
@@ -746,6 +752,7 @@ message CreateWorkloadPolicyTargetRequest {
     optional LabelSelector annotation_selector = 15;   // Target workloads by annotations
     repeated string workload_names = 16;
     repeated string node_group_names = 17;
+    optional RegexPattern namespace_pattern = 18;      // Target namespaces by name pattern
 
     repeated string cluster_ids = 21;
 }
@@ -792,6 +799,7 @@ message UpdateWorkloadPolicyTargetRequest {
     optional LabelSelector annotation_selector = 15;   // Target workloads by annotations
     repeated string workload_names = 16;
     repeated string node_group_names = 17;
+    optional RegexPattern namespace_pattern = 18;      // Target namespaces by name pattern
 
     optional string policy_id = 21; // should only be set when target needs to be attached to diff policy
 
@@ -844,6 +852,7 @@ message PreviewWorkloadPolicyTargetMatchesRequest {
     optional LabelSelector annotation_selector = 7;   // Target workloads by annotations
     repeated string workload_names = 8;
     repeated string node_group_names = 9;
+    optional RegexPattern namespace_pattern = 10;     // Target namespaces by name pattern
 }
 
 message PreviewWorkloadPolicyTargetMatchesResponse {
@@ -862,6 +871,7 @@ message GetPreviewWorkloadPolicyTargetRecommendationsRequest {
     optional LabelSelector annotation_selector = 8;   // Target workloads by annotations
     repeated string workload_names = 9;
     repeated string node_group_names = 10;
+    optional RegexPattern namespace_pattern = 11;     // Target namespaces by name pattern
 
     bool include_deleted = 21;
 
@@ -1155,6 +1165,10 @@ message ContainerResourceConfig {
     optional float limit_multiplier = 5;
     bool limits_adjustment_enabled = 6;
     bool limits_removal_enabled = 7;
+    // Engine-selected target percentile for this container (0.0–1.0).
+    // Carried so the UI can surface profiling's per-container percentile
+    // pick alongside the workload-level chip.
+    optional float target_percentile = 8;
 }
 
 // Per-container resource rule config with CPU/Memory/GPU.
@@ -2379,6 +2393,7 @@ message TargetFilters {
   repeated string labels = 4;
   repeated K8sObjectKind kind_filter = 5;          // Target specific workload kinds
   optional RegexPattern name_pattern = 6;           // Target workloads by name pattern
+  optional RegexPattern namespace_pattern = 7;      // Target namespaces by name pattern
 }
 
 
@@ -3379,12 +3394,47 @@ message GetWorkloadRuleByWorkloadResponse {
     bool found = 4;            // true when a matching rule exists
 }
 
+// GetWorkloadByWorkloadRuleRequest resolves the live workload UID for a rule.
+// Lightweight lookup — does not return full workload data, just the uid that
+// downstream RPCs (e.g. GetWorkloadProfiles, GetWorkload) require.
+message GetWorkloadByWorkloadRuleRequest {
+    string team_id = 1;
+    string rule_id = 2;
+}
+
+message GetWorkloadByWorkloadRuleResponse {
+    string workload_uid = 1;   // empty when no live workload matches the rule's coordinates
+}
+
 message DeleteWorkloadRuleRequest {
     string team_id = 1;
     string rule_id = 2;
 }
 
 message DeleteWorkloadRuleResponse {}
+
+// ManualRuleFields carries the user-configurable rule fields shared by the
+// Upsert and Preview RPCs. Extracted as its own message so the two request
+// messages stay shape-aligned and the Go conversion logic has a single entry
+// point.
+message ManualRuleFields {
+    ResourceRuleConfig cpu_rule = 1;
+    ResourceRuleConfig memory_rule = 2;
+    ResourceRuleConfig gpu_rule = 3;
+    HPARuleConfig hpa_rule = 4;
+    EmergencyResponseConfig emergency_response = 5;
+    repeated ActionTrigger action_triggers = 6;
+    optional int64 startup_period_seconds = 7;
+    optional string cron_schedule = 8;
+    optional int32 cooldown_minutes = 9;
+    repeated WorkloadDetectionTrigger detection_triggers = 10;
+    repeated string scheduler_plugins = 11;
+    optional string defragmentation_schedule = 12;
+    bool live_migration_enabled = 13;
+    bool use_in_place_vertical_scaling = 14;
+    // Per-container resource configs (VPA). When empty, workload-level rules apply to all containers.
+    repeated ContainerResourceRuleConfig containers = 15;
+}
 
 message UpsertManualWorkloadRuleRequest {
     string team_id = 1;
@@ -3394,28 +3444,50 @@ message UpsertManualWorkloadRuleRequest {
     string name = 5;
     bool auto_generate = 6;
 
-    // Manual fields (only used when auto_generate = false)
-    ResourceRuleConfig cpu_rule = 10;
-    ResourceRuleConfig memory_rule = 11;
-    ResourceRuleConfig gpu_rule = 12;
-    HPARuleConfig hpa_rule = 13;
-    EmergencyResponseConfig emergency_response = 50;
-    repeated ActionTrigger action_triggers = 30;
-    optional int64 startup_period_seconds = 31;
-    optional string cron_schedule = 32;
-    optional int32 cooldown_minutes = 33;
-    repeated WorkloadDetectionTrigger detection_triggers = 34;
-    repeated string scheduler_plugins = 35;
-    optional string defragmentation_schedule = 36;
-    bool live_migration_enabled = 37;
-    bool use_in_place_vertical_scaling = 70;
-
-    // Per-container resource configs (VPA). When empty, workload-level rules apply to all containers.
-    repeated ContainerResourceRuleConfig containers = 90;
+    // Manual fields (only used when auto_generate = false).
+    ManualRuleFields fields = 10;
 }
 
 message UpsertManualWorkloadRuleResponse {
     WorkloadRule rule = 1;
+}
+
+// PreviewWorkloadRuleRequest mirrors the upsert request but does not
+// persist anything; returns a side-by-side preview instead.
+message PreviewWorkloadRuleRequest {
+    string team_id = 1;
+    string cluster_id = 2;
+    string namespace = 3;
+    string kind = 4;
+    string name = 5;
+    // Required so the server can fetch the workload's profile (percentiles,
+    // behavior). The form already has uid for any existing workload.
+    string workload_uid = 6;
+
+    ManualRuleFields fields = 10;
+}
+
+message PreviewWorkloadRuleResponse {
+    // Materialized rule — engine output overlaid with the user's draft as
+    // constraints (engine's BaseRequest clamped to user's min/max, multipliers
+    // overridden, etc.). When `fields` is empty/missing, equals engine_projection.
+    // Same shape as a saved rule.
+    WorkloadRule materialized_rule = 1;
+
+    // Engine projection — pure-engine recommendation (classification-driven,
+    // no user constraints). Stable benchmark; same maths Apply uses for auto.
+    // Empty when profile data is insufficient; see engine_projection_unavailable_reason.
+    WorkloadRule engine_projection = 2;
+
+    // Observed profile (per-container percentiles, behavior, classification,
+    // currently configured resources). Same shape as GetWorkloadProfiles
+    // single-workload result.
+    WorkloadProfileResult profile = 3;
+
+    // Set when the engine couldn't produce a projection (insufficient data,
+    // workload not yet emitting metrics, etc.). FE renders the materialized
+    // draft + observed view without an engine column.
+    string engine_projection_unavailable_reason = 4;
 }
 
 message GetWorkloadContainerNamesRequest {
@@ -3482,4 +3554,23 @@ message BatchWorkloadProfiles {
     repeated WorkloadProfileSnapshot profiles = 2;
     // emit_id matches the manifest emit_id for this cycle. Required.
     string emit_id = 3;
+}
+
+message NodeConfigApplyEvent {
+    string config_id = 1;
+    string cluster_id = 2;
+    string status = 3;
+    string error = 4;
+    google.protobuf.Timestamp applied_at = 5;
+}
+
+message GetNodeRecommendationStatusRequest {
+    string team_id = 1;
+    string cluster_id = 2;
+    int32 history_limit = 3;
+}
+
+message GetNodeRecommendationStatusResponse {
+    NodeRecommendationConfig current_config = 1;
+    repeated NodeConfigApplyEvent history = 2;
 }
