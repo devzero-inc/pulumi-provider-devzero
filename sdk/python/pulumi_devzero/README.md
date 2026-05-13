@@ -361,7 +361,7 @@ rule = devzero.resources.WorkloadRule("my-app-rule",
     name="my-api",
     cpu_rule=devzero.resources.ResourceRuleConfigArgsArgs(
         enabled=True,
-        min_request=100,    # 100m CPU
+        min_request=10,     # 10m CPU
         max_request=4000,   # 4 cores
         target_percentile=0.95,
         limits_adjustment_enabled=True,
@@ -369,8 +369,17 @@ rule = devzero.resources.WorkloadRule("my-app-rule",
     ),
     memory_rule=devzero.resources.ResourceRuleConfigArgsArgs(
         enabled=True,
-        min_request=134217728,   # 128 MiB
-        max_request=1073741824,  # 1 GiB
+        min_request=67108864,    # 64 MiB
+        max_request=536870912,   # 512 MiB
+    ),
+    emergency_response=devzero.resources.EmergencyResponseConfigArgsArgs(
+        oom_enabled=True,
+        oom_memory_multiplier=1.5,
+        oom_max_reactions=3,
+        oom_cooldown_seconds=60,
+        cpu_throttling_enabled=True,
+        cpu_throttling_threshold=0.1,
+        cpu_throttling_multiplier=1.25,
     ),
     action_triggers=["on_detection"],
     detection_triggers=["pod_creation", "pod_reschedule"],
@@ -449,7 +458,7 @@ pulumi.export("rule_id", rule.id)
 | Field | Type | Description |
 |---|---|---|
 | `oom_enabled` | `bool` | React to OOM kills by increasing memory |
-| `oom_memory_multiplier` | `float` | Multiplier applied to memory on OOM. Example: `2.0` |
+| `oom_memory_multiplier` | `float` | Multiplier applied to memory on OOM. Example: `1.5` |
 | `oom_max_reactions` | `int` | Max OOM reactions before giving up |
 | `oom_cooldown_seconds` | `int` | Seconds between OOM reactions |
 | `cpu_throttling_enabled` | `bool` | React to CPU throttling |

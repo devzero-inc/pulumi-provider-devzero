@@ -570,7 +570,7 @@ const rule = new resources.WorkloadRule("my-app-rule", {
 
     cpuRule: {
         enabled:                 true,
-        minRequest:              100,   // 100m CPU
+        minRequest:              10,    // 10m CPU
         maxRequest:              4000,  // 4 cores
         targetPercentile:        0.95,
         limitsAdjustmentEnabled: true,
@@ -578,8 +578,17 @@ const rule = new resources.WorkloadRule("my-app-rule", {
     },
     memoryRule: {
         enabled:    true,
-        minRequest: 134217728,   // 128 MiB
-        maxRequest: 1073741824,  // 1 GiB
+        minRequest: 67108864,    // 64 MiB
+        maxRequest: 536870912,   // 512 MiB
+    },
+    emergencyResponse: {
+        oomEnabled:             true,
+        oomMemoryMultiplier:    1.5,
+        oomMaxReactions:        3,
+        oomCooldownSeconds:     60,
+        cpuThrottlingEnabled:   true,
+        cpuThrottlingThreshold: 0.1,
+        cpuThrottlingMultiplier: 1.25,
     },
     actionTriggers: ["on_detection"],
     detectionTriggers: ["pod_creation", "pod_reschedule"],
@@ -610,6 +619,7 @@ import pulumi
 from pulumi_devzero.resources import (
     WorkloadRule, WorkloadRuleArgs,
     ResourceRuleConfigArgsArgs,
+    EmergencyResponseConfigArgsArgs,
 )
 
 # Pin explicit CPU + memory rules to a single Deployment
@@ -622,7 +632,7 @@ rule = WorkloadRule(
         name="my-api",
         cpu_rule=ResourceRuleConfigArgsArgs(
             enabled=True,
-            min_request=100,    # 100m CPU
+            min_request=10,     # 10m CPU
             max_request=4000,   # 4 cores
             target_percentile=0.95,
             limits_adjustment_enabled=True,
@@ -630,8 +640,17 @@ rule = WorkloadRule(
         ),
         memory_rule=ResourceRuleConfigArgsArgs(
             enabled=True,
-            min_request=134217728,   # 128 MiB
-            max_request=1073741824,  # 1 GiB
+            min_request=67108864,    # 64 MiB
+            max_request=536870912,   # 512 MiB
+        ),
+        emergency_response=EmergencyResponseConfigArgsArgs(
+            oom_enabled=True,
+            oom_memory_multiplier=1.5,
+            oom_max_reactions=3,
+            oom_cooldown_seconds=60,
+            cpu_throttling_enabled=True,
+            cpu_throttling_threshold=0.1,
+            cpu_throttling_multiplier=1.25,
         ),
         action_triggers=["on_detection"],
         detection_triggers=["pod_creation", "pod_reschedule"],
@@ -664,7 +683,7 @@ rule, err := resources.NewWorkloadRule(ctx, "my-app-rule", &resources.WorkloadRu
 
     CpuRule: resources.ResourceRuleConfigArgsArgs{
         Enabled:                 pulumi.BoolPtr(true),
-        MinRequest:              pulumi.IntPtr(100),   // 100m CPU
+        MinRequest:              pulumi.IntPtr(10),    // 10m CPU
         MaxRequest:              pulumi.IntPtr(4000),  // 4 cores
         TargetPercentile:        pulumi.Float64Ptr(0.95),
         LimitsAdjustmentEnabled: pulumi.BoolPtr(true),
@@ -672,9 +691,18 @@ rule, err := resources.NewWorkloadRule(ctx, "my-app-rule", &resources.WorkloadRu
     }.ToResourceRuleConfigArgsPtrOutput(),
     MemoryRule: resources.ResourceRuleConfigArgsArgs{
         Enabled:    pulumi.BoolPtr(true),
-        MinRequest: pulumi.IntPtr(134217728),  // 128 MiB
-        MaxRequest: pulumi.IntPtr(1073741824), // 1 GiB
+        MinRequest: pulumi.IntPtr(67108864),  // 64 MiB
+        MaxRequest: pulumi.IntPtr(536870912), // 512 MiB
     }.ToResourceRuleConfigArgsPtrOutput(),
+    EmergencyResponse: resources.EmergencyResponseConfigArgsArgs{
+        OomEnabled:              pulumi.BoolPtr(true),
+        OomMemoryMultiplier:     pulumi.Float64Ptr(1.5),
+        OomMaxReactions:         pulumi.IntPtr(3),
+        OomCooldownSeconds:      pulumi.IntPtr(60),
+        CpuThrottlingEnabled:    pulumi.BoolPtr(true),
+        CpuThrottlingThreshold:  pulumi.Float64Ptr(0.1),
+        CpuThrottlingMultiplier: pulumi.Float64Ptr(1.25),
+    }.ToEmergencyResponseConfigArgsPtrOutput(),
     ActionTriggers:    pulumi.StringArray{pulumi.String("on_detection")},
     DetectionTriggers: pulumi.StringArray{pulumi.String("pod_creation"), pulumi.String("pod_reschedule")},
     CooldownMinutes:   pulumi.IntPtr(60),
@@ -759,12 +787,12 @@ Used for `cpuRule`, `memoryRule`, and `gpuRule` at both the workload and per-con
 | Field | Type | Description |
 |---|---|---|
 | `oomEnabled` | bool | React to OOM kills by increasing memory requests |
-| `oomMemoryMultiplier` | float | Multiplier applied to memory on OOM. Example: `2.0` |
+| `oomMemoryMultiplier` | float | Multiplier applied to memory on OOM. Example: `1.5` |
 | `oomMaxReactions` | int | Maximum OOM reactions before giving up |
 | `oomCooldownSeconds` | int | Seconds to wait between OOM reactions |
 | `cpuThrottlingEnabled` | bool | React to CPU throttling by increasing CPU requests |
-| `cpuThrottlingThreshold` | float | Throttle ratio (0–1) that triggers a reaction. Example: `0.8` |
-| `cpuThrottlingMultiplier` | float | Multiplier applied to CPU request on throttle reaction. Example: `1.5` |
+| `cpuThrottlingThreshold` | float | Throttle ratio (0–1) that triggers a reaction. Example: `0.1` |
+| `cpuThrottlingMultiplier` | float | Multiplier applied to CPU request on throttle reaction. Example: `1.25` |
 
 ### ContainerResourceRuleConfigArgs
 

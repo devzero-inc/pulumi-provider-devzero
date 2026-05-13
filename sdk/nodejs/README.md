@@ -357,7 +357,7 @@ const rule = new resources.WorkloadRule("my-app-rule", {
 
     cpuRule: {
         enabled:                 true,
-        minRequest:              100,   // 100m CPU
+        minRequest:              10,    // 10m CPU
         maxRequest:              4000,  // 4 cores
         targetPercentile:        0.95,
         limitsAdjustmentEnabled: true,
@@ -365,8 +365,17 @@ const rule = new resources.WorkloadRule("my-app-rule", {
     },
     memoryRule: {
         enabled:    true,
-        minRequest: 134217728,   // 128 MiB
-        maxRequest: 1073741824,  // 1 GiB
+        minRequest: 67108864,    // 64 MiB
+        maxRequest: 536870912,   // 512 MiB
+    },
+    emergencyResponse: {
+        oomEnabled:              true,
+        oomMemoryMultiplier:     1.5,
+        oomMaxReactions:         3,
+        oomCooldownSeconds:      60,
+        cpuThrottlingEnabled:    true,
+        cpuThrottlingThreshold:  0.1,
+        cpuThrottlingMultiplier: 1.25,
     },
     actionTriggers:    ["on_detection"],
     detectionTriggers: ["pod_creation", "pod_reschedule"],
@@ -445,7 +454,7 @@ export const ruleId = rule.id;
 | Field | Type | Description |
 |---|---|---|
 | `oomEnabled` | `boolean` | React to OOM kills by increasing memory |
-| `oomMemoryMultiplier` | `number` | Multiplier applied to memory on OOM. Example: `2.0` |
+| `oomMemoryMultiplier` | `number` | Multiplier applied to memory on OOM. Example: `1.5` |
 | `oomMaxReactions` | `number` | Max OOM reactions before giving up |
 | `oomCooldownSeconds` | `number` | Seconds between OOM reactions |
 | `cpuThrottlingEnabled` | `boolean` | React to CPU throttling |
