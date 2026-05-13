@@ -1657,6 +1657,130 @@ func (o CapacityReservationSelectorTermArgsArrayOutput) Index(i pulumi.IntInput)
 	}).(CapacityReservationSelectorTermArgsOutput)
 }
 
+type ContainerResourceRuleConfigArgs struct {
+	// Name of the container this config applies to. Example: 'main'.
+	ContainerName string `pulumi:"containerName"`
+	// CPU resource rule for this container.
+	CpuRule *ResourceRuleConfigArgs `pulumi:"cpuRule"`
+	// GPU resource rule for this container.
+	GpuRule *ResourceRuleConfigArgs `pulumi:"gpuRule"`
+	// Memory resource rule for this container.
+	MemoryRule *ResourceRuleConfigArgs `pulumi:"memoryRule"`
+}
+
+// ContainerResourceRuleConfigArgsInput is an input type that accepts ContainerResourceRuleConfigArgsArgs and ContainerResourceRuleConfigArgsOutput values.
+// You can construct a concrete instance of `ContainerResourceRuleConfigArgsInput` via:
+//
+//	ContainerResourceRuleConfigArgsArgs{...}
+type ContainerResourceRuleConfigArgsInput interface {
+	pulumi.Input
+
+	ToContainerResourceRuleConfigArgsOutput() ContainerResourceRuleConfigArgsOutput
+	ToContainerResourceRuleConfigArgsOutputWithContext(context.Context) ContainerResourceRuleConfigArgsOutput
+}
+
+type ContainerResourceRuleConfigArgsArgs struct {
+	// Name of the container this config applies to. Example: 'main'.
+	ContainerName pulumi.StringInput `pulumi:"containerName"`
+	// CPU resource rule for this container.
+	CpuRule ResourceRuleConfigArgsPtrInput `pulumi:"cpuRule"`
+	// GPU resource rule for this container.
+	GpuRule ResourceRuleConfigArgsPtrInput `pulumi:"gpuRule"`
+	// Memory resource rule for this container.
+	MemoryRule ResourceRuleConfigArgsPtrInput `pulumi:"memoryRule"`
+}
+
+func (ContainerResourceRuleConfigArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*ContainerResourceRuleConfigArgs)(nil)).Elem()
+}
+
+func (i ContainerResourceRuleConfigArgsArgs) ToContainerResourceRuleConfigArgsOutput() ContainerResourceRuleConfigArgsOutput {
+	return i.ToContainerResourceRuleConfigArgsOutputWithContext(context.Background())
+}
+
+func (i ContainerResourceRuleConfigArgsArgs) ToContainerResourceRuleConfigArgsOutputWithContext(ctx context.Context) ContainerResourceRuleConfigArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(ContainerResourceRuleConfigArgsOutput)
+}
+
+// ContainerResourceRuleConfigArgsArrayInput is an input type that accepts ContainerResourceRuleConfigArgsArray and ContainerResourceRuleConfigArgsArrayOutput values.
+// You can construct a concrete instance of `ContainerResourceRuleConfigArgsArrayInput` via:
+//
+//	ContainerResourceRuleConfigArgsArray{ ContainerResourceRuleConfigArgsArgs{...} }
+type ContainerResourceRuleConfigArgsArrayInput interface {
+	pulumi.Input
+
+	ToContainerResourceRuleConfigArgsArrayOutput() ContainerResourceRuleConfigArgsArrayOutput
+	ToContainerResourceRuleConfigArgsArrayOutputWithContext(context.Context) ContainerResourceRuleConfigArgsArrayOutput
+}
+
+type ContainerResourceRuleConfigArgsArray []ContainerResourceRuleConfigArgsInput
+
+func (ContainerResourceRuleConfigArgsArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]ContainerResourceRuleConfigArgs)(nil)).Elem()
+}
+
+func (i ContainerResourceRuleConfigArgsArray) ToContainerResourceRuleConfigArgsArrayOutput() ContainerResourceRuleConfigArgsArrayOutput {
+	return i.ToContainerResourceRuleConfigArgsArrayOutputWithContext(context.Background())
+}
+
+func (i ContainerResourceRuleConfigArgsArray) ToContainerResourceRuleConfigArgsArrayOutputWithContext(ctx context.Context) ContainerResourceRuleConfigArgsArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(ContainerResourceRuleConfigArgsArrayOutput)
+}
+
+type ContainerResourceRuleConfigArgsOutput struct{ *pulumi.OutputState }
+
+func (ContainerResourceRuleConfigArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*ContainerResourceRuleConfigArgs)(nil)).Elem()
+}
+
+func (o ContainerResourceRuleConfigArgsOutput) ToContainerResourceRuleConfigArgsOutput() ContainerResourceRuleConfigArgsOutput {
+	return o
+}
+
+func (o ContainerResourceRuleConfigArgsOutput) ToContainerResourceRuleConfigArgsOutputWithContext(ctx context.Context) ContainerResourceRuleConfigArgsOutput {
+	return o
+}
+
+// Name of the container this config applies to. Example: 'main'.
+func (o ContainerResourceRuleConfigArgsOutput) ContainerName() pulumi.StringOutput {
+	return o.ApplyT(func(v ContainerResourceRuleConfigArgs) string { return v.ContainerName }).(pulumi.StringOutput)
+}
+
+// CPU resource rule for this container.
+func (o ContainerResourceRuleConfigArgsOutput) CpuRule() ResourceRuleConfigArgsPtrOutput {
+	return o.ApplyT(func(v ContainerResourceRuleConfigArgs) *ResourceRuleConfigArgs { return v.CpuRule }).(ResourceRuleConfigArgsPtrOutput)
+}
+
+// GPU resource rule for this container.
+func (o ContainerResourceRuleConfigArgsOutput) GpuRule() ResourceRuleConfigArgsPtrOutput {
+	return o.ApplyT(func(v ContainerResourceRuleConfigArgs) *ResourceRuleConfigArgs { return v.GpuRule }).(ResourceRuleConfigArgsPtrOutput)
+}
+
+// Memory resource rule for this container.
+func (o ContainerResourceRuleConfigArgsOutput) MemoryRule() ResourceRuleConfigArgsPtrOutput {
+	return o.ApplyT(func(v ContainerResourceRuleConfigArgs) *ResourceRuleConfigArgs { return v.MemoryRule }).(ResourceRuleConfigArgsPtrOutput)
+}
+
+type ContainerResourceRuleConfigArgsArrayOutput struct{ *pulumi.OutputState }
+
+func (ContainerResourceRuleConfigArgsArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]ContainerResourceRuleConfigArgs)(nil)).Elem()
+}
+
+func (o ContainerResourceRuleConfigArgsArrayOutput) ToContainerResourceRuleConfigArgsArrayOutput() ContainerResourceRuleConfigArgsArrayOutput {
+	return o
+}
+
+func (o ContainerResourceRuleConfigArgsArrayOutput) ToContainerResourceRuleConfigArgsArrayOutputWithContext(ctx context.Context) ContainerResourceRuleConfigArgsArrayOutput {
+	return o
+}
+
+func (o ContainerResourceRuleConfigArgsArrayOutput) Index(i pulumi.IntInput) ContainerResourceRuleConfigArgsOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) ContainerResourceRuleConfigArgs {
+		return vs[0].([]ContainerResourceRuleConfigArgs)[vs[1].(int)]
+	}).(ContainerResourceRuleConfigArgsOutput)
+}
+
 type DisruptionBudgetArgs struct {
 	// How long the budget window stays active after the cron fires. Example: '8h'.
 	Duration *string `pulumi:"duration"`
@@ -2011,6 +2135,489 @@ func (o DisruptionPolicyArgsPtrOutput) TtlSecondsAfterEmpty() pulumi.IntPtrOutpu
 		}
 		return v.TtlSecondsAfterEmpty
 	}).(pulumi.IntPtrOutput)
+}
+
+type EmergencyResponseConfigArgs struct {
+	// React to CPU throttling by increasing CPU request. Example: true.
+	CpuThrottlingEnabled *bool `pulumi:"cpuThrottlingEnabled"`
+	// Multiplier applied to CPU request on throttle reaction. Example: 1.5.
+	CpuThrottlingMultiplier *float64 `pulumi:"cpuThrottlingMultiplier"`
+	// Throttle ratio threshold that triggers a reaction (0-1). Example: 0.8.
+	CpuThrottlingThreshold *float64 `pulumi:"cpuThrottlingThreshold"`
+	// Seconds to wait between OOM reactions. Example: 60.
+	OomCooldownSeconds *int `pulumi:"oomCooldownSeconds"`
+	// React to OOM kills by increasing memory. Example: true.
+	OomEnabled *bool `pulumi:"oomEnabled"`
+	// Maximum number of OOM reactions before giving up. Example: 3.
+	OomMaxReactions *int `pulumi:"oomMaxReactions"`
+	// Multiplier applied to memory on OOM. Example: 2.0.
+	OomMemoryMultiplier *float64 `pulumi:"oomMemoryMultiplier"`
+}
+
+// EmergencyResponseConfigArgsInput is an input type that accepts EmergencyResponseConfigArgsArgs and EmergencyResponseConfigArgsOutput values.
+// You can construct a concrete instance of `EmergencyResponseConfigArgsInput` via:
+//
+//	EmergencyResponseConfigArgsArgs{...}
+type EmergencyResponseConfigArgsInput interface {
+	pulumi.Input
+
+	ToEmergencyResponseConfigArgsOutput() EmergencyResponseConfigArgsOutput
+	ToEmergencyResponseConfigArgsOutputWithContext(context.Context) EmergencyResponseConfigArgsOutput
+}
+
+type EmergencyResponseConfigArgsArgs struct {
+	// React to CPU throttling by increasing CPU request. Example: true.
+	CpuThrottlingEnabled pulumi.BoolPtrInput `pulumi:"cpuThrottlingEnabled"`
+	// Multiplier applied to CPU request on throttle reaction. Example: 1.5.
+	CpuThrottlingMultiplier pulumi.Float64PtrInput `pulumi:"cpuThrottlingMultiplier"`
+	// Throttle ratio threshold that triggers a reaction (0-1). Example: 0.8.
+	CpuThrottlingThreshold pulumi.Float64PtrInput `pulumi:"cpuThrottlingThreshold"`
+	// Seconds to wait between OOM reactions. Example: 60.
+	OomCooldownSeconds pulumi.IntPtrInput `pulumi:"oomCooldownSeconds"`
+	// React to OOM kills by increasing memory. Example: true.
+	OomEnabled pulumi.BoolPtrInput `pulumi:"oomEnabled"`
+	// Maximum number of OOM reactions before giving up. Example: 3.
+	OomMaxReactions pulumi.IntPtrInput `pulumi:"oomMaxReactions"`
+	// Multiplier applied to memory on OOM. Example: 2.0.
+	OomMemoryMultiplier pulumi.Float64PtrInput `pulumi:"oomMemoryMultiplier"`
+}
+
+func (EmergencyResponseConfigArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*EmergencyResponseConfigArgs)(nil)).Elem()
+}
+
+func (i EmergencyResponseConfigArgsArgs) ToEmergencyResponseConfigArgsOutput() EmergencyResponseConfigArgsOutput {
+	return i.ToEmergencyResponseConfigArgsOutputWithContext(context.Background())
+}
+
+func (i EmergencyResponseConfigArgsArgs) ToEmergencyResponseConfigArgsOutputWithContext(ctx context.Context) EmergencyResponseConfigArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(EmergencyResponseConfigArgsOutput)
+}
+
+func (i EmergencyResponseConfigArgsArgs) ToEmergencyResponseConfigArgsPtrOutput() EmergencyResponseConfigArgsPtrOutput {
+	return i.ToEmergencyResponseConfigArgsPtrOutputWithContext(context.Background())
+}
+
+func (i EmergencyResponseConfigArgsArgs) ToEmergencyResponseConfigArgsPtrOutputWithContext(ctx context.Context) EmergencyResponseConfigArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(EmergencyResponseConfigArgsOutput).ToEmergencyResponseConfigArgsPtrOutputWithContext(ctx)
+}
+
+// EmergencyResponseConfigArgsPtrInput is an input type that accepts EmergencyResponseConfigArgsArgs, EmergencyResponseConfigArgsPtr and EmergencyResponseConfigArgsPtrOutput values.
+// You can construct a concrete instance of `EmergencyResponseConfigArgsPtrInput` via:
+//
+//	        EmergencyResponseConfigArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type EmergencyResponseConfigArgsPtrInput interface {
+	pulumi.Input
+
+	ToEmergencyResponseConfigArgsPtrOutput() EmergencyResponseConfigArgsPtrOutput
+	ToEmergencyResponseConfigArgsPtrOutputWithContext(context.Context) EmergencyResponseConfigArgsPtrOutput
+}
+
+type emergencyResponseConfigArgsPtrType EmergencyResponseConfigArgsArgs
+
+func EmergencyResponseConfigArgsPtr(v *EmergencyResponseConfigArgsArgs) EmergencyResponseConfigArgsPtrInput {
+	return (*emergencyResponseConfigArgsPtrType)(v)
+}
+
+func (*emergencyResponseConfigArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**EmergencyResponseConfigArgs)(nil)).Elem()
+}
+
+func (i *emergencyResponseConfigArgsPtrType) ToEmergencyResponseConfigArgsPtrOutput() EmergencyResponseConfigArgsPtrOutput {
+	return i.ToEmergencyResponseConfigArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *emergencyResponseConfigArgsPtrType) ToEmergencyResponseConfigArgsPtrOutputWithContext(ctx context.Context) EmergencyResponseConfigArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(EmergencyResponseConfigArgsPtrOutput)
+}
+
+type EmergencyResponseConfigArgsOutput struct{ *pulumi.OutputState }
+
+func (EmergencyResponseConfigArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*EmergencyResponseConfigArgs)(nil)).Elem()
+}
+
+func (o EmergencyResponseConfigArgsOutput) ToEmergencyResponseConfigArgsOutput() EmergencyResponseConfigArgsOutput {
+	return o
+}
+
+func (o EmergencyResponseConfigArgsOutput) ToEmergencyResponseConfigArgsOutputWithContext(ctx context.Context) EmergencyResponseConfigArgsOutput {
+	return o
+}
+
+func (o EmergencyResponseConfigArgsOutput) ToEmergencyResponseConfigArgsPtrOutput() EmergencyResponseConfigArgsPtrOutput {
+	return o.ToEmergencyResponseConfigArgsPtrOutputWithContext(context.Background())
+}
+
+func (o EmergencyResponseConfigArgsOutput) ToEmergencyResponseConfigArgsPtrOutputWithContext(ctx context.Context) EmergencyResponseConfigArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v EmergencyResponseConfigArgs) *EmergencyResponseConfigArgs {
+		return &v
+	}).(EmergencyResponseConfigArgsPtrOutput)
+}
+
+// React to CPU throttling by increasing CPU request. Example: true.
+func (o EmergencyResponseConfigArgsOutput) CpuThrottlingEnabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v EmergencyResponseConfigArgs) *bool { return v.CpuThrottlingEnabled }).(pulumi.BoolPtrOutput)
+}
+
+// Multiplier applied to CPU request on throttle reaction. Example: 1.5.
+func (o EmergencyResponseConfigArgsOutput) CpuThrottlingMultiplier() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v EmergencyResponseConfigArgs) *float64 { return v.CpuThrottlingMultiplier }).(pulumi.Float64PtrOutput)
+}
+
+// Throttle ratio threshold that triggers a reaction (0-1). Example: 0.8.
+func (o EmergencyResponseConfigArgsOutput) CpuThrottlingThreshold() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v EmergencyResponseConfigArgs) *float64 { return v.CpuThrottlingThreshold }).(pulumi.Float64PtrOutput)
+}
+
+// Seconds to wait between OOM reactions. Example: 60.
+func (o EmergencyResponseConfigArgsOutput) OomCooldownSeconds() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v EmergencyResponseConfigArgs) *int { return v.OomCooldownSeconds }).(pulumi.IntPtrOutput)
+}
+
+// React to OOM kills by increasing memory. Example: true.
+func (o EmergencyResponseConfigArgsOutput) OomEnabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v EmergencyResponseConfigArgs) *bool { return v.OomEnabled }).(pulumi.BoolPtrOutput)
+}
+
+// Maximum number of OOM reactions before giving up. Example: 3.
+func (o EmergencyResponseConfigArgsOutput) OomMaxReactions() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v EmergencyResponseConfigArgs) *int { return v.OomMaxReactions }).(pulumi.IntPtrOutput)
+}
+
+// Multiplier applied to memory on OOM. Example: 2.0.
+func (o EmergencyResponseConfigArgsOutput) OomMemoryMultiplier() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v EmergencyResponseConfigArgs) *float64 { return v.OomMemoryMultiplier }).(pulumi.Float64PtrOutput)
+}
+
+type EmergencyResponseConfigArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (EmergencyResponseConfigArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**EmergencyResponseConfigArgs)(nil)).Elem()
+}
+
+func (o EmergencyResponseConfigArgsPtrOutput) ToEmergencyResponseConfigArgsPtrOutput() EmergencyResponseConfigArgsPtrOutput {
+	return o
+}
+
+func (o EmergencyResponseConfigArgsPtrOutput) ToEmergencyResponseConfigArgsPtrOutputWithContext(ctx context.Context) EmergencyResponseConfigArgsPtrOutput {
+	return o
+}
+
+func (o EmergencyResponseConfigArgsPtrOutput) Elem() EmergencyResponseConfigArgsOutput {
+	return o.ApplyT(func(v *EmergencyResponseConfigArgs) EmergencyResponseConfigArgs {
+		if v != nil {
+			return *v
+		}
+		var ret EmergencyResponseConfigArgs
+		return ret
+	}).(EmergencyResponseConfigArgsOutput)
+}
+
+// React to CPU throttling by increasing CPU request. Example: true.
+func (o EmergencyResponseConfigArgsPtrOutput) CpuThrottlingEnabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *EmergencyResponseConfigArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.CpuThrottlingEnabled
+	}).(pulumi.BoolPtrOutput)
+}
+
+// Multiplier applied to CPU request on throttle reaction. Example: 1.5.
+func (o EmergencyResponseConfigArgsPtrOutput) CpuThrottlingMultiplier() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *EmergencyResponseConfigArgs) *float64 {
+		if v == nil {
+			return nil
+		}
+		return v.CpuThrottlingMultiplier
+	}).(pulumi.Float64PtrOutput)
+}
+
+// Throttle ratio threshold that triggers a reaction (0-1). Example: 0.8.
+func (o EmergencyResponseConfigArgsPtrOutput) CpuThrottlingThreshold() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *EmergencyResponseConfigArgs) *float64 {
+		if v == nil {
+			return nil
+		}
+		return v.CpuThrottlingThreshold
+	}).(pulumi.Float64PtrOutput)
+}
+
+// Seconds to wait between OOM reactions. Example: 60.
+func (o EmergencyResponseConfigArgsPtrOutput) OomCooldownSeconds() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *EmergencyResponseConfigArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.OomCooldownSeconds
+	}).(pulumi.IntPtrOutput)
+}
+
+// React to OOM kills by increasing memory. Example: true.
+func (o EmergencyResponseConfigArgsPtrOutput) OomEnabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *EmergencyResponseConfigArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.OomEnabled
+	}).(pulumi.BoolPtrOutput)
+}
+
+// Maximum number of OOM reactions before giving up. Example: 3.
+func (o EmergencyResponseConfigArgsPtrOutput) OomMaxReactions() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *EmergencyResponseConfigArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.OomMaxReactions
+	}).(pulumi.IntPtrOutput)
+}
+
+// Multiplier applied to memory on OOM. Example: 2.0.
+func (o EmergencyResponseConfigArgsPtrOutput) OomMemoryMultiplier() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *EmergencyResponseConfigArgs) *float64 {
+		if v == nil {
+			return nil
+		}
+		return v.OomMemoryMultiplier
+	}).(pulumi.Float64PtrOutput)
+}
+
+type HPARuleConfigArgs struct {
+	// Enable horizontal (replica) scaling. Example: true.
+	Enabled *bool `pulumi:"enabled"`
+	// Maximum percentage change in replica count per cycle. Example: 50.0.
+	MaxReplicaChangePercent *float64 `pulumi:"maxReplicaChangePercent"`
+	// Maximum number of replicas. Example: 10.
+	MaxReplicas *int `pulumi:"maxReplicas"`
+	// Minimum number of replicas. Example: 2.
+	MinReplicas *int `pulumi:"minReplicas"`
+	// Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
+	PrimaryMetric *string `pulumi:"primaryMetric"`
+	// Target utilization ratio (0-1) for the primary metric. Example: 0.7.
+	TargetUtilization *float64 `pulumi:"targetUtilization"`
+}
+
+// HPARuleConfigArgsInput is an input type that accepts HPARuleConfigArgsArgs and HPARuleConfigArgsOutput values.
+// You can construct a concrete instance of `HPARuleConfigArgsInput` via:
+//
+//	HPARuleConfigArgsArgs{...}
+type HPARuleConfigArgsInput interface {
+	pulumi.Input
+
+	ToHPARuleConfigArgsOutput() HPARuleConfigArgsOutput
+	ToHPARuleConfigArgsOutputWithContext(context.Context) HPARuleConfigArgsOutput
+}
+
+type HPARuleConfigArgsArgs struct {
+	// Enable horizontal (replica) scaling. Example: true.
+	Enabled pulumi.BoolPtrInput `pulumi:"enabled"`
+	// Maximum percentage change in replica count per cycle. Example: 50.0.
+	MaxReplicaChangePercent pulumi.Float64PtrInput `pulumi:"maxReplicaChangePercent"`
+	// Maximum number of replicas. Example: 10.
+	MaxReplicas pulumi.IntPtrInput `pulumi:"maxReplicas"`
+	// Minimum number of replicas. Example: 2.
+	MinReplicas pulumi.IntPtrInput `pulumi:"minReplicas"`
+	// Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
+	PrimaryMetric pulumi.StringPtrInput `pulumi:"primaryMetric"`
+	// Target utilization ratio (0-1) for the primary metric. Example: 0.7.
+	TargetUtilization pulumi.Float64PtrInput `pulumi:"targetUtilization"`
+}
+
+func (HPARuleConfigArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*HPARuleConfigArgs)(nil)).Elem()
+}
+
+func (i HPARuleConfigArgsArgs) ToHPARuleConfigArgsOutput() HPARuleConfigArgsOutput {
+	return i.ToHPARuleConfigArgsOutputWithContext(context.Background())
+}
+
+func (i HPARuleConfigArgsArgs) ToHPARuleConfigArgsOutputWithContext(ctx context.Context) HPARuleConfigArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(HPARuleConfigArgsOutput)
+}
+
+func (i HPARuleConfigArgsArgs) ToHPARuleConfigArgsPtrOutput() HPARuleConfigArgsPtrOutput {
+	return i.ToHPARuleConfigArgsPtrOutputWithContext(context.Background())
+}
+
+func (i HPARuleConfigArgsArgs) ToHPARuleConfigArgsPtrOutputWithContext(ctx context.Context) HPARuleConfigArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(HPARuleConfigArgsOutput).ToHPARuleConfigArgsPtrOutputWithContext(ctx)
+}
+
+// HPARuleConfigArgsPtrInput is an input type that accepts HPARuleConfigArgsArgs, HPARuleConfigArgsPtr and HPARuleConfigArgsPtrOutput values.
+// You can construct a concrete instance of `HPARuleConfigArgsPtrInput` via:
+//
+//	        HPARuleConfigArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type HPARuleConfigArgsPtrInput interface {
+	pulumi.Input
+
+	ToHPARuleConfigArgsPtrOutput() HPARuleConfigArgsPtrOutput
+	ToHPARuleConfigArgsPtrOutputWithContext(context.Context) HPARuleConfigArgsPtrOutput
+}
+
+type hparuleConfigArgsPtrType HPARuleConfigArgsArgs
+
+func HPARuleConfigArgsPtr(v *HPARuleConfigArgsArgs) HPARuleConfigArgsPtrInput {
+	return (*hparuleConfigArgsPtrType)(v)
+}
+
+func (*hparuleConfigArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**HPARuleConfigArgs)(nil)).Elem()
+}
+
+func (i *hparuleConfigArgsPtrType) ToHPARuleConfigArgsPtrOutput() HPARuleConfigArgsPtrOutput {
+	return i.ToHPARuleConfigArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *hparuleConfigArgsPtrType) ToHPARuleConfigArgsPtrOutputWithContext(ctx context.Context) HPARuleConfigArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(HPARuleConfigArgsPtrOutput)
+}
+
+type HPARuleConfigArgsOutput struct{ *pulumi.OutputState }
+
+func (HPARuleConfigArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*HPARuleConfigArgs)(nil)).Elem()
+}
+
+func (o HPARuleConfigArgsOutput) ToHPARuleConfigArgsOutput() HPARuleConfigArgsOutput {
+	return o
+}
+
+func (o HPARuleConfigArgsOutput) ToHPARuleConfigArgsOutputWithContext(ctx context.Context) HPARuleConfigArgsOutput {
+	return o
+}
+
+func (o HPARuleConfigArgsOutput) ToHPARuleConfigArgsPtrOutput() HPARuleConfigArgsPtrOutput {
+	return o.ToHPARuleConfigArgsPtrOutputWithContext(context.Background())
+}
+
+func (o HPARuleConfigArgsOutput) ToHPARuleConfigArgsPtrOutputWithContext(ctx context.Context) HPARuleConfigArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v HPARuleConfigArgs) *HPARuleConfigArgs {
+		return &v
+	}).(HPARuleConfigArgsPtrOutput)
+}
+
+// Enable horizontal (replica) scaling. Example: true.
+func (o HPARuleConfigArgsOutput) Enabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v HPARuleConfigArgs) *bool { return v.Enabled }).(pulumi.BoolPtrOutput)
+}
+
+// Maximum percentage change in replica count per cycle. Example: 50.0.
+func (o HPARuleConfigArgsOutput) MaxReplicaChangePercent() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v HPARuleConfigArgs) *float64 { return v.MaxReplicaChangePercent }).(pulumi.Float64PtrOutput)
+}
+
+// Maximum number of replicas. Example: 10.
+func (o HPARuleConfigArgsOutput) MaxReplicas() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v HPARuleConfigArgs) *int { return v.MaxReplicas }).(pulumi.IntPtrOutput)
+}
+
+// Minimum number of replicas. Example: 2.
+func (o HPARuleConfigArgsOutput) MinReplicas() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v HPARuleConfigArgs) *int { return v.MinReplicas }).(pulumi.IntPtrOutput)
+}
+
+// Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
+func (o HPARuleConfigArgsOutput) PrimaryMetric() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v HPARuleConfigArgs) *string { return v.PrimaryMetric }).(pulumi.StringPtrOutput)
+}
+
+// Target utilization ratio (0-1) for the primary metric. Example: 0.7.
+func (o HPARuleConfigArgsOutput) TargetUtilization() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v HPARuleConfigArgs) *float64 { return v.TargetUtilization }).(pulumi.Float64PtrOutput)
+}
+
+type HPARuleConfigArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (HPARuleConfigArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**HPARuleConfigArgs)(nil)).Elem()
+}
+
+func (o HPARuleConfigArgsPtrOutput) ToHPARuleConfigArgsPtrOutput() HPARuleConfigArgsPtrOutput {
+	return o
+}
+
+func (o HPARuleConfigArgsPtrOutput) ToHPARuleConfigArgsPtrOutputWithContext(ctx context.Context) HPARuleConfigArgsPtrOutput {
+	return o
+}
+
+func (o HPARuleConfigArgsPtrOutput) Elem() HPARuleConfigArgsOutput {
+	return o.ApplyT(func(v *HPARuleConfigArgs) HPARuleConfigArgs {
+		if v != nil {
+			return *v
+		}
+		var ret HPARuleConfigArgs
+		return ret
+	}).(HPARuleConfigArgsOutput)
+}
+
+// Enable horizontal (replica) scaling. Example: true.
+func (o HPARuleConfigArgsPtrOutput) Enabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *HPARuleConfigArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.Enabled
+	}).(pulumi.BoolPtrOutput)
+}
+
+// Maximum percentage change in replica count per cycle. Example: 50.0.
+func (o HPARuleConfigArgsPtrOutput) MaxReplicaChangePercent() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *HPARuleConfigArgs) *float64 {
+		if v == nil {
+			return nil
+		}
+		return v.MaxReplicaChangePercent
+	}).(pulumi.Float64PtrOutput)
+}
+
+// Maximum number of replicas. Example: 10.
+func (o HPARuleConfigArgsPtrOutput) MaxReplicas() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *HPARuleConfigArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.MaxReplicas
+	}).(pulumi.IntPtrOutput)
+}
+
+// Minimum number of replicas. Example: 2.
+func (o HPARuleConfigArgsPtrOutput) MinReplicas() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *HPARuleConfigArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.MinReplicas
+	}).(pulumi.IntPtrOutput)
+}
+
+// Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
+func (o HPARuleConfigArgsPtrOutput) PrimaryMetric() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *HPARuleConfigArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.PrimaryMetric
+	}).(pulumi.StringPtrOutput)
+}
+
+// Target utilization ratio (0-1) for the primary metric. Example: 0.7.
+func (o HPARuleConfigArgsPtrOutput) TargetUtilization() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *HPARuleConfigArgs) *float64 {
+		if v == nil {
+			return nil
+		}
+		return v.TargetUtilization
+	}).(pulumi.Float64PtrOutput)
 }
 
 type HorizontalScalingArgs struct {
@@ -3493,6 +4100,295 @@ func (o ResourceLimitsArgsPtrOutput) Memory() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
+type ResourceRuleConfigArgs struct {
+	// Enable this resource axis rule. Example: true.
+	Enabled *bool `pulumi:"enabled"`
+	// Multiplier applied to the request to derive the resource limit. Example: 1.5.
+	LimitMultiplier *float64 `pulumi:"limitMultiplier"`
+	// Whether to also adjust resource limits alongside requests. Example: true.
+	LimitsAdjustmentEnabled *bool `pulumi:"limitsAdjustmentEnabled"`
+	// Actively remove limits from workloads. Example: false.
+	LimitsRemovalEnabled *bool `pulumi:"limitsRemovalEnabled"`
+	// Maximum resource request (millicores for CPU, bytes for memory/GPU). Example: 4000.
+	MaxRequest *int `pulumi:"maxRequest"`
+	// Maximum percentage decrease allowed in a single cycle. Example: 20.0.
+	MaxScaleDownPercent *float64 `pulumi:"maxScaleDownPercent"`
+	// Maximum percentage increase allowed in a single cycle. Example: 50.0.
+	MaxScaleUpPercent *float64 `pulumi:"maxScaleUpPercent"`
+	// Minimum resource request (millicores for CPU, bytes for memory/GPU). Example: 100.
+	MinRequest *int `pulumi:"minRequest"`
+	// Percentile of usage data used as the recommendation target (0-1). Example: 0.95.
+	TargetPercentile *float64 `pulumi:"targetPercentile"`
+}
+
+// ResourceRuleConfigArgsInput is an input type that accepts ResourceRuleConfigArgsArgs and ResourceRuleConfigArgsOutput values.
+// You can construct a concrete instance of `ResourceRuleConfigArgsInput` via:
+//
+//	ResourceRuleConfigArgsArgs{...}
+type ResourceRuleConfigArgsInput interface {
+	pulumi.Input
+
+	ToResourceRuleConfigArgsOutput() ResourceRuleConfigArgsOutput
+	ToResourceRuleConfigArgsOutputWithContext(context.Context) ResourceRuleConfigArgsOutput
+}
+
+type ResourceRuleConfigArgsArgs struct {
+	// Enable this resource axis rule. Example: true.
+	Enabled pulumi.BoolPtrInput `pulumi:"enabled"`
+	// Multiplier applied to the request to derive the resource limit. Example: 1.5.
+	LimitMultiplier pulumi.Float64PtrInput `pulumi:"limitMultiplier"`
+	// Whether to also adjust resource limits alongside requests. Example: true.
+	LimitsAdjustmentEnabled pulumi.BoolPtrInput `pulumi:"limitsAdjustmentEnabled"`
+	// Actively remove limits from workloads. Example: false.
+	LimitsRemovalEnabled pulumi.BoolPtrInput `pulumi:"limitsRemovalEnabled"`
+	// Maximum resource request (millicores for CPU, bytes for memory/GPU). Example: 4000.
+	MaxRequest pulumi.IntPtrInput `pulumi:"maxRequest"`
+	// Maximum percentage decrease allowed in a single cycle. Example: 20.0.
+	MaxScaleDownPercent pulumi.Float64PtrInput `pulumi:"maxScaleDownPercent"`
+	// Maximum percentage increase allowed in a single cycle. Example: 50.0.
+	MaxScaleUpPercent pulumi.Float64PtrInput `pulumi:"maxScaleUpPercent"`
+	// Minimum resource request (millicores for CPU, bytes for memory/GPU). Example: 100.
+	MinRequest pulumi.IntPtrInput `pulumi:"minRequest"`
+	// Percentile of usage data used as the recommendation target (0-1). Example: 0.95.
+	TargetPercentile pulumi.Float64PtrInput `pulumi:"targetPercentile"`
+}
+
+func (ResourceRuleConfigArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*ResourceRuleConfigArgs)(nil)).Elem()
+}
+
+func (i ResourceRuleConfigArgsArgs) ToResourceRuleConfigArgsOutput() ResourceRuleConfigArgsOutput {
+	return i.ToResourceRuleConfigArgsOutputWithContext(context.Background())
+}
+
+func (i ResourceRuleConfigArgsArgs) ToResourceRuleConfigArgsOutputWithContext(ctx context.Context) ResourceRuleConfigArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(ResourceRuleConfigArgsOutput)
+}
+
+func (i ResourceRuleConfigArgsArgs) ToResourceRuleConfigArgsPtrOutput() ResourceRuleConfigArgsPtrOutput {
+	return i.ToResourceRuleConfigArgsPtrOutputWithContext(context.Background())
+}
+
+func (i ResourceRuleConfigArgsArgs) ToResourceRuleConfigArgsPtrOutputWithContext(ctx context.Context) ResourceRuleConfigArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(ResourceRuleConfigArgsOutput).ToResourceRuleConfigArgsPtrOutputWithContext(ctx)
+}
+
+// ResourceRuleConfigArgsPtrInput is an input type that accepts ResourceRuleConfigArgsArgs, ResourceRuleConfigArgsPtr and ResourceRuleConfigArgsPtrOutput values.
+// You can construct a concrete instance of `ResourceRuleConfigArgsPtrInput` via:
+//
+//	        ResourceRuleConfigArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type ResourceRuleConfigArgsPtrInput interface {
+	pulumi.Input
+
+	ToResourceRuleConfigArgsPtrOutput() ResourceRuleConfigArgsPtrOutput
+	ToResourceRuleConfigArgsPtrOutputWithContext(context.Context) ResourceRuleConfigArgsPtrOutput
+}
+
+type resourceRuleConfigArgsPtrType ResourceRuleConfigArgsArgs
+
+func ResourceRuleConfigArgsPtr(v *ResourceRuleConfigArgsArgs) ResourceRuleConfigArgsPtrInput {
+	return (*resourceRuleConfigArgsPtrType)(v)
+}
+
+func (*resourceRuleConfigArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**ResourceRuleConfigArgs)(nil)).Elem()
+}
+
+func (i *resourceRuleConfigArgsPtrType) ToResourceRuleConfigArgsPtrOutput() ResourceRuleConfigArgsPtrOutput {
+	return i.ToResourceRuleConfigArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *resourceRuleConfigArgsPtrType) ToResourceRuleConfigArgsPtrOutputWithContext(ctx context.Context) ResourceRuleConfigArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(ResourceRuleConfigArgsPtrOutput)
+}
+
+type ResourceRuleConfigArgsOutput struct{ *pulumi.OutputState }
+
+func (ResourceRuleConfigArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*ResourceRuleConfigArgs)(nil)).Elem()
+}
+
+func (o ResourceRuleConfigArgsOutput) ToResourceRuleConfigArgsOutput() ResourceRuleConfigArgsOutput {
+	return o
+}
+
+func (o ResourceRuleConfigArgsOutput) ToResourceRuleConfigArgsOutputWithContext(ctx context.Context) ResourceRuleConfigArgsOutput {
+	return o
+}
+
+func (o ResourceRuleConfigArgsOutput) ToResourceRuleConfigArgsPtrOutput() ResourceRuleConfigArgsPtrOutput {
+	return o.ToResourceRuleConfigArgsPtrOutputWithContext(context.Background())
+}
+
+func (o ResourceRuleConfigArgsOutput) ToResourceRuleConfigArgsPtrOutputWithContext(ctx context.Context) ResourceRuleConfigArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v ResourceRuleConfigArgs) *ResourceRuleConfigArgs {
+		return &v
+	}).(ResourceRuleConfigArgsPtrOutput)
+}
+
+// Enable this resource axis rule. Example: true.
+func (o ResourceRuleConfigArgsOutput) Enabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v ResourceRuleConfigArgs) *bool { return v.Enabled }).(pulumi.BoolPtrOutput)
+}
+
+// Multiplier applied to the request to derive the resource limit. Example: 1.5.
+func (o ResourceRuleConfigArgsOutput) LimitMultiplier() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v ResourceRuleConfigArgs) *float64 { return v.LimitMultiplier }).(pulumi.Float64PtrOutput)
+}
+
+// Whether to also adjust resource limits alongside requests. Example: true.
+func (o ResourceRuleConfigArgsOutput) LimitsAdjustmentEnabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v ResourceRuleConfigArgs) *bool { return v.LimitsAdjustmentEnabled }).(pulumi.BoolPtrOutput)
+}
+
+// Actively remove limits from workloads. Example: false.
+func (o ResourceRuleConfigArgsOutput) LimitsRemovalEnabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v ResourceRuleConfigArgs) *bool { return v.LimitsRemovalEnabled }).(pulumi.BoolPtrOutput)
+}
+
+// Maximum resource request (millicores for CPU, bytes for memory/GPU). Example: 4000.
+func (o ResourceRuleConfigArgsOutput) MaxRequest() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v ResourceRuleConfigArgs) *int { return v.MaxRequest }).(pulumi.IntPtrOutput)
+}
+
+// Maximum percentage decrease allowed in a single cycle. Example: 20.0.
+func (o ResourceRuleConfigArgsOutput) MaxScaleDownPercent() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v ResourceRuleConfigArgs) *float64 { return v.MaxScaleDownPercent }).(pulumi.Float64PtrOutput)
+}
+
+// Maximum percentage increase allowed in a single cycle. Example: 50.0.
+func (o ResourceRuleConfigArgsOutput) MaxScaleUpPercent() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v ResourceRuleConfigArgs) *float64 { return v.MaxScaleUpPercent }).(pulumi.Float64PtrOutput)
+}
+
+// Minimum resource request (millicores for CPU, bytes for memory/GPU). Example: 100.
+func (o ResourceRuleConfigArgsOutput) MinRequest() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v ResourceRuleConfigArgs) *int { return v.MinRequest }).(pulumi.IntPtrOutput)
+}
+
+// Percentile of usage data used as the recommendation target (0-1). Example: 0.95.
+func (o ResourceRuleConfigArgsOutput) TargetPercentile() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v ResourceRuleConfigArgs) *float64 { return v.TargetPercentile }).(pulumi.Float64PtrOutput)
+}
+
+type ResourceRuleConfigArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (ResourceRuleConfigArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**ResourceRuleConfigArgs)(nil)).Elem()
+}
+
+func (o ResourceRuleConfigArgsPtrOutput) ToResourceRuleConfigArgsPtrOutput() ResourceRuleConfigArgsPtrOutput {
+	return o
+}
+
+func (o ResourceRuleConfigArgsPtrOutput) ToResourceRuleConfigArgsPtrOutputWithContext(ctx context.Context) ResourceRuleConfigArgsPtrOutput {
+	return o
+}
+
+func (o ResourceRuleConfigArgsPtrOutput) Elem() ResourceRuleConfigArgsOutput {
+	return o.ApplyT(func(v *ResourceRuleConfigArgs) ResourceRuleConfigArgs {
+		if v != nil {
+			return *v
+		}
+		var ret ResourceRuleConfigArgs
+		return ret
+	}).(ResourceRuleConfigArgsOutput)
+}
+
+// Enable this resource axis rule. Example: true.
+func (o ResourceRuleConfigArgsPtrOutput) Enabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *ResourceRuleConfigArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.Enabled
+	}).(pulumi.BoolPtrOutput)
+}
+
+// Multiplier applied to the request to derive the resource limit. Example: 1.5.
+func (o ResourceRuleConfigArgsPtrOutput) LimitMultiplier() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *ResourceRuleConfigArgs) *float64 {
+		if v == nil {
+			return nil
+		}
+		return v.LimitMultiplier
+	}).(pulumi.Float64PtrOutput)
+}
+
+// Whether to also adjust resource limits alongside requests. Example: true.
+func (o ResourceRuleConfigArgsPtrOutput) LimitsAdjustmentEnabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *ResourceRuleConfigArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.LimitsAdjustmentEnabled
+	}).(pulumi.BoolPtrOutput)
+}
+
+// Actively remove limits from workloads. Example: false.
+func (o ResourceRuleConfigArgsPtrOutput) LimitsRemovalEnabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *ResourceRuleConfigArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.LimitsRemovalEnabled
+	}).(pulumi.BoolPtrOutput)
+}
+
+// Maximum resource request (millicores for CPU, bytes for memory/GPU). Example: 4000.
+func (o ResourceRuleConfigArgsPtrOutput) MaxRequest() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *ResourceRuleConfigArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.MaxRequest
+	}).(pulumi.IntPtrOutput)
+}
+
+// Maximum percentage decrease allowed in a single cycle. Example: 20.0.
+func (o ResourceRuleConfigArgsPtrOutput) MaxScaleDownPercent() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *ResourceRuleConfigArgs) *float64 {
+		if v == nil {
+			return nil
+		}
+		return v.MaxScaleDownPercent
+	}).(pulumi.Float64PtrOutput)
+}
+
+// Maximum percentage increase allowed in a single cycle. Example: 50.0.
+func (o ResourceRuleConfigArgsPtrOutput) MaxScaleUpPercent() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *ResourceRuleConfigArgs) *float64 {
+		if v == nil {
+			return nil
+		}
+		return v.MaxScaleUpPercent
+	}).(pulumi.Float64PtrOutput)
+}
+
+// Minimum resource request (millicores for CPU, bytes for memory/GPU). Example: 100.
+func (o ResourceRuleConfigArgsPtrOutput) MinRequest() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *ResourceRuleConfigArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.MinRequest
+	}).(pulumi.IntPtrOutput)
+}
+
+// Percentile of usage data used as the recommendation target (0-1). Example: 0.95.
+func (o ResourceRuleConfigArgsPtrOutput) TargetPercentile() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *ResourceRuleConfigArgs) *float64 {
+		if v == nil {
+			return nil
+		}
+		return v.TargetPercentile
+	}).(pulumi.Float64PtrOutput)
+}
+
 type SecurityGroupSelectorTermArgs struct {
 	// Explicit AWS security group ID. Example: 'sg-0a1b2c3d4e5f'.
 	Id *string `pulumi:"id"`
@@ -4228,10 +5124,16 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*BlockDeviceMappingArgsArrayInput)(nil)).Elem(), BlockDeviceMappingArgsArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*CapacityReservationSelectorTermArgsInput)(nil)).Elem(), CapacityReservationSelectorTermArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*CapacityReservationSelectorTermArgsArrayInput)(nil)).Elem(), CapacityReservationSelectorTermArgsArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*ContainerResourceRuleConfigArgsInput)(nil)).Elem(), ContainerResourceRuleConfigArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*ContainerResourceRuleConfigArgsArrayInput)(nil)).Elem(), ContainerResourceRuleConfigArgsArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DisruptionBudgetArgsInput)(nil)).Elem(), DisruptionBudgetArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DisruptionBudgetArgsArrayInput)(nil)).Elem(), DisruptionBudgetArgsArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DisruptionPolicyArgsInput)(nil)).Elem(), DisruptionPolicyArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DisruptionPolicyArgsPtrInput)(nil)).Elem(), DisruptionPolicyArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*EmergencyResponseConfigArgsInput)(nil)).Elem(), EmergencyResponseConfigArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*EmergencyResponseConfigArgsPtrInput)(nil)).Elem(), EmergencyResponseConfigArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*HPARuleConfigArgsInput)(nil)).Elem(), HPARuleConfigArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*HPARuleConfigArgsPtrInput)(nil)).Elem(), HPARuleConfigArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HorizontalScalingArgsInput)(nil)).Elem(), HorizontalScalingArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HorizontalScalingArgsPtrInput)(nil)).Elem(), HorizontalScalingArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*KubeletConfigurationArgsInput)(nil)).Elem(), KubeletConfigurationArgsArgs{})
@@ -4248,6 +5150,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*RawKarpenterSpecArgsArrayInput)(nil)).Elem(), RawKarpenterSpecArgsArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*ResourceLimitsArgsInput)(nil)).Elem(), ResourceLimitsArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*ResourceLimitsArgsPtrInput)(nil)).Elem(), ResourceLimitsArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*ResourceRuleConfigArgsInput)(nil)).Elem(), ResourceRuleConfigArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*ResourceRuleConfigArgsPtrInput)(nil)).Elem(), ResourceRuleConfigArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SecurityGroupSelectorTermArgsInput)(nil)).Elem(), SecurityGroupSelectorTermArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SecurityGroupSelectorTermArgsArrayInput)(nil)).Elem(), SecurityGroupSelectorTermArgsArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SubnetSelectorTermArgsInput)(nil)).Elem(), SubnetSelectorTermArgsArgs{})
@@ -4270,10 +5174,16 @@ func init() {
 	pulumi.RegisterOutputType(BlockDeviceMappingArgsArrayOutput{})
 	pulumi.RegisterOutputType(CapacityReservationSelectorTermArgsOutput{})
 	pulumi.RegisterOutputType(CapacityReservationSelectorTermArgsArrayOutput{})
+	pulumi.RegisterOutputType(ContainerResourceRuleConfigArgsOutput{})
+	pulumi.RegisterOutputType(ContainerResourceRuleConfigArgsArrayOutput{})
 	pulumi.RegisterOutputType(DisruptionBudgetArgsOutput{})
 	pulumi.RegisterOutputType(DisruptionBudgetArgsArrayOutput{})
 	pulumi.RegisterOutputType(DisruptionPolicyArgsOutput{})
 	pulumi.RegisterOutputType(DisruptionPolicyArgsPtrOutput{})
+	pulumi.RegisterOutputType(EmergencyResponseConfigArgsOutput{})
+	pulumi.RegisterOutputType(EmergencyResponseConfigArgsPtrOutput{})
+	pulumi.RegisterOutputType(HPARuleConfigArgsOutput{})
+	pulumi.RegisterOutputType(HPARuleConfigArgsPtrOutput{})
 	pulumi.RegisterOutputType(HorizontalScalingArgsOutput{})
 	pulumi.RegisterOutputType(HorizontalScalingArgsPtrOutput{})
 	pulumi.RegisterOutputType(KubeletConfigurationArgsOutput{})
@@ -4290,6 +5200,8 @@ func init() {
 	pulumi.RegisterOutputType(RawKarpenterSpecArgsArrayOutput{})
 	pulumi.RegisterOutputType(ResourceLimitsArgsOutput{})
 	pulumi.RegisterOutputType(ResourceLimitsArgsPtrOutput{})
+	pulumi.RegisterOutputType(ResourceRuleConfigArgsOutput{})
+	pulumi.RegisterOutputType(ResourceRuleConfigArgsPtrOutput{})
 	pulumi.RegisterOutputType(SecurityGroupSelectorTermArgsOutput{})
 	pulumi.RegisterOutputType(SecurityGroupSelectorTermArgsArrayOutput{})
 	pulumi.RegisterOutputType(SubnetSelectorTermArgsOutput{})

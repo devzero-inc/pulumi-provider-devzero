@@ -9,6 +9,7 @@ The official [Pulumi](https://www.pulumi.com/) provider for [DevZero](https://de
 | `Cluster` | Provision and manage a DevZero cluster |
 | `WorkloadPolicy` | Configure vertical/horizontal scaling policies for workloads |
 | `WorkloadPolicyTarget` | Apply a workload policy to one or more clusters with filters |
+| `WorkloadRule` | Pin explicit resource rules to a specific workload (MPA v3) |
 | `NodePolicy` | Configure node provisioning and pooling (AWS / Azure) |
 | `NodePolicyTarget` | Apply a node policy to one or more clusters |
 
@@ -547,6 +548,260 @@ pulumi stack rm <stack-name>
 |---|---|---|
 | `nodepoolYaml` | string | Raw YAML for a complete Karpenter NodePool resource |
 | `nodeclassYaml` | string | Raw YAML for a complete Karpenter NodeClass resource |
+
+## WorkloadRule
+
+A `WorkloadRule` pins explicit resource rules directly to a single workload (a specific `kind/namespace/name` on a cluster). Unlike `WorkloadPolicy`, which applies a shared policy to many workloads via a `WorkloadPolicyTarget`, a `WorkloadRule` targets one workload and lets you override CPU, memory, GPU, and HPA settings with precise values.
+
+Set `autoGenerate: true` to have the engine automatically compute all rule fields from observed usage. Omit it (or set it to `false`) to provide your own values via `cpuRule`, `memoryRule`, `hpaRule`, etc.
+
+### TypeScript
+
+```typescript
+import * as pulumi from "@pulumi/pulumi";
+import { resources } from "@devzero/pulumi-devzero";
+
+// Pin explicit CPU + memory rules to a single Deployment
+const rule = new resources.WorkloadRule("my-app-rule", {
+    clusterId: "cluster-abc123",
+    namespace:  "production",
+    kind:       "Deployment",
+    name:       "my-api",
+
+    cpuRule: {
+        enabled:                 true,
+        minRequest:              10,    // 10m CPU
+        maxRequest:              4000,  // 4 cores
+        targetPercentile:        0.95,
+        limitsAdjustmentEnabled: true,
+        limitMultiplier:         1.5,
+    },
+    memoryRule: {
+        enabled:    true,
+        minRequest: 67108864,    // 64 MiB
+        maxRequest: 536870912,   // 512 MiB
+    },
+    emergencyResponse: {
+        oomEnabled:             true,
+        oomMemoryMultiplier:    1.5,
+        oomMaxReactions:        3,
+        oomCooldownSeconds:     60,
+        cpuThrottlingEnabled:   true,
+        cpuThrottlingThreshold: 0.1,
+        cpuThrottlingMultiplier: 1.25,
+    },
+    actionTriggers: ["on_detection"],
+    detectionTriggers: ["pod_creation", "pod_reschedule"],
+    cooldownMinutes: 60,
+});
+
+export const ruleId = rule.id;
+```
+
+> **Auto-generate:** Replace the rule body with `autoGenerate: true` to let the engine fill in all fields from observed usage data.
+>
+> ```typescript
+> const rule = new resources.WorkloadRule("my-app-rule", {
+>     clusterId:    "cluster-abc123",
+>     namespace:    "production",
+>     kind:         "Deployment",
+>     name:         "my-api",
+>     autoGenerate: true,
+> });
+> ```
+
+---
+
+### Python
+
+```python
+import pulumi
+from pulumi_devzero.resources import (
+    WorkloadRule, WorkloadRuleArgs,
+    ResourceRuleConfigArgsArgs,
+    EmergencyResponseConfigArgsArgs,
+)
+
+# Pin explicit CPU + memory rules to a single Deployment
+rule = WorkloadRule(
+    "my-app-rule",
+    args=WorkloadRuleArgs(
+        cluster_id="cluster-abc123",
+        namespace="production",
+        kind="Deployment",
+        name="my-api",
+        cpu_rule=ResourceRuleConfigArgsArgs(
+            enabled=True,
+            min_request=10,     # 10m CPU
+            max_request=4000,   # 4 cores
+            target_percentile=0.95,
+            limits_adjustment_enabled=True,
+            limit_multiplier=1.5,
+        ),
+        memory_rule=ResourceRuleConfigArgsArgs(
+            enabled=True,
+            min_request=67108864,    # 64 MiB
+            max_request=536870912,   # 512 MiB
+        ),
+        emergency_response=EmergencyResponseConfigArgsArgs(
+            oom_enabled=True,
+            oom_memory_multiplier=1.5,
+            oom_max_reactions=3,
+            oom_cooldown_seconds=60,
+            cpu_throttling_enabled=True,
+            cpu_throttling_threshold=0.1,
+            cpu_throttling_multiplier=1.25,
+        ),
+        action_triggers=["on_detection"],
+        detection_triggers=["pod_creation", "pod_reschedule"],
+        cooldown_minutes=60,
+    ),
+)
+
+pulumi.export("rule_id", rule.id)
+```
+
+> **Auto-generate:**
+>
+> ```python
+> rule = WorkloadRule("my-app-rule", args=WorkloadRuleArgs(
+>     cluster_id="cluster-abc123", namespace="production",
+>     kind="Deployment", name="my-api", auto_generate=True,
+> ))
+> ```
+
+---
+
+### Go
+
+```go
+rule, err := resources.NewWorkloadRule(ctx, "my-app-rule", &resources.WorkloadRuleArgs{
+    ClusterId: pulumi.String("cluster-abc123"),
+    Namespace: pulumi.String("production"),
+    Kind:      pulumi.String("Deployment"),
+    Name:      pulumi.String("my-api"),
+
+    CpuRule: resources.ResourceRuleConfigArgsArgs{
+        Enabled:                 pulumi.BoolPtr(true),
+        MinRequest:              pulumi.IntPtr(10),    // 10m CPU
+        MaxRequest:              pulumi.IntPtr(4000),  // 4 cores
+        TargetPercentile:        pulumi.Float64Ptr(0.95),
+        LimitsAdjustmentEnabled: pulumi.BoolPtr(true),
+        LimitMultiplier:         pulumi.Float64Ptr(1.5),
+    }.ToResourceRuleConfigArgsPtrOutput(),
+    MemoryRule: resources.ResourceRuleConfigArgsArgs{
+        Enabled:    pulumi.BoolPtr(true),
+        MinRequest: pulumi.IntPtr(67108864),  // 64 MiB
+        MaxRequest: pulumi.IntPtr(536870912), // 512 MiB
+    }.ToResourceRuleConfigArgsPtrOutput(),
+    EmergencyResponse: resources.EmergencyResponseConfigArgsArgs{
+        OomEnabled:              pulumi.BoolPtr(true),
+        OomMemoryMultiplier:     pulumi.Float64Ptr(1.5),
+        OomMaxReactions:         pulumi.IntPtr(3),
+        OomCooldownSeconds:      pulumi.IntPtr(60),
+        CpuThrottlingEnabled:    pulumi.BoolPtr(true),
+        CpuThrottlingThreshold:  pulumi.Float64Ptr(0.1),
+        CpuThrottlingMultiplier: pulumi.Float64Ptr(1.25),
+    }.ToEmergencyResponseConfigArgsPtrOutput(),
+    ActionTriggers:    pulumi.StringArray{pulumi.String("on_detection")},
+    DetectionTriggers: pulumi.StringArray{pulumi.String("pod_creation"), pulumi.String("pod_reschedule")},
+    CooldownMinutes:   pulumi.IntPtr(60),
+})
+if err != nil {
+    return err
+}
+
+ctx.Export("ruleId", rule.ID())
+```
+
+> **Auto-generate:**
+>
+> ```go
+> rule, err := resources.NewWorkloadRule(ctx, "my-app-rule", &resources.WorkloadRuleArgs{
+>     ClusterId:    pulumi.String("cluster-abc123"),
+>     Namespace:    pulumi.String("production"),
+>     Kind:         pulumi.String("Deployment"),
+>     Name:         pulumi.String("my-api"),
+>     AutoGenerate: pulumi.BoolPtr(true),
+> })
+> ```
+
+---
+
+## WorkloadRule — Key Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `clusterId` | string | ID of the cluster the workload lives in |
+| `namespace` | string | Kubernetes namespace of the workload |
+| `kind` | string | Workload kind: `Deployment` \| `StatefulSet` \| `DaemonSet` \| `CronJob` \| `Job` |
+| `name` | string | Name of the Kubernetes workload |
+| `autoGenerate` | bool | When `true`, the engine fills all rule fields from observed usage; manual fields are ignored |
+| `cpuRule` | `ResourceRuleConfigArgs` | CPU vertical scaling rule |
+| `memoryRule` | `ResourceRuleConfigArgs` | Memory vertical scaling rule |
+| `gpuRule` | `ResourceRuleConfigArgs` | GPU vertical scaling rule (units: GPU millicores) |
+| `hpaRule` | `HPARuleConfigArgs` | Horizontal (replica) scaling rule |
+| `emergencyResponse` | `EmergencyResponseConfigArgs` | OOM and CPU-throttle emergency reactions |
+| `actionTriggers` | string[] | When to apply: `on_detection` \| `on_schedule` |
+| `cronSchedule` | string | Cron expression for scheduled application (5-field UTC). Required when `actionTriggers` includes `on_schedule` |
+| `detectionTriggers` | string[] | Events that trigger a recommendation: `pod_creation` \| `pod_update` \| `pod_reschedule` |
+| `startupPeriodSeconds` | int | Seconds after workload start to exclude from usage data |
+| `cooldownMinutes` | int | Minimum minutes between consecutive recommendation applications |
+| `schedulerPlugins` | string[] | Kubernetes scheduler plugins to activate. Example: `["binpacking"]` |
+| `defragmentationSchedule` | string | Cron expression for node defragmentation |
+| `liveMigrationEnabled` | bool | Allow live pod migration when applying recommendations without restart |
+| `useInPlaceVerticalScaling` | bool | Use in-place pod vertical scaling instead of pod restarts |
+| `containers` | `ContainerResourceRuleConfigArgs[]` | Per-container resource overrides. When empty, workload-level rules apply to all containers |
+
+### ResourceRuleConfigArgs
+
+Used for `cpuRule`, `memoryRule`, and `gpuRule` at both the workload and per-container level.
+
+> **Note:** `maxScaleUpPercent` and `maxScaleDownPercent` are **not** supported on per-container rules — set them on the workload-level fields instead.
+
+| Field | Type | Description |
+|---|---|---|
+| `enabled` | bool | Enable this resource axis rule |
+| `minRequest` | int | Minimum resource request (millicores for CPU, bytes for memory/GPU) |
+| `maxRequest` | int | Maximum resource request |
+| `targetPercentile` | float | Percentile of observed usage to target (0–1). Example: `0.95` |
+| `maxScaleUpPercent` | float | Maximum percentage to scale up in one step *(workload-level only)* |
+| `maxScaleDownPercent` | float | Maximum percentage to scale down in one step *(workload-level only)* |
+| `limitsAdjustmentEnabled` | bool | Whether to also adjust resource limits |
+| `limitMultiplier` | float | Limits = request × limitMultiplier |
+| `limitsRemovalEnabled` | bool | Actively remove limits from workloads (CPU only) |
+
+### HPARuleConfigArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `enabled` | bool | Enable horizontal (replica) scaling |
+| `minReplicas` | int | Minimum number of replicas |
+| `maxReplicas` | int | Maximum number of replicas |
+| `targetUtilization` | float | Target utilization ratio (0–1). Example: `0.7` |
+| `primaryMetric` | string | Metric driving HPA: `cpu` \| `memory` \| `gpu` \| `network_ingress` \| `network_egress` |
+| `maxReplicaChangePercent` | float | Maximum % change in replica count per cycle |
+
+### EmergencyResponseConfigArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `oomEnabled` | bool | React to OOM kills by increasing memory requests |
+| `oomMemoryMultiplier` | float | Multiplier applied to memory on OOM. Example: `1.5` |
+| `oomMaxReactions` | int | Maximum OOM reactions before giving up |
+| `oomCooldownSeconds` | int | Seconds to wait between OOM reactions |
+| `cpuThrottlingEnabled` | bool | React to CPU throttling by increasing CPU requests |
+| `cpuThrottlingThreshold` | float | Throttle ratio (0–1) that triggers a reaction. Example: `0.1` |
+| `cpuThrottlingMultiplier` | float | Multiplier applied to CPU request on throttle reaction. Example: `1.25` |
+
+### ContainerResourceRuleConfigArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `containerName` | string | Name of the container this config applies to |
+| `cpuRule` | `ResourceRuleConfigArgs` | CPU rule for this container |
+| `memoryRule` | `ResourceRuleConfigArgs` | Memory rule for this container |
+| `gpuRule` | `ResourceRuleConfigArgs` | GPU rule for this container |
 
 ## NodePolicyTarget — Key Fields
 

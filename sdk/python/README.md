@@ -353,6 +353,126 @@ node_policy = devzero.resources.NodePolicy("my-node-policy",
 
 ---
 
+### `WorkloadRule`
+
+Pin explicit resource rules directly to a single workload. Unlike `WorkloadPolicy`, which applies a shared policy to many workloads, a `WorkloadRule` targets one specific `kind/namespace/name` on a cluster.
+
+```python
+import pulumi_devzero as devzero
+
+rule = devzero.resources.WorkloadRule("my-app-rule",
+    cluster_id="cluster-abc123",
+    namespace="production",
+    kind="Deployment",
+    name="my-api",
+    cpu_rule=devzero.resources.ResourceRuleConfigArgsArgs(
+        enabled=True,
+        min_request=10,     # 10m CPU
+        max_request=4000,   # 4 cores
+        target_percentile=0.95,
+        limits_adjustment_enabled=True,
+        limit_multiplier=1.5,
+    ),
+    memory_rule=devzero.resources.ResourceRuleConfigArgsArgs(
+        enabled=True,
+        min_request=67108864,    # 64 MiB
+        max_request=536870912,   # 512 MiB
+    ),
+    emergency_response=devzero.resources.EmergencyResponseConfigArgsArgs(
+        oom_enabled=True,
+        oom_memory_multiplier=1.5,
+        oom_max_reactions=3,
+        oom_cooldown_seconds=60,
+        cpu_throttling_enabled=True,
+        cpu_throttling_threshold=0.1,
+        cpu_throttling_multiplier=1.25,
+    ),
+    action_triggers=["on_detection"],
+    detection_triggers=["pod_creation", "pod_reschedule"],
+    cooldown_minutes=60,
+)
+
+pulumi.export("rule_id", rule.id)
+```
+
+> **Auto-generate:** Set `auto_generate=True` to let the engine fill in all fields from observed usage:
+>
+> ```python
+> rule = devzero.resources.WorkloadRule("my-app-rule",
+>     cluster_id="cluster-abc123",
+>     namespace="production",
+>     kind="Deployment",
+>     name="my-api",
+>     auto_generate=True,
+> )
+> ```
+
+**Fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `cluster_id` | `str` | ID of the cluster the workload lives in |
+| `namespace` | `str` | Kubernetes namespace of the workload |
+| `kind` | `str` | `Deployment` \| `StatefulSet` \| `DaemonSet` \| `CronJob` \| `Job` |
+| `name` | `str` | Name of the Kubernetes workload |
+| `auto_generate` | `bool` | When `True`, the engine fills all rule fields automatically |
+| `cpu_rule` | `ResourceRuleConfigArgsArgs` | CPU vertical scaling rule |
+| `memory_rule` | `ResourceRuleConfigArgsArgs` | Memory vertical scaling rule |
+| `gpu_rule` | `ResourceRuleConfigArgsArgs` | GPU vertical scaling rule |
+| `hpa_rule` | `HPARuleConfigArgsArgs` | Horizontal (replica) scaling rule |
+| `emergency_response` | `EmergencyResponseConfigArgsArgs` | OOM and CPU-throttle emergency reactions |
+| `action_triggers` | `list[str]` | `on_detection` \| `on_schedule` |
+| `cron_schedule` | `str` | Cron expression (5-field UTC). Required when `action_triggers` includes `on_schedule` |
+| `detection_triggers` | `list[str]` | `pod_creation` \| `pod_update` \| `pod_reschedule` |
+| `startup_period_seconds` | `int` | Seconds after workload start to exclude from usage data |
+| `cooldown_minutes` | `int` | Minimum minutes between recommendation applications |
+| `scheduler_plugins` | `list[str]` | Kubernetes scheduler plugins to activate |
+| `defragmentation_schedule` | `str` | Cron expression for node defragmentation |
+| `live_migration_enabled` | `bool` | Allow live pod migration when applying recommendations |
+| `use_in_place_vertical_scaling` | `bool` | Use in-place pod vertical scaling instead of pod restarts |
+| `containers` | `list[ContainerResourceRuleConfigArgsArgs]` | Per-container resource overrides |
+
+**`ResourceRuleConfigArgsArgs` fields** (used for `cpu_rule`, `memory_rule`, `gpu_rule`):
+
+> **Note:** `max_scale_up_percent` and `max_scale_down_percent` are **not** supported on per-container rules.
+
+| Field | Type | Description |
+|---|---|---|
+| `enabled` | `bool` | Enable this resource axis rule |
+| `min_request` | `int` | Minimum resource request (millicores for CPU, bytes for memory/GPU) |
+| `max_request` | `int` | Maximum resource request |
+| `target_percentile` | `float` | Percentile of observed usage to target (0–1) |
+| `max_scale_up_percent` | `float` | Max % to scale up in one step *(workload-level only)* |
+| `max_scale_down_percent` | `float` | Max % to scale down in one step *(workload-level only)* |
+| `limits_adjustment_enabled` | `bool` | Also adjust resource limits |
+| `limit_multiplier` | `float` | Limits = request × limit_multiplier |
+| `limits_removal_enabled` | `bool` | Actively remove limits (CPU only) |
+
+**`HPARuleConfigArgsArgs` fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `enabled` | `bool` | Enable horizontal scaling |
+| `min_replicas` | `int` | Minimum replicas |
+| `max_replicas` | `int` | Maximum replicas |
+| `target_utilization` | `float` | Target utilization ratio (0–1) |
+| `primary_metric` | `str` | `cpu` \| `memory` \| `gpu` \| `network_ingress` \| `network_egress` |
+| `max_replica_change_percent` | `float` | Max % change in replica count per cycle |
+
+**`EmergencyResponseConfigArgsArgs` fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `oom_enabled` | `bool` | React to OOM kills by increasing memory |
+| `oom_memory_multiplier` | `float` | Multiplier applied to memory on OOM. Example: `1.5` |
+| `oom_max_reactions` | `int` | Max OOM reactions before giving up |
+| `oom_cooldown_seconds` | `int` | Seconds between OOM reactions |
+| `cpu_throttling_enabled` | `bool` | React to CPU throttling |
+| `cpu_throttling_threshold` | `float` | Throttle ratio (0–1) that triggers a reaction |
+| `cpu_throttling_multiplier` | `float` | Multiplier applied to CPU request on throttle reaction |
+
+---
+
 ### `NodePolicyTarget`
 
 Apply a node policy to one or more clusters.

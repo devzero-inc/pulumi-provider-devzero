@@ -73,6 +73,7 @@ func New() p.Provider {
 			infer.Resource[*resources.WorkloadPolicyTarget, resources.WorkloadPolicyTargetArgs, resources.WorkloadPolicyTargetState](&resources.WorkloadPolicyTarget{}),
 			infer.Resource[*resources.NodePolicy, resources.NodePolicyArgs, resources.NodePolicyState](&resources.NodePolicy{}),
 			infer.Resource[*resources.NodePolicyTarget, resources.NodePolicyTargetArgs, resources.NodePolicyTargetState](&resources.NodePolicyTarget{}),
+			infer.Resource[*resources.WorkloadRule, resources.WorkloadRuleArgs, resources.WorkloadRuleState](&resources.WorkloadRule{}),
 		},
 		Functions: []infer.InferredFunction{
 			infer.Function[*resources.GetClusterIdByName, resources.GetClusterIDByNameArgs, resources.GetClusterIDByNameResult](&resources.GetClusterIdByName{}),

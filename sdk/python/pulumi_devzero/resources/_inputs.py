@@ -29,10 +29,16 @@ __all__ = [
     'BlockDeviceMappingArgsArgsDict',
     'CapacityReservationSelectorTermArgsArgs',
     'CapacityReservationSelectorTermArgsArgsDict',
+    'ContainerResourceRuleConfigArgsArgs',
+    'ContainerResourceRuleConfigArgsArgsDict',
     'DisruptionBudgetArgsArgs',
     'DisruptionBudgetArgsArgsDict',
     'DisruptionPolicyArgsArgs',
     'DisruptionPolicyArgsArgsDict',
+    'EmergencyResponseConfigArgsArgs',
+    'EmergencyResponseConfigArgsArgsDict',
+    'HPARuleConfigArgsArgs',
+    'HPARuleConfigArgsArgsDict',
     'HorizontalScalingArgsArgs',
     'HorizontalScalingArgsArgsDict',
     'KubeletConfigurationArgsArgs',
@@ -49,6 +55,8 @@ __all__ = [
     'RawKarpenterSpecArgsArgsDict',
     'ResourceLimitsArgsArgs',
     'ResourceLimitsArgsArgsDict',
+    'ResourceRuleConfigArgsArgs',
+    'ResourceRuleConfigArgsArgsDict',
     'SecurityGroupSelectorTermArgsArgs',
     'SecurityGroupSelectorTermArgsArgsDict',
     'SubnetSelectorTermArgsArgs',
@@ -1202,6 +1210,94 @@ class CapacityReservationSelectorTermArgsArgs:
         pulumi.set(self, "tags", value)
 
 
+class ContainerResourceRuleConfigArgsArgsDict(TypedDict):
+    container_name: pulumi.Input[_builtins.str]
+    """
+    Name of the container this config applies to. Example: 'main'.
+    """
+    cpu_rule: NotRequired[pulumi.Input['ResourceRuleConfigArgsArgsDict']]
+    """
+    CPU resource rule for this container.
+    """
+    gpu_rule: NotRequired[pulumi.Input['ResourceRuleConfigArgsArgsDict']]
+    """
+    GPU resource rule for this container.
+    """
+    memory_rule: NotRequired[pulumi.Input['ResourceRuleConfigArgsArgsDict']]
+    """
+    Memory resource rule for this container.
+    """
+
+@pulumi.input_type
+class ContainerResourceRuleConfigArgsArgs:
+    def __init__(__self__, *,
+                 container_name: pulumi.Input[_builtins.str],
+                 cpu_rule: Optional[pulumi.Input['ResourceRuleConfigArgsArgs']] = None,
+                 gpu_rule: Optional[pulumi.Input['ResourceRuleConfigArgsArgs']] = None,
+                 memory_rule: Optional[pulumi.Input['ResourceRuleConfigArgsArgs']] = None):
+        """
+        :param pulumi.Input[_builtins.str] container_name: Name of the container this config applies to. Example: 'main'.
+        :param pulumi.Input['ResourceRuleConfigArgsArgs'] cpu_rule: CPU resource rule for this container.
+        :param pulumi.Input['ResourceRuleConfigArgsArgs'] gpu_rule: GPU resource rule for this container.
+        :param pulumi.Input['ResourceRuleConfigArgsArgs'] memory_rule: Memory resource rule for this container.
+        """
+        pulumi.set(__self__, "container_name", container_name)
+        if cpu_rule is not None:
+            pulumi.set(__self__, "cpu_rule", cpu_rule)
+        if gpu_rule is not None:
+            pulumi.set(__self__, "gpu_rule", gpu_rule)
+        if memory_rule is not None:
+            pulumi.set(__self__, "memory_rule", memory_rule)
+
+    @_builtins.property
+    @pulumi.getter(name="containerName")
+    def container_name(self) -> pulumi.Input[_builtins.str]:
+        """
+        Name of the container this config applies to. Example: 'main'.
+        """
+        return pulumi.get(self, "container_name")
+
+    @container_name.setter
+    def container_name(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "container_name", value)
+
+    @_builtins.property
+    @pulumi.getter(name="cpuRule")
+    def cpu_rule(self) -> Optional[pulumi.Input['ResourceRuleConfigArgsArgs']]:
+        """
+        CPU resource rule for this container.
+        """
+        return pulumi.get(self, "cpu_rule")
+
+    @cpu_rule.setter
+    def cpu_rule(self, value: Optional[pulumi.Input['ResourceRuleConfigArgsArgs']]):
+        pulumi.set(self, "cpu_rule", value)
+
+    @_builtins.property
+    @pulumi.getter(name="gpuRule")
+    def gpu_rule(self) -> Optional[pulumi.Input['ResourceRuleConfigArgsArgs']]:
+        """
+        GPU resource rule for this container.
+        """
+        return pulumi.get(self, "gpu_rule")
+
+    @gpu_rule.setter
+    def gpu_rule(self, value: Optional[pulumi.Input['ResourceRuleConfigArgsArgs']]):
+        pulumi.set(self, "gpu_rule", value)
+
+    @_builtins.property
+    @pulumi.getter(name="memoryRule")
+    def memory_rule(self) -> Optional[pulumi.Input['ResourceRuleConfigArgsArgs']]:
+        """
+        Memory resource rule for this container.
+        """
+        return pulumi.get(self, "memory_rule")
+
+    @memory_rule.setter
+    def memory_rule(self, value: Optional[pulumi.Input['ResourceRuleConfigArgsArgs']]):
+        pulumi.set(self, "memory_rule", value)
+
+
 class DisruptionBudgetArgsArgsDict(TypedDict):
     duration: NotRequired[pulumi.Input[_builtins.str]]
     """
@@ -1418,6 +1514,284 @@ class DisruptionPolicyArgsArgs:
     @ttl_seconds_after_empty.setter
     def ttl_seconds_after_empty(self, value: Optional[pulumi.Input[_builtins.int]]):
         pulumi.set(self, "ttl_seconds_after_empty", value)
+
+
+class EmergencyResponseConfigArgsArgsDict(TypedDict):
+    cpu_throttling_enabled: NotRequired[pulumi.Input[_builtins.bool]]
+    """
+    React to CPU throttling by increasing CPU request. Example: true.
+    """
+    cpu_throttling_multiplier: NotRequired[pulumi.Input[_builtins.float]]
+    """
+    Multiplier applied to CPU request on throttle reaction. Example: 1.5.
+    """
+    cpu_throttling_threshold: NotRequired[pulumi.Input[_builtins.float]]
+    """
+    Throttle ratio threshold that triggers a reaction (0-1). Example: 0.8.
+    """
+    oom_cooldown_seconds: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Seconds to wait between OOM reactions. Example: 60.
+    """
+    oom_enabled: NotRequired[pulumi.Input[_builtins.bool]]
+    """
+    React to OOM kills by increasing memory. Example: true.
+    """
+    oom_max_reactions: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Maximum number of OOM reactions before giving up. Example: 3.
+    """
+    oom_memory_multiplier: NotRequired[pulumi.Input[_builtins.float]]
+    """
+    Multiplier applied to memory on OOM. Example: 2.0.
+    """
+
+@pulumi.input_type
+class EmergencyResponseConfigArgsArgs:
+    def __init__(__self__, *,
+                 cpu_throttling_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
+                 cpu_throttling_multiplier: Optional[pulumi.Input[_builtins.float]] = None,
+                 cpu_throttling_threshold: Optional[pulumi.Input[_builtins.float]] = None,
+                 oom_cooldown_seconds: Optional[pulumi.Input[_builtins.int]] = None,
+                 oom_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
+                 oom_max_reactions: Optional[pulumi.Input[_builtins.int]] = None,
+                 oom_memory_multiplier: Optional[pulumi.Input[_builtins.float]] = None):
+        """
+        :param pulumi.Input[_builtins.bool] cpu_throttling_enabled: React to CPU throttling by increasing CPU request. Example: true.
+        :param pulumi.Input[_builtins.float] cpu_throttling_multiplier: Multiplier applied to CPU request on throttle reaction. Example: 1.5.
+        :param pulumi.Input[_builtins.float] cpu_throttling_threshold: Throttle ratio threshold that triggers a reaction (0-1). Example: 0.8.
+        :param pulumi.Input[_builtins.int] oom_cooldown_seconds: Seconds to wait between OOM reactions. Example: 60.
+        :param pulumi.Input[_builtins.bool] oom_enabled: React to OOM kills by increasing memory. Example: true.
+        :param pulumi.Input[_builtins.int] oom_max_reactions: Maximum number of OOM reactions before giving up. Example: 3.
+        :param pulumi.Input[_builtins.float] oom_memory_multiplier: Multiplier applied to memory on OOM. Example: 2.0.
+        """
+        if cpu_throttling_enabled is not None:
+            pulumi.set(__self__, "cpu_throttling_enabled", cpu_throttling_enabled)
+        if cpu_throttling_multiplier is not None:
+            pulumi.set(__self__, "cpu_throttling_multiplier", cpu_throttling_multiplier)
+        if cpu_throttling_threshold is not None:
+            pulumi.set(__self__, "cpu_throttling_threshold", cpu_throttling_threshold)
+        if oom_cooldown_seconds is not None:
+            pulumi.set(__self__, "oom_cooldown_seconds", oom_cooldown_seconds)
+        if oom_enabled is not None:
+            pulumi.set(__self__, "oom_enabled", oom_enabled)
+        if oom_max_reactions is not None:
+            pulumi.set(__self__, "oom_max_reactions", oom_max_reactions)
+        if oom_memory_multiplier is not None:
+            pulumi.set(__self__, "oom_memory_multiplier", oom_memory_multiplier)
+
+    @_builtins.property
+    @pulumi.getter(name="cpuThrottlingEnabled")
+    def cpu_throttling_enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        React to CPU throttling by increasing CPU request. Example: true.
+        """
+        return pulumi.get(self, "cpu_throttling_enabled")
+
+    @cpu_throttling_enabled.setter
+    def cpu_throttling_enabled(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "cpu_throttling_enabled", value)
+
+    @_builtins.property
+    @pulumi.getter(name="cpuThrottlingMultiplier")
+    def cpu_throttling_multiplier(self) -> Optional[pulumi.Input[_builtins.float]]:
+        """
+        Multiplier applied to CPU request on throttle reaction. Example: 1.5.
+        """
+        return pulumi.get(self, "cpu_throttling_multiplier")
+
+    @cpu_throttling_multiplier.setter
+    def cpu_throttling_multiplier(self, value: Optional[pulumi.Input[_builtins.float]]):
+        pulumi.set(self, "cpu_throttling_multiplier", value)
+
+    @_builtins.property
+    @pulumi.getter(name="cpuThrottlingThreshold")
+    def cpu_throttling_threshold(self) -> Optional[pulumi.Input[_builtins.float]]:
+        """
+        Throttle ratio threshold that triggers a reaction (0-1). Example: 0.8.
+        """
+        return pulumi.get(self, "cpu_throttling_threshold")
+
+    @cpu_throttling_threshold.setter
+    def cpu_throttling_threshold(self, value: Optional[pulumi.Input[_builtins.float]]):
+        pulumi.set(self, "cpu_throttling_threshold", value)
+
+    @_builtins.property
+    @pulumi.getter(name="oomCooldownSeconds")
+    def oom_cooldown_seconds(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Seconds to wait between OOM reactions. Example: 60.
+        """
+        return pulumi.get(self, "oom_cooldown_seconds")
+
+    @oom_cooldown_seconds.setter
+    def oom_cooldown_seconds(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "oom_cooldown_seconds", value)
+
+    @_builtins.property
+    @pulumi.getter(name="oomEnabled")
+    def oom_enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        React to OOM kills by increasing memory. Example: true.
+        """
+        return pulumi.get(self, "oom_enabled")
+
+    @oom_enabled.setter
+    def oom_enabled(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "oom_enabled", value)
+
+    @_builtins.property
+    @pulumi.getter(name="oomMaxReactions")
+    def oom_max_reactions(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Maximum number of OOM reactions before giving up. Example: 3.
+        """
+        return pulumi.get(self, "oom_max_reactions")
+
+    @oom_max_reactions.setter
+    def oom_max_reactions(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "oom_max_reactions", value)
+
+    @_builtins.property
+    @pulumi.getter(name="oomMemoryMultiplier")
+    def oom_memory_multiplier(self) -> Optional[pulumi.Input[_builtins.float]]:
+        """
+        Multiplier applied to memory on OOM. Example: 2.0.
+        """
+        return pulumi.get(self, "oom_memory_multiplier")
+
+    @oom_memory_multiplier.setter
+    def oom_memory_multiplier(self, value: Optional[pulumi.Input[_builtins.float]]):
+        pulumi.set(self, "oom_memory_multiplier", value)
+
+
+class HPARuleConfigArgsArgsDict(TypedDict):
+    enabled: NotRequired[pulumi.Input[_builtins.bool]]
+    """
+    Enable horizontal (replica) scaling. Example: true.
+    """
+    max_replica_change_percent: NotRequired[pulumi.Input[_builtins.float]]
+    """
+    Maximum percentage change in replica count per cycle. Example: 50.0.
+    """
+    max_replicas: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Maximum number of replicas. Example: 10.
+    """
+    min_replicas: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Minimum number of replicas. Example: 2.
+    """
+    primary_metric: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
+    """
+    target_utilization: NotRequired[pulumi.Input[_builtins.float]]
+    """
+    Target utilization ratio (0-1) for the primary metric. Example: 0.7.
+    """
+
+@pulumi.input_type
+class HPARuleConfigArgsArgs:
+    def __init__(__self__, *,
+                 enabled: Optional[pulumi.Input[_builtins.bool]] = None,
+                 max_replica_change_percent: Optional[pulumi.Input[_builtins.float]] = None,
+                 max_replicas: Optional[pulumi.Input[_builtins.int]] = None,
+                 min_replicas: Optional[pulumi.Input[_builtins.int]] = None,
+                 primary_metric: Optional[pulumi.Input[_builtins.str]] = None,
+                 target_utilization: Optional[pulumi.Input[_builtins.float]] = None):
+        """
+        :param pulumi.Input[_builtins.bool] enabled: Enable horizontal (replica) scaling. Example: true.
+        :param pulumi.Input[_builtins.float] max_replica_change_percent: Maximum percentage change in replica count per cycle. Example: 50.0.
+        :param pulumi.Input[_builtins.int] max_replicas: Maximum number of replicas. Example: 10.
+        :param pulumi.Input[_builtins.int] min_replicas: Minimum number of replicas. Example: 2.
+        :param pulumi.Input[_builtins.str] primary_metric: Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
+        :param pulumi.Input[_builtins.float] target_utilization: Target utilization ratio (0-1) for the primary metric. Example: 0.7.
+        """
+        if enabled is not None:
+            pulumi.set(__self__, "enabled", enabled)
+        if max_replica_change_percent is not None:
+            pulumi.set(__self__, "max_replica_change_percent", max_replica_change_percent)
+        if max_replicas is not None:
+            pulumi.set(__self__, "max_replicas", max_replicas)
+        if min_replicas is not None:
+            pulumi.set(__self__, "min_replicas", min_replicas)
+        if primary_metric is not None:
+            pulumi.set(__self__, "primary_metric", primary_metric)
+        if target_utilization is not None:
+            pulumi.set(__self__, "target_utilization", target_utilization)
+
+    @_builtins.property
+    @pulumi.getter
+    def enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Enable horizontal (replica) scaling. Example: true.
+        """
+        return pulumi.get(self, "enabled")
+
+    @enabled.setter
+    def enabled(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "enabled", value)
+
+    @_builtins.property
+    @pulumi.getter(name="maxReplicaChangePercent")
+    def max_replica_change_percent(self) -> Optional[pulumi.Input[_builtins.float]]:
+        """
+        Maximum percentage change in replica count per cycle. Example: 50.0.
+        """
+        return pulumi.get(self, "max_replica_change_percent")
+
+    @max_replica_change_percent.setter
+    def max_replica_change_percent(self, value: Optional[pulumi.Input[_builtins.float]]):
+        pulumi.set(self, "max_replica_change_percent", value)
+
+    @_builtins.property
+    @pulumi.getter(name="maxReplicas")
+    def max_replicas(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Maximum number of replicas. Example: 10.
+        """
+        return pulumi.get(self, "max_replicas")
+
+    @max_replicas.setter
+    def max_replicas(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "max_replicas", value)
+
+    @_builtins.property
+    @pulumi.getter(name="minReplicas")
+    def min_replicas(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Minimum number of replicas. Example: 2.
+        """
+        return pulumi.get(self, "min_replicas")
+
+    @min_replicas.setter
+    def min_replicas(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "min_replicas", value)
+
+    @_builtins.property
+    @pulumi.getter(name="primaryMetric")
+    def primary_metric(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
+        """
+        return pulumi.get(self, "primary_metric")
+
+    @primary_metric.setter
+    def primary_metric(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "primary_metric", value)
+
+    @_builtins.property
+    @pulumi.getter(name="targetUtilization")
+    def target_utilization(self) -> Optional[pulumi.Input[_builtins.float]]:
+        """
+        Target utilization ratio (0-1) for the primary metric. Example: 0.7.
+        """
+        return pulumi.get(self, "target_utilization")
+
+    @target_utilization.setter
+    def target_utilization(self, value: Optional[pulumi.Input[_builtins.float]]):
+        pulumi.set(self, "target_utilization", value)
 
 
 class HorizontalScalingArgsArgsDict(TypedDict):
@@ -2170,6 +2544,195 @@ class ResourceLimitsArgsArgs:
     @memory.setter
     def memory(self, value: Optional[pulumi.Input[_builtins.str]]):
         pulumi.set(self, "memory", value)
+
+
+class ResourceRuleConfigArgsArgsDict(TypedDict):
+    enabled: NotRequired[pulumi.Input[_builtins.bool]]
+    """
+    Enable this resource axis rule. Example: true.
+    """
+    limit_multiplier: NotRequired[pulumi.Input[_builtins.float]]
+    """
+    Multiplier applied to the request to derive the resource limit. Example: 1.5.
+    """
+    limits_adjustment_enabled: NotRequired[pulumi.Input[_builtins.bool]]
+    """
+    Whether to also adjust resource limits alongside requests. Example: true.
+    """
+    limits_removal_enabled: NotRequired[pulumi.Input[_builtins.bool]]
+    """
+    Actively remove limits from workloads. Example: false.
+    """
+    max_request: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Maximum resource request (millicores for CPU, bytes for memory/GPU). Example: 4000.
+    """
+    max_scale_down_percent: NotRequired[pulumi.Input[_builtins.float]]
+    """
+    Maximum percentage decrease allowed in a single cycle. Example: 20.0.
+    """
+    max_scale_up_percent: NotRequired[pulumi.Input[_builtins.float]]
+    """
+    Maximum percentage increase allowed in a single cycle. Example: 50.0.
+    """
+    min_request: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Minimum resource request (millicores for CPU, bytes for memory/GPU). Example: 100.
+    """
+    target_percentile: NotRequired[pulumi.Input[_builtins.float]]
+    """
+    Percentile of usage data used as the recommendation target (0-1). Example: 0.95.
+    """
+
+@pulumi.input_type
+class ResourceRuleConfigArgsArgs:
+    def __init__(__self__, *,
+                 enabled: Optional[pulumi.Input[_builtins.bool]] = None,
+                 limit_multiplier: Optional[pulumi.Input[_builtins.float]] = None,
+                 limits_adjustment_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
+                 limits_removal_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
+                 max_request: Optional[pulumi.Input[_builtins.int]] = None,
+                 max_scale_down_percent: Optional[pulumi.Input[_builtins.float]] = None,
+                 max_scale_up_percent: Optional[pulumi.Input[_builtins.float]] = None,
+                 min_request: Optional[pulumi.Input[_builtins.int]] = None,
+                 target_percentile: Optional[pulumi.Input[_builtins.float]] = None):
+        """
+        :param pulumi.Input[_builtins.bool] enabled: Enable this resource axis rule. Example: true.
+        :param pulumi.Input[_builtins.float] limit_multiplier: Multiplier applied to the request to derive the resource limit. Example: 1.5.
+        :param pulumi.Input[_builtins.bool] limits_adjustment_enabled: Whether to also adjust resource limits alongside requests. Example: true.
+        :param pulumi.Input[_builtins.bool] limits_removal_enabled: Actively remove limits from workloads. Example: false.
+        :param pulumi.Input[_builtins.int] max_request: Maximum resource request (millicores for CPU, bytes for memory/GPU). Example: 4000.
+        :param pulumi.Input[_builtins.float] max_scale_down_percent: Maximum percentage decrease allowed in a single cycle. Example: 20.0.
+        :param pulumi.Input[_builtins.float] max_scale_up_percent: Maximum percentage increase allowed in a single cycle. Example: 50.0.
+        :param pulumi.Input[_builtins.int] min_request: Minimum resource request (millicores for CPU, bytes for memory/GPU). Example: 100.
+        :param pulumi.Input[_builtins.float] target_percentile: Percentile of usage data used as the recommendation target (0-1). Example: 0.95.
+        """
+        if enabled is not None:
+            pulumi.set(__self__, "enabled", enabled)
+        if limit_multiplier is not None:
+            pulumi.set(__self__, "limit_multiplier", limit_multiplier)
+        if limits_adjustment_enabled is not None:
+            pulumi.set(__self__, "limits_adjustment_enabled", limits_adjustment_enabled)
+        if limits_removal_enabled is not None:
+            pulumi.set(__self__, "limits_removal_enabled", limits_removal_enabled)
+        if max_request is not None:
+            pulumi.set(__self__, "max_request", max_request)
+        if max_scale_down_percent is not None:
+            pulumi.set(__self__, "max_scale_down_percent", max_scale_down_percent)
+        if max_scale_up_percent is not None:
+            pulumi.set(__self__, "max_scale_up_percent", max_scale_up_percent)
+        if min_request is not None:
+            pulumi.set(__self__, "min_request", min_request)
+        if target_percentile is not None:
+            pulumi.set(__self__, "target_percentile", target_percentile)
+
+    @_builtins.property
+    @pulumi.getter
+    def enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Enable this resource axis rule. Example: true.
+        """
+        return pulumi.get(self, "enabled")
+
+    @enabled.setter
+    def enabled(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "enabled", value)
+
+    @_builtins.property
+    @pulumi.getter(name="limitMultiplier")
+    def limit_multiplier(self) -> Optional[pulumi.Input[_builtins.float]]:
+        """
+        Multiplier applied to the request to derive the resource limit. Example: 1.5.
+        """
+        return pulumi.get(self, "limit_multiplier")
+
+    @limit_multiplier.setter
+    def limit_multiplier(self, value: Optional[pulumi.Input[_builtins.float]]):
+        pulumi.set(self, "limit_multiplier", value)
+
+    @_builtins.property
+    @pulumi.getter(name="limitsAdjustmentEnabled")
+    def limits_adjustment_enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Whether to also adjust resource limits alongside requests. Example: true.
+        """
+        return pulumi.get(self, "limits_adjustment_enabled")
+
+    @limits_adjustment_enabled.setter
+    def limits_adjustment_enabled(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "limits_adjustment_enabled", value)
+
+    @_builtins.property
+    @pulumi.getter(name="limitsRemovalEnabled")
+    def limits_removal_enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Actively remove limits from workloads. Example: false.
+        """
+        return pulumi.get(self, "limits_removal_enabled")
+
+    @limits_removal_enabled.setter
+    def limits_removal_enabled(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "limits_removal_enabled", value)
+
+    @_builtins.property
+    @pulumi.getter(name="maxRequest")
+    def max_request(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Maximum resource request (millicores for CPU, bytes for memory/GPU). Example: 4000.
+        """
+        return pulumi.get(self, "max_request")
+
+    @max_request.setter
+    def max_request(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "max_request", value)
+
+    @_builtins.property
+    @pulumi.getter(name="maxScaleDownPercent")
+    def max_scale_down_percent(self) -> Optional[pulumi.Input[_builtins.float]]:
+        """
+        Maximum percentage decrease allowed in a single cycle. Example: 20.0.
+        """
+        return pulumi.get(self, "max_scale_down_percent")
+
+    @max_scale_down_percent.setter
+    def max_scale_down_percent(self, value: Optional[pulumi.Input[_builtins.float]]):
+        pulumi.set(self, "max_scale_down_percent", value)
+
+    @_builtins.property
+    @pulumi.getter(name="maxScaleUpPercent")
+    def max_scale_up_percent(self) -> Optional[pulumi.Input[_builtins.float]]:
+        """
+        Maximum percentage increase allowed in a single cycle. Example: 50.0.
+        """
+        return pulumi.get(self, "max_scale_up_percent")
+
+    @max_scale_up_percent.setter
+    def max_scale_up_percent(self, value: Optional[pulumi.Input[_builtins.float]]):
+        pulumi.set(self, "max_scale_up_percent", value)
+
+    @_builtins.property
+    @pulumi.getter(name="minRequest")
+    def min_request(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Minimum resource request (millicores for CPU, bytes for memory/GPU). Example: 100.
+        """
+        return pulumi.get(self, "min_request")
+
+    @min_request.setter
+    def min_request(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "min_request", value)
+
+    @_builtins.property
+    @pulumi.getter(name="targetPercentile")
+    def target_percentile(self) -> Optional[pulumi.Input[_builtins.float]]:
+        """
+        Percentile of usage data used as the recommendation target (0-1). Example: 0.95.
+        """
+        return pulumi.get(self, "target_percentile")
+
+    @target_percentile.setter
+    def target_percentile(self, value: Optional[pulumi.Input[_builtins.float]]):
+        pulumi.set(self, "target_percentile", value)
 
 
 class SecurityGroupSelectorTermArgsArgsDict(TypedDict):

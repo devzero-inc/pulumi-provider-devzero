@@ -335,6 +335,9 @@ const (
 	// K8SRecommendationServiceUpsertManualWorkloadRuleProcedure is the fully-qualified name of the
 	// K8sRecommendationService's UpsertManualWorkloadRule RPC.
 	K8SRecommendationServiceUpsertManualWorkloadRuleProcedure = "/api.v1.K8sRecommendationService/UpsertManualWorkloadRule"
+	// K8SRecommendationServicePreviewWorkloadRuleProcedure is the fully-qualified name of the
+	// K8sRecommendationService's PreviewWorkloadRule RPC.
+	K8SRecommendationServicePreviewWorkloadRuleProcedure = "/api.v1.K8sRecommendationService/PreviewWorkloadRule"
 	// K8SRecommendationServiceGetWorkloadRulesByPolicyProcedure is the fully-qualified name of the
 	// K8sRecommendationService's GetWorkloadRulesByPolicy RPC.
 	K8SRecommendationServiceGetWorkloadRulesByPolicyProcedure = "/api.v1.K8sRecommendationService/GetWorkloadRulesByPolicy"
@@ -347,6 +350,9 @@ const (
 	// K8SRecommendationServiceGetWorkloadRuleByWorkloadProcedure is the fully-qualified name of the
 	// K8sRecommendationService's GetWorkloadRuleByWorkload RPC.
 	K8SRecommendationServiceGetWorkloadRuleByWorkloadProcedure = "/api.v1.K8sRecommendationService/GetWorkloadRuleByWorkload"
+	// K8SRecommendationServiceGetWorkloadByWorkloadRuleProcedure is the fully-qualified name of the
+	// K8sRecommendationService's GetWorkloadByWorkloadRule RPC.
+	K8SRecommendationServiceGetWorkloadByWorkloadRuleProcedure = "/api.v1.K8sRecommendationService/GetWorkloadByWorkloadRule"
 	// K8SRecommendationServiceDeleteWorkloadRuleProcedure is the fully-qualified name of the
 	// K8sRecommendationService's DeleteWorkloadRule RPC.
 	K8SRecommendationServiceDeleteWorkloadRuleProcedure = "/api.v1.K8sRecommendationService/DeleteWorkloadRule"
@@ -356,6 +362,9 @@ const (
 	// K8SRecommendationServiceBatchAutoOptimizeWorkloadsProcedure is the fully-qualified name of the
 	// K8sRecommendationService's BatchAutoOptimizeWorkloads RPC.
 	K8SRecommendationServiceBatchAutoOptimizeWorkloadsProcedure = "/api.v1.K8sRecommendationService/BatchAutoOptimizeWorkloads"
+	// K8SRecommendationServiceGetNodeRecommendationStatusProcedure is the fully-qualified name of the
+	// K8sRecommendationService's GetNodeRecommendationStatus RPC.
+	K8SRecommendationServiceGetNodeRecommendationStatusProcedure = "/api.v1.K8sRecommendationService/GetNodeRecommendationStatus"
 )
 
 // K8SRecommendationServiceClient is a client for the api.v1.K8sRecommendationService service.
@@ -520,13 +529,17 @@ type K8SRecommendationServiceClient interface {
 	DeleteWorkloadOptimizationPolicy(context.Context, *connect.Request[v1.DeleteWorkloadOptimizationPolicyRequest]) (*connect.Response[v1.DeleteWorkloadOptimizationPolicyResponse], error)
 	// MPA V3: Workload Rules (CRUD)
 	UpsertManualWorkloadRule(context.Context, *connect.Request[v1.UpsertManualWorkloadRuleRequest]) (*connect.Response[v1.UpsertManualWorkloadRuleResponse], error)
+	PreviewWorkloadRule(context.Context, *connect.Request[v1.PreviewWorkloadRuleRequest]) (*connect.Response[v1.PreviewWorkloadRuleResponse], error)
 	GetWorkloadRulesByPolicy(context.Context, *connect.Request[v1.GetWorkloadRulesByPolicyRequest]) (*connect.Response[v1.GetWorkloadRulesByPolicyResponse], error)
 	ListWorkloadRules(context.Context, *connect.Request[v1.ListWorkloadRulesRequest]) (*connect.Response[v1.ListWorkloadRulesResponse], error)
 	GetWorkloadRuleByID(context.Context, *connect.Request[v1.GetWorkloadRuleByIDRequest]) (*connect.Response[v1.GetWorkloadRuleByIDResponse], error)
 	GetWorkloadRuleByWorkload(context.Context, *connect.Request[v1.GetWorkloadRuleByWorkloadRequest]) (*connect.Response[v1.GetWorkloadRuleByWorkloadResponse], error)
+	GetWorkloadByWorkloadRule(context.Context, *connect.Request[v1.GetWorkloadByWorkloadRuleRequest]) (*connect.Response[v1.GetWorkloadByWorkloadRuleResponse], error)
 	DeleteWorkloadRule(context.Context, *connect.Request[v1.DeleteWorkloadRuleRequest]) (*connect.Response[v1.DeleteWorkloadRuleResponse], error)
 	GetWorkloadContainerNames(context.Context, *connect.Request[v1.GetWorkloadContainerNamesRequest]) (*connect.Response[v1.GetWorkloadContainerNamesResponse], error)
 	BatchAutoOptimizeWorkloads(context.Context, *connect.Request[v1.BatchAutoOptimizeWorkloadsRequest]) (*connect.Response[v1.BatchAutoOptimizeWorkloadsResponse], error)
+	// Get current node pool config status and recent apply history for a cluster
+	GetNodeRecommendationStatus(context.Context, *connect.Request[v1.GetNodeRecommendationStatusRequest]) (*connect.Response[v1.GetNodeRecommendationStatusResponse], error)
 }
 
 // NewK8SRecommendationServiceClient constructs a client for the api.v1.K8sRecommendationService
@@ -1039,6 +1052,11 @@ func NewK8SRecommendationServiceClient(httpClient connect.HTTPClient, baseURL st
 			baseURL+K8SRecommendationServiceUpsertManualWorkloadRuleProcedure,
 			opts...,
 		),
+		previewWorkloadRule: connect.NewClient[v1.PreviewWorkloadRuleRequest, v1.PreviewWorkloadRuleResponse](
+			httpClient,
+			baseURL+K8SRecommendationServicePreviewWorkloadRuleProcedure,
+			opts...,
+		),
 		getWorkloadRulesByPolicy: connect.NewClient[v1.GetWorkloadRulesByPolicyRequest, v1.GetWorkloadRulesByPolicyResponse](
 			httpClient,
 			baseURL+K8SRecommendationServiceGetWorkloadRulesByPolicyProcedure,
@@ -1059,6 +1077,11 @@ func NewK8SRecommendationServiceClient(httpClient connect.HTTPClient, baseURL st
 			baseURL+K8SRecommendationServiceGetWorkloadRuleByWorkloadProcedure,
 			opts...,
 		),
+		getWorkloadByWorkloadRule: connect.NewClient[v1.GetWorkloadByWorkloadRuleRequest, v1.GetWorkloadByWorkloadRuleResponse](
+			httpClient,
+			baseURL+K8SRecommendationServiceGetWorkloadByWorkloadRuleProcedure,
+			opts...,
+		),
 		deleteWorkloadRule: connect.NewClient[v1.DeleteWorkloadRuleRequest, v1.DeleteWorkloadRuleResponse](
 			httpClient,
 			baseURL+K8SRecommendationServiceDeleteWorkloadRuleProcedure,
@@ -1072,6 +1095,11 @@ func NewK8SRecommendationServiceClient(httpClient connect.HTTPClient, baseURL st
 		batchAutoOptimizeWorkloads: connect.NewClient[v1.BatchAutoOptimizeWorkloadsRequest, v1.BatchAutoOptimizeWorkloadsResponse](
 			httpClient,
 			baseURL+K8SRecommendationServiceBatchAutoOptimizeWorkloadsProcedure,
+			opts...,
+		),
+		getNodeRecommendationStatus: connect.NewClient[v1.GetNodeRecommendationStatusRequest, v1.GetNodeRecommendationStatusResponse](
+			httpClient,
+			baseURL+K8SRecommendationServiceGetNodeRecommendationStatusProcedure,
 			opts...,
 		),
 	}
@@ -1179,13 +1207,16 @@ type k8SRecommendationServiceClient struct {
 	updateWorkloadOptimizationPolicy               *connect.Client[v1.UpdateWorkloadOptimizationPolicyRequest, v1.UpdateWorkloadOptimizationPolicyResponse]
 	deleteWorkloadOptimizationPolicy               *connect.Client[v1.DeleteWorkloadOptimizationPolicyRequest, v1.DeleteWorkloadOptimizationPolicyResponse]
 	upsertManualWorkloadRule                       *connect.Client[v1.UpsertManualWorkloadRuleRequest, v1.UpsertManualWorkloadRuleResponse]
+	previewWorkloadRule                            *connect.Client[v1.PreviewWorkloadRuleRequest, v1.PreviewWorkloadRuleResponse]
 	getWorkloadRulesByPolicy                       *connect.Client[v1.GetWorkloadRulesByPolicyRequest, v1.GetWorkloadRulesByPolicyResponse]
 	listWorkloadRules                              *connect.Client[v1.ListWorkloadRulesRequest, v1.ListWorkloadRulesResponse]
 	getWorkloadRuleByID                            *connect.Client[v1.GetWorkloadRuleByIDRequest, v1.GetWorkloadRuleByIDResponse]
 	getWorkloadRuleByWorkload                      *connect.Client[v1.GetWorkloadRuleByWorkloadRequest, v1.GetWorkloadRuleByWorkloadResponse]
+	getWorkloadByWorkloadRule                      *connect.Client[v1.GetWorkloadByWorkloadRuleRequest, v1.GetWorkloadByWorkloadRuleResponse]
 	deleteWorkloadRule                             *connect.Client[v1.DeleteWorkloadRuleRequest, v1.DeleteWorkloadRuleResponse]
 	getWorkloadContainerNames                      *connect.Client[v1.GetWorkloadContainerNamesRequest, v1.GetWorkloadContainerNamesResponse]
 	batchAutoOptimizeWorkloads                     *connect.Client[v1.BatchAutoOptimizeWorkloadsRequest, v1.BatchAutoOptimizeWorkloadsResponse]
+	getNodeRecommendationStatus                    *connect.Client[v1.GetNodeRecommendationStatusRequest, v1.GetNodeRecommendationStatusResponse]
 }
 
 // GetNodeGroupStats calls api.v1.K8sRecommendationService.GetNodeGroupStats.
@@ -1771,6 +1802,11 @@ func (c *k8SRecommendationServiceClient) UpsertManualWorkloadRule(ctx context.Co
 	return c.upsertManualWorkloadRule.CallUnary(ctx, req)
 }
 
+// PreviewWorkloadRule calls api.v1.K8sRecommendationService.PreviewWorkloadRule.
+func (c *k8SRecommendationServiceClient) PreviewWorkloadRule(ctx context.Context, req *connect.Request[v1.PreviewWorkloadRuleRequest]) (*connect.Response[v1.PreviewWorkloadRuleResponse], error) {
+	return c.previewWorkloadRule.CallUnary(ctx, req)
+}
+
 // GetWorkloadRulesByPolicy calls api.v1.K8sRecommendationService.GetWorkloadRulesByPolicy.
 func (c *k8SRecommendationServiceClient) GetWorkloadRulesByPolicy(ctx context.Context, req *connect.Request[v1.GetWorkloadRulesByPolicyRequest]) (*connect.Response[v1.GetWorkloadRulesByPolicyResponse], error) {
 	return c.getWorkloadRulesByPolicy.CallUnary(ctx, req)
@@ -1791,6 +1827,11 @@ func (c *k8SRecommendationServiceClient) GetWorkloadRuleByWorkload(ctx context.C
 	return c.getWorkloadRuleByWorkload.CallUnary(ctx, req)
 }
 
+// GetWorkloadByWorkloadRule calls api.v1.K8sRecommendationService.GetWorkloadByWorkloadRule.
+func (c *k8SRecommendationServiceClient) GetWorkloadByWorkloadRule(ctx context.Context, req *connect.Request[v1.GetWorkloadByWorkloadRuleRequest]) (*connect.Response[v1.GetWorkloadByWorkloadRuleResponse], error) {
+	return c.getWorkloadByWorkloadRule.CallUnary(ctx, req)
+}
+
 // DeleteWorkloadRule calls api.v1.K8sRecommendationService.DeleteWorkloadRule.
 func (c *k8SRecommendationServiceClient) DeleteWorkloadRule(ctx context.Context, req *connect.Request[v1.DeleteWorkloadRuleRequest]) (*connect.Response[v1.DeleteWorkloadRuleResponse], error) {
 	return c.deleteWorkloadRule.CallUnary(ctx, req)
@@ -1804,6 +1845,11 @@ func (c *k8SRecommendationServiceClient) GetWorkloadContainerNames(ctx context.C
 // BatchAutoOptimizeWorkloads calls api.v1.K8sRecommendationService.BatchAutoOptimizeWorkloads.
 func (c *k8SRecommendationServiceClient) BatchAutoOptimizeWorkloads(ctx context.Context, req *connect.Request[v1.BatchAutoOptimizeWorkloadsRequest]) (*connect.Response[v1.BatchAutoOptimizeWorkloadsResponse], error) {
 	return c.batchAutoOptimizeWorkloads.CallUnary(ctx, req)
+}
+
+// GetNodeRecommendationStatus calls api.v1.K8sRecommendationService.GetNodeRecommendationStatus.
+func (c *k8SRecommendationServiceClient) GetNodeRecommendationStatus(ctx context.Context, req *connect.Request[v1.GetNodeRecommendationStatusRequest]) (*connect.Response[v1.GetNodeRecommendationStatusResponse], error) {
+	return c.getNodeRecommendationStatus.CallUnary(ctx, req)
 }
 
 // K8SRecommendationServiceHandler is an implementation of the api.v1.K8sRecommendationService
@@ -1969,13 +2015,17 @@ type K8SRecommendationServiceHandler interface {
 	DeleteWorkloadOptimizationPolicy(context.Context, *connect.Request[v1.DeleteWorkloadOptimizationPolicyRequest]) (*connect.Response[v1.DeleteWorkloadOptimizationPolicyResponse], error)
 	// MPA V3: Workload Rules (CRUD)
 	UpsertManualWorkloadRule(context.Context, *connect.Request[v1.UpsertManualWorkloadRuleRequest]) (*connect.Response[v1.UpsertManualWorkloadRuleResponse], error)
+	PreviewWorkloadRule(context.Context, *connect.Request[v1.PreviewWorkloadRuleRequest]) (*connect.Response[v1.PreviewWorkloadRuleResponse], error)
 	GetWorkloadRulesByPolicy(context.Context, *connect.Request[v1.GetWorkloadRulesByPolicyRequest]) (*connect.Response[v1.GetWorkloadRulesByPolicyResponse], error)
 	ListWorkloadRules(context.Context, *connect.Request[v1.ListWorkloadRulesRequest]) (*connect.Response[v1.ListWorkloadRulesResponse], error)
 	GetWorkloadRuleByID(context.Context, *connect.Request[v1.GetWorkloadRuleByIDRequest]) (*connect.Response[v1.GetWorkloadRuleByIDResponse], error)
 	GetWorkloadRuleByWorkload(context.Context, *connect.Request[v1.GetWorkloadRuleByWorkloadRequest]) (*connect.Response[v1.GetWorkloadRuleByWorkloadResponse], error)
+	GetWorkloadByWorkloadRule(context.Context, *connect.Request[v1.GetWorkloadByWorkloadRuleRequest]) (*connect.Response[v1.GetWorkloadByWorkloadRuleResponse], error)
 	DeleteWorkloadRule(context.Context, *connect.Request[v1.DeleteWorkloadRuleRequest]) (*connect.Response[v1.DeleteWorkloadRuleResponse], error)
 	GetWorkloadContainerNames(context.Context, *connect.Request[v1.GetWorkloadContainerNamesRequest]) (*connect.Response[v1.GetWorkloadContainerNamesResponse], error)
 	BatchAutoOptimizeWorkloads(context.Context, *connect.Request[v1.BatchAutoOptimizeWorkloadsRequest]) (*connect.Response[v1.BatchAutoOptimizeWorkloadsResponse], error)
+	// Get current node pool config status and recent apply history for a cluster
+	GetNodeRecommendationStatus(context.Context, *connect.Request[v1.GetNodeRecommendationStatusRequest]) (*connect.Response[v1.GetNodeRecommendationStatusResponse], error)
 }
 
 // NewK8SRecommendationServiceHandler builds an HTTP handler from the service implementation. It
@@ -2484,6 +2534,11 @@ func NewK8SRecommendationServiceHandler(svc K8SRecommendationServiceHandler, opt
 		svc.UpsertManualWorkloadRule,
 		opts...,
 	)
+	k8SRecommendationServicePreviewWorkloadRuleHandler := connect.NewUnaryHandler(
+		K8SRecommendationServicePreviewWorkloadRuleProcedure,
+		svc.PreviewWorkloadRule,
+		opts...,
+	)
 	k8SRecommendationServiceGetWorkloadRulesByPolicyHandler := connect.NewUnaryHandler(
 		K8SRecommendationServiceGetWorkloadRulesByPolicyProcedure,
 		svc.GetWorkloadRulesByPolicy,
@@ -2504,6 +2559,11 @@ func NewK8SRecommendationServiceHandler(svc K8SRecommendationServiceHandler, opt
 		svc.GetWorkloadRuleByWorkload,
 		opts...,
 	)
+	k8SRecommendationServiceGetWorkloadByWorkloadRuleHandler := connect.NewUnaryHandler(
+		K8SRecommendationServiceGetWorkloadByWorkloadRuleProcedure,
+		svc.GetWorkloadByWorkloadRule,
+		opts...,
+	)
 	k8SRecommendationServiceDeleteWorkloadRuleHandler := connect.NewUnaryHandler(
 		K8SRecommendationServiceDeleteWorkloadRuleProcedure,
 		svc.DeleteWorkloadRule,
@@ -2517,6 +2577,11 @@ func NewK8SRecommendationServiceHandler(svc K8SRecommendationServiceHandler, opt
 	k8SRecommendationServiceBatchAutoOptimizeWorkloadsHandler := connect.NewUnaryHandler(
 		K8SRecommendationServiceBatchAutoOptimizeWorkloadsProcedure,
 		svc.BatchAutoOptimizeWorkloads,
+		opts...,
+	)
+	k8SRecommendationServiceGetNodeRecommendationStatusHandler := connect.NewUnaryHandler(
+		K8SRecommendationServiceGetNodeRecommendationStatusProcedure,
+		svc.GetNodeRecommendationStatus,
 		opts...,
 	)
 	return "/api.v1.K8sRecommendationService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -2721,6 +2786,8 @@ func NewK8SRecommendationServiceHandler(svc K8SRecommendationServiceHandler, opt
 			k8SRecommendationServiceDeleteWorkloadOptimizationPolicyHandler.ServeHTTP(w, r)
 		case K8SRecommendationServiceUpsertManualWorkloadRuleProcedure:
 			k8SRecommendationServiceUpsertManualWorkloadRuleHandler.ServeHTTP(w, r)
+		case K8SRecommendationServicePreviewWorkloadRuleProcedure:
+			k8SRecommendationServicePreviewWorkloadRuleHandler.ServeHTTP(w, r)
 		case K8SRecommendationServiceGetWorkloadRulesByPolicyProcedure:
 			k8SRecommendationServiceGetWorkloadRulesByPolicyHandler.ServeHTTP(w, r)
 		case K8SRecommendationServiceListWorkloadRulesProcedure:
@@ -2729,12 +2796,16 @@ func NewK8SRecommendationServiceHandler(svc K8SRecommendationServiceHandler, opt
 			k8SRecommendationServiceGetWorkloadRuleByIDHandler.ServeHTTP(w, r)
 		case K8SRecommendationServiceGetWorkloadRuleByWorkloadProcedure:
 			k8SRecommendationServiceGetWorkloadRuleByWorkloadHandler.ServeHTTP(w, r)
+		case K8SRecommendationServiceGetWorkloadByWorkloadRuleProcedure:
+			k8SRecommendationServiceGetWorkloadByWorkloadRuleHandler.ServeHTTP(w, r)
 		case K8SRecommendationServiceDeleteWorkloadRuleProcedure:
 			k8SRecommendationServiceDeleteWorkloadRuleHandler.ServeHTTP(w, r)
 		case K8SRecommendationServiceGetWorkloadContainerNamesProcedure:
 			k8SRecommendationServiceGetWorkloadContainerNamesHandler.ServeHTTP(w, r)
 		case K8SRecommendationServiceBatchAutoOptimizeWorkloadsProcedure:
 			k8SRecommendationServiceBatchAutoOptimizeWorkloadsHandler.ServeHTTP(w, r)
+		case K8SRecommendationServiceGetNodeRecommendationStatusProcedure:
+			k8SRecommendationServiceGetNodeRecommendationStatusHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -3144,6 +3215,10 @@ func (UnimplementedK8SRecommendationServiceHandler) UpsertManualWorkloadRule(con
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.UpsertManualWorkloadRule is not implemented"))
 }
 
+func (UnimplementedK8SRecommendationServiceHandler) PreviewWorkloadRule(context.Context, *connect.Request[v1.PreviewWorkloadRuleRequest]) (*connect.Response[v1.PreviewWorkloadRuleResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.PreviewWorkloadRule is not implemented"))
+}
+
 func (UnimplementedK8SRecommendationServiceHandler) GetWorkloadRulesByPolicy(context.Context, *connect.Request[v1.GetWorkloadRulesByPolicyRequest]) (*connect.Response[v1.GetWorkloadRulesByPolicyResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.GetWorkloadRulesByPolicy is not implemented"))
 }
@@ -3160,6 +3235,10 @@ func (UnimplementedK8SRecommendationServiceHandler) GetWorkloadRuleByWorkload(co
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.GetWorkloadRuleByWorkload is not implemented"))
 }
 
+func (UnimplementedK8SRecommendationServiceHandler) GetWorkloadByWorkloadRule(context.Context, *connect.Request[v1.GetWorkloadByWorkloadRuleRequest]) (*connect.Response[v1.GetWorkloadByWorkloadRuleResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.GetWorkloadByWorkloadRule is not implemented"))
+}
+
 func (UnimplementedK8SRecommendationServiceHandler) DeleteWorkloadRule(context.Context, *connect.Request[v1.DeleteWorkloadRuleRequest]) (*connect.Response[v1.DeleteWorkloadRuleResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.DeleteWorkloadRule is not implemented"))
 }
@@ -3170,4 +3249,8 @@ func (UnimplementedK8SRecommendationServiceHandler) GetWorkloadContainerNames(co
 
 func (UnimplementedK8SRecommendationServiceHandler) BatchAutoOptimizeWorkloads(context.Context, *connect.Request[v1.BatchAutoOptimizeWorkloadsRequest]) (*connect.Response[v1.BatchAutoOptimizeWorkloadsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.BatchAutoOptimizeWorkloads is not implemented"))
+}
+
+func (UnimplementedK8SRecommendationServiceHandler) GetNodeRecommendationStatus(context.Context, *connect.Request[v1.GetNodeRecommendationStatusRequest]) (*connect.Response[v1.GetNodeRecommendationStatusResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.K8sRecommendationService.GetNodeRecommendationStatus is not implemented"))
 }

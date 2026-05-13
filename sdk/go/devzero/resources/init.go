@@ -31,6 +31,8 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &WorkloadPolicy{}
 	case "devzero:resources:WorkloadPolicyTarget":
 		r = &WorkloadPolicyTarget{}
+	case "devzero:resources:WorkloadRule":
+		r = &WorkloadRule{}
 	default:
 		return nil, fmt.Errorf("unknown resource type: %s", typ)
 	}

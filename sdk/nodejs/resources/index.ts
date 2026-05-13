@@ -35,6 +35,11 @@ export type WorkloadPolicyTarget = import("./workloadPolicyTarget").WorkloadPoli
 export const WorkloadPolicyTarget: typeof import("./workloadPolicyTarget").WorkloadPolicyTarget = null as any;
 utilities.lazyLoad(exports, ["WorkloadPolicyTarget"], () => require("./workloadPolicyTarget"));
 
+export { WorkloadRuleArgs } from "./workloadRule";
+export type WorkloadRule = import("./workloadRule").WorkloadRule;
+export const WorkloadRule: typeof import("./workloadRule").WorkloadRule = null as any;
+utilities.lazyLoad(exports, ["WorkloadRule"], () => require("./workloadRule"));
+
 
 const _module = {
     version: utilities.getVersion(),
@@ -50,6 +55,8 @@ const _module = {
                 return new WorkloadPolicy(name, <any>undefined, { urn })
             case "devzero:resources:WorkloadPolicyTarget":
                 return new WorkloadPolicyTarget(name, <any>undefined, { urn })
+            case "devzero:resources:WorkloadRule":
+                return new WorkloadRule(name, <any>undefined, { urn })
             default:
                 throw new Error(`unknown resource type ${type}`);
         }

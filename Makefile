@@ -9,7 +9,7 @@ SDK_GO       := sdk/go
 
 # VERSION is injected into the provider binary via ldflags. Falls back to
 # the latest git tag (stripped of a leading `v`), or "dev" when no tags exist.
-GIT_TAG      := $(shell git describe --tags --abbrev=0 2>/dev/null)
+GIT_TAG      := $(shell git describe --tags --abbrev=0 --match "v[0-9]*" 2>/dev/null)
 VERSION      ?= $(if $(GIT_TAG),$(patsubst v%,%,$(GIT_TAG)),dev)
 LDFLAGS      := -ldflags "-X main.version=$(VERSION)"
 

@@ -392,6 +392,7 @@ message NodeInfo {
   int32 reserved_count = 3; // Number of reserved nodes.
   int32 spot_count = 4; // Number of spot nodes.
   int32 unknown_count = 5; // Number of nodes with unknown type.
+  map<string, int32> price_source_counts = 6; // Node count by price_source (e.g. {"ri_exact": 2, "sp_api_rate": 1, "on_demand": 5}).
 }
 
 // ResourceInfo provides counts of resources and their scheduling states.
@@ -445,8 +446,16 @@ message Node {
   google.type.Money money_memory_price = 83;
   google.type.Money money_gpu_price = 84;
 
+  // Commitment pricing: original on-demand list price and billing source.
+  // money_price_per_hour holds the effective (RI/SP-adjusted) price.
+  // money_on_demand_price_per_hour holds the baseline list price before any discount.
+  // For on-demand and spot nodes both fields are equal.
+  google.type.Money money_on_demand_price_per_hour = 85;
+  string price_source = 86; // "ri_exact", "ri_flexible", "sp_api_rate", "sp_estimated", "mixed", "spot", "on_demand", "unknown"
+  string pricing_accuracy = 87; // "accurate", "estimated", "fallback", "unknown"
+
   // Enhanced node classification
-  string extracted_node_type = 60; // "spot", "on-demand", "reserved" 
+  string extracted_node_type = 60; // "spot", "on-demand", "reserved"
   string availability_zone = 61;   // Multi-cloud AZ extraction
 
   // Kubernetes metadata
