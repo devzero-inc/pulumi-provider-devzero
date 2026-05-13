@@ -118,15 +118,50 @@ json.dump(ex, open('$(SCHEMA_FILE)','w'), indent=4); \
 print(f'Merged: {len(ex[\"resources\"])} resources, {len(ex[\"types\"])} types, {len(ex[\"functions\"])} functions')"
 	@echo "Applying enum patches..."
 	python3 scripts/patch-schema-enums.py
+	@echo "Injecting README.md into schema..."
+	python3 -c "\
+import json; \
+schema=json.load(open('$(SCHEMA_FILE)')); \
+schema['readme']=open('README.md').read(); \
+json.dump(schema, open('$(SCHEMA_FILE)','w'), indent=4); \
+print('README.md injected into schema readme field')"
 
 .PHONY: gen-sdk
 gen-sdk: gen-schema
+	@echo "Backing up SDK files that gen-sdk deletes..."
+	@cp sdk/go/devzero/go.mod   /tmp/devzero-go.mod   2>/dev/null || true
+	@cp sdk/go/devzero/go.sum   /tmp/devzero-go.sum   2>/dev/null || true
+	@cp sdk/nodejs/.npmignore   /tmp/devzero-.npmignore 2>/dev/null || true
+	@cp sdk/nodejs/package-lock.json /tmp/devzero-package-lock.json 2>/dev/null || true
 	@echo "Generating TypeScript SDK..."
 	pulumi package gen-sdk --language nodejs --out sdk $(SCHEMA_FILE)
+	@echo "Patching sdk/nodejs/package.json..."
+	python3 -c "\
+import json; \
+pkg=json.load(open('sdk/nodejs/package.json')); \
+ordered={}; \
+[ordered.update({k: pkg[k]}) for k in ['name','version','keywords','homepage','repository','license'] if k in pkg]; \
+ordered['main']='bin/index.js'; \
+ordered['types']='bin/index.d.ts'; \
+ordered['files']=['bin/', 'README.md']; \
+ordered['scripts']={'build': 'tsc && cp package.json bin/package.json'}; \
+ordered['dependencies']=pkg.get('dependencies',{}); \
+ordered['devDependencies']=dict(pkg.get('devDependencies',{}), **{'@types/node': '^18'}); \
+[ordered.update({k: pkg[k]}) for k in pkg if k not in ordered]; \
+f=open('sdk/nodejs/package.json','w'); f.write(json.dumps(ordered, indent=4)+'\n'); f.close(); \
+print('package.json patched')"
 	@echo "Generating Python SDK..."
 	pulumi package gen-sdk --language python --out sdk $(SCHEMA_FILE)
 	@echo "Generating Go SDK..."
 	pulumi package gen-sdk --language go     --out sdk $(SCHEMA_FILE)
+	@echo "Restoring SDK files deleted by gen-sdk..."
+	@cp /tmp/devzero-go.mod   sdk/go/devzero/go.mod   2>/dev/null || true
+	@cp /tmp/devzero-go.sum   sdk/go/devzero/go.sum   2>/dev/null || true
+	@cp /tmp/devzero-.npmignore sdk/nodejs/.npmignore  2>/dev/null || true
+	@cp /tmp/devzero-package-lock.json sdk/nodejs/package-lock.json 2>/dev/null || true
+	@echo "Copying README.md into SDK directories..."
+	cp README.md sdk/nodejs/README.md
+	cp README.md sdk/python/README.md
 	@echo "All SDKs generated."
 
 .PHONY: sdk
