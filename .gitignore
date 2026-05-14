@@ -30,3 +30,4 @@ Pulumi.*.yaml
 docs/plans
 examples/python/
 examples/typescript/node_modules/
+example-local-test/

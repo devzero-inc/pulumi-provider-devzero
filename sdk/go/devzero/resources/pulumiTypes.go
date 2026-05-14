@@ -2388,18 +2388,512 @@ func (o EmergencyResponseConfigArgsPtrOutput) OomMemoryMultiplier() pulumi.Float
 	}).(pulumi.Float64PtrOutput)
 }
 
+type HPABehaviorArgs struct {
+	// Scale-down behavior rules.
+	ScaleDown *HPAScalingRulesArgs `pulumi:"scaleDown"`
+	// Scale-up behavior rules.
+	ScaleUp *HPAScalingRulesArgs `pulumi:"scaleUp"`
+}
+
+// HPABehaviorArgsInput is an input type that accepts HPABehaviorArgsArgs and HPABehaviorArgsOutput values.
+// You can construct a concrete instance of `HPABehaviorArgsInput` via:
+//
+//	HPABehaviorArgsArgs{...}
+type HPABehaviorArgsInput interface {
+	pulumi.Input
+
+	ToHPABehaviorArgsOutput() HPABehaviorArgsOutput
+	ToHPABehaviorArgsOutputWithContext(context.Context) HPABehaviorArgsOutput
+}
+
+type HPABehaviorArgsArgs struct {
+	// Scale-down behavior rules.
+	ScaleDown HPAScalingRulesArgsPtrInput `pulumi:"scaleDown"`
+	// Scale-up behavior rules.
+	ScaleUp HPAScalingRulesArgsPtrInput `pulumi:"scaleUp"`
+}
+
+func (HPABehaviorArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*HPABehaviorArgs)(nil)).Elem()
+}
+
+func (i HPABehaviorArgsArgs) ToHPABehaviorArgsOutput() HPABehaviorArgsOutput {
+	return i.ToHPABehaviorArgsOutputWithContext(context.Background())
+}
+
+func (i HPABehaviorArgsArgs) ToHPABehaviorArgsOutputWithContext(ctx context.Context) HPABehaviorArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(HPABehaviorArgsOutput)
+}
+
+func (i HPABehaviorArgsArgs) ToHPABehaviorArgsPtrOutput() HPABehaviorArgsPtrOutput {
+	return i.ToHPABehaviorArgsPtrOutputWithContext(context.Background())
+}
+
+func (i HPABehaviorArgsArgs) ToHPABehaviorArgsPtrOutputWithContext(ctx context.Context) HPABehaviorArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(HPABehaviorArgsOutput).ToHPABehaviorArgsPtrOutputWithContext(ctx)
+}
+
+// HPABehaviorArgsPtrInput is an input type that accepts HPABehaviorArgsArgs, HPABehaviorArgsPtr and HPABehaviorArgsPtrOutput values.
+// You can construct a concrete instance of `HPABehaviorArgsPtrInput` via:
+//
+//	        HPABehaviorArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type HPABehaviorArgsPtrInput interface {
+	pulumi.Input
+
+	ToHPABehaviorArgsPtrOutput() HPABehaviorArgsPtrOutput
+	ToHPABehaviorArgsPtrOutputWithContext(context.Context) HPABehaviorArgsPtrOutput
+}
+
+type hpabehaviorArgsPtrType HPABehaviorArgsArgs
+
+func HPABehaviorArgsPtr(v *HPABehaviorArgsArgs) HPABehaviorArgsPtrInput {
+	return (*hpabehaviorArgsPtrType)(v)
+}
+
+func (*hpabehaviorArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**HPABehaviorArgs)(nil)).Elem()
+}
+
+func (i *hpabehaviorArgsPtrType) ToHPABehaviorArgsPtrOutput() HPABehaviorArgsPtrOutput {
+	return i.ToHPABehaviorArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *hpabehaviorArgsPtrType) ToHPABehaviorArgsPtrOutputWithContext(ctx context.Context) HPABehaviorArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(HPABehaviorArgsPtrOutput)
+}
+
+type HPABehaviorArgsOutput struct{ *pulumi.OutputState }
+
+func (HPABehaviorArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*HPABehaviorArgs)(nil)).Elem()
+}
+
+func (o HPABehaviorArgsOutput) ToHPABehaviorArgsOutput() HPABehaviorArgsOutput {
+	return o
+}
+
+func (o HPABehaviorArgsOutput) ToHPABehaviorArgsOutputWithContext(ctx context.Context) HPABehaviorArgsOutput {
+	return o
+}
+
+func (o HPABehaviorArgsOutput) ToHPABehaviorArgsPtrOutput() HPABehaviorArgsPtrOutput {
+	return o.ToHPABehaviorArgsPtrOutputWithContext(context.Background())
+}
+
+func (o HPABehaviorArgsOutput) ToHPABehaviorArgsPtrOutputWithContext(ctx context.Context) HPABehaviorArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v HPABehaviorArgs) *HPABehaviorArgs {
+		return &v
+	}).(HPABehaviorArgsPtrOutput)
+}
+
+// Scale-down behavior rules.
+func (o HPABehaviorArgsOutput) ScaleDown() HPAScalingRulesArgsPtrOutput {
+	return o.ApplyT(func(v HPABehaviorArgs) *HPAScalingRulesArgs { return v.ScaleDown }).(HPAScalingRulesArgsPtrOutput)
+}
+
+// Scale-up behavior rules.
+func (o HPABehaviorArgsOutput) ScaleUp() HPAScalingRulesArgsPtrOutput {
+	return o.ApplyT(func(v HPABehaviorArgs) *HPAScalingRulesArgs { return v.ScaleUp }).(HPAScalingRulesArgsPtrOutput)
+}
+
+type HPABehaviorArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (HPABehaviorArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**HPABehaviorArgs)(nil)).Elem()
+}
+
+func (o HPABehaviorArgsPtrOutput) ToHPABehaviorArgsPtrOutput() HPABehaviorArgsPtrOutput {
+	return o
+}
+
+func (o HPABehaviorArgsPtrOutput) ToHPABehaviorArgsPtrOutputWithContext(ctx context.Context) HPABehaviorArgsPtrOutput {
+	return o
+}
+
+func (o HPABehaviorArgsPtrOutput) Elem() HPABehaviorArgsOutput {
+	return o.ApplyT(func(v *HPABehaviorArgs) HPABehaviorArgs {
+		if v != nil {
+			return *v
+		}
+		var ret HPABehaviorArgs
+		return ret
+	}).(HPABehaviorArgsOutput)
+}
+
+// Scale-down behavior rules.
+func (o HPABehaviorArgsPtrOutput) ScaleDown() HPAScalingRulesArgsPtrOutput {
+	return o.ApplyT(func(v *HPABehaviorArgs) *HPAScalingRulesArgs {
+		if v == nil {
+			return nil
+		}
+		return v.ScaleDown
+	}).(HPAScalingRulesArgsPtrOutput)
+}
+
+// Scale-up behavior rules.
+func (o HPABehaviorArgsPtrOutput) ScaleUp() HPAScalingRulesArgsPtrOutput {
+	return o.ApplyT(func(v *HPABehaviorArgs) *HPAScalingRulesArgs {
+		if v == nil {
+			return nil
+		}
+		return v.ScaleUp
+	}).(HPAScalingRulesArgsPtrOutput)
+}
+
+type HPAFallbackArgs struct {
+	// Fallback strategy. One of: 'static', 'currentReplicas', 'currentReplicasIfHigher', 'currentReplicasIfLower'. Example: 'currentReplicasIfHigher'.
+	Behavior *string `pulumi:"behavior"`
+	// Number of consecutive metric failures before activating fallback. Example: 3.
+	FailureThreshold *int `pulumi:"failureThreshold"`
+	// Number of replicas to fall back to when metrics are unavailable. Example: 2.
+	Replicas int `pulumi:"replicas"`
+}
+
+// HPAFallbackArgsInput is an input type that accepts HPAFallbackArgsArgs and HPAFallbackArgsOutput values.
+// You can construct a concrete instance of `HPAFallbackArgsInput` via:
+//
+//	HPAFallbackArgsArgs{...}
+type HPAFallbackArgsInput interface {
+	pulumi.Input
+
+	ToHPAFallbackArgsOutput() HPAFallbackArgsOutput
+	ToHPAFallbackArgsOutputWithContext(context.Context) HPAFallbackArgsOutput
+}
+
+type HPAFallbackArgsArgs struct {
+	// Fallback strategy. One of: 'static', 'currentReplicas', 'currentReplicasIfHigher', 'currentReplicasIfLower'. Example: 'currentReplicasIfHigher'.
+	Behavior pulumi.StringPtrInput `pulumi:"behavior"`
+	// Number of consecutive metric failures before activating fallback. Example: 3.
+	FailureThreshold pulumi.IntPtrInput `pulumi:"failureThreshold"`
+	// Number of replicas to fall back to when metrics are unavailable. Example: 2.
+	Replicas pulumi.IntInput `pulumi:"replicas"`
+}
+
+func (HPAFallbackArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*HPAFallbackArgs)(nil)).Elem()
+}
+
+func (i HPAFallbackArgsArgs) ToHPAFallbackArgsOutput() HPAFallbackArgsOutput {
+	return i.ToHPAFallbackArgsOutputWithContext(context.Background())
+}
+
+func (i HPAFallbackArgsArgs) ToHPAFallbackArgsOutputWithContext(ctx context.Context) HPAFallbackArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(HPAFallbackArgsOutput)
+}
+
+func (i HPAFallbackArgsArgs) ToHPAFallbackArgsPtrOutput() HPAFallbackArgsPtrOutput {
+	return i.ToHPAFallbackArgsPtrOutputWithContext(context.Background())
+}
+
+func (i HPAFallbackArgsArgs) ToHPAFallbackArgsPtrOutputWithContext(ctx context.Context) HPAFallbackArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(HPAFallbackArgsOutput).ToHPAFallbackArgsPtrOutputWithContext(ctx)
+}
+
+// HPAFallbackArgsPtrInput is an input type that accepts HPAFallbackArgsArgs, HPAFallbackArgsPtr and HPAFallbackArgsPtrOutput values.
+// You can construct a concrete instance of `HPAFallbackArgsPtrInput` via:
+//
+//	        HPAFallbackArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type HPAFallbackArgsPtrInput interface {
+	pulumi.Input
+
+	ToHPAFallbackArgsPtrOutput() HPAFallbackArgsPtrOutput
+	ToHPAFallbackArgsPtrOutputWithContext(context.Context) HPAFallbackArgsPtrOutput
+}
+
+type hpafallbackArgsPtrType HPAFallbackArgsArgs
+
+func HPAFallbackArgsPtr(v *HPAFallbackArgsArgs) HPAFallbackArgsPtrInput {
+	return (*hpafallbackArgsPtrType)(v)
+}
+
+func (*hpafallbackArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**HPAFallbackArgs)(nil)).Elem()
+}
+
+func (i *hpafallbackArgsPtrType) ToHPAFallbackArgsPtrOutput() HPAFallbackArgsPtrOutput {
+	return i.ToHPAFallbackArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *hpafallbackArgsPtrType) ToHPAFallbackArgsPtrOutputWithContext(ctx context.Context) HPAFallbackArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(HPAFallbackArgsPtrOutput)
+}
+
+type HPAFallbackArgsOutput struct{ *pulumi.OutputState }
+
+func (HPAFallbackArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*HPAFallbackArgs)(nil)).Elem()
+}
+
+func (o HPAFallbackArgsOutput) ToHPAFallbackArgsOutput() HPAFallbackArgsOutput {
+	return o
+}
+
+func (o HPAFallbackArgsOutput) ToHPAFallbackArgsOutputWithContext(ctx context.Context) HPAFallbackArgsOutput {
+	return o
+}
+
+func (o HPAFallbackArgsOutput) ToHPAFallbackArgsPtrOutput() HPAFallbackArgsPtrOutput {
+	return o.ToHPAFallbackArgsPtrOutputWithContext(context.Background())
+}
+
+func (o HPAFallbackArgsOutput) ToHPAFallbackArgsPtrOutputWithContext(ctx context.Context) HPAFallbackArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v HPAFallbackArgs) *HPAFallbackArgs {
+		return &v
+	}).(HPAFallbackArgsPtrOutput)
+}
+
+// Fallback strategy. One of: 'static', 'currentReplicas', 'currentReplicasIfHigher', 'currentReplicasIfLower'. Example: 'currentReplicasIfHigher'.
+func (o HPAFallbackArgsOutput) Behavior() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v HPAFallbackArgs) *string { return v.Behavior }).(pulumi.StringPtrOutput)
+}
+
+// Number of consecutive metric failures before activating fallback. Example: 3.
+func (o HPAFallbackArgsOutput) FailureThreshold() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v HPAFallbackArgs) *int { return v.FailureThreshold }).(pulumi.IntPtrOutput)
+}
+
+// Number of replicas to fall back to when metrics are unavailable. Example: 2.
+func (o HPAFallbackArgsOutput) Replicas() pulumi.IntOutput {
+	return o.ApplyT(func(v HPAFallbackArgs) int { return v.Replicas }).(pulumi.IntOutput)
+}
+
+type HPAFallbackArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (HPAFallbackArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**HPAFallbackArgs)(nil)).Elem()
+}
+
+func (o HPAFallbackArgsPtrOutput) ToHPAFallbackArgsPtrOutput() HPAFallbackArgsPtrOutput {
+	return o
+}
+
+func (o HPAFallbackArgsPtrOutput) ToHPAFallbackArgsPtrOutputWithContext(ctx context.Context) HPAFallbackArgsPtrOutput {
+	return o
+}
+
+func (o HPAFallbackArgsPtrOutput) Elem() HPAFallbackArgsOutput {
+	return o.ApplyT(func(v *HPAFallbackArgs) HPAFallbackArgs {
+		if v != nil {
+			return *v
+		}
+		var ret HPAFallbackArgs
+		return ret
+	}).(HPAFallbackArgsOutput)
+}
+
+// Fallback strategy. One of: 'static', 'currentReplicas', 'currentReplicasIfHigher', 'currentReplicasIfLower'. Example: 'currentReplicasIfHigher'.
+func (o HPAFallbackArgsPtrOutput) Behavior() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *HPAFallbackArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Behavior
+	}).(pulumi.StringPtrOutput)
+}
+
+// Number of consecutive metric failures before activating fallback. Example: 3.
+func (o HPAFallbackArgsPtrOutput) FailureThreshold() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *HPAFallbackArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.FailureThreshold
+	}).(pulumi.IntPtrOutput)
+}
+
+// Number of replicas to fall back to when metrics are unavailable. Example: 2.
+func (o HPAFallbackArgsPtrOutput) Replicas() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *HPAFallbackArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return &v.Replicas
+	}).(pulumi.IntPtrOutput)
+}
+
+type HPAMetricTriggerArgs struct {
+	// Free-form key-value pairs for external scalers. For Prometheus use serverAddress and query instead.
+	Metadata map[string]string `pulumi:"metadata"`
+	// PromQL query string. Shorthand — packed into metadata by the service layer. Example: 'sum(rate(http_requests_total[2m]))'.
+	Query *string `pulumi:"query"`
+	// Prometheus server URL. Shorthand — packed into metadata by the service layer. Example: 'http://prometheus:9090'.
+	ServerAddress *string `pulumi:"serverAddress"`
+	// Target utilization as a decimal string (resource metrics). Example: '0.70'.
+	TargetUtilization *string `pulumi:"targetUtilization"`
+	// Absolute target value as a string (external/object metrics, e.g. bytes/sec). Example: '50000000'.
+	TargetValue *string `pulumi:"targetValue"`
+	// Metric source type. Built-in: 'CPU', 'Memory', 'NetworkIngress', 'NetworkEgress'. External: 'prometheus'. Example: 'prometheus'.
+	Type string `pulumi:"type"`
+	// Weight for composite formula scaling (0-1 decimal string). Example: '0.5'.
+	Weight *string `pulumi:"weight"`
+}
+
+// HPAMetricTriggerArgsInput is an input type that accepts HPAMetricTriggerArgsArgs and HPAMetricTriggerArgsOutput values.
+// You can construct a concrete instance of `HPAMetricTriggerArgsInput` via:
+//
+//	HPAMetricTriggerArgsArgs{...}
+type HPAMetricTriggerArgsInput interface {
+	pulumi.Input
+
+	ToHPAMetricTriggerArgsOutput() HPAMetricTriggerArgsOutput
+	ToHPAMetricTriggerArgsOutputWithContext(context.Context) HPAMetricTriggerArgsOutput
+}
+
+type HPAMetricTriggerArgsArgs struct {
+	// Free-form key-value pairs for external scalers. For Prometheus use serverAddress and query instead.
+	Metadata pulumi.StringMapInput `pulumi:"metadata"`
+	// PromQL query string. Shorthand — packed into metadata by the service layer. Example: 'sum(rate(http_requests_total[2m]))'.
+	Query pulumi.StringPtrInput `pulumi:"query"`
+	// Prometheus server URL. Shorthand — packed into metadata by the service layer. Example: 'http://prometheus:9090'.
+	ServerAddress pulumi.StringPtrInput `pulumi:"serverAddress"`
+	// Target utilization as a decimal string (resource metrics). Example: '0.70'.
+	TargetUtilization pulumi.StringPtrInput `pulumi:"targetUtilization"`
+	// Absolute target value as a string (external/object metrics, e.g. bytes/sec). Example: '50000000'.
+	TargetValue pulumi.StringPtrInput `pulumi:"targetValue"`
+	// Metric source type. Built-in: 'CPU', 'Memory', 'NetworkIngress', 'NetworkEgress'. External: 'prometheus'. Example: 'prometheus'.
+	Type pulumi.StringInput `pulumi:"type"`
+	// Weight for composite formula scaling (0-1 decimal string). Example: '0.5'.
+	Weight pulumi.StringPtrInput `pulumi:"weight"`
+}
+
+func (HPAMetricTriggerArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*HPAMetricTriggerArgs)(nil)).Elem()
+}
+
+func (i HPAMetricTriggerArgsArgs) ToHPAMetricTriggerArgsOutput() HPAMetricTriggerArgsOutput {
+	return i.ToHPAMetricTriggerArgsOutputWithContext(context.Background())
+}
+
+func (i HPAMetricTriggerArgsArgs) ToHPAMetricTriggerArgsOutputWithContext(ctx context.Context) HPAMetricTriggerArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(HPAMetricTriggerArgsOutput)
+}
+
+// HPAMetricTriggerArgsArrayInput is an input type that accepts HPAMetricTriggerArgsArray and HPAMetricTriggerArgsArrayOutput values.
+// You can construct a concrete instance of `HPAMetricTriggerArgsArrayInput` via:
+//
+//	HPAMetricTriggerArgsArray{ HPAMetricTriggerArgsArgs{...} }
+type HPAMetricTriggerArgsArrayInput interface {
+	pulumi.Input
+
+	ToHPAMetricTriggerArgsArrayOutput() HPAMetricTriggerArgsArrayOutput
+	ToHPAMetricTriggerArgsArrayOutputWithContext(context.Context) HPAMetricTriggerArgsArrayOutput
+}
+
+type HPAMetricTriggerArgsArray []HPAMetricTriggerArgsInput
+
+func (HPAMetricTriggerArgsArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]HPAMetricTriggerArgs)(nil)).Elem()
+}
+
+func (i HPAMetricTriggerArgsArray) ToHPAMetricTriggerArgsArrayOutput() HPAMetricTriggerArgsArrayOutput {
+	return i.ToHPAMetricTriggerArgsArrayOutputWithContext(context.Background())
+}
+
+func (i HPAMetricTriggerArgsArray) ToHPAMetricTriggerArgsArrayOutputWithContext(ctx context.Context) HPAMetricTriggerArgsArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(HPAMetricTriggerArgsArrayOutput)
+}
+
+type HPAMetricTriggerArgsOutput struct{ *pulumi.OutputState }
+
+func (HPAMetricTriggerArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*HPAMetricTriggerArgs)(nil)).Elem()
+}
+
+func (o HPAMetricTriggerArgsOutput) ToHPAMetricTriggerArgsOutput() HPAMetricTriggerArgsOutput {
+	return o
+}
+
+func (o HPAMetricTriggerArgsOutput) ToHPAMetricTriggerArgsOutputWithContext(ctx context.Context) HPAMetricTriggerArgsOutput {
+	return o
+}
+
+// Free-form key-value pairs for external scalers. For Prometheus use serverAddress and query instead.
+func (o HPAMetricTriggerArgsOutput) Metadata() pulumi.StringMapOutput {
+	return o.ApplyT(func(v HPAMetricTriggerArgs) map[string]string { return v.Metadata }).(pulumi.StringMapOutput)
+}
+
+// PromQL query string. Shorthand — packed into metadata by the service layer. Example: 'sum(rate(http_requests_total[2m]))'.
+func (o HPAMetricTriggerArgsOutput) Query() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v HPAMetricTriggerArgs) *string { return v.Query }).(pulumi.StringPtrOutput)
+}
+
+// Prometheus server URL. Shorthand — packed into metadata by the service layer. Example: 'http://prometheus:9090'.
+func (o HPAMetricTriggerArgsOutput) ServerAddress() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v HPAMetricTriggerArgs) *string { return v.ServerAddress }).(pulumi.StringPtrOutput)
+}
+
+// Target utilization as a decimal string (resource metrics). Example: '0.70'.
+func (o HPAMetricTriggerArgsOutput) TargetUtilization() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v HPAMetricTriggerArgs) *string { return v.TargetUtilization }).(pulumi.StringPtrOutput)
+}
+
+// Absolute target value as a string (external/object metrics, e.g. bytes/sec). Example: '50000000'.
+func (o HPAMetricTriggerArgsOutput) TargetValue() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v HPAMetricTriggerArgs) *string { return v.TargetValue }).(pulumi.StringPtrOutput)
+}
+
+// Metric source type. Built-in: 'CPU', 'Memory', 'NetworkIngress', 'NetworkEgress'. External: 'prometheus'. Example: 'prometheus'.
+func (o HPAMetricTriggerArgsOutput) Type() pulumi.StringOutput {
+	return o.ApplyT(func(v HPAMetricTriggerArgs) string { return v.Type }).(pulumi.StringOutput)
+}
+
+// Weight for composite formula scaling (0-1 decimal string). Example: '0.5'.
+func (o HPAMetricTriggerArgsOutput) Weight() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v HPAMetricTriggerArgs) *string { return v.Weight }).(pulumi.StringPtrOutput)
+}
+
+type HPAMetricTriggerArgsArrayOutput struct{ *pulumi.OutputState }
+
+func (HPAMetricTriggerArgsArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]HPAMetricTriggerArgs)(nil)).Elem()
+}
+
+func (o HPAMetricTriggerArgsArrayOutput) ToHPAMetricTriggerArgsArrayOutput() HPAMetricTriggerArgsArrayOutput {
+	return o
+}
+
+func (o HPAMetricTriggerArgsArrayOutput) ToHPAMetricTriggerArgsArrayOutputWithContext(ctx context.Context) HPAMetricTriggerArgsArrayOutput {
+	return o
+}
+
+func (o HPAMetricTriggerArgsArrayOutput) Index(i pulumi.IntInput) HPAMetricTriggerArgsOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) HPAMetricTriggerArgs {
+		return vs[0].([]HPAMetricTriggerArgs)[vs[1].(int)]
+	}).(HPAMetricTriggerArgsOutput)
+}
+
 type HPARuleConfigArgs struct {
+	// Fine-grained scale-up and scale-down behavior policies.
+	Behavior *HPABehaviorArgs `pulumi:"behavior"`
+	// Formula combining multiple metric weights into a single scaling signal. Example: '0.6*cpu + 0.4*memory'.
+	CompositeFormula *string `pulumi:"compositeFormula"`
 	// Enable horizontal (replica) scaling. Example: true.
 	Enabled *bool `pulumi:"enabled"`
+	// Replica fallback configuration when metrics are unavailable.
+	Fallback *HPAFallbackArgs `pulumi:"fallback"`
 	// Maximum percentage change in replica count per cycle. Example: 50.0.
 	MaxReplicaChangePercent *float64 `pulumi:"maxReplicaChangePercent"`
 	// Maximum number of replicas. Example: 10.
 	MaxReplicas *int `pulumi:"maxReplicas"`
+	// Additional metric triggers (e.g. Prometheus). CPU/Memory/Network triggers are auto-generated from primaryMetric — do not redeclare them here.
+	Metrics []HPAMetricTriggerArgs `pulumi:"metrics"`
 	// Minimum number of replicas. Example: 2.
 	MinReplicas *int `pulumi:"minReplicas"`
-	// Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
+	// Primary metric driving HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
 	PrimaryMetric *string `pulumi:"primaryMetric"`
-	// Target utilization ratio (0-1) for the primary metric. Example: 0.7.
+	// Seconds to wait between scale-down events. Example: 300.
+	ScaleDownCooldownSeconds *int `pulumi:"scaleDownCooldownSeconds"`
+	// Target memory utilization ratio (0-1), tuned independently of CPU. Example: 0.8.
+	TargetMemoryUtilization *float64 `pulumi:"targetMemoryUtilization"`
+	// Target CPU utilization ratio (0-1). Example: 0.7.
 	TargetUtilization *float64 `pulumi:"targetUtilization"`
 }
 
@@ -2415,17 +2909,29 @@ type HPARuleConfigArgsInput interface {
 }
 
 type HPARuleConfigArgsArgs struct {
+	// Fine-grained scale-up and scale-down behavior policies.
+	Behavior HPABehaviorArgsPtrInput `pulumi:"behavior"`
+	// Formula combining multiple metric weights into a single scaling signal. Example: '0.6*cpu + 0.4*memory'.
+	CompositeFormula pulumi.StringPtrInput `pulumi:"compositeFormula"`
 	// Enable horizontal (replica) scaling. Example: true.
 	Enabled pulumi.BoolPtrInput `pulumi:"enabled"`
+	// Replica fallback configuration when metrics are unavailable.
+	Fallback HPAFallbackArgsPtrInput `pulumi:"fallback"`
 	// Maximum percentage change in replica count per cycle. Example: 50.0.
 	MaxReplicaChangePercent pulumi.Float64PtrInput `pulumi:"maxReplicaChangePercent"`
 	// Maximum number of replicas. Example: 10.
 	MaxReplicas pulumi.IntPtrInput `pulumi:"maxReplicas"`
+	// Additional metric triggers (e.g. Prometheus). CPU/Memory/Network triggers are auto-generated from primaryMetric — do not redeclare them here.
+	Metrics HPAMetricTriggerArgsArrayInput `pulumi:"metrics"`
 	// Minimum number of replicas. Example: 2.
 	MinReplicas pulumi.IntPtrInput `pulumi:"minReplicas"`
-	// Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
+	// Primary metric driving HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
 	PrimaryMetric pulumi.StringPtrInput `pulumi:"primaryMetric"`
-	// Target utilization ratio (0-1) for the primary metric. Example: 0.7.
+	// Seconds to wait between scale-down events. Example: 300.
+	ScaleDownCooldownSeconds pulumi.IntPtrInput `pulumi:"scaleDownCooldownSeconds"`
+	// Target memory utilization ratio (0-1), tuned independently of CPU. Example: 0.8.
+	TargetMemoryUtilization pulumi.Float64PtrInput `pulumi:"targetMemoryUtilization"`
+	// Target CPU utilization ratio (0-1). Example: 0.7.
 	TargetUtilization pulumi.Float64PtrInput `pulumi:"targetUtilization"`
 }
 
@@ -2506,9 +3012,24 @@ func (o HPARuleConfigArgsOutput) ToHPARuleConfigArgsPtrOutputWithContext(ctx con
 	}).(HPARuleConfigArgsPtrOutput)
 }
 
+// Fine-grained scale-up and scale-down behavior policies.
+func (o HPARuleConfigArgsOutput) Behavior() HPABehaviorArgsPtrOutput {
+	return o.ApplyT(func(v HPARuleConfigArgs) *HPABehaviorArgs { return v.Behavior }).(HPABehaviorArgsPtrOutput)
+}
+
+// Formula combining multiple metric weights into a single scaling signal. Example: '0.6*cpu + 0.4*memory'.
+func (o HPARuleConfigArgsOutput) CompositeFormula() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v HPARuleConfigArgs) *string { return v.CompositeFormula }).(pulumi.StringPtrOutput)
+}
+
 // Enable horizontal (replica) scaling. Example: true.
 func (o HPARuleConfigArgsOutput) Enabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v HPARuleConfigArgs) *bool { return v.Enabled }).(pulumi.BoolPtrOutput)
+}
+
+// Replica fallback configuration when metrics are unavailable.
+func (o HPARuleConfigArgsOutput) Fallback() HPAFallbackArgsPtrOutput {
+	return o.ApplyT(func(v HPARuleConfigArgs) *HPAFallbackArgs { return v.Fallback }).(HPAFallbackArgsPtrOutput)
 }
 
 // Maximum percentage change in replica count per cycle. Example: 50.0.
@@ -2521,17 +3042,32 @@ func (o HPARuleConfigArgsOutput) MaxReplicas() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v HPARuleConfigArgs) *int { return v.MaxReplicas }).(pulumi.IntPtrOutput)
 }
 
+// Additional metric triggers (e.g. Prometheus). CPU/Memory/Network triggers are auto-generated from primaryMetric — do not redeclare them here.
+func (o HPARuleConfigArgsOutput) Metrics() HPAMetricTriggerArgsArrayOutput {
+	return o.ApplyT(func(v HPARuleConfigArgs) []HPAMetricTriggerArgs { return v.Metrics }).(HPAMetricTriggerArgsArrayOutput)
+}
+
 // Minimum number of replicas. Example: 2.
 func (o HPARuleConfigArgsOutput) MinReplicas() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v HPARuleConfigArgs) *int { return v.MinReplicas }).(pulumi.IntPtrOutput)
 }
 
-// Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
+// Primary metric driving HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
 func (o HPARuleConfigArgsOutput) PrimaryMetric() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v HPARuleConfigArgs) *string { return v.PrimaryMetric }).(pulumi.StringPtrOutput)
 }
 
-// Target utilization ratio (0-1) for the primary metric. Example: 0.7.
+// Seconds to wait between scale-down events. Example: 300.
+func (o HPARuleConfigArgsOutput) ScaleDownCooldownSeconds() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v HPARuleConfigArgs) *int { return v.ScaleDownCooldownSeconds }).(pulumi.IntPtrOutput)
+}
+
+// Target memory utilization ratio (0-1), tuned independently of CPU. Example: 0.8.
+func (o HPARuleConfigArgsOutput) TargetMemoryUtilization() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v HPARuleConfigArgs) *float64 { return v.TargetMemoryUtilization }).(pulumi.Float64PtrOutput)
+}
+
+// Target CPU utilization ratio (0-1). Example: 0.7.
 func (o HPARuleConfigArgsOutput) TargetUtilization() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v HPARuleConfigArgs) *float64 { return v.TargetUtilization }).(pulumi.Float64PtrOutput)
 }
@@ -2560,6 +3096,26 @@ func (o HPARuleConfigArgsPtrOutput) Elem() HPARuleConfigArgsOutput {
 	}).(HPARuleConfigArgsOutput)
 }
 
+// Fine-grained scale-up and scale-down behavior policies.
+func (o HPARuleConfigArgsPtrOutput) Behavior() HPABehaviorArgsPtrOutput {
+	return o.ApplyT(func(v *HPARuleConfigArgs) *HPABehaviorArgs {
+		if v == nil {
+			return nil
+		}
+		return v.Behavior
+	}).(HPABehaviorArgsPtrOutput)
+}
+
+// Formula combining multiple metric weights into a single scaling signal. Example: '0.6*cpu + 0.4*memory'.
+func (o HPARuleConfigArgsPtrOutput) CompositeFormula() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *HPARuleConfigArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.CompositeFormula
+	}).(pulumi.StringPtrOutput)
+}
+
 // Enable horizontal (replica) scaling. Example: true.
 func (o HPARuleConfigArgsPtrOutput) Enabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *HPARuleConfigArgs) *bool {
@@ -2568,6 +3124,16 @@ func (o HPARuleConfigArgsPtrOutput) Enabled() pulumi.BoolPtrOutput {
 		}
 		return v.Enabled
 	}).(pulumi.BoolPtrOutput)
+}
+
+// Replica fallback configuration when metrics are unavailable.
+func (o HPARuleConfigArgsPtrOutput) Fallback() HPAFallbackArgsPtrOutput {
+	return o.ApplyT(func(v *HPARuleConfigArgs) *HPAFallbackArgs {
+		if v == nil {
+			return nil
+		}
+		return v.Fallback
+	}).(HPAFallbackArgsPtrOutput)
 }
 
 // Maximum percentage change in replica count per cycle. Example: 50.0.
@@ -2590,6 +3156,16 @@ func (o HPARuleConfigArgsPtrOutput) MaxReplicas() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
+// Additional metric triggers (e.g. Prometheus). CPU/Memory/Network triggers are auto-generated from primaryMetric — do not redeclare them here.
+func (o HPARuleConfigArgsPtrOutput) Metrics() HPAMetricTriggerArgsArrayOutput {
+	return o.ApplyT(func(v *HPARuleConfigArgs) []HPAMetricTriggerArgs {
+		if v == nil {
+			return nil
+		}
+		return v.Metrics
+	}).(HPAMetricTriggerArgsArrayOutput)
+}
+
 // Minimum number of replicas. Example: 2.
 func (o HPARuleConfigArgsPtrOutput) MinReplicas() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *HPARuleConfigArgs) *int {
@@ -2600,7 +3176,7 @@ func (o HPARuleConfigArgsPtrOutput) MinReplicas() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
-// Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
+// Primary metric driving HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
 func (o HPARuleConfigArgsPtrOutput) PrimaryMetric() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *HPARuleConfigArgs) *string {
 		if v == nil {
@@ -2610,7 +3186,27 @@ func (o HPARuleConfigArgsPtrOutput) PrimaryMetric() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-// Target utilization ratio (0-1) for the primary metric. Example: 0.7.
+// Seconds to wait between scale-down events. Example: 300.
+func (o HPARuleConfigArgsPtrOutput) ScaleDownCooldownSeconds() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *HPARuleConfigArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.ScaleDownCooldownSeconds
+	}).(pulumi.IntPtrOutput)
+}
+
+// Target memory utilization ratio (0-1), tuned independently of CPU. Example: 0.8.
+func (o HPARuleConfigArgsPtrOutput) TargetMemoryUtilization() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *HPARuleConfigArgs) *float64 {
+		if v == nil {
+			return nil
+		}
+		return v.TargetMemoryUtilization
+	}).(pulumi.Float64PtrOutput)
+}
+
+// Target CPU utilization ratio (0-1). Example: 0.7.
 func (o HPARuleConfigArgsPtrOutput) TargetUtilization() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v *HPARuleConfigArgs) *float64 {
 		if v == nil {
@@ -2618,6 +3214,296 @@ func (o HPARuleConfigArgsPtrOutput) TargetUtilization() pulumi.Float64PtrOutput 
 		}
 		return v.TargetUtilization
 	}).(pulumi.Float64PtrOutput)
+}
+
+type HPAScalingPolicyArgs struct {
+	// Period over which the policy applies in seconds. Example: 60.
+	PeriodSeconds int `pulumi:"periodSeconds"`
+	// Policy type. One of: 'Pods', 'Percent'. Example: 'Percent'.
+	Type string `pulumi:"type"`
+	// Policy value (pods count or percent). Example: 100.
+	Value int `pulumi:"value"`
+}
+
+// HPAScalingPolicyArgsInput is an input type that accepts HPAScalingPolicyArgsArgs and HPAScalingPolicyArgsOutput values.
+// You can construct a concrete instance of `HPAScalingPolicyArgsInput` via:
+//
+//	HPAScalingPolicyArgsArgs{...}
+type HPAScalingPolicyArgsInput interface {
+	pulumi.Input
+
+	ToHPAScalingPolicyArgsOutput() HPAScalingPolicyArgsOutput
+	ToHPAScalingPolicyArgsOutputWithContext(context.Context) HPAScalingPolicyArgsOutput
+}
+
+type HPAScalingPolicyArgsArgs struct {
+	// Period over which the policy applies in seconds. Example: 60.
+	PeriodSeconds pulumi.IntInput `pulumi:"periodSeconds"`
+	// Policy type. One of: 'Pods', 'Percent'. Example: 'Percent'.
+	Type pulumi.StringInput `pulumi:"type"`
+	// Policy value (pods count or percent). Example: 100.
+	Value pulumi.IntInput `pulumi:"value"`
+}
+
+func (HPAScalingPolicyArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*HPAScalingPolicyArgs)(nil)).Elem()
+}
+
+func (i HPAScalingPolicyArgsArgs) ToHPAScalingPolicyArgsOutput() HPAScalingPolicyArgsOutput {
+	return i.ToHPAScalingPolicyArgsOutputWithContext(context.Background())
+}
+
+func (i HPAScalingPolicyArgsArgs) ToHPAScalingPolicyArgsOutputWithContext(ctx context.Context) HPAScalingPolicyArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(HPAScalingPolicyArgsOutput)
+}
+
+// HPAScalingPolicyArgsArrayInput is an input type that accepts HPAScalingPolicyArgsArray and HPAScalingPolicyArgsArrayOutput values.
+// You can construct a concrete instance of `HPAScalingPolicyArgsArrayInput` via:
+//
+//	HPAScalingPolicyArgsArray{ HPAScalingPolicyArgsArgs{...} }
+type HPAScalingPolicyArgsArrayInput interface {
+	pulumi.Input
+
+	ToHPAScalingPolicyArgsArrayOutput() HPAScalingPolicyArgsArrayOutput
+	ToHPAScalingPolicyArgsArrayOutputWithContext(context.Context) HPAScalingPolicyArgsArrayOutput
+}
+
+type HPAScalingPolicyArgsArray []HPAScalingPolicyArgsInput
+
+func (HPAScalingPolicyArgsArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]HPAScalingPolicyArgs)(nil)).Elem()
+}
+
+func (i HPAScalingPolicyArgsArray) ToHPAScalingPolicyArgsArrayOutput() HPAScalingPolicyArgsArrayOutput {
+	return i.ToHPAScalingPolicyArgsArrayOutputWithContext(context.Background())
+}
+
+func (i HPAScalingPolicyArgsArray) ToHPAScalingPolicyArgsArrayOutputWithContext(ctx context.Context) HPAScalingPolicyArgsArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(HPAScalingPolicyArgsArrayOutput)
+}
+
+type HPAScalingPolicyArgsOutput struct{ *pulumi.OutputState }
+
+func (HPAScalingPolicyArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*HPAScalingPolicyArgs)(nil)).Elem()
+}
+
+func (o HPAScalingPolicyArgsOutput) ToHPAScalingPolicyArgsOutput() HPAScalingPolicyArgsOutput {
+	return o
+}
+
+func (o HPAScalingPolicyArgsOutput) ToHPAScalingPolicyArgsOutputWithContext(ctx context.Context) HPAScalingPolicyArgsOutput {
+	return o
+}
+
+// Period over which the policy applies in seconds. Example: 60.
+func (o HPAScalingPolicyArgsOutput) PeriodSeconds() pulumi.IntOutput {
+	return o.ApplyT(func(v HPAScalingPolicyArgs) int { return v.PeriodSeconds }).(pulumi.IntOutput)
+}
+
+// Policy type. One of: 'Pods', 'Percent'. Example: 'Percent'.
+func (o HPAScalingPolicyArgsOutput) Type() pulumi.StringOutput {
+	return o.ApplyT(func(v HPAScalingPolicyArgs) string { return v.Type }).(pulumi.StringOutput)
+}
+
+// Policy value (pods count or percent). Example: 100.
+func (o HPAScalingPolicyArgsOutput) Value() pulumi.IntOutput {
+	return o.ApplyT(func(v HPAScalingPolicyArgs) int { return v.Value }).(pulumi.IntOutput)
+}
+
+type HPAScalingPolicyArgsArrayOutput struct{ *pulumi.OutputState }
+
+func (HPAScalingPolicyArgsArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]HPAScalingPolicyArgs)(nil)).Elem()
+}
+
+func (o HPAScalingPolicyArgsArrayOutput) ToHPAScalingPolicyArgsArrayOutput() HPAScalingPolicyArgsArrayOutput {
+	return o
+}
+
+func (o HPAScalingPolicyArgsArrayOutput) ToHPAScalingPolicyArgsArrayOutputWithContext(ctx context.Context) HPAScalingPolicyArgsArrayOutput {
+	return o
+}
+
+func (o HPAScalingPolicyArgsArrayOutput) Index(i pulumi.IntInput) HPAScalingPolicyArgsOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) HPAScalingPolicyArgs {
+		return vs[0].([]HPAScalingPolicyArgs)[vs[1].(int)]
+	}).(HPAScalingPolicyArgsOutput)
+}
+
+type HPAScalingRulesArgs struct {
+	// List of scaling step policies applied during this direction.
+	Policies []HPAScalingPolicyArgs `pulumi:"policies"`
+	// Which policy wins when multiple match. One of: 'Max', 'Min', 'Disabled'. Example: 'Max'.
+	SelectPolicy *string `pulumi:"selectPolicy"`
+	// Seconds to wait before acting on a scaling signal to avoid flapping. Example: 300.
+	StabilizationWindowSeconds *int `pulumi:"stabilizationWindowSeconds"`
+}
+
+// HPAScalingRulesArgsInput is an input type that accepts HPAScalingRulesArgsArgs and HPAScalingRulesArgsOutput values.
+// You can construct a concrete instance of `HPAScalingRulesArgsInput` via:
+//
+//	HPAScalingRulesArgsArgs{...}
+type HPAScalingRulesArgsInput interface {
+	pulumi.Input
+
+	ToHPAScalingRulesArgsOutput() HPAScalingRulesArgsOutput
+	ToHPAScalingRulesArgsOutputWithContext(context.Context) HPAScalingRulesArgsOutput
+}
+
+type HPAScalingRulesArgsArgs struct {
+	// List of scaling step policies applied during this direction.
+	Policies HPAScalingPolicyArgsArrayInput `pulumi:"policies"`
+	// Which policy wins when multiple match. One of: 'Max', 'Min', 'Disabled'. Example: 'Max'.
+	SelectPolicy pulumi.StringPtrInput `pulumi:"selectPolicy"`
+	// Seconds to wait before acting on a scaling signal to avoid flapping. Example: 300.
+	StabilizationWindowSeconds pulumi.IntPtrInput `pulumi:"stabilizationWindowSeconds"`
+}
+
+func (HPAScalingRulesArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*HPAScalingRulesArgs)(nil)).Elem()
+}
+
+func (i HPAScalingRulesArgsArgs) ToHPAScalingRulesArgsOutput() HPAScalingRulesArgsOutput {
+	return i.ToHPAScalingRulesArgsOutputWithContext(context.Background())
+}
+
+func (i HPAScalingRulesArgsArgs) ToHPAScalingRulesArgsOutputWithContext(ctx context.Context) HPAScalingRulesArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(HPAScalingRulesArgsOutput)
+}
+
+func (i HPAScalingRulesArgsArgs) ToHPAScalingRulesArgsPtrOutput() HPAScalingRulesArgsPtrOutput {
+	return i.ToHPAScalingRulesArgsPtrOutputWithContext(context.Background())
+}
+
+func (i HPAScalingRulesArgsArgs) ToHPAScalingRulesArgsPtrOutputWithContext(ctx context.Context) HPAScalingRulesArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(HPAScalingRulesArgsOutput).ToHPAScalingRulesArgsPtrOutputWithContext(ctx)
+}
+
+// HPAScalingRulesArgsPtrInput is an input type that accepts HPAScalingRulesArgsArgs, HPAScalingRulesArgsPtr and HPAScalingRulesArgsPtrOutput values.
+// You can construct a concrete instance of `HPAScalingRulesArgsPtrInput` via:
+//
+//	        HPAScalingRulesArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type HPAScalingRulesArgsPtrInput interface {
+	pulumi.Input
+
+	ToHPAScalingRulesArgsPtrOutput() HPAScalingRulesArgsPtrOutput
+	ToHPAScalingRulesArgsPtrOutputWithContext(context.Context) HPAScalingRulesArgsPtrOutput
+}
+
+type hpascalingRulesArgsPtrType HPAScalingRulesArgsArgs
+
+func HPAScalingRulesArgsPtr(v *HPAScalingRulesArgsArgs) HPAScalingRulesArgsPtrInput {
+	return (*hpascalingRulesArgsPtrType)(v)
+}
+
+func (*hpascalingRulesArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**HPAScalingRulesArgs)(nil)).Elem()
+}
+
+func (i *hpascalingRulesArgsPtrType) ToHPAScalingRulesArgsPtrOutput() HPAScalingRulesArgsPtrOutput {
+	return i.ToHPAScalingRulesArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *hpascalingRulesArgsPtrType) ToHPAScalingRulesArgsPtrOutputWithContext(ctx context.Context) HPAScalingRulesArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(HPAScalingRulesArgsPtrOutput)
+}
+
+type HPAScalingRulesArgsOutput struct{ *pulumi.OutputState }
+
+func (HPAScalingRulesArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*HPAScalingRulesArgs)(nil)).Elem()
+}
+
+func (o HPAScalingRulesArgsOutput) ToHPAScalingRulesArgsOutput() HPAScalingRulesArgsOutput {
+	return o
+}
+
+func (o HPAScalingRulesArgsOutput) ToHPAScalingRulesArgsOutputWithContext(ctx context.Context) HPAScalingRulesArgsOutput {
+	return o
+}
+
+func (o HPAScalingRulesArgsOutput) ToHPAScalingRulesArgsPtrOutput() HPAScalingRulesArgsPtrOutput {
+	return o.ToHPAScalingRulesArgsPtrOutputWithContext(context.Background())
+}
+
+func (o HPAScalingRulesArgsOutput) ToHPAScalingRulesArgsPtrOutputWithContext(ctx context.Context) HPAScalingRulesArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v HPAScalingRulesArgs) *HPAScalingRulesArgs {
+		return &v
+	}).(HPAScalingRulesArgsPtrOutput)
+}
+
+// List of scaling step policies applied during this direction.
+func (o HPAScalingRulesArgsOutput) Policies() HPAScalingPolicyArgsArrayOutput {
+	return o.ApplyT(func(v HPAScalingRulesArgs) []HPAScalingPolicyArgs { return v.Policies }).(HPAScalingPolicyArgsArrayOutput)
+}
+
+// Which policy wins when multiple match. One of: 'Max', 'Min', 'Disabled'. Example: 'Max'.
+func (o HPAScalingRulesArgsOutput) SelectPolicy() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v HPAScalingRulesArgs) *string { return v.SelectPolicy }).(pulumi.StringPtrOutput)
+}
+
+// Seconds to wait before acting on a scaling signal to avoid flapping. Example: 300.
+func (o HPAScalingRulesArgsOutput) StabilizationWindowSeconds() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v HPAScalingRulesArgs) *int { return v.StabilizationWindowSeconds }).(pulumi.IntPtrOutput)
+}
+
+type HPAScalingRulesArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (HPAScalingRulesArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**HPAScalingRulesArgs)(nil)).Elem()
+}
+
+func (o HPAScalingRulesArgsPtrOutput) ToHPAScalingRulesArgsPtrOutput() HPAScalingRulesArgsPtrOutput {
+	return o
+}
+
+func (o HPAScalingRulesArgsPtrOutput) ToHPAScalingRulesArgsPtrOutputWithContext(ctx context.Context) HPAScalingRulesArgsPtrOutput {
+	return o
+}
+
+func (o HPAScalingRulesArgsPtrOutput) Elem() HPAScalingRulesArgsOutput {
+	return o.ApplyT(func(v *HPAScalingRulesArgs) HPAScalingRulesArgs {
+		if v != nil {
+			return *v
+		}
+		var ret HPAScalingRulesArgs
+		return ret
+	}).(HPAScalingRulesArgsOutput)
+}
+
+// List of scaling step policies applied during this direction.
+func (o HPAScalingRulesArgsPtrOutput) Policies() HPAScalingPolicyArgsArrayOutput {
+	return o.ApplyT(func(v *HPAScalingRulesArgs) []HPAScalingPolicyArgs {
+		if v == nil {
+			return nil
+		}
+		return v.Policies
+	}).(HPAScalingPolicyArgsArrayOutput)
+}
+
+// Which policy wins when multiple match. One of: 'Max', 'Min', 'Disabled'. Example: 'Max'.
+func (o HPAScalingRulesArgsPtrOutput) SelectPolicy() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *HPAScalingRulesArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.SelectPolicy
+	}).(pulumi.StringPtrOutput)
+}
+
+// Seconds to wait before acting on a scaling signal to avoid flapping. Example: 300.
+func (o HPAScalingRulesArgsPtrOutput) StabilizationWindowSeconds() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *HPAScalingRulesArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.StabilizationWindowSeconds
+	}).(pulumi.IntPtrOutput)
 }
 
 type HorizontalScalingArgs struct {
@@ -5132,8 +6018,18 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*DisruptionPolicyArgsPtrInput)(nil)).Elem(), DisruptionPolicyArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*EmergencyResponseConfigArgsInput)(nil)).Elem(), EmergencyResponseConfigArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*EmergencyResponseConfigArgsPtrInput)(nil)).Elem(), EmergencyResponseConfigArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*HPABehaviorArgsInput)(nil)).Elem(), HPABehaviorArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*HPABehaviorArgsPtrInput)(nil)).Elem(), HPABehaviorArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*HPAFallbackArgsInput)(nil)).Elem(), HPAFallbackArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*HPAFallbackArgsPtrInput)(nil)).Elem(), HPAFallbackArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*HPAMetricTriggerArgsInput)(nil)).Elem(), HPAMetricTriggerArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*HPAMetricTriggerArgsArrayInput)(nil)).Elem(), HPAMetricTriggerArgsArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HPARuleConfigArgsInput)(nil)).Elem(), HPARuleConfigArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HPARuleConfigArgsPtrInput)(nil)).Elem(), HPARuleConfigArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*HPAScalingPolicyArgsInput)(nil)).Elem(), HPAScalingPolicyArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*HPAScalingPolicyArgsArrayInput)(nil)).Elem(), HPAScalingPolicyArgsArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*HPAScalingRulesArgsInput)(nil)).Elem(), HPAScalingRulesArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*HPAScalingRulesArgsPtrInput)(nil)).Elem(), HPAScalingRulesArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HorizontalScalingArgsInput)(nil)).Elem(), HorizontalScalingArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HorizontalScalingArgsPtrInput)(nil)).Elem(), HorizontalScalingArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*KubeletConfigurationArgsInput)(nil)).Elem(), KubeletConfigurationArgsArgs{})
@@ -5182,8 +6078,18 @@ func init() {
 	pulumi.RegisterOutputType(DisruptionPolicyArgsPtrOutput{})
 	pulumi.RegisterOutputType(EmergencyResponseConfigArgsOutput{})
 	pulumi.RegisterOutputType(EmergencyResponseConfigArgsPtrOutput{})
+	pulumi.RegisterOutputType(HPABehaviorArgsOutput{})
+	pulumi.RegisterOutputType(HPABehaviorArgsPtrOutput{})
+	pulumi.RegisterOutputType(HPAFallbackArgsOutput{})
+	pulumi.RegisterOutputType(HPAFallbackArgsPtrOutput{})
+	pulumi.RegisterOutputType(HPAMetricTriggerArgsOutput{})
+	pulumi.RegisterOutputType(HPAMetricTriggerArgsArrayOutput{})
 	pulumi.RegisterOutputType(HPARuleConfigArgsOutput{})
 	pulumi.RegisterOutputType(HPARuleConfigArgsPtrOutput{})
+	pulumi.RegisterOutputType(HPAScalingPolicyArgsOutput{})
+	pulumi.RegisterOutputType(HPAScalingPolicyArgsArrayOutput{})
+	pulumi.RegisterOutputType(HPAScalingRulesArgsOutput{})
+	pulumi.RegisterOutputType(HPAScalingRulesArgsPtrOutput{})
 	pulumi.RegisterOutputType(HorizontalScalingArgsOutput{})
 	pulumi.RegisterOutputType(HorizontalScalingArgsPtrOutput{})
 	pulumi.RegisterOutputType(KubeletConfigurationArgsOutput{})

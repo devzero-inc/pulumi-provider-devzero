@@ -498,11 +498,95 @@
             },
             "type": "object"
         },
+        "devzero:resources:HPABehaviorArgs": {
+            "properties": {
+                "scaleDown": {
+                    "$ref": "#/types/devzero:resources:HPAScalingRulesArgs",
+                    "description": "Scale-down behavior rules."
+                },
+                "scaleUp": {
+                    "$ref": "#/types/devzero:resources:HPAScalingRulesArgs",
+                    "description": "Scale-up behavior rules."
+                }
+            },
+            "type": "object"
+        },
+        "devzero:resources:HPAFallbackArgs": {
+            "properties": {
+                "behavior": {
+                    "type": "string",
+                    "description": "Fallback strategy. One of: 'static', 'currentReplicas', 'currentReplicasIfHigher', 'currentReplicasIfLower'. Example: 'currentReplicasIfHigher'."
+                },
+                "failureThreshold": {
+                    "type": "integer",
+                    "description": "Number of consecutive metric failures before activating fallback. Example: 3."
+                },
+                "replicas": {
+                    "type": "integer",
+                    "description": "Number of replicas to fall back to when metrics are unavailable. Example: 2."
+                }
+            },
+            "type": "object",
+            "required": [
+                "replicas"
+            ]
+        },
+        "devzero:resources:HPAMetricTriggerArgs": {
+            "properties": {
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Free-form key-value pairs for external scalers. For Prometheus use serverAddress and query instead."
+                },
+                "query": {
+                    "type": "string",
+                    "description": "PromQL query string. Shorthand \u2014 packed into metadata by the service layer. Example: 'sum(rate(http_requests_total[2m]))'."
+                },
+                "serverAddress": {
+                    "type": "string",
+                    "description": "Prometheus server URL. Shorthand \u2014 packed into metadata by the service layer. Example: 'http://prometheus:9090'."
+                },
+                "targetUtilization": {
+                    "type": "string",
+                    "description": "Target utilization as a decimal string (resource metrics). Example: '0.70'."
+                },
+                "targetValue": {
+                    "type": "string",
+                    "description": "Absolute target value as a string (external/object metrics, e.g. bytes/sec). Example: '50000000'."
+                },
+                "type": {
+                    "type": "string",
+                    "description": "Metric source type. Built-in: 'CPU', 'Memory', 'NetworkIngress', 'NetworkEgress'. External: 'prometheus'. Example: 'prometheus'."
+                },
+                "weight": {
+                    "type": "string",
+                    "description": "Weight for composite formula scaling (0-1 decimal string). Example: '0.5'."
+                }
+            },
+            "type": "object",
+            "required": [
+                "type"
+            ]
+        },
         "devzero:resources:HPARuleConfigArgs": {
             "properties": {
+                "behavior": {
+                    "$ref": "#/types/devzero:resources:HPABehaviorArgs",
+                    "description": "Fine-grained scale-up and scale-down behavior policies."
+                },
+                "compositeFormula": {
+                    "type": "string",
+                    "description": "Formula combining multiple metric weights into a single scaling signal. Example: '0.6*cpu + 0.4*memory'."
+                },
                 "enabled": {
                     "type": "boolean",
                     "description": "Enable horizontal (replica) scaling. Example: true."
+                },
+                "fallback": {
+                    "$ref": "#/types/devzero:resources:HPAFallbackArgs",
+                    "description": "Replica fallback configuration when metrics are unavailable."
                 },
                 "maxReplicaChangePercent": {
                     "type": "number",
@@ -512,17 +596,74 @@
                     "type": "integer",
                     "description": "Maximum number of replicas. Example: 10."
                 },
+                "metrics": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/types/devzero:resources:HPAMetricTriggerArgs"
+                    },
+                    "description": "Additional metric triggers (e.g. Prometheus). CPU/Memory/Network triggers are auto-generated from primaryMetric \u2014 do not redeclare them here."
+                },
                 "minReplicas": {
                     "type": "integer",
                     "description": "Minimum number of replicas. Example: 2."
                 },
                 "primaryMetric": {
                     "type": "string",
-                    "description": "Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'."
+                    "description": "Primary metric driving HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'."
+                },
+                "scaleDownCooldownSeconds": {
+                    "type": "integer",
+                    "description": "Seconds to wait between scale-down events. Example: 300."
+                },
+                "targetMemoryUtilization": {
+                    "type": "number",
+                    "description": "Target memory utilization ratio (0-1), tuned independently of CPU. Example: 0.8."
                 },
                 "targetUtilization": {
                     "type": "number",
-                    "description": "Target utilization ratio (0-1) for the primary metric. Example: 0.7."
+                    "description": "Target CPU utilization ratio (0-1). Example: 0.7."
+                }
+            },
+            "type": "object"
+        },
+        "devzero:resources:HPAScalingPolicyArgs": {
+            "properties": {
+                "periodSeconds": {
+                    "type": "integer",
+                    "description": "Period over which the policy applies in seconds. Example: 60."
+                },
+                "type": {
+                    "type": "string",
+                    "description": "Policy type. One of: 'Pods', 'Percent'. Example: 'Percent'."
+                },
+                "value": {
+                    "type": "integer",
+                    "description": "Policy value (pods count or percent). Example: 100."
+                }
+            },
+            "type": "object",
+            "required": [
+                "type",
+                "value",
+                "periodSeconds"
+            ]
+        },
+        "devzero:resources:HPAScalingRulesArgs": {
+            "properties": {
+                "policies": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/types/devzero:resources:HPAScalingPolicyArgs"
+                    },
+                    "description": "List of scaling step policies applied during this direction."
+                },
+                "selectPolicy": {
+                    "type": "string",
+                    "description": "Which policy wins when multiple match. One of: 'Max', 'Min', 'Disabled'. Example: 'Max'."
+                },
+                "stabilizationWindowSeconds": {
+                    "type": "integer",
+                    "description": "Seconds to wait before acting on a scaling signal to avoid flapping. Example: 300."
                 }
             },
             "type": "object"
