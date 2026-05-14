@@ -341,11 +341,80 @@ export namespace resources {
         oomMemoryMultiplier?: pulumi.Input<number>;
     }
 
+    export interface HPABehaviorArgsArgs {
+        /**
+         * Scale-down behavior rules.
+         */
+        scaleDown?: pulumi.Input<inputs.resources.HPAScalingRulesArgsArgs>;
+        /**
+         * Scale-up behavior rules.
+         */
+        scaleUp?: pulumi.Input<inputs.resources.HPAScalingRulesArgsArgs>;
+    }
+
+    export interface HPAFallbackArgsArgs {
+        /**
+         * Fallback strategy. One of: 'static', 'currentReplicas', 'currentReplicasIfHigher', 'currentReplicasIfLower'. Example: 'currentReplicasIfHigher'.
+         */
+        behavior?: pulumi.Input<string>;
+        /**
+         * Number of consecutive metric failures before activating fallback. Example: 3.
+         */
+        failureThreshold?: pulumi.Input<number>;
+        /**
+         * Number of replicas to fall back to when metrics are unavailable. Example: 2.
+         */
+        replicas: pulumi.Input<number>;
+    }
+
+    export interface HPAMetricTriggerArgsArgs {
+        /**
+         * Free-form key-value pairs for external scalers. For Prometheus use serverAddress and query instead.
+         */
+        metadata?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+        /**
+         * PromQL query string. Shorthand — packed into metadata by the service layer. Example: 'sum(rate(http_requests_total[2m]))'.
+         */
+        query?: pulumi.Input<string>;
+        /**
+         * Prometheus server URL. Shorthand — packed into metadata by the service layer. Example: 'http://prometheus:9090'.
+         */
+        serverAddress?: pulumi.Input<string>;
+        /**
+         * Target utilization as a decimal string (resource metrics). Example: '0.70'.
+         */
+        targetUtilization?: pulumi.Input<string>;
+        /**
+         * Absolute target value as a string (external/object metrics, e.g. bytes/sec). Example: '50000000'.
+         */
+        targetValue?: pulumi.Input<string>;
+        /**
+         * Metric source type. Built-in: 'CPU', 'Memory', 'NetworkIngress', 'NetworkEgress'. External: 'prometheus'. Example: 'prometheus'.
+         */
+        type: pulumi.Input<string>;
+        /**
+         * Weight for composite formula scaling (0-1 decimal string). Example: '0.5'.
+         */
+        weight?: pulumi.Input<string>;
+    }
+
     export interface HPARuleConfigArgsArgs {
+        /**
+         * Fine-grained scale-up and scale-down behavior policies.
+         */
+        behavior?: pulumi.Input<inputs.resources.HPABehaviorArgsArgs>;
+        /**
+         * Formula combining multiple metric weights into a single scaling signal. Example: '0.6*cpu + 0.4*memory'.
+         */
+        compositeFormula?: pulumi.Input<string>;
         /**
          * Enable horizontal (replica) scaling. Example: true.
          */
         enabled?: pulumi.Input<boolean>;
+        /**
+         * Replica fallback configuration when metrics are unavailable.
+         */
+        fallback?: pulumi.Input<inputs.resources.HPAFallbackArgsArgs>;
         /**
          * Maximum percentage change in replica count per cycle. Example: 50.0.
          */
@@ -355,17 +424,59 @@ export namespace resources {
          */
         maxReplicas?: pulumi.Input<number>;
         /**
+         * Additional metric triggers (e.g. Prometheus). CPU/Memory/Network triggers are auto-generated from primaryMetric — do not redeclare them here.
+         */
+        metrics?: pulumi.Input<pulumi.Input<inputs.resources.HPAMetricTriggerArgsArgs>[]>;
+        /**
          * Minimum number of replicas. Example: 2.
          */
         minReplicas?: pulumi.Input<number>;
         /**
-         * Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
+         * Primary metric driving HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
          */
         primaryMetric?: pulumi.Input<string>;
         /**
-         * Target utilization ratio (0-1) for the primary metric. Example: 0.7.
+         * Seconds to wait between scale-down events. Example: 300.
+         */
+        scaleDownCooldownSeconds?: pulumi.Input<number>;
+        /**
+         * Target memory utilization ratio (0-1), tuned independently of CPU. Example: 0.8.
+         */
+        targetMemoryUtilization?: pulumi.Input<number>;
+        /**
+         * Target CPU utilization ratio (0-1). Example: 0.7.
          */
         targetUtilization?: pulumi.Input<number>;
+    }
+
+    export interface HPAScalingPolicyArgsArgs {
+        /**
+         * Period over which the policy applies in seconds. Example: 60.
+         */
+        periodSeconds: pulumi.Input<number>;
+        /**
+         * Policy type. One of: 'Pods', 'Percent'. Example: 'Percent'.
+         */
+        type: pulumi.Input<string>;
+        /**
+         * Policy value (pods count or percent). Example: 100.
+         */
+        value: pulumi.Input<number>;
+    }
+
+    export interface HPAScalingRulesArgsArgs {
+        /**
+         * List of scaling step policies applied during this direction.
+         */
+        policies?: pulumi.Input<pulumi.Input<inputs.resources.HPAScalingPolicyArgsArgs>[]>;
+        /**
+         * Which policy wins when multiple match. One of: 'Max', 'Min', 'Disabled'. Example: 'Max'.
+         */
+        selectPolicy?: pulumi.Input<string>;
+        /**
+         * Seconds to wait before acting on a scaling signal to avoid flapping. Example: 300.
+         */
+        stabilizationWindowSeconds?: pulumi.Input<number>;
     }
 
     export interface HorizontalScalingArgsArgs {

@@ -27,7 +27,12 @@ __all__ = [
     'DisruptionBudgetArgs',
     'DisruptionPolicyArgs',
     'EmergencyResponseConfigArgs',
+    'HPABehaviorArgs',
+    'HPAFallbackArgs',
+    'HPAMetricTriggerArgs',
     'HPARuleConfigArgs',
+    'HPAScalingPolicyArgs',
+    'HPAScalingRulesArgs',
     'HorizontalScalingArgs',
     'KubeletConfigurationArgs',
     'LabelSelectorArgs',
@@ -1276,11 +1281,233 @@ class EmergencyResponseConfigArgs(dict):
 
 
 @pulumi.output_type
+class HPABehaviorArgs(dict):
+    @staticmethod
+    def __key_warning(key: str):
+        suggest = None
+        if key == "scaleDown":
+            suggest = "scale_down"
+        elif key == "scaleUp":
+            suggest = "scale_up"
+
+        if suggest:
+            pulumi.log.warn(f"Key '{key}' not found in HPABehaviorArgs. Access the value via the '{suggest}' property getter instead.")
+
+    def __getitem__(self, key: str) -> Any:
+        HPABehaviorArgs.__key_warning(key)
+        return super().__getitem__(key)
+
+    def get(self, key: str, default = None) -> Any:
+        HPABehaviorArgs.__key_warning(key)
+        return super().get(key, default)
+
+    def __init__(__self__, *,
+                 scale_down: Optional['outputs.HPAScalingRulesArgs'] = None,
+                 scale_up: Optional['outputs.HPAScalingRulesArgs'] = None):
+        """
+        :param 'HPAScalingRulesArgs' scale_down: Scale-down behavior rules.
+        :param 'HPAScalingRulesArgs' scale_up: Scale-up behavior rules.
+        """
+        if scale_down is not None:
+            pulumi.set(__self__, "scale_down", scale_down)
+        if scale_up is not None:
+            pulumi.set(__self__, "scale_up", scale_up)
+
+    @_builtins.property
+    @pulumi.getter(name="scaleDown")
+    def scale_down(self) -> Optional['outputs.HPAScalingRulesArgs']:
+        """
+        Scale-down behavior rules.
+        """
+        return pulumi.get(self, "scale_down")
+
+    @_builtins.property
+    @pulumi.getter(name="scaleUp")
+    def scale_up(self) -> Optional['outputs.HPAScalingRulesArgs']:
+        """
+        Scale-up behavior rules.
+        """
+        return pulumi.get(self, "scale_up")
+
+
+@pulumi.output_type
+class HPAFallbackArgs(dict):
+    @staticmethod
+    def __key_warning(key: str):
+        suggest = None
+        if key == "failureThreshold":
+            suggest = "failure_threshold"
+
+        if suggest:
+            pulumi.log.warn(f"Key '{key}' not found in HPAFallbackArgs. Access the value via the '{suggest}' property getter instead.")
+
+    def __getitem__(self, key: str) -> Any:
+        HPAFallbackArgs.__key_warning(key)
+        return super().__getitem__(key)
+
+    def get(self, key: str, default = None) -> Any:
+        HPAFallbackArgs.__key_warning(key)
+        return super().get(key, default)
+
+    def __init__(__self__, *,
+                 replicas: _builtins.int,
+                 behavior: Optional[_builtins.str] = None,
+                 failure_threshold: Optional[_builtins.int] = None):
+        """
+        :param _builtins.int replicas: Number of replicas to fall back to when metrics are unavailable. Example: 2.
+        :param _builtins.str behavior: Fallback strategy. One of: 'static', 'currentReplicas', 'currentReplicasIfHigher', 'currentReplicasIfLower'. Example: 'currentReplicasIfHigher'.
+        :param _builtins.int failure_threshold: Number of consecutive metric failures before activating fallback. Example: 3.
+        """
+        pulumi.set(__self__, "replicas", replicas)
+        if behavior is not None:
+            pulumi.set(__self__, "behavior", behavior)
+        if failure_threshold is not None:
+            pulumi.set(__self__, "failure_threshold", failure_threshold)
+
+    @_builtins.property
+    @pulumi.getter
+    def replicas(self) -> _builtins.int:
+        """
+        Number of replicas to fall back to when metrics are unavailable. Example: 2.
+        """
+        return pulumi.get(self, "replicas")
+
+    @_builtins.property
+    @pulumi.getter
+    def behavior(self) -> Optional[_builtins.str]:
+        """
+        Fallback strategy. One of: 'static', 'currentReplicas', 'currentReplicasIfHigher', 'currentReplicasIfLower'. Example: 'currentReplicasIfHigher'.
+        """
+        return pulumi.get(self, "behavior")
+
+    @_builtins.property
+    @pulumi.getter(name="failureThreshold")
+    def failure_threshold(self) -> Optional[_builtins.int]:
+        """
+        Number of consecutive metric failures before activating fallback. Example: 3.
+        """
+        return pulumi.get(self, "failure_threshold")
+
+
+@pulumi.output_type
+class HPAMetricTriggerArgs(dict):
+    @staticmethod
+    def __key_warning(key: str):
+        suggest = None
+        if key == "serverAddress":
+            suggest = "server_address"
+        elif key == "targetUtilization":
+            suggest = "target_utilization"
+        elif key == "targetValue":
+            suggest = "target_value"
+
+        if suggest:
+            pulumi.log.warn(f"Key '{key}' not found in HPAMetricTriggerArgs. Access the value via the '{suggest}' property getter instead.")
+
+    def __getitem__(self, key: str) -> Any:
+        HPAMetricTriggerArgs.__key_warning(key)
+        return super().__getitem__(key)
+
+    def get(self, key: str, default = None) -> Any:
+        HPAMetricTriggerArgs.__key_warning(key)
+        return super().get(key, default)
+
+    def __init__(__self__, *,
+                 type: _builtins.str,
+                 metadata: Optional[Mapping[str, _builtins.str]] = None,
+                 query: Optional[_builtins.str] = None,
+                 server_address: Optional[_builtins.str] = None,
+                 target_utilization: Optional[_builtins.str] = None,
+                 target_value: Optional[_builtins.str] = None,
+                 weight: Optional[_builtins.str] = None):
+        """
+        :param _builtins.str type: Metric source type. Built-in: 'CPU', 'Memory', 'NetworkIngress', 'NetworkEgress'. External: 'prometheus'. Example: 'prometheus'.
+        :param Mapping[str, _builtins.str] metadata: Free-form key-value pairs for external scalers. For Prometheus use serverAddress and query instead.
+        :param _builtins.str query: PromQL query string. Shorthand — packed into metadata by the service layer. Example: 'sum(rate(http_requests_total[2m]))'.
+        :param _builtins.str server_address: Prometheus server URL. Shorthand — packed into metadata by the service layer. Example: 'http://prometheus:9090'.
+        :param _builtins.str target_utilization: Target utilization as a decimal string (resource metrics). Example: '0.70'.
+        :param _builtins.str target_value: Absolute target value as a string (external/object metrics, e.g. bytes/sec). Example: '50000000'.
+        :param _builtins.str weight: Weight for composite formula scaling (0-1 decimal string). Example: '0.5'.
+        """
+        pulumi.set(__self__, "type", type)
+        if metadata is not None:
+            pulumi.set(__self__, "metadata", metadata)
+        if query is not None:
+            pulumi.set(__self__, "query", query)
+        if server_address is not None:
+            pulumi.set(__self__, "server_address", server_address)
+        if target_utilization is not None:
+            pulumi.set(__self__, "target_utilization", target_utilization)
+        if target_value is not None:
+            pulumi.set(__self__, "target_value", target_value)
+        if weight is not None:
+            pulumi.set(__self__, "weight", weight)
+
+    @_builtins.property
+    @pulumi.getter
+    def type(self) -> _builtins.str:
+        """
+        Metric source type. Built-in: 'CPU', 'Memory', 'NetworkIngress', 'NetworkEgress'. External: 'prometheus'. Example: 'prometheus'.
+        """
+        return pulumi.get(self, "type")
+
+    @_builtins.property
+    @pulumi.getter
+    def metadata(self) -> Optional[Mapping[str, _builtins.str]]:
+        """
+        Free-form key-value pairs for external scalers. For Prometheus use serverAddress and query instead.
+        """
+        return pulumi.get(self, "metadata")
+
+    @_builtins.property
+    @pulumi.getter
+    def query(self) -> Optional[_builtins.str]:
+        """
+        PromQL query string. Shorthand — packed into metadata by the service layer. Example: 'sum(rate(http_requests_total[2m]))'.
+        """
+        return pulumi.get(self, "query")
+
+    @_builtins.property
+    @pulumi.getter(name="serverAddress")
+    def server_address(self) -> Optional[_builtins.str]:
+        """
+        Prometheus server URL. Shorthand — packed into metadata by the service layer. Example: 'http://prometheus:9090'.
+        """
+        return pulumi.get(self, "server_address")
+
+    @_builtins.property
+    @pulumi.getter(name="targetUtilization")
+    def target_utilization(self) -> Optional[_builtins.str]:
+        """
+        Target utilization as a decimal string (resource metrics). Example: '0.70'.
+        """
+        return pulumi.get(self, "target_utilization")
+
+    @_builtins.property
+    @pulumi.getter(name="targetValue")
+    def target_value(self) -> Optional[_builtins.str]:
+        """
+        Absolute target value as a string (external/object metrics, e.g. bytes/sec). Example: '50000000'.
+        """
+        return pulumi.get(self, "target_value")
+
+    @_builtins.property
+    @pulumi.getter
+    def weight(self) -> Optional[_builtins.str]:
+        """
+        Weight for composite formula scaling (0-1 decimal string). Example: '0.5'.
+        """
+        return pulumi.get(self, "weight")
+
+
+@pulumi.output_type
 class HPARuleConfigArgs(dict):
     @staticmethod
     def __key_warning(key: str):
         suggest = None
-        if key == "maxReplicaChangePercent":
+        if key == "compositeFormula":
+            suggest = "composite_formula"
+        elif key == "maxReplicaChangePercent":
             suggest = "max_replica_change_percent"
         elif key == "maxReplicas":
             suggest = "max_replicas"
@@ -1288,6 +1515,10 @@ class HPARuleConfigArgs(dict):
             suggest = "min_replicas"
         elif key == "primaryMetric":
             suggest = "primary_metric"
+        elif key == "scaleDownCooldownSeconds":
+            suggest = "scale_down_cooldown_seconds"
+        elif key == "targetMemoryUtilization":
+            suggest = "target_memory_utilization"
         elif key == "targetUtilization":
             suggest = "target_utilization"
 
@@ -1303,32 +1534,72 @@ class HPARuleConfigArgs(dict):
         return super().get(key, default)
 
     def __init__(__self__, *,
+                 behavior: Optional['outputs.HPABehaviorArgs'] = None,
+                 composite_formula: Optional[_builtins.str] = None,
                  enabled: Optional[_builtins.bool] = None,
+                 fallback: Optional['outputs.HPAFallbackArgs'] = None,
                  max_replica_change_percent: Optional[_builtins.float] = None,
                  max_replicas: Optional[_builtins.int] = None,
+                 metrics: Optional[Sequence['outputs.HPAMetricTriggerArgs']] = None,
                  min_replicas: Optional[_builtins.int] = None,
                  primary_metric: Optional[_builtins.str] = None,
+                 scale_down_cooldown_seconds: Optional[_builtins.int] = None,
+                 target_memory_utilization: Optional[_builtins.float] = None,
                  target_utilization: Optional[_builtins.float] = None):
         """
+        :param 'HPABehaviorArgs' behavior: Fine-grained scale-up and scale-down behavior policies.
+        :param _builtins.str composite_formula: Formula combining multiple metric weights into a single scaling signal. Example: '0.6*cpu + 0.4*memory'.
         :param _builtins.bool enabled: Enable horizontal (replica) scaling. Example: true.
+        :param 'HPAFallbackArgs' fallback: Replica fallback configuration when metrics are unavailable.
         :param _builtins.float max_replica_change_percent: Maximum percentage change in replica count per cycle. Example: 50.0.
         :param _builtins.int max_replicas: Maximum number of replicas. Example: 10.
+        :param Sequence['HPAMetricTriggerArgs'] metrics: Additional metric triggers (e.g. Prometheus). CPU/Memory/Network triggers are auto-generated from primaryMetric — do not redeclare them here.
         :param _builtins.int min_replicas: Minimum number of replicas. Example: 2.
-        :param _builtins.str primary_metric: Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
-        :param _builtins.float target_utilization: Target utilization ratio (0-1) for the primary metric. Example: 0.7.
+        :param _builtins.str primary_metric: Primary metric driving HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
+        :param _builtins.int scale_down_cooldown_seconds: Seconds to wait between scale-down events. Example: 300.
+        :param _builtins.float target_memory_utilization: Target memory utilization ratio (0-1), tuned independently of CPU. Example: 0.8.
+        :param _builtins.float target_utilization: Target CPU utilization ratio (0-1). Example: 0.7.
         """
+        if behavior is not None:
+            pulumi.set(__self__, "behavior", behavior)
+        if composite_formula is not None:
+            pulumi.set(__self__, "composite_formula", composite_formula)
         if enabled is not None:
             pulumi.set(__self__, "enabled", enabled)
+        if fallback is not None:
+            pulumi.set(__self__, "fallback", fallback)
         if max_replica_change_percent is not None:
             pulumi.set(__self__, "max_replica_change_percent", max_replica_change_percent)
         if max_replicas is not None:
             pulumi.set(__self__, "max_replicas", max_replicas)
+        if metrics is not None:
+            pulumi.set(__self__, "metrics", metrics)
         if min_replicas is not None:
             pulumi.set(__self__, "min_replicas", min_replicas)
         if primary_metric is not None:
             pulumi.set(__self__, "primary_metric", primary_metric)
+        if scale_down_cooldown_seconds is not None:
+            pulumi.set(__self__, "scale_down_cooldown_seconds", scale_down_cooldown_seconds)
+        if target_memory_utilization is not None:
+            pulumi.set(__self__, "target_memory_utilization", target_memory_utilization)
         if target_utilization is not None:
             pulumi.set(__self__, "target_utilization", target_utilization)
+
+    @_builtins.property
+    @pulumi.getter
+    def behavior(self) -> Optional['outputs.HPABehaviorArgs']:
+        """
+        Fine-grained scale-up and scale-down behavior policies.
+        """
+        return pulumi.get(self, "behavior")
+
+    @_builtins.property
+    @pulumi.getter(name="compositeFormula")
+    def composite_formula(self) -> Optional[_builtins.str]:
+        """
+        Formula combining multiple metric weights into a single scaling signal. Example: '0.6*cpu + 0.4*memory'.
+        """
+        return pulumi.get(self, "composite_formula")
 
     @_builtins.property
     @pulumi.getter
@@ -1337,6 +1608,14 @@ class HPARuleConfigArgs(dict):
         Enable horizontal (replica) scaling. Example: true.
         """
         return pulumi.get(self, "enabled")
+
+    @_builtins.property
+    @pulumi.getter
+    def fallback(self) -> Optional['outputs.HPAFallbackArgs']:
+        """
+        Replica fallback configuration when metrics are unavailable.
+        """
+        return pulumi.get(self, "fallback")
 
     @_builtins.property
     @pulumi.getter(name="maxReplicaChangePercent")
@@ -1355,6 +1634,14 @@ class HPARuleConfigArgs(dict):
         return pulumi.get(self, "max_replicas")
 
     @_builtins.property
+    @pulumi.getter
+    def metrics(self) -> Optional[Sequence['outputs.HPAMetricTriggerArgs']]:
+        """
+        Additional metric triggers (e.g. Prometheus). CPU/Memory/Network triggers are auto-generated from primaryMetric — do not redeclare them here.
+        """
+        return pulumi.get(self, "metrics")
+
+    @_builtins.property
     @pulumi.getter(name="minReplicas")
     def min_replicas(self) -> Optional[_builtins.int]:
         """
@@ -1366,17 +1653,152 @@ class HPARuleConfigArgs(dict):
     @pulumi.getter(name="primaryMetric")
     def primary_metric(self) -> Optional[_builtins.str]:
         """
-        Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
+        Primary metric driving HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
         """
         return pulumi.get(self, "primary_metric")
+
+    @_builtins.property
+    @pulumi.getter(name="scaleDownCooldownSeconds")
+    def scale_down_cooldown_seconds(self) -> Optional[_builtins.int]:
+        """
+        Seconds to wait between scale-down events. Example: 300.
+        """
+        return pulumi.get(self, "scale_down_cooldown_seconds")
+
+    @_builtins.property
+    @pulumi.getter(name="targetMemoryUtilization")
+    def target_memory_utilization(self) -> Optional[_builtins.float]:
+        """
+        Target memory utilization ratio (0-1), tuned independently of CPU. Example: 0.8.
+        """
+        return pulumi.get(self, "target_memory_utilization")
 
     @_builtins.property
     @pulumi.getter(name="targetUtilization")
     def target_utilization(self) -> Optional[_builtins.float]:
         """
-        Target utilization ratio (0-1) for the primary metric. Example: 0.7.
+        Target CPU utilization ratio (0-1). Example: 0.7.
         """
         return pulumi.get(self, "target_utilization")
+
+
+@pulumi.output_type
+class HPAScalingPolicyArgs(dict):
+    @staticmethod
+    def __key_warning(key: str):
+        suggest = None
+        if key == "periodSeconds":
+            suggest = "period_seconds"
+
+        if suggest:
+            pulumi.log.warn(f"Key '{key}' not found in HPAScalingPolicyArgs. Access the value via the '{suggest}' property getter instead.")
+
+    def __getitem__(self, key: str) -> Any:
+        HPAScalingPolicyArgs.__key_warning(key)
+        return super().__getitem__(key)
+
+    def get(self, key: str, default = None) -> Any:
+        HPAScalingPolicyArgs.__key_warning(key)
+        return super().get(key, default)
+
+    def __init__(__self__, *,
+                 period_seconds: _builtins.int,
+                 type: _builtins.str,
+                 value: _builtins.int):
+        """
+        :param _builtins.int period_seconds: Period over which the policy applies in seconds. Example: 60.
+        :param _builtins.str type: Policy type. One of: 'Pods', 'Percent'. Example: 'Percent'.
+        :param _builtins.int value: Policy value (pods count or percent). Example: 100.
+        """
+        pulumi.set(__self__, "period_seconds", period_seconds)
+        pulumi.set(__self__, "type", type)
+        pulumi.set(__self__, "value", value)
+
+    @_builtins.property
+    @pulumi.getter(name="periodSeconds")
+    def period_seconds(self) -> _builtins.int:
+        """
+        Period over which the policy applies in seconds. Example: 60.
+        """
+        return pulumi.get(self, "period_seconds")
+
+    @_builtins.property
+    @pulumi.getter
+    def type(self) -> _builtins.str:
+        """
+        Policy type. One of: 'Pods', 'Percent'. Example: 'Percent'.
+        """
+        return pulumi.get(self, "type")
+
+    @_builtins.property
+    @pulumi.getter
+    def value(self) -> _builtins.int:
+        """
+        Policy value (pods count or percent). Example: 100.
+        """
+        return pulumi.get(self, "value")
+
+
+@pulumi.output_type
+class HPAScalingRulesArgs(dict):
+    @staticmethod
+    def __key_warning(key: str):
+        suggest = None
+        if key == "selectPolicy":
+            suggest = "select_policy"
+        elif key == "stabilizationWindowSeconds":
+            suggest = "stabilization_window_seconds"
+
+        if suggest:
+            pulumi.log.warn(f"Key '{key}' not found in HPAScalingRulesArgs. Access the value via the '{suggest}' property getter instead.")
+
+    def __getitem__(self, key: str) -> Any:
+        HPAScalingRulesArgs.__key_warning(key)
+        return super().__getitem__(key)
+
+    def get(self, key: str, default = None) -> Any:
+        HPAScalingRulesArgs.__key_warning(key)
+        return super().get(key, default)
+
+    def __init__(__self__, *,
+                 policies: Optional[Sequence['outputs.HPAScalingPolicyArgs']] = None,
+                 select_policy: Optional[_builtins.str] = None,
+                 stabilization_window_seconds: Optional[_builtins.int] = None):
+        """
+        :param Sequence['HPAScalingPolicyArgs'] policies: List of scaling step policies applied during this direction.
+        :param _builtins.str select_policy: Which policy wins when multiple match. One of: 'Max', 'Min', 'Disabled'. Example: 'Max'.
+        :param _builtins.int stabilization_window_seconds: Seconds to wait before acting on a scaling signal to avoid flapping. Example: 300.
+        """
+        if policies is not None:
+            pulumi.set(__self__, "policies", policies)
+        if select_policy is not None:
+            pulumi.set(__self__, "select_policy", select_policy)
+        if stabilization_window_seconds is not None:
+            pulumi.set(__self__, "stabilization_window_seconds", stabilization_window_seconds)
+
+    @_builtins.property
+    @pulumi.getter
+    def policies(self) -> Optional[Sequence['outputs.HPAScalingPolicyArgs']]:
+        """
+        List of scaling step policies applied during this direction.
+        """
+        return pulumi.get(self, "policies")
+
+    @_builtins.property
+    @pulumi.getter(name="selectPolicy")
+    def select_policy(self) -> Optional[_builtins.str]:
+        """
+        Which policy wins when multiple match. One of: 'Max', 'Min', 'Disabled'. Example: 'Max'.
+        """
+        return pulumi.get(self, "select_policy")
+
+    @_builtins.property
+    @pulumi.getter(name="stabilizationWindowSeconds")
+    def stabilization_window_seconds(self) -> Optional[_builtins.int]:
+        """
+        Seconds to wait before acting on a scaling signal to avoid flapping. Example: 300.
+        """
+        return pulumi.get(self, "stabilization_window_seconds")
 
 
 @pulumi.output_type

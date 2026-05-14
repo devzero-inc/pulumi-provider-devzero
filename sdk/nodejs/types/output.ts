@@ -341,11 +341,80 @@ export namespace resources {
         oomMemoryMultiplier?: number;
     }
 
+    export interface HPABehaviorArgs {
+        /**
+         * Scale-down behavior rules.
+         */
+        scaleDown?: outputs.resources.HPAScalingRulesArgs;
+        /**
+         * Scale-up behavior rules.
+         */
+        scaleUp?: outputs.resources.HPAScalingRulesArgs;
+    }
+
+    export interface HPAFallbackArgs {
+        /**
+         * Fallback strategy. One of: 'static', 'currentReplicas', 'currentReplicasIfHigher', 'currentReplicasIfLower'. Example: 'currentReplicasIfHigher'.
+         */
+        behavior?: string;
+        /**
+         * Number of consecutive metric failures before activating fallback. Example: 3.
+         */
+        failureThreshold?: number;
+        /**
+         * Number of replicas to fall back to when metrics are unavailable. Example: 2.
+         */
+        replicas: number;
+    }
+
+    export interface HPAMetricTriggerArgs {
+        /**
+         * Free-form key-value pairs for external scalers. For Prometheus use serverAddress and query instead.
+         */
+        metadata?: {[key: string]: string};
+        /**
+         * PromQL query string. Shorthand — packed into metadata by the service layer. Example: 'sum(rate(http_requests_total[2m]))'.
+         */
+        query?: string;
+        /**
+         * Prometheus server URL. Shorthand — packed into metadata by the service layer. Example: 'http://prometheus:9090'.
+         */
+        serverAddress?: string;
+        /**
+         * Target utilization as a decimal string (resource metrics). Example: '0.70'.
+         */
+        targetUtilization?: string;
+        /**
+         * Absolute target value as a string (external/object metrics, e.g. bytes/sec). Example: '50000000'.
+         */
+        targetValue?: string;
+        /**
+         * Metric source type. Built-in: 'CPU', 'Memory', 'NetworkIngress', 'NetworkEgress'. External: 'prometheus'. Example: 'prometheus'.
+         */
+        type: string;
+        /**
+         * Weight for composite formula scaling (0-1 decimal string). Example: '0.5'.
+         */
+        weight?: string;
+    }
+
     export interface HPARuleConfigArgs {
+        /**
+         * Fine-grained scale-up and scale-down behavior policies.
+         */
+        behavior?: outputs.resources.HPABehaviorArgs;
+        /**
+         * Formula combining multiple metric weights into a single scaling signal. Example: '0.6*cpu + 0.4*memory'.
+         */
+        compositeFormula?: string;
         /**
          * Enable horizontal (replica) scaling. Example: true.
          */
         enabled?: boolean;
+        /**
+         * Replica fallback configuration when metrics are unavailable.
+         */
+        fallback?: outputs.resources.HPAFallbackArgs;
         /**
          * Maximum percentage change in replica count per cycle. Example: 50.0.
          */
@@ -355,17 +424,59 @@ export namespace resources {
          */
         maxReplicas?: number;
         /**
+         * Additional metric triggers (e.g. Prometheus). CPU/Memory/Network triggers are auto-generated from primaryMetric — do not redeclare them here.
+         */
+        metrics?: outputs.resources.HPAMetricTriggerArgs[];
+        /**
          * Minimum number of replicas. Example: 2.
          */
         minReplicas?: number;
         /**
-         * Primary metric for HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
+         * Primary metric driving HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
          */
         primaryMetric?: string;
         /**
-         * Target utilization ratio (0-1) for the primary metric. Example: 0.7.
+         * Seconds to wait between scale-down events. Example: 300.
+         */
+        scaleDownCooldownSeconds?: number;
+        /**
+         * Target memory utilization ratio (0-1), tuned independently of CPU. Example: 0.8.
+         */
+        targetMemoryUtilization?: number;
+        /**
+         * Target CPU utilization ratio (0-1). Example: 0.7.
          */
         targetUtilization?: number;
+    }
+
+    export interface HPAScalingPolicyArgs {
+        /**
+         * Period over which the policy applies in seconds. Example: 60.
+         */
+        periodSeconds: number;
+        /**
+         * Policy type. One of: 'Pods', 'Percent'. Example: 'Percent'.
+         */
+        type: string;
+        /**
+         * Policy value (pods count or percent). Example: 100.
+         */
+        value: number;
+    }
+
+    export interface HPAScalingRulesArgs {
+        /**
+         * List of scaling step policies applied during this direction.
+         */
+        policies?: outputs.resources.HPAScalingPolicyArgs[];
+        /**
+         * Which policy wins when multiple match. One of: 'Max', 'Min', 'Disabled'. Example: 'Max'.
+         */
+        selectPolicy?: string;
+        /**
+         * Seconds to wait before acting on a scaling signal to avoid flapping. Example: 300.
+         */
+        stabilizationWindowSeconds?: number;
     }
 
     export interface HorizontalScalingArgs {
