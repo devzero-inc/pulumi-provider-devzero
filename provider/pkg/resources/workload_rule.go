@@ -654,9 +654,12 @@ func hpaMetricTriggersToProto(ms []HPAMetricTriggerArgs) []*apiv1.HPAMetricTrigg
 }
 
 func hpaMetricTriggersFromProto(ps []*apiv1.HPAMetricTrigger) []HPAMetricTriggerArgs {
-	result := make([]HPAMetricTriggerArgs, len(ps))
-	for i, p := range ps {
-		result[i] = HPAMetricTriggerArgs{
+	result := make([]HPAMetricTriggerArgs, 0, len(ps))
+	for _, p := range ps {
+		if p == nil {
+			continue
+		}
+		result = append(result, HPAMetricTriggerArgs{
 			Type:              p.Type,
 			TargetUtilization: p.TargetUtilization,
 			TargetValue:       p.TargetValue,
@@ -664,7 +667,7 @@ func hpaMetricTriggersFromProto(ps []*apiv1.HPAMetricTrigger) []HPAMetricTrigger
 			Metadata:          p.Metadata,
 			ServerAddress:     p.ServerAddress,
 			Query:             p.Query,
-		}
+		})
 	}
 	return result
 }
@@ -738,6 +741,9 @@ func hpaScalingRulesFromProto(p *apiv1.HPAScalingRules) *HPAScalingRulesArgs {
 		SelectPolicy:               p.SelectPolicy,
 	}
 	for _, pol := range p.Policies {
+		if pol == nil {
+			continue
+		}
 		r.Policies = append(r.Policies, HPAScalingPolicyArgs{
 			Type:          pol.Type,
 			Value:         int(pol.Value),
