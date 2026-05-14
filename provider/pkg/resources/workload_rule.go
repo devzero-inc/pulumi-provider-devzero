@@ -257,12 +257,22 @@ func (w *WorkloadRule) Delete(ctx context.Context, req infer.DeleteRequest[Workl
 // ---------- proto conversion helpers ----------
 
 func ruleArgsToUpsertRequest(teamID string, a WorkloadRuleArgs) *apiv1.UpsertManualWorkloadRuleRequest {
+	// Attribute the rule to the Pulumi provider so the server persists
+	// source=pulumi_manual or source=pulumi_auto. Audit + UI surfaces use
+	// this to distinguish IaC-managed rules from UI edits AND to tell whether
+	// the user hand-specified fields or asked the engine to generate them
+	// (which matters for round-tripping AutoGenerate on read).
+	source := apiv1.WorkloadRuleSource_WORKLOAD_RULE_SOURCE_PULUMI_MANUAL
+	if a.AutoGenerate != nil && *a.AutoGenerate {
+		source = apiv1.WorkloadRuleSource_WORKLOAD_RULE_SOURCE_PULUMI_AUTO
+	}
 	req := &apiv1.UpsertManualWorkloadRuleRequest{
 		TeamId:    teamID,
 		ClusterId: a.ClusterID,
 		Namespace: a.Namespace,
 		Kind:      a.Kind,
 		Name:      a.Name,
+		Source:    source,
 	}
 	if a.AutoGenerate != nil && *a.AutoGenerate {
 		req.AutoGenerate = true
@@ -330,7 +340,11 @@ func ruleProtoToArgs(r *apiv1.WorkloadRule) WorkloadRuleArgs {
 	if r.DefragmentationSchedule != nil {
 		a.DefragmentationSchedule = r.DefragmentationSchedule
 	}
-	if r.CurrentSource == "auto_optimization" {
+	// Round-trip AutoGenerate. "auto_optimization" covers legacy auto rules;
+	// "pulumi_auto" / "terraform_auto" are the per-IaC-provider markers we
+	// now persist so the read path can distinguish auto vs manual unambiguously.
+	switch r.CurrentSource {
+	case "auto_optimization", "pulumi_auto", "terraform_auto":
 		autoGen := true
 		a.AutoGenerate = &autoGen
 	}

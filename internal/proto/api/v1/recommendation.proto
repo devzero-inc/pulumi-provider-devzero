@@ -1115,7 +1115,7 @@ message WorkloadRule {
     // UI display fields (not sent to cluster, only used for listing)
     string status = 80;                // "active" or "inactive"
     string sync_status = 81;           // "pending", "synced", or "failed"
-    string current_source = 82;        // "crd", "policy", "auto_optimization", "manual"
+    string current_source = 82;        // "crd", "policy", "auto_optimization", "manual", "pulumi_manual", "pulumi_auto", "terraform_manual", "terraform_auto"
     google.protobuf.Timestamp created_at = 83;
     google.protobuf.Timestamp updated_at = 84;
 
@@ -1143,10 +1143,13 @@ message ResourceRuleConfig {
 }
 
 message HPAMetricTrigger {
-    string type = 1;                          // "CPU", "Memory", "NetworkIngress", "NetworkEgress"
+    string type = 1;                          // "CPU", "Memory", "NetworkIngress", "NetworkEgress", "prometheus"
     optional string target_utilization = 2;    // "0.70" for resource metrics
     optional string target_value = 3;          // "50000000" for absolute metrics (bytes/sec)
     optional string weight = 4;                // "0.5" for composite formula
+    map<string, string> metadata = 5;          // Free-form key-value for external scalers (e.g. serverAddress, query for Prometheus)
+    optional string server_address = 6;        // Frontend-friendly: Prometheus server URL (packed into metadata by service layer)
+    optional string query = 7;                 // Frontend-friendly: PromQL query (packed into metadata by service layer)
 }
 
 // HPABehavior, HPAScalingRules, HPAScalingPolicy are defined in common.proto
@@ -2170,6 +2173,10 @@ message GetNodeAnnotationReadinessResponse {
     int32 unannotated_nodes = 3;
     bool ready = 4;
     repeated string unannotated_node_names = 5;
+    // supported is false when the cluster's cloud provider has no annotation
+    // schema yet (Azure / OCI today). The wizard renders a clear "not
+    // supported" state instead of polling indefinitely.
+    bool supported = 6;
 }
 
 // Migration wizard state
@@ -2324,6 +2331,11 @@ message NodePolicy {
   optional int64 cloud_provider_id = 85;
   CloudProvider cloud_provider = 86;
 
+  // Cloud-agnostic opt-in for AZ outage handling (AWS ARC zonal shift today;
+  // analogous GCP behavior planned). The compile step translates this to
+  // provider-specific annotations on the Karpenter NodePool.
+  ZonalShiftConfig zonal_shift = 90;
+
   // Raw escape hatch for node pool
   repeated RawKarpenterSpec raw = 100;
 
@@ -2475,6 +2487,45 @@ message NodePolicyTarget {
   google.protobuf.Timestamp created_at = 110;
   google.protobuf.Timestamp updated_at = 111;
   google.protobuf.Timestamp deleted_at = 112;
+
+  // Runtime status conditions read from the compiled Karpenter NodePool in the
+  // target cluster (e.g. ZonalShiftReady / ZonalShiftActive). Populated by
+  // ListNodePolicyTargets via a join against k8s_karpenter_resources. Empty
+  // when no conditions are observed for this target.
+  NodePolicyTargetStatus status = 120;
+}
+
+message NodePolicyCondition {
+  // e.g. "ZonalShiftReady", "ZonalShiftActive"
+  string type = 1;
+  // "True" | "False" | "Unknown"
+  string status = 2;
+  // Machine-readable reason code (e.g. "Ready", "ZonePinned", "NoFallbackZones",
+  // "NoActiveShift", "AwayFrom", "ZoneConstraintConflict").
+  string reason = 3;
+  // Human-readable detail (e.g. impacted zone names).
+  string message = 4;
+  google.protobuf.Timestamp last_transition_time = 5;
+}
+
+message NodePolicyTargetStatus {
+  repeated NodePolicyCondition conditions = 1;
+}
+
+// Cloud-agnostic config for how a node policy should react to AZ outage
+// signals from the cloud provider (AWS ARC zonal shift today; GCP analogue
+// planned). The compile step maps these intents to provider-specific
+// annotations on the resulting Karpenter NodePool.
+message ZonalShiftConfig {
+  // Master opt-in. When false the other two fields are ignored.
+  bool respect_zonal_shift = 1;
+  // Also terminate existing nodes in the impacted zone, forcing reschedule.
+  // Respects pod disruption budgets. Only meaningful when respect_zonal_shift is true.
+  bool evict_impacted_nodes = 2;
+  // If the policy is pinned to a single zone and that zone is impacted, expand
+  // to other zones available on the node class. Only meaningful when
+  // respect_zonal_shift is true.
+  bool allow_zone_fallback = 3;
 }
 
 message Taint {
@@ -3436,6 +3487,23 @@ message ManualRuleFields {
     repeated ContainerResourceRuleConfig containers = 15;
 }
 
+// WorkloadRuleSource identifies who created/last-modified a WorkloadRule.
+// Mirrors models.WorkloadRuleSource on the server. New IaC ecosystems get
+// their own value so audit + UI can attribute rules accurately.
+enum WorkloadRuleSource {
+    WORKLOAD_RULE_SOURCE_UNSPECIFIED = 0;
+    WORKLOAD_RULE_SOURCE_CRD = 1;                // kubectl / in-cluster CRD edit
+    WORKLOAD_RULE_SOURCE_POLICY = 2;             // workload_optimization_policy loop
+    WORKLOAD_RULE_SOURCE_AUTO_OPTIMIZATION = 3;  // engine-driven auto rule
+    WORKLOAD_RULE_SOURCE_MANUAL = 4;             // UI form
+    // IaC providers — split per mode so audit + UI can tell whether the user
+    // hand-specified the rule fields or asked the engine to auto-generate.
+    WORKLOAD_RULE_SOURCE_PULUMI_MANUAL = 5;      // pulumi, auto_generate=false
+    WORKLOAD_RULE_SOURCE_PULUMI_AUTO = 6;        // pulumi, auto_generate=true
+    WORKLOAD_RULE_SOURCE_TERRAFORM_MANUAL = 7;   // terraform, auto_generate=false
+    WORKLOAD_RULE_SOURCE_TERRAFORM_AUTO = 8;     // terraform, auto_generate=true
+}
+
 message UpsertManualWorkloadRuleRequest {
     string team_id = 1;
     string cluster_id = 2;
@@ -3446,6 +3514,12 @@ message UpsertManualWorkloadRuleRequest {
 
     // Manual fields (only used when auto_generate = false).
     ManualRuleFields fields = 10;
+
+    // Optional: identifies which caller is upserting this rule. When unset,
+    // the server defaults to WORKLOAD_RULE_SOURCE_MANUAL (legacy UI behavior).
+    // External IaC providers (pulumi, terraform) MUST set this so the rule
+    // can be attributed in audit and UI surfaces.
+    WorkloadRuleSource source = 11;
 }
 
 message UpsertManualWorkloadRuleResponse {
