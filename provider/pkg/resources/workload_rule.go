@@ -343,9 +343,14 @@ func ruleProtoToArgs(r *apiv1.WorkloadRule) WorkloadRuleArgs {
 	// Round-trip AutoGenerate. "auto_optimization" covers legacy auto rules;
 	// "pulumi_auto" / "terraform_auto" are the per-IaC-provider markers we
 	// now persist so the read path can distinguish auto vs manual unambiguously.
+	// Explicitly setting false for *_manual prevents drift detection from
+	// flagging a Pulumi-managed manual rule as needing to flip to AutoGenerate.
 	switch r.CurrentSource {
 	case "auto_optimization", "pulumi_auto", "terraform_auto":
 		autoGen := true
+		a.AutoGenerate = &autoGen
+	case "pulumi_manual", "terraform_manual":
+		autoGen := false
 		a.AutoGenerate = &autoGen
 	}
 	return a
