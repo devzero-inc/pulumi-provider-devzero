@@ -112,7 +112,7 @@ const policy = new resources.WorkloadPolicy("cpu-scaling-policy", {
             minChangePercent: 0.2,                             // apply only if change > 20%
         });
 
-// 3. Apply the workload policy to the cluster for all Deployments
+// 3. Apply the workload policy to the cluster for all Deployments in prod-* namespaces
 const workloadTarget = new resources.WorkloadPolicyTarget("prod-cluster-deployments-target", {
     name: "prod-cluster-deployments-target",
     description: "Apply cpu-scaling-policy to all Deployments in prod-cluster",
@@ -120,6 +120,12 @@ const workloadTarget = new resources.WorkloadPolicyTarget("prod-cluster-deployme
     clusterIds: [cluster.id],
     kindFilter: ["Deployment"],
     enabled: true,
+    // Target namespaces by name pattern instead of (or in addition to) labels.
+    // Matches any namespace whose name starts with "prod-" (case-insensitive).
+    namespacePattern: {
+        pattern: "^prod-",
+        flags: "i",
+    },
 });
 
 // 4. Create a node policy for dzkarp-based node provisioning
@@ -246,6 +252,7 @@ from pulumi_devzero.resources import (
     WorkloadPolicyTarget, WorkloadPolicyTargetArgs,
     NodePolicy, NodePolicyArgs,
     NodePolicyTarget, NodePolicyTargetArgs,
+    NamePatternArgs,
 )
 from pulumi_devzero.resources.types import (
     VerticalScalingArgs,
@@ -302,7 +309,7 @@ policy = WorkloadPolicy(
     ),
 )
 
-# 3. Apply the workload policy to the cluster for all Deployments
+# 3. Apply the workload policy to the cluster for all Deployments in prod-* namespaces
 workload_target = WorkloadPolicyTarget(
     "prod-cluster-deployments-target",
     args=WorkloadPolicyTargetArgs(
@@ -311,6 +318,9 @@ workload_target = WorkloadPolicyTarget(
         cluster_ids=[cluster.id],
         kind_filter=["Deployment"],
         enabled=True,
+        # Target namespaces by name pattern instead of (or in addition to) labels.
+        # Matches any namespace whose name starts with "prod-" (case-insensitive).
+        namespace_pattern=NamePatternArgs(pattern="^prod-", flags="i"),
     ),
 )
 
@@ -481,13 +491,19 @@ func main() {
             return err
         }
 
-        // 3. Apply the workload policy to the cluster for all Deployments
+        // 3. Apply the workload policy to the cluster for all Deployments in prod-* namespaces
         workloadTarget, err := resources.NewWorkloadPolicyTarget(ctx, "prod-cluster-deployments-target", &resources.WorkloadPolicyTargetArgs{
             Name:       pulumi.String("prod-cluster-deployments-target"),
             PolicyId:   policy.ID(),
             ClusterIds: pulumi.StringArray{cluster.ID()},
             KindFilter: pulumi.StringArray{pulumi.String("Deployment")},
             Enabled:    pulumi.BoolPtr(true),
+            // Target namespaces by name pattern instead of (or in addition to) labels.
+            // Matches any namespace whose name starts with "prod-" (case-insensitive).
+            NamespacePattern: &resources.NamePatternArgsArgs{
+                Pattern: pulumi.String("^prod-"),
+                Flags:   pulumi.StringPtr("i"),
+            },
         })
         if err != nil {
             return err
@@ -787,11 +803,19 @@ Python: `min_replicas`, `max_replicas`, `target_utilization`, `primary_metric`, 
 | `workloadNames` | string[] | Explicit list of workload names to include |
 | `nodeGroupNames` | string[] | Restrict matching to specific node groups by name |
 | `namePattern` | `NamePatternArgs` | Regex pattern to match workload names |
+| `namespacePattern` | `NamePatternArgs` | Regex pattern to match namespace names. Useful when namespaces follow a naming convention but lack consistent labels (e.g. `^prod-`). Combined with other criteria using AND logic. |
 | `namespaceSelector` | `LabelSelectorArgs` | Select namespaces by labels (`matchLabels` / `matchExpressions`) |
 | `workloadSelector` | `LabelSelectorArgs` | Select workloads by labels |
 | `enabled` | bool | Activate the target. Default: `true` |
 
-Python: `policy_id`, `cluster_ids`, `kind_filter`, `workload_names`, `node_group_names`, `name_pattern`, `namespace_selector`, `workload_selector`. Go uses PascalCase equivalents.
+### NamePatternArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `pattern` | string | Regular expression to match against the name |
+| `flags` | string | Optional regex flags. Use `"i"` for case-insensitive matching. Can also be embedded inline in the pattern with `(?i)`. |
+
+Python: `policy_id`, `cluster_ids`, `kind_filter`, `workload_names`, `node_group_names`, `name_pattern`, `namespace_pattern`, `namespace_selector`, `workload_selector`. Go uses PascalCase equivalents.
 
 ---
 
