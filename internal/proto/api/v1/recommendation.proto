@@ -2287,6 +2287,10 @@ message NodePolicy {
   LabelSelector instance_generations = 14; // self explanatory; UI: Generation; e.g., 4 (Azure), 5 (AWS)
   LabelSelector instance_sizes = 15; // UI: Size; eg: Standard_D4s (Azure), large (AWS)
   LabelSelector instance_types = 16; // UI: Type; eg: Standard_D4s_v2 (Azure), m4.2xlarge (AWS)
+  // AWS only — karpenter.k8s.aws/instance-local-nvme. Ephemeral NVMe GiB per
+  // node. Karpenter-provider-gcp/-azure/-oci have no equivalent label; this
+  // field is silently dropped on the compile path for those providers.
+  LabelSelector instance_local_nvme = 113;
 
   optional string instance_categories_tip = 26;
   optional string instance_families_tip = 27;
@@ -2294,6 +2298,7 @@ message NodePolicy {
   optional string instance_hypervisors_tip = 29;
   optional string instance_generations_tip = 30;
   optional string instance_sizes_tip = 31;
+  optional string instance_local_nvme_tip = 114;
 
   LabelSelector zones = 36; // abstract, per-cloud mapping
   LabelSelector architectures = 37;    // amd64, arm64

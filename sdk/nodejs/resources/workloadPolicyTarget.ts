@@ -58,6 +58,10 @@ export class WorkloadPolicyTarget extends pulumi.CustomResource {
      */
     declare public readonly namePattern: pulumi.Output<outputs.resources.NamePatternArgs | undefined>;
     /**
+     * Regex to match namespace names.
+     */
+    declare public readonly namespacePattern: pulumi.Output<outputs.resources.NamePatternArgs | undefined>;
+    /**
      * Select namespaces by labels.
      */
     declare public readonly namespaceSelector: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
@@ -108,6 +112,7 @@ export class WorkloadPolicyTarget extends pulumi.CustomResource {
             resourceInputs["kindFilter"] = args?.kindFilter;
             resourceInputs["name"] = args?.name;
             resourceInputs["namePattern"] = args?.namePattern;
+            resourceInputs["namespacePattern"] = args?.namespacePattern;
             resourceInputs["namespaceSelector"] = args?.namespaceSelector;
             resourceInputs["nodeGroupNames"] = args?.nodeGroupNames;
             resourceInputs["policyId"] = args?.policyId;
@@ -121,6 +126,7 @@ export class WorkloadPolicyTarget extends pulumi.CustomResource {
             resourceInputs["kindFilter"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["namePattern"] = undefined /*out*/;
+            resourceInputs["namespacePattern"] = undefined /*out*/;
             resourceInputs["namespaceSelector"] = undefined /*out*/;
             resourceInputs["nodeGroupNames"] = undefined /*out*/;
             resourceInputs["policyId"] = undefined /*out*/;
@@ -143,6 +149,7 @@ export interface WorkloadPolicyTargetArgs {
     kindFilter?: pulumi.Input<pulumi.Input<string>[]>;
     name: pulumi.Input<string>;
     namePattern?: pulumi.Input<inputs.resources.NamePatternArgsArgs>;
+    namespacePattern?: pulumi.Input<inputs.resources.NamePatternArgsArgs>;
     namespaceSelector?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
     nodeGroupNames?: pulumi.Input<pulumi.Input<string>[]>;
     policyId: pulumi.Input<string>;

@@ -1587,6 +1587,10 @@
                     "$ref": "#/types/devzero:resources:NamePatternArgs",
                     "description": "Regex to match workload names."
                 },
+                "namespacePattern": {
+                    "$ref": "#/types/devzero:resources:NamePatternArgs",
+                    "description": "Regex to match namespace names."
+                },
                 "namespaceSelector": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
                     "description": "Select namespaces by labels."
@@ -1657,6 +1661,9 @@
                     "type": "string"
                 },
                 "namePattern": {
+                    "$ref": "#/types/devzero:resources:NamePatternArgs"
+                },
+                "namespacePattern": {
                     "$ref": "#/types/devzero:resources:NamePatternArgs"
                 },
                 "namespaceSelector": {

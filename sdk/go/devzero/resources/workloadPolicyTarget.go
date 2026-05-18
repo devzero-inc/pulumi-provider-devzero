@@ -27,6 +27,8 @@ type WorkloadPolicyTarget struct {
 	Name pulumi.StringOutput `pulumi:"name"`
 	// Regex to match workload names.
 	NamePattern NamePatternArgsPtrOutput `pulumi:"namePattern"`
+	// Regex to match namespace names.
+	NamespacePattern NamePatternArgsPtrOutput `pulumi:"namespacePattern"`
 	// Select namespaces by labels.
 	NamespaceSelector LabelSelectorArgsPtrOutput `pulumi:"namespaceSelector"`
 	// Restrict matching to specific node groups by name.
@@ -96,6 +98,7 @@ type workloadPolicyTargetArgs struct {
 	KindFilter        []string           `pulumi:"kindFilter"`
 	Name              string             `pulumi:"name"`
 	NamePattern       *NamePatternArgs   `pulumi:"namePattern"`
+	NamespacePattern  *NamePatternArgs   `pulumi:"namespacePattern"`
 	NamespaceSelector *LabelSelectorArgs `pulumi:"namespaceSelector"`
 	NodeGroupNames    []string           `pulumi:"nodeGroupNames"`
 	PolicyId          string             `pulumi:"policyId"`
@@ -112,6 +115,7 @@ type WorkloadPolicyTargetArgs struct {
 	KindFilter        pulumi.StringArrayInput
 	Name              pulumi.StringInput
 	NamePattern       NamePatternArgsPtrInput
+	NamespacePattern  NamePatternArgsPtrInput
 	NamespaceSelector LabelSelectorArgsPtrInput
 	NodeGroupNames    pulumi.StringArrayInput
 	PolicyId          pulumi.StringInput
@@ -235,6 +239,11 @@ func (o WorkloadPolicyTargetOutput) Name() pulumi.StringOutput {
 // Regex to match workload names.
 func (o WorkloadPolicyTargetOutput) NamePattern() NamePatternArgsPtrOutput {
 	return o.ApplyT(func(v *WorkloadPolicyTarget) NamePatternArgsPtrOutput { return v.NamePattern }).(NamePatternArgsPtrOutput)
+}
+
+// Regex to match namespace names.
+func (o WorkloadPolicyTargetOutput) NamespacePattern() NamePatternArgsPtrOutput {
+	return o.ApplyT(func(v *WorkloadPolicyTarget) NamePatternArgsPtrOutput { return v.NamespacePattern }).(NamePatternArgsPtrOutput)
 }
 
 // Select namespaces by labels.
