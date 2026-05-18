@@ -481,3 +481,186 @@ func TestLabelSelector_Nil(t *testing.T) {
 		t.Error("expected nil for nil input")
 	}
 }
+
+// ---------- namespace_pattern ----------
+
+func TestNamespacePatternRoundTrip(t *testing.T) {
+	flags := "i"
+	n := &NamePatternArgs{Pattern: "^prod-.*", Flags: &flags}
+	back := namePatternFromProto(namePatternToProto(n))
+	if back == nil {
+		t.Fatal("expected non-nil")
+	}
+	if back.Pattern != "^prod-.*" {
+		t.Errorf("Pattern: got %q, want %q", back.Pattern, "^prod-.*")
+	}
+	if back.Flags == nil || *back.Flags != flags {
+		t.Errorf("Flags: got %v, want %q", back.Flags, flags)
+	}
+}
+
+func TestNamespacePatternRoundTrip_NoFlags(t *testing.T) {
+	n := &NamePatternArgs{Pattern: "^team-"}
+	back := namePatternFromProto(namePatternToProto(n))
+	if back == nil {
+		t.Fatal("expected non-nil")
+	}
+	if back.Pattern != "^team-" {
+		t.Errorf("Pattern: got %q, want %q", back.Pattern, "^team-")
+	}
+	if back.Flags != nil {
+		t.Errorf("Flags: expected nil, got %v", back.Flags)
+	}
+}
+
+func TestWorkloadPolicyTarget_Create_WithNamespacePattern(t *testing.T) {
+	rec := &mockRecommendationClientFull{
+		createTargetFn: func(_ context.Context, req *connect.Request[apiv1.CreateWorkloadPolicyTargetRequest]) (*connect.Response[apiv1.CreateWorkloadPolicyTargetResponse], error) {
+			if req.Msg.NamespacePattern == nil {
+				t.Fatal("NamespacePattern should be set")
+			}
+			if req.Msg.NamespacePattern.Pattern != "^prod-" {
+				t.Errorf("NamespacePattern.Pattern: got %q, want %q", req.Msg.NamespacePattern.Pattern, "^prod-")
+			}
+			return connect.NewResponse(&apiv1.CreateWorkloadPolicyTargetResponse{
+				Target: &apiv1.WorkloadPolicyTarget{
+					TargetId:         "target-ns",
+					Name:             "ns-target",
+					PolicyId:         "policy-abc",
+					ClusterIds:       []string{"cluster-1"},
+					NamespacePattern: req.Msg.NamespacePattern,
+				},
+			}), nil
+		},
+	}
+	withMockTargetClientSet(t, rec)
+
+	w := &WorkloadPolicyTarget{}
+	resp, err := w.Create(context.Background(), infer.CreateRequest[WorkloadPolicyTargetArgs]{
+		Inputs: WorkloadPolicyTargetArgs{
+			Name:             "ns-target",
+			PolicyId:         "policy-abc",
+			ClusterIds:       []string{"cluster-1"},
+			NamespacePattern: &NamePatternArgs{Pattern: "^prod-"},
+		},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.Output.NamespacePattern == nil || resp.Output.NamespacePattern.Pattern != "^prod-" {
+		t.Errorf("NamespacePattern roundtrip: got %v", resp.Output.NamespacePattern)
+	}
+}
+
+func TestWorkloadPolicyTarget_Update_WithNamespacePattern(t *testing.T) {
+	rec := &mockRecommendationClientFull{
+		updateTargetFn: func(_ context.Context, req *connect.Request[apiv1.UpdateWorkloadPolicyTargetRequest]) (*connect.Response[apiv1.UpdateWorkloadPolicyTargetResponse], error) {
+			if req.Msg.NamespacePattern == nil {
+				t.Fatal("NamespacePattern should be set")
+			}
+			if req.Msg.NamespacePattern.Pattern != "^staging-" {
+				t.Errorf("NamespacePattern.Pattern: got %q, want %q", req.Msg.NamespacePattern.Pattern, "^staging-")
+			}
+			return connect.NewResponse(&apiv1.UpdateWorkloadPolicyTargetResponse{
+				Target: &apiv1.WorkloadPolicyTarget{
+					TargetId:         "target-123",
+					Name:             req.Msg.Name,
+					PolicyId:         "policy-abc",
+					ClusterIds:       req.Msg.ClusterIds,
+					NamespacePattern: req.Msg.NamespacePattern,
+				},
+			}), nil
+		},
+	}
+	withMockTargetClientSet(t, rec)
+
+	w := &WorkloadPolicyTarget{}
+	resp, err := w.Update(context.Background(), infer.UpdateRequest[WorkloadPolicyTargetArgs, WorkloadPolicyTargetState]{
+		ID:    "target-123",
+		State: WorkloadPolicyTargetState{WorkloadPolicyTargetArgs: WorkloadPolicyTargetArgs{Name: "old", PolicyId: "policy-abc", ClusterIds: []string{"cluster-1"}}},
+		Inputs: WorkloadPolicyTargetArgs{
+			Name:             "updated",
+			PolicyId:         "policy-abc",
+			ClusterIds:       []string{"cluster-1"},
+			NamespacePattern: &NamePatternArgs{Pattern: "^staging-"},
+		},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.Output.NamespacePattern == nil || resp.Output.NamespacePattern.Pattern != "^staging-" {
+		t.Errorf("NamespacePattern roundtrip: got %v", resp.Output.NamespacePattern)
+	}
+}
+
+func TestWorkloadPolicyTarget_Read_WithNamespacePattern(t *testing.T) {
+	rec := &mockRecommendationClientFull{
+		getTargetFn: func(_ context.Context, _ *connect.Request[apiv1.GetWorkloadPolicyTargetRequest]) (*connect.Response[apiv1.GetWorkloadPolicyTargetResponse], error) {
+			return connect.NewResponse(&apiv1.GetWorkloadPolicyTargetResponse{
+				Target: &apiv1.WorkloadPolicyTarget{
+					TargetId:   "target-123",
+					Name:       "ns-target",
+					PolicyId:   "policy-abc",
+					ClusterIds: []string{"cluster-1"},
+					NamespacePattern: &apiv1.RegexPattern{
+						Pattern: "^prod-",
+						Flags:   "i",
+					},
+				},
+			}), nil
+		},
+	}
+	withMockTargetClientSet(t, rec)
+
+	w := &WorkloadPolicyTarget{}
+	resp, err := w.Read(context.Background(), infer.ReadRequest[WorkloadPolicyTargetArgs, WorkloadPolicyTargetState]{
+		ID: "target-123",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.Inputs.NamespacePattern == nil {
+		t.Fatal("NamespacePattern should be set after Read")
+	}
+	if resp.Inputs.NamespacePattern.Pattern != "^prod-" {
+		t.Errorf("Pattern: got %q, want %q", resp.Inputs.NamespacePattern.Pattern, "^prod-")
+	}
+	if resp.Inputs.NamespacePattern.Flags == nil || *resp.Inputs.NamespacePattern.Flags != "i" {
+		t.Errorf("Flags: got %v, want %q", resp.Inputs.NamespacePattern.Flags, "i")
+	}
+}
+
+func TestWorkloadPolicyTarget_Create_NamespacePatternNilWhenAbsent(t *testing.T) {
+	rec := &mockRecommendationClientFull{
+		createTargetFn: func(_ context.Context, req *connect.Request[apiv1.CreateWorkloadPolicyTargetRequest]) (*connect.Response[apiv1.CreateWorkloadPolicyTargetResponse], error) {
+			if req.Msg.NamespacePattern != nil {
+				t.Errorf("NamespacePattern should be nil when not set, got %v", req.Msg.NamespacePattern)
+			}
+			return connect.NewResponse(&apiv1.CreateWorkloadPolicyTargetResponse{
+				Target: &apiv1.WorkloadPolicyTarget{
+					TargetId:   "target-no-ns",
+					Name:       "no-ns-target",
+					PolicyId:   "policy-abc",
+					ClusterIds: []string{"cluster-1"},
+				},
+			}), nil
+		},
+	}
+	withMockTargetClientSet(t, rec)
+
+	w := &WorkloadPolicyTarget{}
+	resp, err := w.Create(context.Background(), infer.CreateRequest[WorkloadPolicyTargetArgs]{
+		Inputs: WorkloadPolicyTargetArgs{
+			Name:       "no-ns-target",
+			PolicyId:   "policy-abc",
+			ClusterIds: []string{"cluster-1"},
+			// NamespacePattern intentionally omitted
+		},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.Output.NamespacePattern != nil {
+		t.Errorf("expected nil NamespacePattern in output, got %v", resp.Output.NamespacePattern)
+	}
+}

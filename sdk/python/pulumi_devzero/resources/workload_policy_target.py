@@ -28,6 +28,7 @@ class WorkloadPolicyTargetArgs:
                  enabled: Optional[pulumi.Input[_builtins.bool]] = None,
                  kind_filter: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  name_pattern: Optional[pulumi.Input['NamePatternArgsArgs']] = None,
+                 namespace_pattern: Optional[pulumi.Input['NamePatternArgsArgs']] = None,
                  namespace_selector: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
                  node_group_names: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  priority: Optional[pulumi.Input[_builtins.int]] = None,
@@ -47,6 +48,8 @@ class WorkloadPolicyTargetArgs:
             pulumi.set(__self__, "kind_filter", kind_filter)
         if name_pattern is not None:
             pulumi.set(__self__, "name_pattern", name_pattern)
+        if namespace_pattern is not None:
+            pulumi.set(__self__, "namespace_pattern", namespace_pattern)
         if namespace_selector is not None:
             pulumi.set(__self__, "namespace_selector", namespace_selector)
         if node_group_names is not None:
@@ -122,6 +125,15 @@ class WorkloadPolicyTargetArgs:
         pulumi.set(self, "name_pattern", value)
 
     @_builtins.property
+    @pulumi.getter(name="namespacePattern")
+    def namespace_pattern(self) -> Optional[pulumi.Input['NamePatternArgsArgs']]:
+        return pulumi.get(self, "namespace_pattern")
+
+    @namespace_pattern.setter
+    def namespace_pattern(self, value: Optional[pulumi.Input['NamePatternArgsArgs']]):
+        pulumi.set(self, "namespace_pattern", value)
+
+    @_builtins.property
     @pulumi.getter(name="namespaceSelector")
     def namespace_selector(self) -> Optional[pulumi.Input['LabelSelectorArgsArgs']]:
         return pulumi.get(self, "namespace_selector")
@@ -179,6 +191,7 @@ class WorkloadPolicyTarget(pulumi.CustomResource):
                  kind_filter: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  name_pattern: Optional[pulumi.Input[Union['NamePatternArgsArgs', 'NamePatternArgsArgsDict']]] = None,
+                 namespace_pattern: Optional[pulumi.Input[Union['NamePatternArgsArgs', 'NamePatternArgsArgsDict']]] = None,
                  namespace_selector: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  node_group_names: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  policy_id: Optional[pulumi.Input[_builtins.str]] = None,
@@ -222,6 +235,7 @@ class WorkloadPolicyTarget(pulumi.CustomResource):
                  kind_filter: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  name_pattern: Optional[pulumi.Input[Union['NamePatternArgsArgs', 'NamePatternArgsArgsDict']]] = None,
+                 namespace_pattern: Optional[pulumi.Input[Union['NamePatternArgsArgs', 'NamePatternArgsArgsDict']]] = None,
                  namespace_selector: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  node_group_names: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  policy_id: Optional[pulumi.Input[_builtins.str]] = None,
@@ -247,6 +261,7 @@ class WorkloadPolicyTarget(pulumi.CustomResource):
                 raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
             __props__.__dict__["name_pattern"] = name_pattern
+            __props__.__dict__["namespace_pattern"] = namespace_pattern
             __props__.__dict__["namespace_selector"] = namespace_selector
             __props__.__dict__["node_group_names"] = node_group_names
             if policy_id is None and not opts.urn:
@@ -283,6 +298,7 @@ class WorkloadPolicyTarget(pulumi.CustomResource):
         __props__.__dict__["kind_filter"] = None
         __props__.__dict__["name"] = None
         __props__.__dict__["name_pattern"] = None
+        __props__.__dict__["namespace_pattern"] = None
         __props__.__dict__["namespace_selector"] = None
         __props__.__dict__["node_group_names"] = None
         __props__.__dict__["policy_id"] = None
@@ -338,6 +354,14 @@ class WorkloadPolicyTarget(pulumi.CustomResource):
         Regex to match workload names.
         """
         return pulumi.get(self, "name_pattern")
+
+    @_builtins.property
+    @pulumi.getter(name="namespacePattern")
+    def namespace_pattern(self) -> pulumi.Output[Optional['outputs.NamePatternArgs']]:
+        """
+        Regex to match namespace names.
+        """
+        return pulumi.get(self, "namespace_pattern")
 
     @_builtins.property
     @pulumi.getter(name="namespaceSelector")

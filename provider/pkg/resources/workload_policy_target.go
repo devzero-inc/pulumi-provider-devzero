@@ -62,6 +62,7 @@ type WorkloadPolicyTargetArgs struct {
 	NodeGroupNames    []string           `pulumi:"nodeGroupNames,optional"`
 	KindFilter        []string           `pulumi:"kindFilter,optional"`
 	NamePattern       *NamePatternArgs   `pulumi:"namePattern,optional"`
+	NamespacePattern  *NamePatternArgs   `pulumi:"namespacePattern,optional"`
 	NamespaceSelector *LabelSelectorArgs `pulumi:"namespaceSelector,optional"`
 	WorkloadSelector  *LabelSelectorArgs `pulumi:"workloadSelector,optional"`
 }
@@ -83,6 +84,7 @@ func (s *WorkloadPolicyTargetState) Annotate(a infer.Annotator) {
 	a.Describe(&s.NodeGroupNames, "Restrict matching to specific node groups by name.")
 	a.Describe(&s.KindFilter, "Restrict matching to specific Kubernetes kinds (e.g. Deployment, Pod).")
 	a.Describe(&s.NamePattern, "Regex to match workload names.")
+	a.Describe(&s.NamespacePattern, "Regex to match namespace names.")
 	a.Describe(&s.NamespaceSelector, "Select namespaces by labels.")
 	a.Describe(&s.WorkloadSelector, "Select workloads by labels.")
 }
@@ -209,6 +211,7 @@ func targetArgsToCreateRequest(teamID string, a WorkloadPolicyTargetArgs) *apiv1
 		NodeGroupNames:    a.NodeGroupNames,
 		KindFilter:        kindFilterToProto(a.KindFilter),
 		NamePattern:       namePatternToProto(a.NamePattern),
+		NamespacePattern:  namePatternToProto(a.NamespacePattern),
 		NamespaceSelector: labelSelectorToProto(a.NamespaceSelector),
 		WorkloadSelector:  labelSelectorToProto(a.WorkloadSelector),
 	}
@@ -232,6 +235,7 @@ func targetArgsToUpdateRequest(teamID, targetID string, a WorkloadPolicyTargetAr
 		NodeGroupNames:    a.NodeGroupNames,
 		KindFilter:        kindFilterToProto(a.KindFilter),
 		NamePattern:       namePatternToProto(a.NamePattern),
+		NamespacePattern:  namePatternToProto(a.NamespacePattern),
 		NamespaceSelector: labelSelectorToProto(a.NamespaceSelector),
 		WorkloadSelector:  labelSelectorToProto(a.WorkloadSelector),
 	}
@@ -252,6 +256,7 @@ func targetProtoToArgs(t *apiv1.WorkloadPolicyTarget) WorkloadPolicyTargetArgs {
 		NodeGroupNames:    t.NodeGroupNames,
 		KindFilter:        kindFilterFromProto(t.KindFilter),
 		NamePattern:       namePatternFromProto(t.NamePattern),
+		NamespacePattern:  namePatternFromProto(t.NamespacePattern),
 		NamespaceSelector: labelSelectorFromProto(t.NamespaceSelector),
 		WorkloadSelector:  labelSelectorFromProto(t.WorkloadSelector),
 	}
