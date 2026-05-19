@@ -1176,43 +1176,37 @@ const rule = new resources.WorkloadRule("my-app-rule", {
     kind: "Deployment",
     name: "my-api",
     hpaRule: {
-        enabled: true,
+        enabled: true,                                         // activate horizontal (replica) scaling
         minReplicas: 1,
         maxReplicas: 8,
-        primaryMetric: "HPA_METRIC_TYPE_MEMORY", // primary scaling signal
-        targetUtilization: 0.8,        // CPU target — 80%
-        targetMemoryUtilization: 0.65, // Memory target — 65%
-        maxReplicaChangePercent: 0.25, // at most 25% of replicas changed per event
-        scaleDownCooldownSeconds: 300, // 5 min between scale-downs
-        // Only add external metrics here — CPU/Memory are auto-generated above
+        primaryMetric: "HPA_METRIC_TYPE_MEMORY",               // primary metric driving HPA decisions
+        targetUtilization: 0.8,                                // target 80% utilization for the primary metric
+        targetMemoryUtilization: 0.65,                         // target 65% memory utilization, tuned independently
+        maxReplicaChangePercent: 0.25,                         // cap scale events at ±25% of current replicas per cycle
         metrics: [
             {
-                type: "prometheus",
-                targetValue: "100",
-                serverAddress: "http://prometheus.monitoring:9090",
-                query: "sum(rate(http_requests_total{app='my-api'}[2m]))",
+                type: "prometheus",                            // external Prometheus metric
+                targetValue: "50000000",                       // absolute target value (e.g. 50 req/s)
+                serverAddress: "http://prometheus:9090",       // Prometheus server URL
+                query: "sum(rate(http_requests_total[2m]))",   // PromQL query
             },
         ],
-        compositeFormula: "0.6*cpu + 0.4*prometheus",
         fallback: {
-            replicas: 1,
-            behavior: "currentReplicas", // keep whatever is running when metrics fail
-            failureThreshold: 3,
+            replicas: 1,                                       // hold at 1 replica when metrics are unavailable
+            behavior: "currentReplicas",                       // use the current live replica count as the fallback value
+            failureThreshold: 3,                               // activate fallback after 3 consecutive metric failures
         },
         behavior: {
             scaleDown: {
-                stabilizationWindowSeconds: 300, // wait 5 min before scaling down
-                selectPolicy: "Min",
+                selectPolicy: "Min",   // apply the most conservative (smallest) scale-down step
                 policies: [
-                    { type: "Pods", value: 1, periodSeconds: 60 }, // remove at most 1 pod/min
+                    { type: "Percent", value: 10 }, // remove at most 10% of replicas per cycle
                 ],
             },
             scaleUp: {
-                stabilizationWindowSeconds: 0,   // scale up immediately
-                selectPolicy: "Max",
+                selectPolicy: "Max",   // apply the most aggressive (largest) scale-up step
                 policies: [
-                    { type: "Percent", value: 100, periodSeconds: 60 }, // double replicas/min
-                    { type: "Pods", value: 4, periodSeconds: 60 },      // or add 4 pods/min
+                    { type: "Percent", value: 100 }, // allow up to 100% more replicas per cycle
                 ],
             },
         },
@@ -1238,39 +1232,33 @@ rule = WorkloadRule("my-app-rule", args=WorkloadRuleArgs(
     kind="Deployment",
     name="my-api",
     hpa_rule=HPARuleConfigArgsArgs(
-        enabled=True,
+        enabled=True,                                          # activate horizontal (replica) scaling
         min_replicas=1,
         max_replicas=8,
-        primary_metric="HPA_METRIC_TYPE_MEMORY", # primary scaling signal
-        target_utilization=0.8,           # CPU target — 80%
-        target_memory_utilization=0.65,   # Memory target — 65%
-        max_replica_change_percent=0.25,  # at most 25% of replicas changed per event
-        scale_down_cooldown_seconds=300,  # 5 min between scale-downs
-        # Only add external metrics here — CPU/Memory are auto-generated above
+        primary_metric="HPA_METRIC_TYPE_MEMORY",               # primary metric driving HPA decisions
+        target_utilization=0.8,                                # target 80% utilization for the primary metric
+        target_memory_utilization=0.65,                        # target 65% memory utilization, tuned independently
+        max_replica_change_percent=0.25,                       # cap scale events at ±25% of current replicas per cycle
         metrics=[HPAMetricTriggerArgsArgs(
-            type="prometheus",
-            target_value="100",
-            server_address="http://prometheus.monitoring:9090",
-            query="sum(rate(http_requests_total{app='my-api'}[2m]))",
+            type="prometheus",                                 # external Prometheus metric
+            target_value="50000000",                           # absolute target value (e.g. 50 req/s)
+            server_address="http://prometheus:9090",           # Prometheus server URL
+            query="sum(rate(http_requests_total[2m]))",        # PromQL query
         )],
-        composite_formula="0.6*cpu + 0.4*prometheus",
         fallback=HPAFallbackArgsArgs(
-            replicas=1,
-            behavior="currentReplicas",  # keep whatever is running when metrics fail
-            failure_threshold=3,
+            replicas=1,                                        # hold at 1 replica when metrics are unavailable
+            behavior="currentReplicas",                        # use the current live replica count as the fallback value
+            failure_threshold=3,                               # activate fallback after 3 consecutive metric failures
         ),
         behavior=HPABehaviorArgsArgs(
             scale_down=HPAScalingRulesArgsArgs(
-                stabilization_window_seconds=300,  # wait 5 min before scaling down
-                select_policy="Min",
-                policies=[HPAScalingPolicyArgsArgs(type="Pods", value=1, period_seconds=60)],  # remove at most 1 pod/min
+                select_policy="Min",                           # apply the most conservative (smallest) scale-down step
+                policies=[HPAScalingPolicyArgsArgs(type="Percent", value=10)],  # remove at most 10% of replicas per cycle
             ),
             scale_up=HPAScalingRulesArgsArgs(
-                stabilization_window_seconds=0,    # scale up immediately
-                select_policy="Max",
+                select_policy="Max",                           # apply the most aggressive (largest) scale-up step
                 policies=[
-                    HPAScalingPolicyArgsArgs(type="Percent", value=100, period_seconds=60),  # double replicas/min
-                    HPAScalingPolicyArgsArgs(type="Pods", value=4, period_seconds=60),       # or add 4 pods/min
+                    HPAScalingPolicyArgsArgs(type="Percent", value=100),  # allow up to 100% more replicas per cycle
                 ],
             ),
         ),
@@ -1286,46 +1274,37 @@ rule, err := resources.NewWorkloadRule(ctx, "my-app-rule", &resources.WorkloadRu
     Kind:      pulumi.String("Deployment"),
     Name:      pulumi.String("my-api"),
     HpaRule: resources.HPARuleConfigArgsArgs{
-        Enabled:                    pulumi.BoolPtr(true),
-        MinReplicas:                pulumi.IntPtr(1),
-        MaxReplicas:                pulumi.IntPtr(8),
-        PrimaryMetric:              pulumi.StringPtr("HPA_METRIC_TYPE_MEMORY"), // primary scaling signal
-        TargetUtilization:          pulumi.Float64Ptr(0.8),      // CPU target — 80%
-        TargetMemoryUtilization:    pulumi.Float64Ptr(0.65),     // Memory target — 65%
-        MaxReplicaChangePercent:    pulumi.Float64Ptr(0.25),     // at most 25% of replicas changed per event
-        ScaleDownCooldownSeconds:   pulumi.IntPtr(300),          // 5 min between scale-downs
-        CompositeFormula:           pulumi.StringPtr("0.6*cpu + 0.4*prometheus"),
-        // Only add external metrics here — CPU/Memory are auto-generated above
+        Enabled:                 pulumi.BoolPtr(true),                       // activate horizontal (replica) scaling
+        MinReplicas:             pulumi.IntPtr(1),
+        MaxReplicas:             pulumi.IntPtr(8),
+        PrimaryMetric:           pulumi.StringPtr("HPA_METRIC_TYPE_MEMORY"), // primary metric driving HPA decisions
+        TargetUtilization:       pulumi.Float64Ptr(0.8),                     // target 80% utilization for the primary metric
+        TargetMemoryUtilization: pulumi.Float64Ptr(0.65),                    // target 65% memory utilization, tuned independently
+        MaxReplicaChangePercent: pulumi.Float64Ptr(0.25),                    // cap scale events at ±25% of current replicas per cycle
         Metrics: resources.HPAMetricTriggerArgsArray{
             resources.HPAMetricTriggerArgsArgs{
-                Type:          pulumi.String("prometheus"),
-                TargetValue:   pulumi.StringPtr("100"),
-                ServerAddress: pulumi.StringPtr("http://prometheus.monitoring:9090"),
-                Query:         pulumi.StringPtr("sum(rate(http_requests_total{app='my-api'}[2m]))"),
+                Type:          pulumi.String("prometheus"),                         // external Prometheus metric
+                TargetValue:   pulumi.StringPtr("50000000"),                        // absolute target value (e.g. 50 req/s)
+                ServerAddress: pulumi.StringPtr("http://prometheus:9090"),          // Prometheus server URL
+                Query:         pulumi.StringPtr("sum(rate(http_requests_total[2m]))"), // PromQL query
             },
         },
         Fallback: resources.HPAFallbackArgsArgs{
-            Replicas:         pulumi.Int(1),
-            Behavior:         pulumi.String("currentReplicas"), // keep whatever is running when metrics fail
-            FailureThreshold: pulumi.Int(3),
+            Replicas:         pulumi.Int(1),                            // hold at 1 replica when metrics are unavailable
+            Behavior:         pulumi.String("currentReplicas"),         // use the current live replica count as the fallback value
+            FailureThreshold: pulumi.Int(3),                            // activate fallback after 3 consecutive metric failures
         }.ToHPAFallbackArgsPtrOutput(),
         Behavior: resources.HPABehaviorArgsArgs{
             ScaleDown: resources.HPAScalingRulesArgsArgs{
-                StabilizationWindowSeconds: pulumi.Int(300), // wait 5 min before scaling down
-                SelectPolicy:               pulumi.String("Min"),
+                SelectPolicy: pulumi.String("Min"), // apply the most conservative (smallest) scale-down step
                 Policies: resources.HPAScalingPolicyArgsArray{
-                    // remove at most 1 pod per minute
-                    resources.HPAScalingPolicyArgsArgs{Type: pulumi.String("Pods"), Value: pulumi.Int(1), PeriodSeconds: pulumi.Int(60)},
+                    resources.HPAScalingPolicyArgsArgs{Type: pulumi.String("Percent"), Value: pulumi.Int(10)}, // remove at most 10% of replicas per cycle
                 },
             }.ToHPAScalingRulesArgsPtrOutput(),
             ScaleUp: resources.HPAScalingRulesArgsArgs{
-                StabilizationWindowSeconds: pulumi.Int(0), // scale up immediately
-                SelectPolicy:               pulumi.String("Max"),
+                SelectPolicy: pulumi.String("Max"), // apply the most aggressive (largest) scale-up step
                 Policies: resources.HPAScalingPolicyArgsArray{
-                    // double replicas per minute
-                    resources.HPAScalingPolicyArgsArgs{Type: pulumi.String("Percent"), Value: pulumi.Int(100), PeriodSeconds: pulumi.Int(60)},
-                    // or add up to 4 pods per minute
-                    resources.HPAScalingPolicyArgsArgs{Type: pulumi.String("Pods"), Value: pulumi.Int(4), PeriodSeconds: pulumi.Int(60)},
+                    resources.HPAScalingPolicyArgsArgs{Type: pulumi.String("Percent"), Value: pulumi.Int(100)}, // allow up to 100% more replicas per cycle
                 },
             }.ToHPAScalingRulesArgsPtrOutput(),
         }.ToHPABehaviorArgsPtrOutput(),
