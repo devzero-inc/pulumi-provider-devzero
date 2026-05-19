@@ -112,7 +112,7 @@ const policy = new resources.WorkloadPolicy("cpu-scaling-policy", {
             minChangePercent: 0.2,                             // apply only if change > 20%
         });
 
-// 3. Apply the workload policy to the cluster for all Deployments
+// 3. Apply the workload policy to the cluster for all Deployments in prod-* namespaces
 const workloadTarget = new resources.WorkloadPolicyTarget("prod-cluster-deployments-target", {
     name: "prod-cluster-deployments-target",
     description: "Apply cpu-scaling-policy to all Deployments in prod-cluster",
@@ -120,6 +120,12 @@ const workloadTarget = new resources.WorkloadPolicyTarget("prod-cluster-deployme
     clusterIds: [cluster.id],
     kindFilter: ["Deployment"],
     enabled: true,
+    // Target namespaces by name pattern instead of (or in addition to) labels.
+    // Matches any namespace whose name starts with "prod-" (case-insensitive).
+    namespacePattern: {
+        pattern: "^prod-",
+        flags: "i",
+    },
 });
 
 // 4. Create a node policy for dzkarp-based node provisioning
@@ -246,6 +252,7 @@ from pulumi_devzero.resources import (
     WorkloadPolicyTarget, WorkloadPolicyTargetArgs,
     NodePolicy, NodePolicyArgs,
     NodePolicyTarget, NodePolicyTargetArgs,
+    NamePatternArgs,
 )
 from pulumi_devzero.resources.types import (
     VerticalScalingArgs,
@@ -302,7 +309,7 @@ policy = WorkloadPolicy(
     ),
 )
 
-# 3. Apply the workload policy to the cluster for all Deployments
+# 3. Apply the workload policy to the cluster for all Deployments in prod-* namespaces
 workload_target = WorkloadPolicyTarget(
     "prod-cluster-deployments-target",
     args=WorkloadPolicyTargetArgs(
@@ -311,6 +318,9 @@ workload_target = WorkloadPolicyTarget(
         cluster_ids=[cluster.id],
         kind_filter=["Deployment"],
         enabled=True,
+        # Target namespaces by name pattern instead of (or in addition to) labels.
+        # Matches any namespace whose name starts with "prod-" (case-insensitive).
+        namespace_pattern=NamePatternArgs(pattern="^prod-", flags="i"),
     ),
 )
 
@@ -481,13 +491,19 @@ func main() {
             return err
         }
 
-        // 3. Apply the workload policy to the cluster for all Deployments
+        // 3. Apply the workload policy to the cluster for all Deployments in prod-* namespaces
         workloadTarget, err := resources.NewWorkloadPolicyTarget(ctx, "prod-cluster-deployments-target", &resources.WorkloadPolicyTargetArgs{
             Name:       pulumi.String("prod-cluster-deployments-target"),
             PolicyId:   policy.ID(),
             ClusterIds: pulumi.StringArray{cluster.ID()},
             KindFilter: pulumi.StringArray{pulumi.String("Deployment")},
             Enabled:    pulumi.BoolPtr(true),
+            // Target namespaces by name pattern instead of (or in addition to) labels.
+            // Matches any namespace whose name starts with "prod-" (case-insensitive).
+            NamespacePattern: resources.NamePatternArgsArgs{
+                Pattern: pulumi.StringPtr("^prod-"),
+                Flags:   pulumi.StringPtr("i"),
+            },
         })
         if err != nil {
             return err
@@ -787,11 +803,19 @@ Python: `min_replicas`, `max_replicas`, `target_utilization`, `primary_metric`, 
 | `workloadNames` | string[] | Explicit list of workload names to include |
 | `nodeGroupNames` | string[] | Restrict matching to specific node groups by name |
 | `namePattern` | `NamePatternArgs` | Regex pattern to match workload names |
+| `namespacePattern` | `NamePatternArgs` | Regex pattern to match namespace names. Useful when namespaces follow a naming convention but lack consistent labels (e.g. `^prod-`). Combined with other criteria using AND logic. |
 | `namespaceSelector` | `LabelSelectorArgs` | Select namespaces by labels (`matchLabels` / `matchExpressions`) |
 | `workloadSelector` | `LabelSelectorArgs` | Select workloads by labels |
 | `enabled` | bool | Activate the target. Default: `true` |
 
-Python: `policy_id`, `cluster_ids`, `kind_filter`, `workload_names`, `node_group_names`, `name_pattern`, `namespace_selector`, `workload_selector`. Go uses PascalCase equivalents.
+### NamePatternArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `pattern` | string | Regular expression to match against the name |
+| `flags` | string | Optional regex flags. Use `"i"` for case-insensitive matching. Can also be embedded inline in the pattern with `(?i)`. |
+
+Python: `policy_id`, `cluster_ids`, `kind_filter`, `workload_names`, `node_group_names`, `name_pattern`, `namespace_pattern`, `namespace_selector`, `workload_selector`. Go uses PascalCase equivalents.
 
 ---
 
@@ -909,7 +933,6 @@ Set `autoGenerate: true` to have the engine automatically compute all rule field
 import * as pulumi from "@pulumi/pulumi";
 import { resources } from "@devzero/pulumi-devzero";
 
-// Pin explicit CPU + memory rules to a single Deployment
 const rule = new resources.WorkloadRule("my-app-rule", {
     clusterId: "cluster-abc123",
     namespace:  "production",
@@ -917,30 +940,27 @@ const rule = new resources.WorkloadRule("my-app-rule", {
     name:       "my-api",
 
     cpuRule: {
-        enabled:                 true,
-        minRequest:              10,    // 10m CPU
-        maxRequest:              4000,  // 4 cores
-        targetPercentile:        0.95,
-        limitsAdjustmentEnabled: true,
-        limitMultiplier:         1.5,
+        enabled:                 true,    // activate CPU vertical scaling
+        minRequest:              10,      // millicores; hard floor for CPU requests
+        maxRequest:              4000,    // millicores; hard ceiling for CPU requests (4 cores)
+        targetPercentile:        0.95,    // P95 of observed CPU usage to target
+        limitsAdjustmentEnabled: true,    // adjust CPU limits alongside requests
+        limitMultiplier:         1.5,     // limits = request × 1.5
     },
     memoryRule: {
-        enabled:    true,
-        minRequest: 67108864,    // 64 MiB
-        maxRequest: 536870912,   // 512 MiB
+        enabled:    true,                 // activate memory vertical scaling for this workload
+        minRequest: 67108864,             // bytes; hard floor for memory requests (64 MiB)
+        maxRequest: 536870912,            // bytes; hard ceiling for memory requests (512 MiB)
     },
     emergencyResponse: {
-        oomEnabled:             true,
-        oomMemoryMultiplier:    1.5,
-        oomMaxReactions:        3,
-        oomCooldownSeconds:     60,
-        cpuThrottlingEnabled:   true,
-        cpuThrottlingThreshold: 0.1,
-        cpuThrottlingMultiplier: 1.25,
+        oomEnabled:              true,    // react to OOMKills by increasing memory requests
+        oomMemoryMultiplier:     1.5,     // multiply memory request by 1.5× on each OOM event
+        cpuThrottlingEnabled:    true,    // react to CPU throttling by increasing CPU requests
+        cpuThrottlingThreshold:  0.1,     // trigger when throttle ratio exceeds 10%
+        cpuThrottlingMultiplier: 1.25,    // multiply CPU request by 1.25× on throttle reaction
     },
-    actionTriggers: ["on_detection"],
-    detectionTriggers: ["pod_creation", "pod_reschedule"],
-    cooldownMinutes: 60,
+    actionTriggers:    ["on_detection"],                   // apply recommendations immediately on pod events
+    detectionTriggers: ["pod_creation", "pod_reschedule"], // pod events that trigger a recommendation
 });
 
 export const ruleId = rule.id;
@@ -970,7 +990,6 @@ from pulumi_devzero.resources import (
     EmergencyResponseConfigArgsArgs,
 )
 
-# Pin explicit CPU + memory rules to a single Deployment
 rule = WorkloadRule(
     "my-app-rule",
     args=WorkloadRuleArgs(
@@ -979,30 +998,27 @@ rule = WorkloadRule(
         kind="Deployment",
         name="my-api",
         cpu_rule=ResourceRuleConfigArgsArgs(
-            enabled=True,
-            min_request=10,     # 10m CPU
-            max_request=4000,   # 4 cores
-            target_percentile=0.95,
-            limits_adjustment_enabled=True,
-            limit_multiplier=1.5,
+            enabled=True,                    # activate CPU vertical scaling
+            min_request=10,                  # millicores; hard floor for CPU requests
+            max_request=4000,                # millicores; hard ceiling for CPU requests (4 cores)
+            target_percentile=0.95,          # P95 of observed CPU usage to target
+            limits_adjustment_enabled=True,  # adjust CPU limits alongside requests
+            limit_multiplier=1.5,            # limits = request × 1.5
         ),
         memory_rule=ResourceRuleConfigArgsArgs(
-            enabled=True,
-            min_request=67108864,    # 64 MiB
-            max_request=536870912,   # 512 MiB
+            enabled=True,           # activate memory vertical scaling for this workload
+            min_request=67108864,   # bytes; hard floor for memory requests (64 MiB)
+            max_request=536870912,  # bytes; hard ceiling for memory requests (512 MiB)
         ),
         emergency_response=EmergencyResponseConfigArgsArgs(
-            oom_enabled=True,
-            oom_memory_multiplier=1.5,
-            oom_max_reactions=3,
-            oom_cooldown_seconds=60,
-            cpu_throttling_enabled=True,
-            cpu_throttling_threshold=0.1,
-            cpu_throttling_multiplier=1.25,
+            oom_enabled=True,                  # react to OOMKills by increasing memory requests
+            oom_memory_multiplier=1.5,         # multiply memory request by 1.5× on each OOM event
+            cpu_throttling_enabled=True,       # react to CPU throttling by increasing CPU requests
+            cpu_throttling_threshold=0.1,      # trigger when throttle ratio exceeds 10%
+            cpu_throttling_multiplier=1.25,    # multiply CPU request by 1.25× on throttle reaction
         ),
-        action_triggers=["on_detection"],
-        detection_triggers=["pod_creation", "pod_reschedule"],
-        cooldown_minutes=60,
+        action_triggers=["on_detection"],                    # apply recommendations immediately on pod events
+        detection_triggers=["pod_creation", "pod_reschedule"],  # pod events that trigger a recommendation
     ),
 )
 
@@ -1030,30 +1046,27 @@ rule, err := resources.NewWorkloadRule(ctx, "my-app-rule", &resources.WorkloadRu
     Name:      pulumi.String("my-api"),
 
     CpuRule: resources.ResourceRuleConfigArgsArgs{
-        Enabled:                 pulumi.BoolPtr(true),
-        MinRequest:              pulumi.IntPtr(10),    // 10m CPU
-        MaxRequest:              pulumi.IntPtr(4000),  // 4 cores
-        TargetPercentile:        pulumi.Float64Ptr(0.95),
-        LimitsAdjustmentEnabled: pulumi.BoolPtr(true),
-        LimitMultiplier:         pulumi.Float64Ptr(1.5),
+        Enabled:                 pulumi.BoolPtr(true),          // activate CPU vertical scaling
+        MinRequest:              pulumi.IntPtr(10),             // millicores; hard floor for CPU requests
+        MaxRequest:              pulumi.IntPtr(4000),           // millicores; hard ceiling for CPU requests (4 cores)
+        TargetPercentile:        pulumi.Float64Ptr(0.95),       // P95 of observed CPU usage to target
+        LimitsAdjustmentEnabled: pulumi.BoolPtr(true),          // adjust CPU limits alongside requests
+        LimitMultiplier:         pulumi.Float64Ptr(1.5),        // limits = request × 1.5
     }.ToResourceRuleConfigArgsPtrOutput(),
     MemoryRule: resources.ResourceRuleConfigArgsArgs{
-        Enabled:    pulumi.BoolPtr(true),
-        MinRequest: pulumi.IntPtr(67108864),  // 64 MiB
-        MaxRequest: pulumi.IntPtr(536870912), // 512 MiB
+        Enabled:    pulumi.BoolPtr(true),           // activate memory vertical scaling for this workload
+        MinRequest: pulumi.IntPtr(67108864),        // bytes; hard floor for memory requests (64 MiB)
+        MaxRequest: pulumi.IntPtr(536870912),       // bytes; hard ceiling for memory requests (512 MiB)
     }.ToResourceRuleConfigArgsPtrOutput(),
     EmergencyResponse: resources.EmergencyResponseConfigArgsArgs{
-        OomEnabled:              pulumi.BoolPtr(true),
-        OomMemoryMultiplier:     pulumi.Float64Ptr(1.5),
-        OomMaxReactions:         pulumi.IntPtr(3),
-        OomCooldownSeconds:      pulumi.IntPtr(60),
-        CpuThrottlingEnabled:    pulumi.BoolPtr(true),
-        CpuThrottlingThreshold:  pulumi.Float64Ptr(0.1),
-        CpuThrottlingMultiplier: pulumi.Float64Ptr(1.25),
+        OomEnabled:              pulumi.BoolPtr(true),          // react to OOMKills by increasing memory requests
+        OomMemoryMultiplier:     pulumi.Float64Ptr(1.5),        // multiply memory request by 1.5× on each OOM event
+        CpuThrottlingEnabled:    pulumi.BoolPtr(true),          // react to CPU throttling by increasing CPU requests
+        CpuThrottlingThreshold:  pulumi.Float64Ptr(0.1),        // trigger when throttle ratio exceeds 10%
+        CpuThrottlingMultiplier: pulumi.Float64Ptr(1.25),       // multiply CPU request by 1.25× on throttle reaction
     }.ToEmergencyResponseConfigArgsPtrOutput(),
-    ActionTriggers:    pulumi.StringArray{pulumi.String("on_detection")},
-    DetectionTriggers: pulumi.StringArray{pulumi.String("pod_creation"), pulumi.String("pod_reschedule")},
-    CooldownMinutes:   pulumi.IntPtr(60),
+    ActionTriggers:    pulumi.StringArray{pulumi.String("on_detection")},                                        // apply recommendations immediately on pod events
+    DetectionTriggers: pulumi.StringArray{pulumi.String("pod_creation"), pulumi.String("pod_reschedule")},       // pod events that trigger a recommendation
 })
 if err != nil {
     return err
@@ -1094,7 +1107,6 @@ ctx.Export("ruleId", rule.ID())
 | `cronSchedule` | string | Cron expression for scheduled application (5-field UTC). Required when `actionTriggers` includes `on_schedule` |
 | `detectionTriggers` | string[] | Events that trigger a recommendation: `pod_creation` \| `pod_update` \| `pod_reschedule` |
 | `startupPeriodSeconds` | int | Seconds after workload start to exclude from usage data |
-| `cooldownMinutes` | int | Minimum minutes between consecutive recommendation applications |
 | `schedulerPlugins` | string[] | Kubernetes scheduler plugins to activate. Example: `["binpacking"]` |
 | `defragmentationSchedule` | string | Cron expression for node defragmentation |
 | `liveMigrationEnabled` | bool | Allow live pod migration when applying recommendations without restart |
@@ -1128,10 +1140,10 @@ Used for `cpuRule`, `memoryRule`, and `gpuRule` at both the workload and per-con
 | `maxReplicas` | int | Maximum number of replicas |
 | `targetUtilization` | float | Target CPU utilization ratio (0–1). Example: `0.8` |
 | `targetMemoryUtilization` | float | Target memory utilization ratio (0–1), tuned independently of CPU. Example: `0.65` |
-| `primaryMetric` | string | Primary metric driving HPA (used when `metrics` is empty): `cpu` \| `memory` \| `gpu` \| `network_ingress` \| `network_egress`. Example: `"memory"` |
+| `primaryMetric` | string | Primary metric driving HPA (used when `metrics` is empty): `HPA_METRIC_TYPE_CPU` \| `HPA_METRIC_TYPE_MEMORY` \| `HPA_METRIC_TYPE_GPU` \| `HPA_METRIC_TYPE_NETWORK_INGRESS` \| `HPA_METRIC_TYPE_NETWORK_EGRESS`. Example: `"HPA_METRIC_TYPE_MEMORY"` |
 | `maxReplicaChangePercent` | float | Maximum fraction of current replicas that can change in one scale event (0–1). `0.25` means at most 25% added or removed at once. Example: `0.25` |
 | `scaleDownCooldownSeconds` | int | Seconds to wait between scale-down events. Example: `300` |
-| `metrics` | `HPAMetricTriggerArgs[]` | Additional metric triggers (e.g. Prometheus). CPU/Memory/Network are auto-generated by the engine from `primaryMetric` — do not redeclare them here |
+| `metrics` | `HPAMetricTriggerArgs[]` | External metric triggers only (e.g. Prometheus, queue depth). CPU/Memory/Network are auto-generated by the engine from `primaryMetric` + `targetUtilization` — redeclaring them here has no effect; the engine silently drops them and regenerates its own triggers |
 | `compositeFormula` | string | Expression combining multiple metric ratios into one scaling signal. Example: `"0.6*cpu + 0.4*memory"` |
 | `behavior` | `HPABehaviorArgs` | Fine-grained scale-up and scale-down behavior policies |
 | `fallback` | `HPAFallbackArgs` | Replica fallback when metrics become unavailable |
@@ -1140,7 +1152,7 @@ Python uses snake_case (e.g. `target_memory_utilization`, `scale_down_cooldown_s
 
 ### HPAMetricTriggerArgs
 
-> **Note:** CPU, Memory, and Network triggers are auto-generated by the engine from `primaryMetric` + `targetUtilization`. Only add entries here for **external metrics** (e.g. Prometheus). Redeclaring built-in metrics here will result in duplicate triggers.
+> **When to use `metrics[]`:** Only add entries here when you need to scale on **external metrics** (e.g. a Prometheus query, request queue depth, or custom business metric). CPU, Memory, and Network triggers are auto-generated by the engine from `primaryMetric` + `targetUtilization` — redeclaring them in `metrics[]` has no effect; the engine silently drops them and regenerates its own triggers.
 
 | Field | Type | Description |
 |---|---|---|
@@ -1167,7 +1179,7 @@ const rule = new resources.WorkloadRule("my-app-rule", {
         enabled: true,
         minReplicas: 1,
         maxReplicas: 8,
-        primaryMetric: "memory",       // primary scaling signal
+        primaryMetric: "HPA_METRIC_TYPE_MEMORY", // primary scaling signal
         targetUtilization: 0.8,        // CPU target — 80%
         targetMemoryUtilization: 0.65, // Memory target — 65%
         maxReplicaChangePercent: 0.25, // at most 25% of replicas changed per event
@@ -1229,7 +1241,7 @@ rule = WorkloadRule("my-app-rule", args=WorkloadRuleArgs(
         enabled=True,
         min_replicas=1,
         max_replicas=8,
-        primary_metric="memory",          # primary scaling signal
+        primary_metric="HPA_METRIC_TYPE_MEMORY", # primary scaling signal
         target_utilization=0.8,           # CPU target — 80%
         target_memory_utilization=0.65,   # Memory target — 65%
         max_replica_change_percent=0.25,  # at most 25% of replicas changed per event
@@ -1277,7 +1289,7 @@ rule, err := resources.NewWorkloadRule(ctx, "my-app-rule", &resources.WorkloadRu
         Enabled:                    pulumi.BoolPtr(true),
         MinReplicas:                pulumi.IntPtr(1),
         MaxReplicas:                pulumi.IntPtr(8),
-        PrimaryMetric:              pulumi.StringPtr("memory"),  // primary scaling signal
+        PrimaryMetric:              pulumi.StringPtr("HPA_METRIC_TYPE_MEMORY"), // primary scaling signal
         TargetUtilization:          pulumi.Float64Ptr(0.8),      // CPU target — 80%
         TargetMemoryUtilization:    pulumi.Float64Ptr(0.65),     // Memory target — 65%
         MaxReplicaChangePercent:    pulumi.Float64Ptr(0.25),     // at most 25% of replicas changed per event
@@ -1360,8 +1372,6 @@ Python: `stabilization_window_seconds`, `select_policy`, `period_seconds`. Go us
 |---|---|---|
 | `oomEnabled` | bool | React to OOM kills by increasing memory requests |
 | `oomMemoryMultiplier` | float | Multiplier applied to memory on OOM. Example: `1.5` |
-| `oomMaxReactions` | int | Maximum OOM reactions before giving up |
-| `oomCooldownSeconds` | int | Seconds to wait between OOM reactions |
 | `cpuThrottlingEnabled` | bool | React to CPU throttling by increasing CPU requests |
 | `cpuThrottlingThreshold` | float | Throttle ratio (0–1) that triggers a reaction. Example: `0.1` |
 | `cpuThrottlingMultiplier` | float | Multiplier applied to CPU request on throttle reaction. Example: `1.25` |
