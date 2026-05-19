@@ -1158,7 +1158,7 @@ Python uses snake_case (e.g. `target_memory_utilization`, `scale_down_cooldown_s
 |---|---|---|
 | `type` | string | Metric source type. Built-in: `CPU`, `Memory`, `NetworkIngress`, `NetworkEgress`. External: `prometheus` |
 | `targetUtilization` | string | Target utilization as a decimal string (resource metrics). Example: `"0.70"` |
-| `targetValue` | string | Absolute target value as a string (external/object metrics). Example: `"50000000"` |
+| `targetValue` | string | Absolute target value as a string (external/object metrics). Example: `"50000000"` (50 MB/s of network throughput) |
 | `weight` | string | Weight for composite formula scaling (decimal string). Example: `"0.5"` |
 | `metadata` | map[string]string | Free-form key-value pairs passed to the external scaler |
 | `serverAddress` | string | Prometheus server URL — packed into `metadata` by the service layer. Example: `"http://prometheus:9090"` |
@@ -1186,7 +1186,7 @@ const rule = new resources.WorkloadRule("my-app-rule", {
         metrics: [
             {
                 type: "prometheus",                            // external Prometheus metric
-                targetValue: "50000000",                       // absolute target value (e.g. 50 req/s)
+                targetValue: "50000000",                       // absolute target value (e.g. 50 MB/s of network throughput)
                 serverAddress: "http://prometheus:9090",       // Prometheus server URL
                 query: "sum(rate(http_requests_total[2m]))",   // PromQL query
             },
@@ -1284,7 +1284,7 @@ rule, err := resources.NewWorkloadRule(ctx, "my-app-rule", &resources.WorkloadRu
         Metrics: resources.HPAMetricTriggerArgsArray{
             resources.HPAMetricTriggerArgsArgs{
                 Type:          pulumi.String("prometheus"),                         // external Prometheus metric
-                TargetValue:   pulumi.StringPtr("50000000"),                        // absolute target value (e.g. 50 req/s)
+                TargetValue:   pulumi.StringPtr("50000000"),                        // absolute target value (e.g. 50 MB/s of network throughput)
                 ServerAddress: pulumi.StringPtr("http://prometheus:9090"),          // Prometheus server URL
                 Query:         pulumi.StringPtr("sum(rate(http_requests_total[2m]))"), // PromQL query
             },
