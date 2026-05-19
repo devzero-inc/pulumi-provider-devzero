@@ -500,8 +500,8 @@ func main() {
             Enabled:    pulumi.BoolPtr(true),
             // Target namespaces by name pattern instead of (or in addition to) labels.
             // Matches any namespace whose name starts with "prod-" (case-insensitive).
-            NamespacePattern: &resources.NamePatternArgsArgs{
-                Pattern: pulumi.String("^prod-"),
+            NamespacePattern: resources.NamePatternArgsArgs{
+                Pattern: pulumi.StringPtr("^prod-"),
                 Flags:   pulumi.StringPtr("i"),
             },
         })
