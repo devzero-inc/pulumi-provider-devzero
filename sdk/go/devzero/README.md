@@ -958,13 +958,6 @@ const rule = new resources.WorkloadRule("my-app-rule", {
         targetPercentile:        0.95,    // P95 of observed memory usage to target
         limitsAdjustmentEnabled: true,    // adjust memory limits alongside requests
     },
-    hpaRule: {
-        enabled:           true,   // activate horizontal (replica) scaling
-        minReplicas:       1,
-        maxReplicas:       10,
-        targetUtilization: 0.70,   // target 70% utilization for the primary metric
-        primaryMetric:     "cpu",  // primary metric driving HPA decisions
-    },
     emergencyResponse: {
         oomEnabled:              true,    // react to OOMKills by increasing memory requests
         oomMemoryMultiplier:     1.5,     // multiply memory request by 1.5× on each OOM event
@@ -1015,6 +1008,7 @@ from pulumi_devzero.resources import (
     WorkloadRule, WorkloadRuleArgs,
     ResourceRuleConfigArgsArgs,
     EmergencyResponseConfigArgsArgs,
+    ContainerResourceRuleConfigArgsArgs,
 )
 
 rule = WorkloadRule(
@@ -1051,7 +1045,7 @@ rule = WorkloadRule(
         ),
         live_migration_enabled=False,
         containers=[
-            ContainerResourceRuleConfigArgs(
+            ContainerResourceRuleConfigArgsArgs(
                 container_name="app",
                 cpu_rule=ResourceRuleConfigArgsArgs(
                     enabled=True,
