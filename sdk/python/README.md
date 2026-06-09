@@ -939,28 +939,48 @@ const rule = new resources.WorkloadRule("my-app-rule", {
     kind:       "Deployment",
     name:       "my-api",
 
+    actionTriggers:    ["on_schedule", "on_detection"],    // apply on schedule AND pod events
+    cronSchedule:      "0 2 * * *",                        // daily at 2 am UTC (required for on_schedule)
+    detectionTriggers: ["pod_creation", "pod_update"],     // pod events that trigger a recommendation
+
     cpuRule: {
         enabled:                 true,    // activate CPU vertical scaling
         minRequest:              10,      // millicores; hard floor for CPU requests
-        maxRequest:              4000,    // millicores; hard ceiling for CPU requests (4 cores)
+        maxRequest:              32000,   // millicores; hard ceiling for CPU requests (32 cores)
         targetPercentile:        0.95,    // P95 of observed CPU usage to target
         limitsAdjustmentEnabled: true,    // adjust CPU limits alongside requests
-        limitMultiplier:         1.5,     // limits = request × 1.5
+        limitMultiplier:         1.0,     // limits = request × 1.0
     },
     memoryRule: {
-        enabled:    true,                 // activate memory vertical scaling for this workload
-        minRequest: 67108864,             // bytes; hard floor for memory requests (64 MiB)
-        maxRequest: 536870912,            // bytes; hard ceiling for memory requests (512 MiB)
+        enabled:                 true,    // activate memory vertical scaling for this workload
+        minRequest:              67108864,     // bytes; hard floor for memory requests (64 MiB)
+        maxRequest:              68719476736,  // bytes; hard ceiling for memory requests (64 GiB)
+        targetPercentile:        0.95,    // P95 of observed memory usage to target
+        limitsAdjustmentEnabled: true,    // adjust memory limits alongside requests
     },
     emergencyResponse: {
         oomEnabled:              true,    // react to OOMKills by increasing memory requests
         oomMemoryMultiplier:     1.5,     // multiply memory request by 1.5× on each OOM event
         cpuThrottlingEnabled:    true,    // react to CPU throttling by increasing CPU requests
-        cpuThrottlingThreshold:  0.1,     // trigger when throttle ratio exceeds 10%
+        cpuThrottlingThreshold:  0.20,    // trigger when throttle ratio exceeds 20%
         cpuThrottlingMultiplier: 1.25,    // multiply CPU request by 1.25× on throttle reaction
     },
-    actionTriggers:    ["on_detection"],                   // apply recommendations immediately on pod events
-    detectionTriggers: ["pod_creation", "pod_reschedule"], // pod events that trigger a recommendation
+    liveMigrationEnabled: false,
+    containers: [
+        {
+            containerName: "app",
+            cpuRule: {
+                enabled:    true,
+                minRequest: 10,
+                maxRequest: 32000,
+            },
+            memoryRule: {
+                enabled:    true,
+                minRequest: 67108864,    // 64 MiB
+                maxRequest: 68719476736, // 64 GiB
+            },
+        },
+    ],
 });
 
 export const ruleId = rule.id;
@@ -988,6 +1008,7 @@ from pulumi_devzero.resources import (
     WorkloadRule, WorkloadRuleArgs,
     ResourceRuleConfigArgsArgs,
     EmergencyResponseConfigArgsArgs,
+    ContainerResourceRuleConfigArgsArgs,
 )
 
 rule = WorkloadRule(
@@ -997,28 +1018,47 @@ rule = WorkloadRule(
         namespace="production",
         kind="Deployment",
         name="my-api",
+        action_triggers=["on_schedule", "on_detection"],    # apply on schedule AND pod events
+        cron_schedule="0 2 * * *",                          # daily at 2 am UTC (required for on_schedule)
+        detection_triggers=["pod_creation", "pod_update"],  # pod events that trigger a recommendation
         cpu_rule=ResourceRuleConfigArgsArgs(
             enabled=True,                    # activate CPU vertical scaling
             min_request=10,                  # millicores; hard floor for CPU requests
-            max_request=4000,                # millicores; hard ceiling for CPU requests (4 cores)
+            max_request=32000,               # millicores; hard ceiling for CPU requests (32 cores)
             target_percentile=0.95,          # P95 of observed CPU usage to target
             limits_adjustment_enabled=True,  # adjust CPU limits alongside requests
-            limit_multiplier=1.5,            # limits = request × 1.5
+            limit_multiplier=1.0,            # limits = request × 1.0
         ),
         memory_rule=ResourceRuleConfigArgsArgs(
-            enabled=True,           # activate memory vertical scaling for this workload
-            min_request=67108864,   # bytes; hard floor for memory requests (64 MiB)
-            max_request=536870912,  # bytes; hard ceiling for memory requests (512 MiB)
+            enabled=True,                    # activate memory vertical scaling for this workload
+            min_request=67108864,            # bytes; hard floor for memory requests (64 MiB)
+            max_request=68719476736,         # bytes; hard ceiling for memory requests (64 GiB)
+            target_percentile=0.95,          # P95 of observed memory usage to target
+            limits_adjustment_enabled=True,  # adjust memory limits alongside requests
         ),
         emergency_response=EmergencyResponseConfigArgsArgs(
             oom_enabled=True,                  # react to OOMKills by increasing memory requests
             oom_memory_multiplier=1.5,         # multiply memory request by 1.5× on each OOM event
             cpu_throttling_enabled=True,       # react to CPU throttling by increasing CPU requests
-            cpu_throttling_threshold=0.1,      # trigger when throttle ratio exceeds 10%
+            cpu_throttling_threshold=0.20,     # trigger when throttle ratio exceeds 20%
             cpu_throttling_multiplier=1.25,    # multiply CPU request by 1.25× on throttle reaction
         ),
-        action_triggers=["on_detection"],                    # apply recommendations immediately on pod events
-        detection_triggers=["pod_creation", "pod_reschedule"],  # pod events that trigger a recommendation
+        live_migration_enabled=False,
+        containers=[
+            ContainerResourceRuleConfigArgsArgs(
+                container_name="app",
+                cpu_rule=ResourceRuleConfigArgsArgs(
+                    enabled=True,
+                    min_request=10,
+                    max_request=32000,
+                ),
+                memory_rule=ResourceRuleConfigArgsArgs(
+                    enabled=True,
+                    min_request=67108864,    # 64 MiB
+                    max_request=68719476736, # 64 GiB
+                ),
+            ),
+        ],
     ),
 )
 
@@ -1045,28 +1085,48 @@ rule, err := resources.NewWorkloadRule(ctx, "my-app-rule", &resources.WorkloadRu
     Kind:      pulumi.String("Deployment"),
     Name:      pulumi.String("my-api"),
 
+    ActionTriggers:    pulumi.StringArray{pulumi.String("on_schedule"), pulumi.String("on_detection")}, // apply on schedule AND pod events
+    CronSchedule:      pulumi.StringPtr("0 2 * * *"),                                                   // daily at 2 am UTC (required for on_schedule)
+    DetectionTriggers: pulumi.StringArray{pulumi.String("pod_creation"), pulumi.String("pod_update")},  // pod events that trigger a recommendation
+
     CpuRule: resources.ResourceRuleConfigArgsArgs{
         Enabled:                 pulumi.BoolPtr(true),          // activate CPU vertical scaling
         MinRequest:              pulumi.IntPtr(10),             // millicores; hard floor for CPU requests
-        MaxRequest:              pulumi.IntPtr(4000),           // millicores; hard ceiling for CPU requests (4 cores)
+        MaxRequest:              pulumi.IntPtr(32000),          // millicores; hard ceiling for CPU requests (32 cores)
         TargetPercentile:        pulumi.Float64Ptr(0.95),       // P95 of observed CPU usage to target
         LimitsAdjustmentEnabled: pulumi.BoolPtr(true),          // adjust CPU limits alongside requests
-        LimitMultiplier:         pulumi.Float64Ptr(1.5),        // limits = request × 1.5
+        LimitMultiplier:         pulumi.Float64Ptr(1.0),        // limits = request × 1.0
     }.ToResourceRuleConfigArgsPtrOutput(),
     MemoryRule: resources.ResourceRuleConfigArgsArgs{
-        Enabled:    pulumi.BoolPtr(true),           // activate memory vertical scaling for this workload
-        MinRequest: pulumi.IntPtr(67108864),        // bytes; hard floor for memory requests (64 MiB)
-        MaxRequest: pulumi.IntPtr(536870912),       // bytes; hard ceiling for memory requests (512 MiB)
+        Enabled:                 pulumi.BoolPtr(true),           // activate memory vertical scaling for this workload
+        MinRequest:              pulumi.IntPtr(67108864),        // bytes; hard floor for memory requests (64 MiB)
+        MaxRequest:              pulumi.IntPtr(68719476736),     // bytes; hard ceiling for memory requests (64 GiB)
+        TargetPercentile:        pulumi.Float64Ptr(0.95),        // P95 of observed memory usage to target
+        LimitsAdjustmentEnabled: pulumi.BoolPtr(true),           // adjust memory limits alongside requests
     }.ToResourceRuleConfigArgsPtrOutput(),
     EmergencyResponse: resources.EmergencyResponseConfigArgsArgs{
         OomEnabled:              pulumi.BoolPtr(true),          // react to OOMKills by increasing memory requests
         OomMemoryMultiplier:     pulumi.Float64Ptr(1.5),        // multiply memory request by 1.5× on each OOM event
         CpuThrottlingEnabled:    pulumi.BoolPtr(true),          // react to CPU throttling by increasing CPU requests
-        CpuThrottlingThreshold:  pulumi.Float64Ptr(0.1),        // trigger when throttle ratio exceeds 10%
+        CpuThrottlingThreshold:  pulumi.Float64Ptr(0.20),       // trigger when throttle ratio exceeds 20%
         CpuThrottlingMultiplier: pulumi.Float64Ptr(1.25),       // multiply CPU request by 1.25× on throttle reaction
     }.ToEmergencyResponseConfigArgsPtrOutput(),
-    ActionTriggers:    pulumi.StringArray{pulumi.String("on_detection")},                                        // apply recommendations immediately on pod events
-    DetectionTriggers: pulumi.StringArray{pulumi.String("pod_creation"), pulumi.String("pod_reschedule")},       // pod events that trigger a recommendation
+    LiveMigrationEnabled: pulumi.BoolPtr(false),
+    Containers: resources.ContainerResourceRuleConfigArgsArray{
+        resources.ContainerResourceRuleConfigArgsArgs{
+            ContainerName: pulumi.String("app"),
+            CpuRule: resources.ResourceRuleConfigArgsArgs{
+                Enabled:    pulumi.BoolPtr(true),
+                MinRequest: pulumi.IntPtr(10),
+                MaxRequest: pulumi.IntPtr(32000),
+            }.ToResourceRuleConfigArgsPtrOutput(),
+            MemoryRule: resources.ResourceRuleConfigArgsArgs{
+                Enabled:    pulumi.BoolPtr(true),
+                MinRequest: pulumi.IntPtr(67108864),    // 64 MiB
+                MaxRequest: pulumi.IntPtr(68719476736), // 64 GiB
+            }.ToResourceRuleConfigArgsPtrOutput(),
+        },
+    },
 })
 if err != nil {
     return err
