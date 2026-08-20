@@ -58,7 +58,7 @@ func TestNodePolicyTarget_Create_Success(t *testing.T) {
 			if tgt.TeamId != "team-test" {
 				t.Errorf("TeamId: got %q, want %q", tgt.TeamId, "team-test")
 			}
-			if len(tgt.ClusterIds) != 2 {
+			if len(tgt.ClusterIds) != 1 {
 				t.Errorf("ClusterIds: got %v", tgt.ClusterIds)
 			}
 			if !tgt.Enabled {
@@ -71,7 +71,7 @@ func TestNodePolicyTarget_Create_Success(t *testing.T) {
 						Name:       "prod-target",
 						PolicyId:   "np-123",
 						TeamId:     "team-test",
-						ClusterIds: []string{"c-1", "c-2"},
+						ClusterIds: []string{"c-1"},
 						Enabled:    true,
 					},
 				},
@@ -86,8 +86,8 @@ func TestNodePolicyTarget_Create_Success(t *testing.T) {
 		Inputs: NodePolicyTargetArgs{
 			Name:       "prod-target",
 			PolicyId:   "np-123",
-			ClusterIds: []string{"c-1", "c-2"},
-			Enabled:    true,
+			ClusterIds: []string{"c-1"},
+			Enabled:    boolPtr(true),
 		},
 	})
 	if err != nil {
@@ -242,7 +242,7 @@ func TestNodePolicyTarget_Read_Success(t *testing.T) {
 	if resp.State.PolicyId != "np-123" {
 		t.Errorf("PolicyId: got %q, want %q", resp.State.PolicyId, "np-123")
 	}
-	if !resp.State.Enabled {
+	if resp.State.Enabled == nil || !*resp.State.Enabled {
 		t.Error("Enabled should be true")
 	}
 }
@@ -258,9 +258,12 @@ func TestNodePolicyTarget_Read_NotFound(t *testing.T) {
 	withMockNPTClientSet(t, rec)
 
 	n := &NodePolicyTarget{}
-	_, err := n.Read(context.Background(), infer.ReadRequest[NodePolicyTargetArgs, NodePolicyTargetState]{ID: "npt-missing"})
-	if err == nil {
-		t.Fatal("expected error for not-found, got nil")
+	resp, err := n.Read(context.Background(), infer.ReadRequest[NodePolicyTargetArgs, NodePolicyTargetState]{ID: "npt-missing"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.ID != "" {
+		t.Fatalf("expected empty response (drop from state) for a target deleted out of band, got ID %q", resp.ID)
 	}
 }
 
@@ -325,7 +328,7 @@ func TestNodePolicyTarget_Update_Success(t *testing.T) {
 	n := &NodePolicyTarget{}
 	resp, err := n.Update(context.Background(), infer.UpdateRequest[NodePolicyTargetArgs, NodePolicyTargetState]{
 		ID:     "npt-456",
-		Inputs: NodePolicyTargetArgs{Name: "updated-target", PolicyId: "np-123", ClusterIds: []string{"c-1"}, Enabled: true},
+		Inputs: NodePolicyTargetArgs{Name: "updated-target", PolicyId: "np-123", ClusterIds: []string{"c-1"}, Enabled: boolPtr(true)},
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -351,12 +354,12 @@ func TestNodePolicyTarget_Update_Disable(t *testing.T) {
 	n := &NodePolicyTarget{}
 	resp, err := n.Update(context.Background(), infer.UpdateRequest[NodePolicyTargetArgs, NodePolicyTargetState]{
 		ID:     "npt-456",
-		Inputs: NodePolicyTargetArgs{Name: "staging", PolicyId: "np-123", ClusterIds: []string{"c-1"}, Enabled: false},
+		Inputs: NodePolicyTargetArgs{Name: "staging", PolicyId: "np-123", ClusterIds: []string{"c-1"}, Enabled: boolPtr(false)},
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if resp.Output.Enabled {
+	if resp.Output.Enabled != nil && *resp.Output.Enabled {
 		t.Error("Enabled should be false after update")
 	}
 }
@@ -429,14 +432,36 @@ func TestNodePolicyTarget_Update_EmptyResponse(t *testing.T) {
 
 // ---------- Delete ----------
 
-func TestNodePolicyTarget_Delete_StateOnly(t *testing.T) {
+// The API has no DeleteNodePolicyTarget RPC: destroy must disable the target
+// so the node policy stops being applied.
+func TestNodePolicyTarget_Delete_DisablesTarget(t *testing.T) {
+	disabled := false
+	rec := &mockRecommendationClientNPT{
+		updateNodePolicyTargetFn: func(_ context.Context, req *connect.Request[apiv1.UpdateNodePolicyTargetRequest]) (*connect.Response[apiv1.UpdateNodePolicyTargetResponse], error) {
+			if req.Msg.Target.Enabled {
+				t.Error("expected the target to be disabled on destroy")
+			}
+			disabled = true
+			return connect.NewResponse(&apiv1.UpdateNodePolicyTargetResponse{Target: req.Msg.Target}), nil
+		},
+	}
+	withMockNPTClientSet(t, rec)
+
 	n := &NodePolicyTarget{}
 	_, err := n.Delete(context.Background(), infer.DeleteRequest[NodePolicyTargetState]{
-		ID:    "npt-456",
-		State: NodePolicyTargetState{},
+		ID: "npt-456",
+		State: NodePolicyTargetState{NodePolicyTargetArgs: NodePolicyTargetArgs{
+			Name:       "prod-target",
+			PolicyId:   "np-123",
+			ClusterIds: []string{"c-1"},
+			Enabled:    boolPtr(true),
+		}},
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+	if !disabled {
+		t.Fatal("expected UpdateNodePolicyTarget to be called with enabled=false")
 	}
 }
 
@@ -447,8 +472,8 @@ func TestNodePolicyTarget_Delete_NilClientSet(t *testing.T) {
 
 	n := &NodePolicyTarget{}
 	_, err := n.Delete(context.Background(), infer.DeleteRequest[NodePolicyTargetState]{ID: "npt-456"})
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
+	if err == nil {
+		t.Fatal("expected error when provider is not configured")
 	}
 }
 
@@ -461,7 +486,7 @@ func TestNodePolicyTarget_ProtoRoundtrip(t *testing.T) {
 		PolicyId:    "np-123",
 		ClusterIds:  []string{"c-1", "c-2", "c-3"},
 		Description: &desc,
-		Enabled:     true,
+		Enabled:     boolPtr(true),
 	}
 
 	proto := nodePolicyTargetArgsToProto("team-abc", "npt-456", input)
@@ -497,40 +522,23 @@ func TestNodePolicyTarget_ProtoRoundtrip(t *testing.T) {
 	if got.Description == nil || *got.Description != desc {
 		t.Errorf("Description roundtrip failed")
 	}
-	if !got.Enabled {
+	if got.Enabled == nil || !*got.Enabled {
 		t.Error("Enabled roundtrip failed")
 	}
 }
 
-func TestNodePolicyTarget_MultipleClusterIds(t *testing.T) {
-	clusterIDs := []string{"c-us-east-1", "c-us-west-2", "c-eu-west-1"}
-	rec := &mockRecommendationClientNPT{
-		createNodePolicyTargetsFn: func(_ context.Context, req *connect.Request[apiv1.CreateNodePolicyTargetsRequest]) (*connect.Response[apiv1.CreateNodePolicyTargetsResponse], error) {
-			tgt := req.Msg.Targets[0]
-			if len(tgt.ClusterIds) != 3 {
-				t.Errorf("expected 3 cluster IDs, got %d: %v", len(tgt.ClusterIds), tgt.ClusterIds)
-			}
-			return connect.NewResponse(&apiv1.CreateNodePolicyTargetsResponse{
-				Targets: []*apiv1.NodePolicyTarget{
-					{TargetId: "npt-multi", Name: "multi-cluster", PolicyId: "np-123", ClusterIds: clusterIDs},
-				},
-			}), nil
-		},
-	}
-	withMockNPTClientSet(t, rec)
-
+// The API accepts at most one cluster per node policy target; the provider
+// rejects multi-cluster targets before calling the API.
+func TestNodePolicyTarget_MultipleClusterIds_Rejected(t *testing.T) {
 	n := &NodePolicyTarget{}
-	resp, err := n.Create(context.Background(), infer.CreateRequest[NodePolicyTargetArgs]{
+	_, err := n.Create(context.Background(), infer.CreateRequest[NodePolicyTargetArgs]{
 		Inputs: NodePolicyTargetArgs{
 			Name:       "multi-cluster",
 			PolicyId:   "np-123",
-			ClusterIds: clusterIDs,
+			ClusterIds: []string{"c-us-east-1", "c-us-west-2", "c-eu-west-1"},
 		},
 	})
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if len(resp.Output.ClusterIds) != 3 {
-		t.Errorf("ClusterIds: got %v", resp.Output.ClusterIds)
+	if err == nil {
+		t.Fatal("expected validation error for multiple cluster IDs")
 	}
 }

@@ -3,6 +3,7 @@ package resources
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"connectrpc.com/connect"
 	"github.com/pulumi/pulumi-go-provider/infer"
@@ -140,6 +141,10 @@ type WorkloadPolicy struct{}
 // ---------- CRUD ----------
 
 func (w *WorkloadPolicy) Create(ctx context.Context, req infer.CreateRequest[WorkloadPolicyArgs]) (infer.CreateResponse[WorkloadPolicyState], error) {
+	if err := validateWorkloadPolicyArgs(req.Inputs); err != nil {
+		return infer.CreateResponse[WorkloadPolicyState]{}, err
+	}
+
 	if req.DryRun {
 		return infer.CreateResponse[WorkloadPolicyState]{Output: WorkloadPolicyState{WorkloadPolicyArgs: req.Inputs}}, nil
 	}
@@ -178,12 +183,15 @@ func (w *WorkloadPolicy) Read(ctx context.Context, req infer.ReadRequest[Workloa
 		PolicyId: req.ID,
 	}))
 	if err != nil {
+		if connect.CodeOf(err) == connect.CodeNotFound {
+			// Deleted out of band — drop from state.
+			return infer.ReadResponse[WorkloadPolicyArgs, WorkloadPolicyState]{}, nil
+		}
 		return infer.ReadResponse[WorkloadPolicyArgs, WorkloadPolicyState]{ID: req.ID, Inputs: req.Inputs, State: req.State},
 			fmt.Errorf("GetWorkloadRecommendationPolicy: %w", err)
 	}
 	if resp.Msg.Policy == nil {
-		return infer.ReadResponse[WorkloadPolicyArgs, WorkloadPolicyState]{ID: req.ID, Inputs: req.Inputs, State: req.State},
-			fmt.Errorf("GetWorkloadRecommendationPolicy: policy not found")
+		return infer.ReadResponse[WorkloadPolicyArgs, WorkloadPolicyState]{}, nil
 	}
 
 	updatedArgs := protoToArgs(resp.Msg.Policy)
@@ -195,6 +203,10 @@ func (w *WorkloadPolicy) Read(ctx context.Context, req infer.ReadRequest[Workloa
 }
 
 func (w *WorkloadPolicy) Update(ctx context.Context, req infer.UpdateRequest[WorkloadPolicyArgs, WorkloadPolicyState]) (infer.UpdateResponse[WorkloadPolicyState], error) {
+	if err := validateWorkloadPolicyArgs(req.Inputs); err != nil {
+		return infer.UpdateResponse[WorkloadPolicyState]{}, err
+	}
+
 	if req.DryRun {
 		return infer.UpdateResponse[WorkloadPolicyState]{Output: WorkloadPolicyState{WorkloadPolicyArgs: req.Inputs}}, nil
 	}
@@ -230,7 +242,7 @@ func (w *WorkloadPolicy) Delete(ctx context.Context, req infer.DeleteRequest[Wor
 		TeamId:   cs.TeamID,
 		PolicyId: req.ID,
 	}))
-	if err != nil {
+	if err != nil && connect.CodeOf(err) != connect.CodeNotFound {
 		return infer.DeleteResponse{}, fmt.Errorf("DeleteWorkloadRecommendationPolicy: %w", err)
 	}
 	return infer.DeleteResponse{}, nil
@@ -339,7 +351,7 @@ func protoToArgs(p *apiv1.WorkloadRecommendationPolicy) WorkloadPolicyArgs {
 		a.StartupPeriodSeconds = &v
 	}
 	if p.MinChangePercent != nil {
-		v := float64(*p.MinChangePercent)
+		v := f32(*p.MinChangePercent)
 		a.MinChangePercent = &v
 	}
 	if p.MinDataPoints != nil {
@@ -347,15 +359,15 @@ func protoToArgs(p *apiv1.WorkloadRecommendationPolicy) WorkloadPolicyArgs {
 		a.MinDataPoints = &v
 	}
 	if p.StabilityCvMax != nil {
-		v := float64(*p.StabilityCvMax)
+		v := f32(*p.StabilityCvMax)
 		a.StabilityCvMax = &v
 	}
 	if p.HysteresisVsTarget != nil {
-		v := float64(*p.HysteresisVsTarget)
+		v := f32(*p.HysteresisVsTarget)
 		a.HysteresisVsTarget = &v
 	}
 	if p.DriftDeltaPercent != nil {
-		v := float64(*p.DriftDeltaPercent)
+		v := f32(*p.DriftDeltaPercent)
 		a.DriftDeltaPercent = &v
 	}
 	if p.MinVpaWindowDataPoints != nil {
@@ -366,10 +378,12 @@ func protoToArgs(p *apiv1.WorkloadRecommendationPolicy) WorkloadPolicyArgs {
 		v := int(*p.CooldownMinutes)
 		a.CooldownMinutes = &v
 	}
-	v := p.EnablePmaxProtection
-	a.EnablePmaxProtection = &v
+	if p.EnablePmaxProtection {
+		v := true
+		a.EnablePmaxProtection = &v
+	}
 	if p.PmaxRatioThreshold != nil {
-		v := float64(*p.PmaxRatioThreshold)
+		v := f32(*p.PmaxRatioThreshold)
 		a.PmaxRatioThreshold = &v
 	}
 	return a
@@ -504,26 +518,26 @@ func verticalScalingFromProto(t *apiv1.VerticalScalingOptimizationTarget) *Verti
 		v.MaxRequest = &x
 	}
 	if t.OverheadMultiplier != nil {
-		x := float64(*t.OverheadMultiplier)
+		x := f32(*t.OverheadMultiplier)
 		v.OverheadMultiplier = &x
 	}
 	if t.TargetPercentile != nil {
-		x := float64(*t.TargetPercentile)
+		x := f32(*t.TargetPercentile)
 		v.TargetPercentile = &x
 	}
 	if t.MaxScaleUpPercent != nil {
-		x := float64(*t.MaxScaleUpPercent)
+		x := f32(*t.MaxScaleUpPercent)
 		v.MaxScaleUpPercent = &x
 	}
 	if t.MaxScaleDownPercent != nil {
-		x := float64(*t.MaxScaleDownPercent)
+		x := f32(*t.MaxScaleDownPercent)
 		v.MaxScaleDownPercent = &x
 	}
 	if t.LimitsAdjustmentEnabled != nil {
 		v.LimitsAdjustmentEnabled = t.LimitsAdjustmentEnabled
 	}
 	if t.LimitMultiplier != nil {
-		x := float64(*t.LimitMultiplier)
+		x := f32(*t.LimitMultiplier)
 		v.LimitMultiplier = &x
 	}
 	if t.MinDataPoints != nil {
@@ -586,7 +600,7 @@ func horizontalScalingFromProto(t *apiv1.HorizontalScalingOptimizationTarget) *H
 		h.MaxReplicas = &x
 	}
 	if t.TargetUtilization != nil {
-		x := float64(*t.TargetUtilization)
+		x := f32(*t.TargetUtilization)
 		h.TargetUtilization = &x
 	}
 	if t.PrimaryMetric != nil {
@@ -597,7 +611,7 @@ func horizontalScalingFromProto(t *apiv1.HorizontalScalingOptimizationTarget) *H
 		h.MinDataPoints = &x
 	}
 	if t.MaxReplicaChangePercent != nil {
-		x := float64(*t.MaxReplicaChangePercent)
+		x := f32(*t.MaxReplicaChangePercent)
 		h.MaxReplicaChangePercent = &x
 	}
 	return h
@@ -645,4 +659,13 @@ func hpaMetricFromProto(m *apiv1.HPAMetricType) *string {
 		return nil
 	}
 	return &s
+}
+
+// f32(v) converts a float32 coming from the API into the float64 the Pulumi
+// SDKs use, picking the shortest decimal that round-trips (so a stored 0.7
+// comes back as 0.7, not 0.699999988079071 — which would show as a perpetual
+// diff after refresh).
+func f32(v float32) float64 {
+	f, _ := strconv.ParseFloat(strconv.FormatFloat(float64(v), 'g', -1, 32), 64)
+	return f
 }

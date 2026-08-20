@@ -77,12 +77,15 @@ func (c *Cluster) Read(ctx context.Context, req infer.ReadRequest[ClusterArgs, C
 		ClusterId: req.ID,
 	}))
 	if err != nil {
+		if connect.CodeOf(err) == connect.CodeNotFound {
+			// Deleted out of band — drop from state.
+			return infer.ReadResponse[ClusterArgs, ClusterState]{}, nil
+		}
 		return infer.ReadResponse[ClusterArgs, ClusterState]{ID: req.ID, Inputs: req.Inputs, State: req.State},
 			fmt.Errorf("GetCluster: %w", err)
 	}
 	if resp.Msg.Cluster == nil {
-		return infer.ReadResponse[ClusterArgs, ClusterState]{ID: req.ID, Inputs: req.Inputs, State: req.State},
-			fmt.Errorf("GetCluster: cluster not found")
+		return infer.ReadResponse[ClusterArgs, ClusterState]{}, nil
 	}
 
 	// Prefer CustomName (user-set); fall back to the system-assigned Name.
@@ -126,26 +129,21 @@ func (c *Cluster) Update(ctx context.Context, req infer.UpdateRequest[ClusterArg
 		return infer.UpdateResponse[ClusterState]{}, fmt.Errorf("UpdateCluster: empty response from server")
 	}
 
-	token := req.State.Token
-	// Rotate the token if it is empty — this happens after `pulumi import`.
-	if token == "" {
-		resetResp, err := cs.ClusterMutationClient.ResetClusterToken(ctx, connect.NewRequest(&apiv1.ResetClusterTokenRequest{
-			TeamId:    cs.TeamID,
-			ClusterId: req.ID,
-		}))
-		if err != nil {
-			return infer.UpdateResponse[ClusterState]{}, fmt.Errorf("ResetClusterToken: %w", err)
-		}
-		if resetResp.Msg.Token == "" {
-			return infer.UpdateResponse[ClusterState]{}, fmt.Errorf("ResetClusterToken: server returned empty token")
-		}
-		token = resetResp.Msg.Token
+	// NOTE: the token is intentionally never rotated here. Rotating on update
+	// (the previous behavior when state had no token, e.g. after `pulumi
+	// import`) silently invalidated the credential the running in-cluster
+	// agent was using whenever an unrelated field changed. An imported
+	// cluster therefore has an empty token; rotate it deliberately from the
+	// DevZero UI (or by recreating the resource) if you need it in state.
+	name := updateResp.Msg.Cluster.CustomName
+	if name == "" {
+		name = updateResp.Msg.Cluster.Name
 	}
 
 	return infer.UpdateResponse[ClusterState]{
 		Output: ClusterState{
-			ClusterArgs: ClusterArgs{Name: updateResp.Msg.Cluster.CustomName},
-			Token:       token,
+			ClusterArgs: ClusterArgs{Name: name},
+			Token:       req.State.Token,
 		},
 	}, nil
 }
@@ -161,7 +159,7 @@ func (c *Cluster) Delete(ctx context.Context, req infer.DeleteRequest[ClusterSta
 		TeamId:    cs.TeamID,
 		ClusterId: req.ID,
 	}))
-	if err != nil {
+	if err != nil && connect.CodeOf(err) != connect.CodeNotFound {
 		return infer.DeleteResponse{}, fmt.Errorf("DeleteCluster: %w", err)
 	}
 	return infer.DeleteResponse{}, nil

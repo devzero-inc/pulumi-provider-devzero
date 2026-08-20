@@ -40,8 +40,7 @@ func TestRetryInterceptor_SuccessOnFirstAttempt(t *testing.T) {
 		return nil, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodPost, "http://example.com", nil)
-	_, err := retryInterceptor(3, time.Millisecond)(next)(context.Background(), connect.NewRequest(req))
+	_, err := retryInterceptor(3, time.Millisecond)(next)(context.Background(), newIdempotentRequest())
 
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -49,6 +48,27 @@ func TestRetryInterceptor_SuccessOnFirstAttempt(t *testing.T) {
 	if calls != 1 {
 		t.Errorf("expected 1 call, got %d", calls)
 	}
+}
+
+// fakeIdempotentRequest wraps a connect request and reports a Get-style
+// procedure, since retryInterceptor only retries idempotent (read) RPCs.
+type fakeIdempotentRequest struct {
+	connect.AnyRequest
+	procedure string
+}
+
+func (f *fakeIdempotentRequest) Spec() connect.Spec {
+	return connect.Spec{Procedure: f.procedure}
+}
+
+func newIdempotentRequest() connect.AnyRequest {
+	req, _ := http.NewRequest(http.MethodPost, "http://example.com", nil)
+	return &fakeIdempotentRequest{AnyRequest: connect.NewRequest(req), procedure: "/api.v1.K8sService/GetCluster"}
+}
+
+func newMutatingRequest() connect.AnyRequest {
+	req, _ := http.NewRequest(http.MethodPost, "http://example.com", nil)
+	return &fakeIdempotentRequest{AnyRequest: connect.NewRequest(req), procedure: "/api.v1.K8sRecommendationService/CreateNodePolicies"}
 }
 
 func TestRetryInterceptor_RetriesOnUnavailable(t *testing.T) {
@@ -61,8 +81,7 @@ func TestRetryInterceptor_RetriesOnUnavailable(t *testing.T) {
 		return nil, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodPost, "http://example.com", nil)
-	_, err := retryInterceptor(3, time.Millisecond)(next)(context.Background(), connect.NewRequest(req))
+	_, err := retryInterceptor(3, time.Millisecond)(next)(context.Background(), newIdempotentRequest())
 
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -79,8 +98,7 @@ func TestRetryInterceptor_DoesNotRetryOnPermissionDenied(t *testing.T) {
 		return nil, connect.NewError(connect.CodePermissionDenied, errors.New("forbidden"))
 	}
 
-	req, _ := http.NewRequest(http.MethodPost, "http://example.com", nil)
-	_, err := retryInterceptor(3, time.Millisecond)(next)(context.Background(), connect.NewRequest(req))
+	_, err := retryInterceptor(3, time.Millisecond)(next)(context.Background(), newIdempotentRequest())
 
 	if err == nil {
 		t.Fatal("expected error, got nil")
@@ -97,8 +115,7 @@ func TestRetryInterceptor_ExhaustsAllAttempts(t *testing.T) {
 		return nil, connect.NewError(connect.CodeUnavailable, errors.New("always down"))
 	}
 
-	req, _ := http.NewRequest(http.MethodPost, "http://example.com", nil)
-	_, err := retryInterceptor(3, time.Millisecond)(next)(context.Background(), connect.NewRequest(req))
+	_, err := retryInterceptor(3, time.Millisecond)(next)(context.Background(), newIdempotentRequest())
 
 	if err == nil {
 		t.Fatal("expected error after exhausting retries")
@@ -142,8 +159,7 @@ func TestRetryInterceptor_RetriesOnDeadlineExceeded(t *testing.T) {
 		return nil, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodPost, "http://example.com", nil)
-	_, err := retryInterceptor(3, time.Millisecond)(next)(context.Background(), connect.NewRequest(req))
+	_, err := retryInterceptor(3, time.Millisecond)(next)(context.Background(), newIdempotentRequest())
 
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -189,5 +205,23 @@ func TestClientsetGetSet(t *testing.T) {
 	clientset.Set(cs)
 	if clientset.Get() != cs {
 		t.Error("Get should return the set ClientSet")
+	}
+}
+
+// A transient failure on a mutating RPC must NOT be retried: if the first
+// attempt landed server-side, a retry would create a duplicate resource.
+func TestRetryInterceptor_DoesNotRetryMutations(t *testing.T) {
+	calls := 0
+	next := func(_ context.Context, _ connect.AnyRequest) (connect.AnyResponse, error) {
+		calls++
+		return nil, connect.NewError(connect.CodeUnavailable, errors.New("service down"))
+	}
+
+	_, err := retryInterceptor(3, time.Millisecond)(next)(context.Background(), newMutatingRequest())
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if calls != 1 {
+		t.Errorf("expected exactly 1 call for a mutating RPC, got %d", calls)
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	"connectrpc.com/connect"
@@ -42,11 +43,28 @@ func authInterceptor(token string) connect.UnaryInterceptorFunc {
 	}
 }
 
+// isIdempotentProcedure reports whether an RPC is safe to retry after a
+// transport-level failure. Only read-style RPCs qualify: a Create/Upsert whose
+// first attempt actually landed server-side would be duplicated on retry
+// (CreateNodePolicies without a client-set id always inserts a new row, and
+// there is no name uniqueness).
+func isIdempotentProcedure(procedure string) bool {
+	name := procedure
+	if i := strings.LastIndex(procedure, "/"); i >= 0 {
+		name = procedure[i+1:]
+	}
+	return strings.HasPrefix(name, "Get") || strings.HasPrefix(name, "List")
+}
+
 // retryInterceptor returns a Connect interceptor that retries transient errors
-// (CodeUnavailable, CodeDeadlineExceeded) with exponential backoff.
+// (CodeUnavailable, CodeDeadlineExceeded) with exponential backoff. Only
+// idempotent (read-style) RPCs are retried.
 func retryInterceptor(maxAttempts int, initialDelay time.Duration) connect.UnaryInterceptorFunc {
 	return func(next connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
+			if !isIdempotentProcedure(req.Spec().Procedure) {
+				return next(ctx, req)
+			}
 			delay := initialDelay
 			for attempt := 0; attempt < maxAttempts; attempt++ {
 				resp, err := next(ctx, req)

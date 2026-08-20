@@ -444,7 +444,12 @@ func (n *NodePolicy) Read(ctx context.Context, req infer.ReadRequest[NodePolicyA
 			fmt.Errorf("ListNodePolicies: %w", err)
 	}
 
+	// ListNodePolicies also returns read-only virtual policies mirrored from
+	// non-dakr Karpenter resources (source == "cluster"); skip them.
 	for _, p := range resp.Msg.Policies {
+		if p.Source != "" && p.Source != "dakr" {
+			continue
+		}
 		if p.Id == req.ID {
 			updatedArgs := nodePolicyProtoToArgs(p)
 			return infer.ReadResponse[NodePolicyArgs, NodePolicyState]{
@@ -455,8 +460,9 @@ func (n *NodePolicy) Read(ctx context.Context, req infer.ReadRequest[NodePolicyA
 		}
 	}
 
-	return infer.ReadResponse[NodePolicyArgs, NodePolicyState]{ID: req.ID, Inputs: req.Inputs, State: req.State},
-		fmt.Errorf("ListNodePolicies: policy %q not found", req.ID)
+	// Deleted out of band — return an empty response so the engine drops the
+	// resource from state instead of failing the refresh.
+	return infer.ReadResponse[NodePolicyArgs, NodePolicyState]{}, nil
 }
 
 func (n *NodePolicy) Update(ctx context.Context, req infer.UpdateRequest[NodePolicyArgs, NodePolicyState]) (infer.UpdateResponse[NodePolicyState], error) {
@@ -485,8 +491,21 @@ func (n *NodePolicy) Update(ctx context.Context, req infer.UpdateRequest[NodePol
 	}, nil
 }
 
-// Delete removes the resource from Pulumi state only — no delete endpoint exists for NodePolicy.
-func (n *NodePolicy) Delete(_ context.Context, _ infer.DeleteRequest[NodePolicyState]) (infer.DeleteResponse, error) {
+// Delete removes the node policy via DeleteNodePolicy (which also cascades
+// its targets server-side). A policy already gone is treated as deleted.
+func (n *NodePolicy) Delete(ctx context.Context, req infer.DeleteRequest[NodePolicyState]) (infer.DeleteResponse, error) {
+	cs := clientset.Get()
+	if cs == nil {
+		return infer.DeleteResponse{}, fmt.Errorf("devzero: provider not configured (ClientSet is nil)")
+	}
+
+	_, err := cs.RecommendationClient.DeleteNodePolicy(ctx, connect.NewRequest(&apiv1.DeleteNodePolicyRequest{
+		TeamId:   cs.TeamID,
+		PolicyId: req.ID,
+	}))
+	if err != nil && connect.CodeOf(err) != connect.CodeNotFound {
+		return infer.DeleteResponse{}, fmt.Errorf("DeleteNodePolicy: %w", err)
+	}
 	return infer.DeleteResponse{}, nil
 }
 

@@ -3,8 +3,11 @@ package resources
 import (
 	"context"
 	"fmt"
+	"reflect"
+	"strings"
 
 	"connectrpc.com/connect"
+	prov "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 
 	apiv1 "github.com/devzero-inc/pulumi-provider-devzero/internal/gen/api/v1"
@@ -182,26 +185,26 @@ func (c *ContainerResourceRuleConfigArgs) Annotate(a infer.Annotator) {
 
 // WorkloadRuleArgs are the user-configurable inputs for a WorkloadRule resource.
 type WorkloadRuleArgs struct {
-	ClusterID                string                            `pulumi:"clusterId"`
-	Namespace                string                            `pulumi:"namespace"`
-	Kind                     string                            `pulumi:"kind"`
-	Name                     string                            `pulumi:"name"`
-	AutoGenerate             *bool                             `pulumi:"autoGenerate,optional"`
-	CpuRule                  *ResourceRuleConfigArgs           `pulumi:"cpuRule,optional"`
-	MemoryRule               *ResourceRuleConfigArgs           `pulumi:"memoryRule,optional"`
-	GpuRule                  *ResourceRuleConfigArgs           `pulumi:"gpuRule,optional"`
-	HpaRule                  *HPARuleConfigArgs                `pulumi:"hpaRule,optional"`
-	EmergencyResponse        *EmergencyResponseConfigArgs      `pulumi:"emergencyResponse,optional"`
-	ActionTriggers           []string                          `pulumi:"actionTriggers,optional"`
-	StartupPeriodSeconds     *int                              `pulumi:"startupPeriodSeconds,optional"`
-	CronSchedule             *string                           `pulumi:"cronSchedule,optional"`
-	CooldownMinutes          *int                              `pulumi:"cooldownMinutes,optional"`
-	DetectionTriggers        []string                          `pulumi:"detectionTriggers,optional"`
-	SchedulerPlugins         []string                          `pulumi:"schedulerPlugins,optional"`
-	DefragmentationSchedule  *string                           `pulumi:"defragmentationSchedule,optional"`
-	LiveMigrationEnabled     bool                              `pulumi:"liveMigrationEnabled,optional"`
-	UseInPlaceVerticalScaling bool                             `pulumi:"useInPlaceVerticalScaling,optional"`
-	Containers               []ContainerResourceRuleConfigArgs `pulumi:"containers,optional"`
+	ClusterID                 string                            `pulumi:"clusterId"`
+	Namespace                 string                            `pulumi:"namespace"`
+	Kind                      string                            `pulumi:"kind"`
+	Name                      string                            `pulumi:"name"`
+	AutoGenerate              *bool                             `pulumi:"autoGenerate,optional"`
+	CpuRule                   *ResourceRuleConfigArgs           `pulumi:"cpuRule,optional"`
+	MemoryRule                *ResourceRuleConfigArgs           `pulumi:"memoryRule,optional"`
+	GpuRule                   *ResourceRuleConfigArgs           `pulumi:"gpuRule,optional"`
+	HpaRule                   *HPARuleConfigArgs                `pulumi:"hpaRule,optional"`
+	EmergencyResponse         *EmergencyResponseConfigArgs      `pulumi:"emergencyResponse,optional"`
+	ActionTriggers            []string                          `pulumi:"actionTriggers,optional"`
+	StartupPeriodSeconds      *int                              `pulumi:"startupPeriodSeconds,optional"`
+	CronSchedule              *string                           `pulumi:"cronSchedule,optional"`
+	CooldownMinutes           *int                              `pulumi:"cooldownMinutes,optional"`
+	DetectionTriggers         []string                          `pulumi:"detectionTriggers,optional"`
+	SchedulerPlugins          []string                          `pulumi:"schedulerPlugins,optional"`
+	DefragmentationSchedule   *string                           `pulumi:"defragmentationSchedule,optional"`
+	LiveMigrationEnabled      bool                              `pulumi:"liveMigrationEnabled,optional"`
+	UseInPlaceVerticalScaling bool                              `pulumi:"useInPlaceVerticalScaling,optional"`
+	Containers                []ContainerResourceRuleConfigArgs `pulumi:"containers,optional"`
 }
 
 // Annotate provides SDK documentation for WorkloadRuleArgs fields.
@@ -239,6 +242,10 @@ type WorkloadRule struct{}
 // ---------- CRUD ----------
 
 func (w *WorkloadRule) Create(ctx context.Context, req infer.CreateRequest[WorkloadRuleArgs]) (infer.CreateResponse[WorkloadRuleState], error) {
+	if err := validateWorkloadRuleArgs(req.Inputs); err != nil {
+		return infer.CreateResponse[WorkloadRuleState]{}, err
+	}
+
 	if err := validateContainerRules(req.Inputs.Containers); err != nil {
 		return infer.CreateResponse[WorkloadRuleState]{}, err
 	}
@@ -279,12 +286,15 @@ func (w *WorkloadRule) Read(ctx context.Context, req infer.ReadRequest[WorkloadR
 		RuleId: req.ID,
 	}))
 	if err != nil {
+		if connect.CodeOf(err) == connect.CodeNotFound {
+			// Deleted out of band — drop from state.
+			return infer.ReadResponse[WorkloadRuleArgs, WorkloadRuleState]{}, nil
+		}
 		return infer.ReadResponse[WorkloadRuleArgs, WorkloadRuleState]{ID: req.ID, Inputs: req.Inputs, State: req.State},
 			fmt.Errorf("GetWorkloadRuleByID: %w", err)
 	}
 	if resp.Msg.Rule == nil {
-		return infer.ReadResponse[WorkloadRuleArgs, WorkloadRuleState]{ID: req.ID, Inputs: req.Inputs, State: req.State},
-			fmt.Errorf("GetWorkloadRuleByID: rule not found")
+		return infer.ReadResponse[WorkloadRuleArgs, WorkloadRuleState]{}, nil
 	}
 
 	updatedArgs := ruleProtoToArgs(resp.Msg.Rule)
@@ -296,6 +306,10 @@ func (w *WorkloadRule) Read(ctx context.Context, req infer.ReadRequest[WorkloadR
 }
 
 func (w *WorkloadRule) Update(ctx context.Context, req infer.UpdateRequest[WorkloadRuleArgs, WorkloadRuleState]) (infer.UpdateResponse[WorkloadRuleState], error) {
+	if err := validateWorkloadRuleArgs(req.Inputs); err != nil {
+		return infer.UpdateResponse[WorkloadRuleState]{}, err
+	}
+
 	if err := validateContainerRules(req.Inputs.Containers); err != nil {
 		return infer.UpdateResponse[WorkloadRuleState]{}, err
 	}
@@ -323,6 +337,44 @@ func (w *WorkloadRule) Update(ctx context.Context, req infer.UpdateRequest[Workl
 	}, nil
 }
 
+// Diff implements infer.CustomDiff. The upsert API keys workload rules on
+// (clusterId, namespace, kind, name): changing any of them through Update
+// would create a second rule server-side while the Pulumi ID kept pointing at
+// the old one. Mark those fields as requiring a replacement instead.
+func (w *WorkloadRule) Diff(_ context.Context, req infer.DiffRequest[WorkloadRuleArgs, WorkloadRuleState]) (infer.DiffResponse, error) {
+	replaceOn := map[string]bool{
+		"clusterId": true,
+		"namespace": true,
+		"kind":      true,
+		"name":      true,
+	}
+
+	diff := map[string]prov.PropertyDiff{}
+	oldArgs := reflect.ValueOf(req.State.WorkloadRuleArgs)
+	newArgs := reflect.ValueOf(req.Inputs)
+	t := oldArgs.Type()
+	for i := 0; i < t.NumField(); i++ {
+		tag, ok := t.Field(i).Tag.Lookup("pulumi")
+		if !ok {
+			continue
+		}
+		name := strings.Split(tag, ",")[0]
+		if reflect.DeepEqual(oldArgs.Field(i).Interface(), newArgs.Field(i).Interface()) {
+			continue
+		}
+		kind := prov.Update
+		if replaceOn[name] {
+			kind = prov.UpdateReplace
+		}
+		diff[name] = prov.PropertyDiff{Kind: kind, InputDiff: true}
+	}
+
+	return infer.DiffResponse{
+		HasChanges:   len(diff) > 0,
+		DetailedDiff: diff,
+	}, nil
+}
+
 func (w *WorkloadRule) Delete(ctx context.Context, req infer.DeleteRequest[WorkloadRuleState]) (infer.DeleteResponse, error) {
 	cs := clientset.Get()
 	if cs == nil {
@@ -333,7 +385,7 @@ func (w *WorkloadRule) Delete(ctx context.Context, req infer.DeleteRequest[Workl
 		TeamId: cs.TeamID,
 		RuleId: req.ID,
 	}))
-	if err != nil {
+	if err != nil && connect.CodeOf(err) != connect.CodeNotFound {
 		return infer.DeleteResponse{}, fmt.Errorf("DeleteWorkloadRule: %w", err)
 	}
 	return infer.DeleteResponse{}, nil
@@ -515,19 +567,19 @@ func resourceRuleConfigFromProto(p *apiv1.ResourceRuleConfig) *ResourceRuleConfi
 		r.MaxRequest = &v
 	}
 	if p.LimitMultiplier != nil {
-		v := float64(*p.LimitMultiplier)
+		v := f32(*p.LimitMultiplier)
 		r.LimitMultiplier = &v
 	}
 	if p.TargetPercentile != nil {
-		v := float64(*p.TargetPercentile)
+		v := f32(*p.TargetPercentile)
 		r.TargetPercentile = &v
 	}
 	if p.MaxScaleUpPercent != nil {
-		v := float64(*p.MaxScaleUpPercent)
+		v := f32(*p.MaxScaleUpPercent)
 		r.MaxScaleUpPercent = &v
 	}
 	if p.MaxScaleDownPercent != nil {
-		v := float64(*p.MaxScaleDownPercent)
+		v := f32(*p.MaxScaleDownPercent)
 		r.MaxScaleDownPercent = &v
 	}
 	return r
@@ -587,7 +639,7 @@ func hpaRuleConfigFromProto(p *apiv1.HPARuleConfig) *HPARuleConfigArgs {
 		h.MaxReplicas = &v
 	}
 	if p.MaxReplicaChangePercent != nil {
-		v := float64(*p.MaxReplicaChangePercent)
+		v := f32(*p.MaxReplicaChangePercent)
 		h.MaxReplicaChangePercent = &v
 	}
 	if p.ScaleDownCooldownSeconds != nil {
@@ -835,11 +887,11 @@ func containerResourceConfigFromProto(p *apiv1.ContainerResourceConfig) *Resourc
 		r.MaxRequest = &v
 	}
 	if p.LimitMultiplier != nil {
-		v := float64(*p.LimitMultiplier)
+		v := f32(*p.LimitMultiplier)
 		r.LimitMultiplier = &v
 	}
 	if p.TargetPercentile != nil {
-		v := float64(*p.TargetPercentile)
+		v := f32(*p.TargetPercentile)
 		r.TargetPercentile = &v
 	}
 	return r

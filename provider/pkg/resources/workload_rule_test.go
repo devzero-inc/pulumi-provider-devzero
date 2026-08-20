@@ -311,7 +311,7 @@ func TestWorkloadRule_Read_NilClientSet(t *testing.T) {
 func TestWorkloadRule_Read_APIError(t *testing.T) {
 	rec := &mockWorkloadRuleClient{
 		getFn: func(_ context.Context, _ *connect.Request[apiv1.GetWorkloadRuleByIDRequest]) (*connect.Response[apiv1.GetWorkloadRuleByIDResponse], error) {
-			return nil, connect.NewError(connect.CodeNotFound, errors.New("not found"))
+			return nil, connect.NewError(connect.CodeInternal, errors.New("backend exploded"))
 		},
 	}
 	withMockWorkloadRuleClientSet(t, rec)
@@ -463,7 +463,7 @@ func TestWorkloadRule_Delete_NilClientSet(t *testing.T) {
 func TestWorkloadRule_Delete_APIError(t *testing.T) {
 	rec := &mockWorkloadRuleClient{
 		deleteFn: func(_ context.Context, _ *connect.Request[apiv1.DeleteWorkloadRuleRequest]) (*connect.Response[apiv1.DeleteWorkloadRuleResponse], error) {
-			return nil, connect.NewError(connect.CodeNotFound, errors.New("not found"))
+			return nil, connect.NewError(connect.CodeInternal, errors.New("backend exploded"))
 		},
 	}
 	withMockWorkloadRuleClientSet(t, rec)

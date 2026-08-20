@@ -56,9 +56,9 @@ func (f *GetClusterIdByName) Invoke(ctx context.Context, req infer.FunctionReque
 	}
 
 	rpcReq := &apiv1.GetClusterIDByNameRequest{
-		TeamId: teamID,
-		Name:   req.Input.Name,
-		Region: req.Input.Region,
+		TeamId:        teamID,
+		Name:          req.Input.Name,
+		Region:        req.Input.Region,
 		CloudProvider: req.Input.CloudProvider,
 	}
 	if req.Input.Liveness != nil {
