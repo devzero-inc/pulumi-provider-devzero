@@ -31,3 +31,6 @@ docs/plans
 examples/python/
 examples/typescript/node_modules/
 example-local-test/
+# Never commit ad-hoc API scratch files (may contain tokens)
+curl.txt
+*.curl

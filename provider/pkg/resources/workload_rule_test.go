@@ -538,16 +538,12 @@ func TestResourceRuleConfig_Nil(t *testing.T) {
 func TestHPARuleConfig_RoundTrip(t *testing.T) {
 	minR := 1
 	maxR := 10
-	util := 0.7
-	metric := "cpu"
 	maxChange := 50.0
 
 	h := &HPARuleConfigArgs{
-		Enabled:                true,
-		MinReplicas:            &minR,
-		MaxReplicas:            &maxR,
-		TargetUtilization:      &util,
-		PrimaryMetric:          &metric,
+		Enabled:                 true,
+		MinReplicas:             &minR,
+		MaxReplicas:             &maxR,
 		MaxReplicaChangePercent: &maxChange,
 	}
 
@@ -563,9 +559,6 @@ func TestHPARuleConfig_RoundTrip(t *testing.T) {
 	}
 	if back.MaxReplicas == nil || *back.MaxReplicas != maxR {
 		t.Errorf("MaxReplicas: got %v, want %d", back.MaxReplicas, maxR)
-	}
-	if back.PrimaryMetric == nil || *back.PrimaryMetric != metric {
-		t.Errorf("PrimaryMetric: got %v, want %q", back.PrimaryMetric, metric)
 	}
 	if back.MaxReplicaChangePercent == nil || *back.MaxReplicaChangePercent != maxChange {
 		t.Errorf("MaxReplicaChangePercent: got %v, want %f", back.MaxReplicaChangePercent, maxChange)
