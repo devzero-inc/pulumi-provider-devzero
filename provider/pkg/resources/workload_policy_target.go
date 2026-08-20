@@ -52,19 +52,22 @@ func (l *LabelSelectorArgs) Annotate(a infer.Annotator) {
 
 // WorkloadPolicyTargetArgs are the user-configurable inputs for a WorkloadPolicyTarget resource.
 type WorkloadPolicyTargetArgs struct {
-	Name              string             `pulumi:"name"`
-	PolicyId          string             `pulumi:"policyId"`
-	ClusterIds        []string           `pulumi:"clusterIds"`
-	Description       *string            `pulumi:"description,optional"`
-	Priority          int                `pulumi:"priority,optional"`
-	Enabled           *bool              `pulumi:"enabled,optional"`
-	WorkloadNames     []string           `pulumi:"workloadNames,optional"`
-	NodeGroupNames    []string           `pulumi:"nodeGroupNames,optional"`
-	KindFilter        []string           `pulumi:"kindFilter,optional"`
-	NamePattern       *NamePatternArgs   `pulumi:"namePattern,optional"`
-	NamespacePattern  *NamePatternArgs   `pulumi:"namespacePattern,optional"`
-	NamespaceSelector *LabelSelectorArgs `pulumi:"namespaceSelector,optional"`
-	WorkloadSelector  *LabelSelectorArgs `pulumi:"workloadSelector,optional"`
+	Name               string             `pulumi:"name"`
+	PolicyId           string             `pulumi:"policyId"`
+	ClusterIds         []string           `pulumi:"clusterIds"`
+	Description        *string            `pulumi:"description,optional"`
+	Priority           int                `pulumi:"priority,optional"`
+	Enabled            *bool              `pulumi:"enabled,optional"`
+	WorkloadNames      []string           `pulumi:"workloadNames,optional"`
+	WorkloadNamesNotIn []string           `pulumi:"workloadNamesNotIn,optional"`
+	NodeGroupNames     []string           `pulumi:"nodeGroupNames,optional"`
+	KindFilter         []string           `pulumi:"kindFilter,optional"`
+	KindFilterNotIn    []string           `pulumi:"kindFilterNotIn,optional"`
+	AnnotationSelector *LabelSelectorArgs `pulumi:"annotationSelector,optional"`
+	NamePattern        *NamePatternArgs   `pulumi:"namePattern,optional"`
+	NamespacePattern   *NamePatternArgs   `pulumi:"namespacePattern,optional"`
+	NamespaceSelector  *LabelSelectorArgs `pulumi:"namespaceSelector,optional"`
+	WorkloadSelector   *LabelSelectorArgs `pulumi:"workloadSelector,optional"`
 }
 
 // WorkloadPolicyTargetState is the full persisted state (identical to args — no additional computed fields).
@@ -82,7 +85,11 @@ func (s *WorkloadPolicyTargetState) Annotate(a infer.Annotator) {
 	a.Describe(&s.Enabled, "Enable or disable this target. Defaults to true.")
 	a.SetDefault(&s.Enabled, true)
 	a.Describe(&s.WorkloadNames, "Explicit list of workload names to include.")
-	a.Describe(&s.NodeGroupNames, "Restrict matching to specific node groups by name.")
+	a.Describe(&s.WorkloadNamesNotIn, "Explicit list of workload names to exclude.")
+	a.Describe(&s.KindFilterNotIn, "Kubernetes kinds to exclude from matching. Same allowed values as kindFilter.")
+	a.Describe(&s.AnnotationSelector, "Select workloads by annotations (same semantics as label selectors, evaluated against annotations).")
+	a.Describe(&s.NodeGroupNames, "DEPRECATED: unused by the DevZero API — no longer evaluated by any active target.")
+	a.Deprecate(&s.NodeGroupNames, "node_group_names is deprecated by the DevZero API and no longer evaluated.")
 	a.Describe(&s.KindFilter, "Restrict matching to specific Kubernetes kinds (e.g. Deployment, Pod).")
 	a.Describe(&s.NamePattern, "Regex to match workload names.")
 	a.Describe(&s.NamespacePattern, "Regex to match namespace names.")
@@ -213,19 +220,22 @@ func (w *WorkloadPolicyTarget) Delete(ctx context.Context, req infer.DeleteReque
 
 func targetArgsToCreateRequest(teamID string, a WorkloadPolicyTargetArgs) *apiv1.CreateWorkloadPolicyTargetRequest {
 	r := &apiv1.CreateWorkloadPolicyTargetRequest{
-		TeamId:            teamID,
-		PolicyId:          a.PolicyId,
-		Name:              a.Name,
-		Priority:          int32(a.Priority),
-		Enabled:           a.EnabledOrDefault(),
-		ClusterIds:        a.ClusterIds,
-		WorkloadNames:     a.WorkloadNames,
-		NodeGroupNames:    a.NodeGroupNames,
-		KindFilter:        kindFilterToProto(a.KindFilter),
-		NamePattern:       namePatternToProto(a.NamePattern),
-		NamespacePattern:  namePatternToProto(a.NamespacePattern),
-		NamespaceSelector: labelSelectorToProto(a.NamespaceSelector),
-		WorkloadSelector:  labelSelectorToProto(a.WorkloadSelector),
+		TeamId:             teamID,
+		PolicyId:           a.PolicyId,
+		Name:               a.Name,
+		Priority:           int32(a.Priority),
+		Enabled:            a.EnabledOrDefault(),
+		ClusterIds:         a.ClusterIds,
+		WorkloadNames:      a.WorkloadNames,
+		WorkloadNamesNotIn: a.WorkloadNamesNotIn,
+		NodeGroupNames:     a.NodeGroupNames,
+		KindFilter:         kindFilterToProto(a.KindFilter),
+		KindFilterNotIn:    kindFilterToProto(a.KindFilterNotIn),
+		NamePattern:        namePatternToProto(a.NamePattern),
+		NamespacePattern:   namePatternToProto(a.NamespacePattern),
+		NamespaceSelector:  labelSelectorToProto(a.NamespaceSelector),
+		WorkloadSelector:   labelSelectorToProto(a.WorkloadSelector),
+		AnnotationSelector: labelSelectorToProto(a.AnnotationSelector),
 	}
 	if a.Description != nil {
 		r.Description = *a.Description
@@ -236,20 +246,23 @@ func targetArgsToCreateRequest(teamID string, a WorkloadPolicyTargetArgs) *apiv1
 func targetArgsToUpdateRequest(teamID, targetID string, a WorkloadPolicyTargetArgs) *apiv1.UpdateWorkloadPolicyTargetRequest {
 	policyID := a.PolicyId
 	r := &apiv1.UpdateWorkloadPolicyTargetRequest{
-		TeamId:            teamID,
-		TargetId:          targetID,
-		PolicyId:          &policyID,
-		Name:              a.Name,
-		Priority:          int32(a.Priority),
-		Enabled:           a.EnabledOrDefault(),
-		ClusterIds:        a.ClusterIds,
-		WorkloadNames:     a.WorkloadNames,
-		NodeGroupNames:    a.NodeGroupNames,
-		KindFilter:        kindFilterToProto(a.KindFilter),
-		NamePattern:       namePatternToProto(a.NamePattern),
-		NamespacePattern:  namePatternToProto(a.NamespacePattern),
-		NamespaceSelector: labelSelectorToProto(a.NamespaceSelector),
-		WorkloadSelector:  labelSelectorToProto(a.WorkloadSelector),
+		TeamId:             teamID,
+		TargetId:           targetID,
+		PolicyId:           &policyID,
+		Name:               a.Name,
+		Priority:           int32(a.Priority),
+		Enabled:            a.EnabledOrDefault(),
+		ClusterIds:         a.ClusterIds,
+		WorkloadNames:      a.WorkloadNames,
+		WorkloadNamesNotIn: a.WorkloadNamesNotIn,
+		NodeGroupNames:     a.NodeGroupNames,
+		KindFilter:         kindFilterToProto(a.KindFilter),
+		KindFilterNotIn:    kindFilterToProto(a.KindFilterNotIn),
+		NamePattern:        namePatternToProto(a.NamePattern),
+		NamespacePattern:   namePatternToProto(a.NamespacePattern),
+		NamespaceSelector:  labelSelectorToProto(a.NamespaceSelector),
+		WorkloadSelector:   labelSelectorToProto(a.WorkloadSelector),
+		AnnotationSelector: labelSelectorToProto(a.AnnotationSelector),
 	}
 	if a.Description != nil {
 		r.Description = *a.Description
@@ -259,18 +272,21 @@ func targetArgsToUpdateRequest(teamID, targetID string, a WorkloadPolicyTargetAr
 
 func targetProtoToArgs(t *apiv1.WorkloadPolicyTarget) WorkloadPolicyTargetArgs {
 	a := WorkloadPolicyTargetArgs{
-		Name:              t.Name,
-		PolicyId:          t.PolicyId,
-		ClusterIds:        t.ClusterIds,
-		Priority:          int(t.Priority),
-		Enabled:           boolPtr(t.Enabled),
-		WorkloadNames:     t.WorkloadNames,
-		NodeGroupNames:    t.NodeGroupNames,
-		KindFilter:        kindFilterFromProto(t.KindFilter),
-		NamePattern:       namePatternFromProto(t.NamePattern),
-		NamespacePattern:  namePatternFromProto(t.NamespacePattern),
-		NamespaceSelector: labelSelectorFromProto(t.NamespaceSelector),
-		WorkloadSelector:  labelSelectorFromProto(t.WorkloadSelector),
+		Name:               t.Name,
+		PolicyId:           t.PolicyId,
+		ClusterIds:         t.ClusterIds,
+		Priority:           int(t.Priority),
+		Enabled:            boolPtr(t.Enabled),
+		WorkloadNames:      t.WorkloadNames,
+		WorkloadNamesNotIn: t.WorkloadNamesNotIn,
+		NodeGroupNames:     t.NodeGroupNames,
+		KindFilter:         kindFilterFromProto(t.KindFilter),
+		KindFilterNotIn:    kindFilterFromProto(t.KindFilterNotIn),
+		NamePattern:        namePatternFromProto(t.NamePattern),
+		NamespacePattern:   namePatternFromProto(t.NamespacePattern),
+		NamespaceSelector:  labelSelectorFromProto(t.NamespaceSelector),
+		WorkloadSelector:   labelSelectorFromProto(t.WorkloadSelector),
+		AnnotationSelector: labelSelectorFromProto(t.AnnotationSelector),
 	}
 	if t.Description != "" {
 		a.Description = &t.Description

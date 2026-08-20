@@ -25,6 +25,14 @@ type ResourceRuleConfigArgs struct {
 	MaxScaleUpPercent       *float64 `pulumi:"maxScaleUpPercent,optional"`
 	MaxScaleDownPercent     *float64 `pulumi:"maxScaleDownPercent,optional"`
 	LimitsRemovalEnabled    bool     `pulumi:"limitsRemovalEnabled,optional"`
+	InitialRequest          *int     `pulumi:"initialRequest,optional"`
+	FloorPercent            *int     `pulumi:"floorPercent,optional"`
+	CeilingPercent          *int     `pulumi:"ceilingPercent,optional"`
+	InitialLimit            *int     `pulumi:"initialLimit,optional"`
+	LimitFloorPercent       *int     `pulumi:"limitFloorPercent,optional"`
+	LimitCeilingPercent     *int     `pulumi:"limitCeilingPercent,optional"`
+	RequestUseRss           *bool    `pulumi:"requestUseRss,optional"`
+	LimitUseRss             *bool    `pulumi:"limitUseRss,optional"`
 }
 
 // Annotate provides SDK documentation for ResourceRuleConfigArgs fields.
@@ -52,6 +60,7 @@ type HPAMetricTriggerArgs struct {
 	Metadata          map[string]string `pulumi:"metadata,optional"`
 	ServerAddress     *string           `pulumi:"serverAddress,optional"`
 	Query             *string           `pulumi:"query,optional"`
+	ConnectorId       *string           `pulumi:"connectorId,optional"`
 }
 
 // Annotate provides SDK documentation for HPAMetricTriggerArgs fields.
@@ -205,6 +214,8 @@ type WorkloadRuleArgs struct {
 	LiveMigrationEnabled      bool                              `pulumi:"liveMigrationEnabled,optional"`
 	UseInPlaceVerticalScaling bool                              `pulumi:"useInPlaceVerticalScaling,optional"`
 	Containers                []ContainerResourceRuleConfigArgs `pulumi:"containers,optional"`
+	Disabled                  *bool                             `pulumi:"disabled,optional"`
+	LookbackPeriodSeconds     *int                              `pulumi:"lookbackPeriodSeconds,optional"`
 }
 
 // Annotate provides SDK documentation for WorkloadRuleArgs fields.
@@ -258,7 +269,7 @@ func (w *WorkloadRule) Create(ctx context.Context, req infer.CreateRequest[Workl
 		return infer.CreateResponse[WorkloadRuleState]{}, fmt.Errorf("devzero: provider not configured (ClientSet is nil)")
 	}
 
-	resp, err := cs.RecommendationClient.UpsertManualWorkloadRule(ctx, connect.NewRequest(ruleArgsToUpsertRequest(cs.TeamID, req.Inputs)))
+	resp, err := cs.RecommendationClient.UpsertManualWorkloadRule(ctx, connect.NewRequest(ruleArgsToUpsertRequest(cs.TeamID, req.Inputs, true)))
 	if err != nil {
 		return infer.CreateResponse[WorkloadRuleState]{}, fmt.Errorf("UpsertManualWorkloadRule: %w", err)
 	}
@@ -322,12 +333,31 @@ func (w *WorkloadRule) Update(ctx context.Context, req infer.UpdateRequest[Workl
 		return infer.UpdateResponse[WorkloadRuleState]{}, fmt.Errorf("devzero: provider not configured (ClientSet is nil)")
 	}
 
-	resp, err := cs.RecommendationClient.UpsertManualWorkloadRule(ctx, connect.NewRequest(ruleArgsToUpsertRequest(cs.TeamID, req.Inputs)))
+	resp, err := cs.RecommendationClient.UpsertManualWorkloadRule(ctx, connect.NewRequest(ruleArgsToUpsertRequest(cs.TeamID, req.Inputs, false)))
 	if err != nil {
 		return infer.UpdateResponse[WorkloadRuleState]{}, fmt.Errorf("UpsertManualWorkloadRule: %w", err)
 	}
 	if resp.Msg.Rule == nil {
 		return infer.UpdateResponse[WorkloadRuleState]{}, fmt.Errorf("UpsertManualWorkloadRule: empty response from server")
+	}
+
+	// disabled cannot be sent through the upsert on update; use the toggle RPC.
+	wantDisabled := req.Inputs.Disabled != nil && *req.Inputs.Disabled
+	haveDisabled := req.State.Disabled != nil && *req.State.Disabled
+	if wantDisabled != haveDisabled {
+		toggleResp, err := cs.RecommendationClient.ToggleWorkloadRuleDisabled(ctx, connect.NewRequest(&apiv1.ToggleWorkloadRuleDisabledRequest{
+			TeamId:   cs.TeamID,
+			RuleId:   resp.Msg.Rule.RuleId,
+			Disabled: wantDisabled,
+		}))
+		if err != nil {
+			return infer.UpdateResponse[WorkloadRuleState]{}, fmt.Errorf("ToggleWorkloadRuleDisabled: %w", err)
+		}
+		if toggleResp.Msg.Rule != nil {
+			resp.Msg.Rule.Disabled = toggleResp.Msg.Rule.Disabled
+		} else {
+			resp.Msg.Rule.Disabled = wantDisabled
+		}
 	}
 
 	out := ruleProtoToArgs(resp.Msg.Rule)
@@ -393,7 +423,10 @@ func (w *WorkloadRule) Delete(ctx context.Context, req infer.DeleteRequest[Workl
 
 // ---------- proto conversion helpers ----------
 
-func ruleArgsToUpsertRequest(teamID string, a WorkloadRuleArgs) *apiv1.UpsertManualWorkloadRuleRequest {
+// ruleArgsToUpsertRequest builds the upsert request. includeDisabled must be
+// true only on Create: the server rejects fields.disabled when updating an
+// existing rule (ToggleWorkloadRuleDisabled is the update path).
+func ruleArgsToUpsertRequest(teamID string, a WorkloadRuleArgs, includeDisabled bool) *apiv1.UpsertManualWorkloadRuleRequest {
 	// Attribute the rule to the Pulumi provider so the server persists
 	// source=pulumi_manual or source=pulumi_auto. Audit + UI surfaces use
 	// this to distinguish IaC-managed rules from UI edits AND to tell whether
@@ -442,6 +475,13 @@ func ruleArgsToUpsertRequest(teamID string, a WorkloadRuleArgs) *apiv1.UpsertMan
 	if a.DefragmentationSchedule != nil {
 		req.Fields.DefragmentationSchedule = a.DefragmentationSchedule
 	}
+	if a.LookbackPeriodSeconds != nil {
+		v := int32(*a.LookbackPeriodSeconds)
+		req.Fields.LookbackPeriodSeconds = &v
+	}
+	if includeDisabled && a.Disabled != nil {
+		req.Fields.Disabled = a.Disabled
+	}
 	return req
 }
 
@@ -462,6 +502,14 @@ func ruleProtoToArgs(r *apiv1.WorkloadRule) WorkloadRuleArgs {
 		LiveMigrationEnabled:      r.LiveMigrationEnabled,
 		UseInPlaceVerticalScaling: r.UseInPlaceVerticalScaling,
 		Containers:                containerRuleConfigsFromProto(r.Containers),
+	}
+	if r.Disabled {
+		v := true
+		a.Disabled = &v
+	}
+	if r.LookbackPeriodSeconds != nil {
+		v := int(*r.LookbackPeriodSeconds)
+		a.LookbackPeriodSeconds = &v
 	}
 	if r.StartupPeriodSeconds != nil {
 		v := int(*r.StartupPeriodSeconds)
@@ -546,6 +594,14 @@ func resourceRuleConfigToProto(r *ResourceRuleConfigArgs) *apiv1.ResourceRuleCon
 		v := float32(*r.MaxScaleDownPercent)
 		p.MaxScaleDownPercent = &v
 	}
+	p.InitialRequest = intPtrToInt64Ptr(r.InitialRequest)
+	p.FloorPercent = intPtrToInt64Ptr(r.FloorPercent)
+	p.CeilingPercent = intPtrToInt64Ptr(r.CeilingPercent)
+	p.InitialLimit = intPtrToInt64Ptr(r.InitialLimit)
+	p.LimitFloorPercent = intPtrToInt64Ptr(r.LimitFloorPercent)
+	p.LimitCeilingPercent = intPtrToInt64Ptr(r.LimitCeilingPercent)
+	p.RequestUseRss = r.RequestUseRss
+	p.LimitUseRss = r.LimitUseRss
 	return p
 }
 
@@ -582,6 +638,14 @@ func resourceRuleConfigFromProto(p *apiv1.ResourceRuleConfig) *ResourceRuleConfi
 		v := f32(*p.MaxScaleDownPercent)
 		r.MaxScaleDownPercent = &v
 	}
+	r.InitialRequest = int64PtrToIntPtr(p.InitialRequest)
+	r.FloorPercent = int64PtrToIntPtr(p.FloorPercent)
+	r.CeilingPercent = int64PtrToIntPtr(p.CeilingPercent)
+	r.InitialLimit = int64PtrToIntPtr(p.InitialLimit)
+	r.LimitFloorPercent = int64PtrToIntPtr(p.LimitFloorPercent)
+	r.LimitCeilingPercent = int64PtrToIntPtr(p.LimitCeilingPercent)
+	r.RequestUseRss = p.RequestUseRss
+	r.LimitUseRss = p.LimitUseRss
 	return r
 }
 
@@ -673,6 +737,7 @@ func hpaMetricTriggersToProto(ms []HPAMetricTriggerArgs) []*apiv1.HPAMetricTrigg
 		result[i].Weight = m.Weight
 		result[i].ServerAddress = m.ServerAddress
 		result[i].Query = m.Query
+		result[i].ConnectorId = m.ConnectorId
 	}
 	return result
 }
@@ -683,14 +748,28 @@ func hpaMetricTriggersFromProto(ps []*apiv1.HPAMetricTrigger) []HPAMetricTrigger
 		if p == nil {
 			continue
 		}
+		// The backend folds serverAddress/query into metadata on write and
+		// re-derives the dedicated fields on read; strip the folded keys so
+		// metadata reflects only what the user configured.
+		var metadata map[string]string
+		for k, v := range p.Metadata {
+			if k == "serverAddress" || k == "query" {
+				continue
+			}
+			if metadata == nil {
+				metadata = map[string]string{}
+			}
+			metadata[k] = v
+		}
 		result = append(result, HPAMetricTriggerArgs{
 			Type:              p.Type,
 			TargetUtilization: p.TargetUtilization,
 			TargetValue:       p.TargetValue,
 			Weight:            p.Weight,
-			Metadata:          p.Metadata,
+			Metadata:          metadata,
 			ServerAddress:     p.ServerAddress,
 			Query:             p.Query,
+			ConnectorId:       p.ConnectorId,
 		})
 	}
 	return result
@@ -866,6 +945,8 @@ func containerResourceConfigToProto(r *ResourceRuleConfigArgs) *apiv1.ContainerR
 		v := float32(*r.TargetPercentile)
 		p.TargetPercentile = &v
 	}
+	p.RequestUseRss = r.RequestUseRss
+	p.LimitUseRss = r.LimitUseRss
 	return p
 }
 
@@ -894,5 +975,7 @@ func containerResourceConfigFromProto(p *apiv1.ContainerResourceConfig) *Resourc
 		v := f32(*p.TargetPercentile)
 		r.TargetPercentile = &v
 	}
+	r.RequestUseRss = p.RequestUseRss
+	r.LimitUseRss = p.LimitUseRss
 	return r
 }

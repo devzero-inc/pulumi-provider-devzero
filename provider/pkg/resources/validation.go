@@ -81,10 +81,16 @@ func validateWorkloadPolicyTargetArgs(a WorkloadPolicyTargetArgs) error {
 	if err := validateEnumList("kindFilter", a.KindFilter, validKinds); err != nil {
 		return err
 	}
+	if err := validateEnumList("kindFilterNotIn", a.KindFilterNotIn, validKinds); err != nil {
+		return err
+	}
 	if err := validateSelector("namespaceSelector", a.NamespaceSelector); err != nil {
 		return err
 	}
-	return validateSelector("workloadSelector", a.WorkloadSelector)
+	if err := validateSelector("workloadSelector", a.WorkloadSelector); err != nil {
+		return err
+	}
+	return validateSelector("annotationSelector", a.AnnotationSelector)
 }
 
 func validateWorkloadRuleArgs(a WorkloadRuleArgs) error {
