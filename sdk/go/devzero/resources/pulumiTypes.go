@@ -891,7 +891,8 @@ type AzureNodeClassSpecArgs struct {
 	// FIPS 140-2 compliance mode for the node. One of: 'Enabled', 'Disabled'. Example: 'Disabled'.
 	FipsMode *string `pulumi:"fipsMode"`
 	// Azure node image family. One of: 'AzureLinux', 'Ubuntu2204'. Example: 'AzureLinux'.
-	ImageFamily *string `pulumi:"imageFamily"`
+	ImageFamily  *string `pulumi:"imageFamily"`
+	ImageVersion *string `pulumi:"imageVersion"`
 	// Kubelet configuration overrides for Azure nodes.
 	Kubelet *AzureKubeletConfigurationArgs `pulumi:"kubelet"`
 	// Maximum pods per node, overrides the AKS cluster default. Example: 110.
@@ -919,7 +920,8 @@ type AzureNodeClassSpecArgsArgs struct {
 	// FIPS 140-2 compliance mode for the node. One of: 'Enabled', 'Disabled'. Example: 'Disabled'.
 	FipsMode pulumi.StringPtrInput `pulumi:"fipsMode"`
 	// Azure node image family. One of: 'AzureLinux', 'Ubuntu2204'. Example: 'AzureLinux'.
-	ImageFamily pulumi.StringPtrInput `pulumi:"imageFamily"`
+	ImageFamily  pulumi.StringPtrInput `pulumi:"imageFamily"`
+	ImageVersion pulumi.StringPtrInput `pulumi:"imageVersion"`
 	// Kubelet configuration overrides for Azure nodes.
 	Kubelet AzureKubeletConfigurationArgsPtrInput `pulumi:"kubelet"`
 	// Maximum pods per node, overrides the AKS cluster default. Example: 110.
@@ -1019,6 +1021,10 @@ func (o AzureNodeClassSpecArgsOutput) ImageFamily() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v AzureNodeClassSpecArgs) *string { return v.ImageFamily }).(pulumi.StringPtrOutput)
 }
 
+func (o AzureNodeClassSpecArgsOutput) ImageVersion() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v AzureNodeClassSpecArgs) *string { return v.ImageVersion }).(pulumi.StringPtrOutput)
+}
+
 // Kubelet configuration overrides for Azure nodes.
 func (o AzureNodeClassSpecArgsOutput) Kubelet() AzureKubeletConfigurationArgsPtrOutput {
 	return o.ApplyT(func(v AzureNodeClassSpecArgs) *AzureKubeletConfigurationArgs { return v.Kubelet }).(AzureKubeletConfigurationArgsPtrOutput)
@@ -1085,6 +1091,15 @@ func (o AzureNodeClassSpecArgsPtrOutput) ImageFamily() pulumi.StringPtrOutput {
 			return nil
 		}
 		return v.ImageFamily
+	}).(pulumi.StringPtrOutput)
+}
+
+func (o AzureNodeClassSpecArgsPtrOutput) ImageVersion() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *AzureNodeClassSpecArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.ImageVersion
 	}).(pulumi.StringPtrOutput)
 }
 
@@ -2720,6 +2735,7 @@ func (o HPAFallbackArgsPtrOutput) Replicas() pulumi.IntPtrOutput {
 }
 
 type HPAMetricTriggerArgs struct {
+	ConnectorId *string `pulumi:"connectorId"`
 	// Free-form key-value pairs for external scalers. For Prometheus use serverAddress and query instead.
 	Metadata map[string]string `pulumi:"metadata"`
 	// PromQL query string. Shorthand — packed into metadata by the service layer. Example: 'sum(rate(http_requests_total[2m]))'.
@@ -2748,6 +2764,7 @@ type HPAMetricTriggerArgsInput interface {
 }
 
 type HPAMetricTriggerArgsArgs struct {
+	ConnectorId pulumi.StringPtrInput `pulumi:"connectorId"`
 	// Free-form key-value pairs for external scalers. For Prometheus use serverAddress and query instead.
 	Metadata pulumi.StringMapInput `pulumi:"metadata"`
 	// PromQL query string. Shorthand — packed into metadata by the service layer. Example: 'sum(rate(http_requests_total[2m]))'.
@@ -2813,6 +2830,10 @@ func (o HPAMetricTriggerArgsOutput) ToHPAMetricTriggerArgsOutput() HPAMetricTrig
 
 func (o HPAMetricTriggerArgsOutput) ToHPAMetricTriggerArgsOutputWithContext(ctx context.Context) HPAMetricTriggerArgsOutput {
 	return o
+}
+
+func (o HPAMetricTriggerArgsOutput) ConnectorId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v HPAMetricTriggerArgs) *string { return v.ConnectorId }).(pulumi.StringPtrOutput)
 }
 
 // Free-form key-value pairs for external scalers. For Prometheus use serverAddress and query instead.
@@ -2883,18 +2904,12 @@ type HPARuleConfigArgs struct {
 	MaxReplicaChangePercent *float64 `pulumi:"maxReplicaChangePercent"`
 	// Maximum number of replicas. Example: 10.
 	MaxReplicas *int `pulumi:"maxReplicas"`
-	// Additional metric triggers (e.g. Prometheus). CPU/Memory/Network triggers are auto-generated from primaryMetric — do not redeclare them here.
+	// HPA metric triggers (CPU, Memory, Network*, or external such as prometheus/kafka). Replaces the removed targetUtilization/primaryMetric fields.
 	Metrics []HPAMetricTriggerArgs `pulumi:"metrics"`
 	// Minimum number of replicas. Example: 2.
 	MinReplicas *int `pulumi:"minReplicas"`
-	// Primary metric driving HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
-	PrimaryMetric *string `pulumi:"primaryMetric"`
 	// Seconds to wait between scale-down events. Example: 300.
 	ScaleDownCooldownSeconds *int `pulumi:"scaleDownCooldownSeconds"`
-	// Target memory utilization ratio (0-1), tuned independently of CPU. Example: 0.8.
-	TargetMemoryUtilization *float64 `pulumi:"targetMemoryUtilization"`
-	// Target CPU utilization ratio (0-1). Example: 0.7.
-	TargetUtilization *float64 `pulumi:"targetUtilization"`
 }
 
 // HPARuleConfigArgsInput is an input type that accepts HPARuleConfigArgsArgs and HPARuleConfigArgsOutput values.
@@ -2921,18 +2936,12 @@ type HPARuleConfigArgsArgs struct {
 	MaxReplicaChangePercent pulumi.Float64PtrInput `pulumi:"maxReplicaChangePercent"`
 	// Maximum number of replicas. Example: 10.
 	MaxReplicas pulumi.IntPtrInput `pulumi:"maxReplicas"`
-	// Additional metric triggers (e.g. Prometheus). CPU/Memory/Network triggers are auto-generated from primaryMetric — do not redeclare them here.
+	// HPA metric triggers (CPU, Memory, Network*, or external such as prometheus/kafka). Replaces the removed targetUtilization/primaryMetric fields.
 	Metrics HPAMetricTriggerArgsArrayInput `pulumi:"metrics"`
 	// Minimum number of replicas. Example: 2.
 	MinReplicas pulumi.IntPtrInput `pulumi:"minReplicas"`
-	// Primary metric driving HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
-	PrimaryMetric pulumi.StringPtrInput `pulumi:"primaryMetric"`
 	// Seconds to wait between scale-down events. Example: 300.
 	ScaleDownCooldownSeconds pulumi.IntPtrInput `pulumi:"scaleDownCooldownSeconds"`
-	// Target memory utilization ratio (0-1), tuned independently of CPU. Example: 0.8.
-	TargetMemoryUtilization pulumi.Float64PtrInput `pulumi:"targetMemoryUtilization"`
-	// Target CPU utilization ratio (0-1). Example: 0.7.
-	TargetUtilization pulumi.Float64PtrInput `pulumi:"targetUtilization"`
 }
 
 func (HPARuleConfigArgsArgs) ElementType() reflect.Type {
@@ -3042,7 +3051,7 @@ func (o HPARuleConfigArgsOutput) MaxReplicas() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v HPARuleConfigArgs) *int { return v.MaxReplicas }).(pulumi.IntPtrOutput)
 }
 
-// Additional metric triggers (e.g. Prometheus). CPU/Memory/Network triggers are auto-generated from primaryMetric — do not redeclare them here.
+// HPA metric triggers (CPU, Memory, Network*, or external such as prometheus/kafka). Replaces the removed targetUtilization/primaryMetric fields.
 func (o HPARuleConfigArgsOutput) Metrics() HPAMetricTriggerArgsArrayOutput {
 	return o.ApplyT(func(v HPARuleConfigArgs) []HPAMetricTriggerArgs { return v.Metrics }).(HPAMetricTriggerArgsArrayOutput)
 }
@@ -3052,24 +3061,9 @@ func (o HPARuleConfigArgsOutput) MinReplicas() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v HPARuleConfigArgs) *int { return v.MinReplicas }).(pulumi.IntPtrOutput)
 }
 
-// Primary metric driving HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
-func (o HPARuleConfigArgsOutput) PrimaryMetric() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v HPARuleConfigArgs) *string { return v.PrimaryMetric }).(pulumi.StringPtrOutput)
-}
-
 // Seconds to wait between scale-down events. Example: 300.
 func (o HPARuleConfigArgsOutput) ScaleDownCooldownSeconds() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v HPARuleConfigArgs) *int { return v.ScaleDownCooldownSeconds }).(pulumi.IntPtrOutput)
-}
-
-// Target memory utilization ratio (0-1), tuned independently of CPU. Example: 0.8.
-func (o HPARuleConfigArgsOutput) TargetMemoryUtilization() pulumi.Float64PtrOutput {
-	return o.ApplyT(func(v HPARuleConfigArgs) *float64 { return v.TargetMemoryUtilization }).(pulumi.Float64PtrOutput)
-}
-
-// Target CPU utilization ratio (0-1). Example: 0.7.
-func (o HPARuleConfigArgsOutput) TargetUtilization() pulumi.Float64PtrOutput {
-	return o.ApplyT(func(v HPARuleConfigArgs) *float64 { return v.TargetUtilization }).(pulumi.Float64PtrOutput)
 }
 
 type HPARuleConfigArgsPtrOutput struct{ *pulumi.OutputState }
@@ -3156,7 +3150,7 @@ func (o HPARuleConfigArgsPtrOutput) MaxReplicas() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
-// Additional metric triggers (e.g. Prometheus). CPU/Memory/Network triggers are auto-generated from primaryMetric — do not redeclare them here.
+// HPA metric triggers (CPU, Memory, Network*, or external such as prometheus/kafka). Replaces the removed targetUtilization/primaryMetric fields.
 func (o HPARuleConfigArgsPtrOutput) Metrics() HPAMetricTriggerArgsArrayOutput {
 	return o.ApplyT(func(v *HPARuleConfigArgs) []HPAMetricTriggerArgs {
 		if v == nil {
@@ -3176,16 +3170,6 @@ func (o HPARuleConfigArgsPtrOutput) MinReplicas() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
-// Primary metric driving HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
-func (o HPARuleConfigArgsPtrOutput) PrimaryMetric() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *HPARuleConfigArgs) *string {
-		if v == nil {
-			return nil
-		}
-		return v.PrimaryMetric
-	}).(pulumi.StringPtrOutput)
-}
-
 // Seconds to wait between scale-down events. Example: 300.
 func (o HPARuleConfigArgsPtrOutput) ScaleDownCooldownSeconds() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *HPARuleConfigArgs) *int {
@@ -3194,26 +3178,6 @@ func (o HPARuleConfigArgsPtrOutput) ScaleDownCooldownSeconds() pulumi.IntPtrOutp
 		}
 		return v.ScaleDownCooldownSeconds
 	}).(pulumi.IntPtrOutput)
-}
-
-// Target memory utilization ratio (0-1), tuned independently of CPU. Example: 0.8.
-func (o HPARuleConfigArgsPtrOutput) TargetMemoryUtilization() pulumi.Float64PtrOutput {
-	return o.ApplyT(func(v *HPARuleConfigArgs) *float64 {
-		if v == nil {
-			return nil
-		}
-		return v.TargetMemoryUtilization
-	}).(pulumi.Float64PtrOutput)
-}
-
-// Target CPU utilization ratio (0-1). Example: 0.7.
-func (o HPARuleConfigArgsPtrOutput) TargetUtilization() pulumi.Float64PtrOutput {
-	return o.ApplyT(func(v *HPARuleConfigArgs) *float64 {
-		if v == nil {
-			return nil
-		}
-		return v.TargetUtilization
-	}).(pulumi.Float64PtrOutput)
 }
 
 type HPAScalingPolicyArgs struct {
@@ -3507,6 +3471,7 @@ func (o HPAScalingRulesArgsPtrOutput) StabilizationWindowSeconds() pulumi.IntPtr
 }
 
 type HorizontalScalingArgs struct {
+	CompositeFormula *string `pulumi:"compositeFormula"`
 	// Enable horizontal (replica) scaling. Example: true.
 	Enabled *bool `pulumi:"enabled"`
 	// Maximum percentage change in replica count per recommendation cycle. Example: 50.0 allows up to 50% change.
@@ -3516,9 +3481,12 @@ type HorizontalScalingArgs struct {
 	// Minimum data points required before a recommendation is emitted. Example: 20.
 	MinDataPoints *int `pulumi:"minDataPoints"`
 	// Minimum number of replicas to maintain. Example: 2.
-	MinReplicas *int `pulumi:"minReplicas"`
+	MinReplicas                        *int `pulumi:"minReplicas"`
+	NetworkTargetThroughputBytesPerSec *int `pulumi:"networkTargetThroughputBytesPerSec"`
 	// Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
-	PrimaryMetric *string `pulumi:"primaryMetric"`
+	PrimaryMetric            *string  `pulumi:"primaryMetric"`
+	ScaleDownCooldownSeconds *int     `pulumi:"scaleDownCooldownSeconds"`
+	TargetMemoryUtilization  *float64 `pulumi:"targetMemoryUtilization"`
 	// Target utilization ratio (0-1) for the primary metric. Example: 0.7 targets 70% utilization.
 	TargetUtilization *float64 `pulumi:"targetUtilization"`
 }
@@ -3535,6 +3503,7 @@ type HorizontalScalingArgsInput interface {
 }
 
 type HorizontalScalingArgsArgs struct {
+	CompositeFormula pulumi.StringPtrInput `pulumi:"compositeFormula"`
 	// Enable horizontal (replica) scaling. Example: true.
 	Enabled pulumi.BoolPtrInput `pulumi:"enabled"`
 	// Maximum percentage change in replica count per recommendation cycle. Example: 50.0 allows up to 50% change.
@@ -3544,9 +3513,12 @@ type HorizontalScalingArgsArgs struct {
 	// Minimum data points required before a recommendation is emitted. Example: 20.
 	MinDataPoints pulumi.IntPtrInput `pulumi:"minDataPoints"`
 	// Minimum number of replicas to maintain. Example: 2.
-	MinReplicas pulumi.IntPtrInput `pulumi:"minReplicas"`
+	MinReplicas                        pulumi.IntPtrInput `pulumi:"minReplicas"`
+	NetworkTargetThroughputBytesPerSec pulumi.IntPtrInput `pulumi:"networkTargetThroughputBytesPerSec"`
 	// Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
-	PrimaryMetric pulumi.StringPtrInput `pulumi:"primaryMetric"`
+	PrimaryMetric            pulumi.StringPtrInput  `pulumi:"primaryMetric"`
+	ScaleDownCooldownSeconds pulumi.IntPtrInput     `pulumi:"scaleDownCooldownSeconds"`
+	TargetMemoryUtilization  pulumi.Float64PtrInput `pulumi:"targetMemoryUtilization"`
 	// Target utilization ratio (0-1) for the primary metric. Example: 0.7 targets 70% utilization.
 	TargetUtilization pulumi.Float64PtrInput `pulumi:"targetUtilization"`
 }
@@ -3628,6 +3600,10 @@ func (o HorizontalScalingArgsOutput) ToHorizontalScalingArgsPtrOutputWithContext
 	}).(HorizontalScalingArgsPtrOutput)
 }
 
+func (o HorizontalScalingArgsOutput) CompositeFormula() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v HorizontalScalingArgs) *string { return v.CompositeFormula }).(pulumi.StringPtrOutput)
+}
+
 // Enable horizontal (replica) scaling. Example: true.
 func (o HorizontalScalingArgsOutput) Enabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v HorizontalScalingArgs) *bool { return v.Enabled }).(pulumi.BoolPtrOutput)
@@ -3653,9 +3629,21 @@ func (o HorizontalScalingArgsOutput) MinReplicas() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v HorizontalScalingArgs) *int { return v.MinReplicas }).(pulumi.IntPtrOutput)
 }
 
+func (o HorizontalScalingArgsOutput) NetworkTargetThroughputBytesPerSec() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v HorizontalScalingArgs) *int { return v.NetworkTargetThroughputBytesPerSec }).(pulumi.IntPtrOutput)
+}
+
 // Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
 func (o HorizontalScalingArgsOutput) PrimaryMetric() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v HorizontalScalingArgs) *string { return v.PrimaryMetric }).(pulumi.StringPtrOutput)
+}
+
+func (o HorizontalScalingArgsOutput) ScaleDownCooldownSeconds() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v HorizontalScalingArgs) *int { return v.ScaleDownCooldownSeconds }).(pulumi.IntPtrOutput)
+}
+
+func (o HorizontalScalingArgsOutput) TargetMemoryUtilization() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v HorizontalScalingArgs) *float64 { return v.TargetMemoryUtilization }).(pulumi.Float64PtrOutput)
 }
 
 // Target utilization ratio (0-1) for the primary metric. Example: 0.7 targets 70% utilization.
@@ -3685,6 +3673,15 @@ func (o HorizontalScalingArgsPtrOutput) Elem() HorizontalScalingArgsOutput {
 		var ret HorizontalScalingArgs
 		return ret
 	}).(HorizontalScalingArgsOutput)
+}
+
+func (o HorizontalScalingArgsPtrOutput) CompositeFormula() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *HorizontalScalingArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.CompositeFormula
+	}).(pulumi.StringPtrOutput)
 }
 
 // Enable horizontal (replica) scaling. Example: true.
@@ -3737,6 +3734,15 @@ func (o HorizontalScalingArgsPtrOutput) MinReplicas() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
+func (o HorizontalScalingArgsPtrOutput) NetworkTargetThroughputBytesPerSec() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *HorizontalScalingArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.NetworkTargetThroughputBytesPerSec
+	}).(pulumi.IntPtrOutput)
+}
+
 // Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
 func (o HorizontalScalingArgsPtrOutput) PrimaryMetric() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *HorizontalScalingArgs) *string {
@@ -3745,6 +3751,24 @@ func (o HorizontalScalingArgsPtrOutput) PrimaryMetric() pulumi.StringPtrOutput {
 		}
 		return v.PrimaryMetric
 	}).(pulumi.StringPtrOutput)
+}
+
+func (o HorizontalScalingArgsPtrOutput) ScaleDownCooldownSeconds() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *HorizontalScalingArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.ScaleDownCooldownSeconds
+	}).(pulumi.IntPtrOutput)
+}
+
+func (o HorizontalScalingArgsPtrOutput) TargetMemoryUtilization() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *HorizontalScalingArgs) *float64 {
+		if v == nil {
+			return nil
+		}
+		return v.TargetMemoryUtilization
+	}).(pulumi.Float64PtrOutput)
 }
 
 // Target utilization ratio (0-1) for the primary metric. Example: 0.7 targets 70% utilization.
@@ -4987,10 +5011,17 @@ func (o ResourceLimitsArgsPtrOutput) Memory() pulumi.StringPtrOutput {
 }
 
 type ResourceRuleConfigArgs struct {
+	CeilingPercent *int `pulumi:"ceilingPercent"`
 	// Enable this resource axis rule. Example: true.
-	Enabled *bool `pulumi:"enabled"`
+	Enabled             *bool `pulumi:"enabled"`
+	FloorPercent        *int  `pulumi:"floorPercent"`
+	InitialLimit        *int  `pulumi:"initialLimit"`
+	InitialRequest      *int  `pulumi:"initialRequest"`
+	LimitCeilingPercent *int  `pulumi:"limitCeilingPercent"`
+	LimitFloorPercent   *int  `pulumi:"limitFloorPercent"`
 	// Multiplier applied to the request to derive the resource limit. Example: 1.5.
 	LimitMultiplier *float64 `pulumi:"limitMultiplier"`
+	LimitUseRss     *bool    `pulumi:"limitUseRss"`
 	// Whether to also adjust resource limits alongside requests. Example: true.
 	LimitsAdjustmentEnabled *bool `pulumi:"limitsAdjustmentEnabled"`
 	// Actively remove limits from workloads. Example: false.
@@ -5002,7 +5033,8 @@ type ResourceRuleConfigArgs struct {
 	// Maximum percentage increase allowed in a single cycle. Example: 50.0.
 	MaxScaleUpPercent *float64 `pulumi:"maxScaleUpPercent"`
 	// Minimum resource request (millicores for CPU, bytes for memory/GPU). Example: 100.
-	MinRequest *int `pulumi:"minRequest"`
+	MinRequest    *int  `pulumi:"minRequest"`
+	RequestUseRss *bool `pulumi:"requestUseRss"`
 	// Percentile of usage data used as the recommendation target (0-1). Example: 0.95.
 	TargetPercentile *float64 `pulumi:"targetPercentile"`
 }
@@ -5019,10 +5051,17 @@ type ResourceRuleConfigArgsInput interface {
 }
 
 type ResourceRuleConfigArgsArgs struct {
+	CeilingPercent pulumi.IntPtrInput `pulumi:"ceilingPercent"`
 	// Enable this resource axis rule. Example: true.
-	Enabled pulumi.BoolPtrInput `pulumi:"enabled"`
+	Enabled             pulumi.BoolPtrInput `pulumi:"enabled"`
+	FloorPercent        pulumi.IntPtrInput  `pulumi:"floorPercent"`
+	InitialLimit        pulumi.IntPtrInput  `pulumi:"initialLimit"`
+	InitialRequest      pulumi.IntPtrInput  `pulumi:"initialRequest"`
+	LimitCeilingPercent pulumi.IntPtrInput  `pulumi:"limitCeilingPercent"`
+	LimitFloorPercent   pulumi.IntPtrInput  `pulumi:"limitFloorPercent"`
 	// Multiplier applied to the request to derive the resource limit. Example: 1.5.
 	LimitMultiplier pulumi.Float64PtrInput `pulumi:"limitMultiplier"`
+	LimitUseRss     pulumi.BoolPtrInput    `pulumi:"limitUseRss"`
 	// Whether to also adjust resource limits alongside requests. Example: true.
 	LimitsAdjustmentEnabled pulumi.BoolPtrInput `pulumi:"limitsAdjustmentEnabled"`
 	// Actively remove limits from workloads. Example: false.
@@ -5034,7 +5073,8 @@ type ResourceRuleConfigArgsArgs struct {
 	// Maximum percentage increase allowed in a single cycle. Example: 50.0.
 	MaxScaleUpPercent pulumi.Float64PtrInput `pulumi:"maxScaleUpPercent"`
 	// Minimum resource request (millicores for CPU, bytes for memory/GPU). Example: 100.
-	MinRequest pulumi.IntPtrInput `pulumi:"minRequest"`
+	MinRequest    pulumi.IntPtrInput  `pulumi:"minRequest"`
+	RequestUseRss pulumi.BoolPtrInput `pulumi:"requestUseRss"`
 	// Percentile of usage data used as the recommendation target (0-1). Example: 0.95.
 	TargetPercentile pulumi.Float64PtrInput `pulumi:"targetPercentile"`
 }
@@ -5116,14 +5156,42 @@ func (o ResourceRuleConfigArgsOutput) ToResourceRuleConfigArgsPtrOutputWithConte
 	}).(ResourceRuleConfigArgsPtrOutput)
 }
 
+func (o ResourceRuleConfigArgsOutput) CeilingPercent() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v ResourceRuleConfigArgs) *int { return v.CeilingPercent }).(pulumi.IntPtrOutput)
+}
+
 // Enable this resource axis rule. Example: true.
 func (o ResourceRuleConfigArgsOutput) Enabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v ResourceRuleConfigArgs) *bool { return v.Enabled }).(pulumi.BoolPtrOutput)
 }
 
+func (o ResourceRuleConfigArgsOutput) FloorPercent() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v ResourceRuleConfigArgs) *int { return v.FloorPercent }).(pulumi.IntPtrOutput)
+}
+
+func (o ResourceRuleConfigArgsOutput) InitialLimit() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v ResourceRuleConfigArgs) *int { return v.InitialLimit }).(pulumi.IntPtrOutput)
+}
+
+func (o ResourceRuleConfigArgsOutput) InitialRequest() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v ResourceRuleConfigArgs) *int { return v.InitialRequest }).(pulumi.IntPtrOutput)
+}
+
+func (o ResourceRuleConfigArgsOutput) LimitCeilingPercent() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v ResourceRuleConfigArgs) *int { return v.LimitCeilingPercent }).(pulumi.IntPtrOutput)
+}
+
+func (o ResourceRuleConfigArgsOutput) LimitFloorPercent() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v ResourceRuleConfigArgs) *int { return v.LimitFloorPercent }).(pulumi.IntPtrOutput)
+}
+
 // Multiplier applied to the request to derive the resource limit. Example: 1.5.
 func (o ResourceRuleConfigArgsOutput) LimitMultiplier() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v ResourceRuleConfigArgs) *float64 { return v.LimitMultiplier }).(pulumi.Float64PtrOutput)
+}
+
+func (o ResourceRuleConfigArgsOutput) LimitUseRss() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v ResourceRuleConfigArgs) *bool { return v.LimitUseRss }).(pulumi.BoolPtrOutput)
 }
 
 // Whether to also adjust resource limits alongside requests. Example: true.
@@ -5156,6 +5224,10 @@ func (o ResourceRuleConfigArgsOutput) MinRequest() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v ResourceRuleConfigArgs) *int { return v.MinRequest }).(pulumi.IntPtrOutput)
 }
 
+func (o ResourceRuleConfigArgsOutput) RequestUseRss() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v ResourceRuleConfigArgs) *bool { return v.RequestUseRss }).(pulumi.BoolPtrOutput)
+}
+
 // Percentile of usage data used as the recommendation target (0-1). Example: 0.95.
 func (o ResourceRuleConfigArgsOutput) TargetPercentile() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v ResourceRuleConfigArgs) *float64 { return v.TargetPercentile }).(pulumi.Float64PtrOutput)
@@ -5185,6 +5257,15 @@ func (o ResourceRuleConfigArgsPtrOutput) Elem() ResourceRuleConfigArgsOutput {
 	}).(ResourceRuleConfigArgsOutput)
 }
 
+func (o ResourceRuleConfigArgsPtrOutput) CeilingPercent() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *ResourceRuleConfigArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.CeilingPercent
+	}).(pulumi.IntPtrOutput)
+}
+
 // Enable this resource axis rule. Example: true.
 func (o ResourceRuleConfigArgsPtrOutput) Enabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *ResourceRuleConfigArgs) *bool {
@@ -5195,6 +5276,51 @@ func (o ResourceRuleConfigArgsPtrOutput) Enabled() pulumi.BoolPtrOutput {
 	}).(pulumi.BoolPtrOutput)
 }
 
+func (o ResourceRuleConfigArgsPtrOutput) FloorPercent() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *ResourceRuleConfigArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.FloorPercent
+	}).(pulumi.IntPtrOutput)
+}
+
+func (o ResourceRuleConfigArgsPtrOutput) InitialLimit() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *ResourceRuleConfigArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.InitialLimit
+	}).(pulumi.IntPtrOutput)
+}
+
+func (o ResourceRuleConfigArgsPtrOutput) InitialRequest() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *ResourceRuleConfigArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.InitialRequest
+	}).(pulumi.IntPtrOutput)
+}
+
+func (o ResourceRuleConfigArgsPtrOutput) LimitCeilingPercent() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *ResourceRuleConfigArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.LimitCeilingPercent
+	}).(pulumi.IntPtrOutput)
+}
+
+func (o ResourceRuleConfigArgsPtrOutput) LimitFloorPercent() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *ResourceRuleConfigArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.LimitFloorPercent
+	}).(pulumi.IntPtrOutput)
+}
+
 // Multiplier applied to the request to derive the resource limit. Example: 1.5.
 func (o ResourceRuleConfigArgsPtrOutput) LimitMultiplier() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v *ResourceRuleConfigArgs) *float64 {
@@ -5203,6 +5329,15 @@ func (o ResourceRuleConfigArgsPtrOutput) LimitMultiplier() pulumi.Float64PtrOutp
 		}
 		return v.LimitMultiplier
 	}).(pulumi.Float64PtrOutput)
+}
+
+func (o ResourceRuleConfigArgsPtrOutput) LimitUseRss() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *ResourceRuleConfigArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.LimitUseRss
+	}).(pulumi.BoolPtrOutput)
 }
 
 // Whether to also adjust resource limits alongside requests. Example: true.
@@ -5263,6 +5398,15 @@ func (o ResourceRuleConfigArgsPtrOutput) MinRequest() pulumi.IntPtrOutput {
 		}
 		return v.MinRequest
 	}).(pulumi.IntPtrOutput)
+}
+
+func (o ResourceRuleConfigArgsPtrOutput) RequestUseRss() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *ResourceRuleConfigArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.RequestUseRss
+	}).(pulumi.BoolPtrOutput)
 }
 
 // Percentile of usage data used as the recommendation target (0-1). Example: 0.95.
@@ -5618,6 +5762,7 @@ type VerticalScalingArgs struct {
 	Enabled *bool `pulumi:"enabled"`
 	// Multiplier applied to the request to derive the resource limit. Example: 1.5 sets limit to 150% of request.
 	LimitMultiplier *float64 `pulumi:"limitMultiplier"`
+	LimitUseRss     *bool    `pulumi:"limitUseRss"`
 	// Whether to also adjust resource limits alongside requests. Example: true.
 	LimitsAdjustmentEnabled *bool `pulumi:"limitsAdjustmentEnabled"`
 	// Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over limitsAdjustmentEnabled when set. Default: false.
@@ -5634,6 +5779,7 @@ type VerticalScalingArgs struct {
 	MinRequest *int `pulumi:"minRequest"`
 	// Multiplier applied on top of the recommendation to add headroom. Example: 1.15 adds 15% overhead.
 	OverheadMultiplier *float64 `pulumi:"overheadMultiplier"`
+	RequestUseRss      *bool    `pulumi:"requestUseRss"`
 	// Percentile of usage data used as the recommendation target (0-1). Example: 0.95 targets the 95th percentile.
 	TargetPercentile *float64 `pulumi:"targetPercentile"`
 }
@@ -5677,6 +5823,7 @@ type VerticalScalingArgsArgs struct {
 	Enabled pulumi.BoolPtrInput `pulumi:"enabled"`
 	// Multiplier applied to the request to derive the resource limit. Example: 1.5 sets limit to 150% of request.
 	LimitMultiplier pulumi.Float64PtrInput `pulumi:"limitMultiplier"`
+	LimitUseRss     pulumi.BoolPtrInput    `pulumi:"limitUseRss"`
 	// Whether to also adjust resource limits alongside requests. Example: true.
 	LimitsAdjustmentEnabled pulumi.BoolPtrInput `pulumi:"limitsAdjustmentEnabled"`
 	// Actively remove limits from workloads (CPU axis only — memory limits removal is not supported). Takes precedence over limitsAdjustmentEnabled when set. Default: false.
@@ -5693,6 +5840,7 @@ type VerticalScalingArgsArgs struct {
 	MinRequest pulumi.IntPtrInput `pulumi:"minRequest"`
 	// Multiplier applied on top of the recommendation to add headroom. Example: 1.15 adds 15% overhead.
 	OverheadMultiplier pulumi.Float64PtrInput `pulumi:"overheadMultiplier"`
+	RequestUseRss      pulumi.BoolPtrInput    `pulumi:"requestUseRss"`
 	// Percentile of usage data used as the recommendation target (0-1). Example: 0.95 targets the 95th percentile.
 	TargetPercentile pulumi.Float64PtrInput `pulumi:"targetPercentile"`
 }
@@ -5806,6 +5954,10 @@ func (o VerticalScalingArgsOutput) LimitMultiplier() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *float64 { return v.LimitMultiplier }).(pulumi.Float64PtrOutput)
 }
 
+func (o VerticalScalingArgsOutput) LimitUseRss() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v VerticalScalingArgs) *bool { return v.LimitUseRss }).(pulumi.BoolPtrOutput)
+}
+
 // Whether to also adjust resource limits alongside requests. Example: true.
 func (o VerticalScalingArgsOutput) LimitsAdjustmentEnabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *bool { return v.LimitsAdjustmentEnabled }).(pulumi.BoolPtrOutput)
@@ -5844,6 +5996,10 @@ func (o VerticalScalingArgsOutput) MinRequest() pulumi.IntPtrOutput {
 // Multiplier applied on top of the recommendation to add headroom. Example: 1.15 adds 15% overhead.
 func (o VerticalScalingArgsOutput) OverheadMultiplier() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v VerticalScalingArgs) *float64 { return v.OverheadMultiplier }).(pulumi.Float64PtrOutput)
+}
+
+func (o VerticalScalingArgsOutput) RequestUseRss() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v VerticalScalingArgs) *bool { return v.RequestUseRss }).(pulumi.BoolPtrOutput)
 }
 
 // Percentile of usage data used as the recommendation target (0-1). Example: 0.95 targets the 95th percentile.
@@ -5903,6 +6059,15 @@ func (o VerticalScalingArgsPtrOutput) LimitMultiplier() pulumi.Float64PtrOutput 
 		}
 		return v.LimitMultiplier
 	}).(pulumi.Float64PtrOutput)
+}
+
+func (o VerticalScalingArgsPtrOutput) LimitUseRss() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *VerticalScalingArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.LimitUseRss
+	}).(pulumi.BoolPtrOutput)
 }
 
 // Whether to also adjust resource limits alongside requests. Example: true.
@@ -5985,6 +6150,15 @@ func (o VerticalScalingArgsPtrOutput) OverheadMultiplier() pulumi.Float64PtrOutp
 	}).(pulumi.Float64PtrOutput)
 }
 
+func (o VerticalScalingArgsPtrOutput) RequestUseRss() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *VerticalScalingArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.RequestUseRss
+	}).(pulumi.BoolPtrOutput)
+}
+
 // Percentile of usage data used as the recommendation target (0-1). Example: 0.95 targets the 95th percentile.
 func (o VerticalScalingArgsPtrOutput) TargetPercentile() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v *VerticalScalingArgs) *float64 {
@@ -5993,6 +6167,169 @@ func (o VerticalScalingArgsPtrOutput) TargetPercentile() pulumi.Float64PtrOutput
 		}
 		return v.TargetPercentile
 	}).(pulumi.Float64PtrOutput)
+}
+
+type ZonalShiftConfigArgs struct {
+	AllowZoneFallback  *bool `pulumi:"allowZoneFallback"`
+	EvictImpactedNodes *bool `pulumi:"evictImpactedNodes"`
+	RespectZonalShift  *bool `pulumi:"respectZonalShift"`
+}
+
+// ZonalShiftConfigArgsInput is an input type that accepts ZonalShiftConfigArgsArgs and ZonalShiftConfigArgsOutput values.
+// You can construct a concrete instance of `ZonalShiftConfigArgsInput` via:
+//
+//	ZonalShiftConfigArgsArgs{...}
+type ZonalShiftConfigArgsInput interface {
+	pulumi.Input
+
+	ToZonalShiftConfigArgsOutput() ZonalShiftConfigArgsOutput
+	ToZonalShiftConfigArgsOutputWithContext(context.Context) ZonalShiftConfigArgsOutput
+}
+
+type ZonalShiftConfigArgsArgs struct {
+	AllowZoneFallback  pulumi.BoolPtrInput `pulumi:"allowZoneFallback"`
+	EvictImpactedNodes pulumi.BoolPtrInput `pulumi:"evictImpactedNodes"`
+	RespectZonalShift  pulumi.BoolPtrInput `pulumi:"respectZonalShift"`
+}
+
+func (ZonalShiftConfigArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*ZonalShiftConfigArgs)(nil)).Elem()
+}
+
+func (i ZonalShiftConfigArgsArgs) ToZonalShiftConfigArgsOutput() ZonalShiftConfigArgsOutput {
+	return i.ToZonalShiftConfigArgsOutputWithContext(context.Background())
+}
+
+func (i ZonalShiftConfigArgsArgs) ToZonalShiftConfigArgsOutputWithContext(ctx context.Context) ZonalShiftConfigArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(ZonalShiftConfigArgsOutput)
+}
+
+func (i ZonalShiftConfigArgsArgs) ToZonalShiftConfigArgsPtrOutput() ZonalShiftConfigArgsPtrOutput {
+	return i.ToZonalShiftConfigArgsPtrOutputWithContext(context.Background())
+}
+
+func (i ZonalShiftConfigArgsArgs) ToZonalShiftConfigArgsPtrOutputWithContext(ctx context.Context) ZonalShiftConfigArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(ZonalShiftConfigArgsOutput).ToZonalShiftConfigArgsPtrOutputWithContext(ctx)
+}
+
+// ZonalShiftConfigArgsPtrInput is an input type that accepts ZonalShiftConfigArgsArgs, ZonalShiftConfigArgsPtr and ZonalShiftConfigArgsPtrOutput values.
+// You can construct a concrete instance of `ZonalShiftConfigArgsPtrInput` via:
+//
+//	        ZonalShiftConfigArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type ZonalShiftConfigArgsPtrInput interface {
+	pulumi.Input
+
+	ToZonalShiftConfigArgsPtrOutput() ZonalShiftConfigArgsPtrOutput
+	ToZonalShiftConfigArgsPtrOutputWithContext(context.Context) ZonalShiftConfigArgsPtrOutput
+}
+
+type zonalShiftConfigArgsPtrType ZonalShiftConfigArgsArgs
+
+func ZonalShiftConfigArgsPtr(v *ZonalShiftConfigArgsArgs) ZonalShiftConfigArgsPtrInput {
+	return (*zonalShiftConfigArgsPtrType)(v)
+}
+
+func (*zonalShiftConfigArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**ZonalShiftConfigArgs)(nil)).Elem()
+}
+
+func (i *zonalShiftConfigArgsPtrType) ToZonalShiftConfigArgsPtrOutput() ZonalShiftConfigArgsPtrOutput {
+	return i.ToZonalShiftConfigArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *zonalShiftConfigArgsPtrType) ToZonalShiftConfigArgsPtrOutputWithContext(ctx context.Context) ZonalShiftConfigArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(ZonalShiftConfigArgsPtrOutput)
+}
+
+type ZonalShiftConfigArgsOutput struct{ *pulumi.OutputState }
+
+func (ZonalShiftConfigArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*ZonalShiftConfigArgs)(nil)).Elem()
+}
+
+func (o ZonalShiftConfigArgsOutput) ToZonalShiftConfigArgsOutput() ZonalShiftConfigArgsOutput {
+	return o
+}
+
+func (o ZonalShiftConfigArgsOutput) ToZonalShiftConfigArgsOutputWithContext(ctx context.Context) ZonalShiftConfigArgsOutput {
+	return o
+}
+
+func (o ZonalShiftConfigArgsOutput) ToZonalShiftConfigArgsPtrOutput() ZonalShiftConfigArgsPtrOutput {
+	return o.ToZonalShiftConfigArgsPtrOutputWithContext(context.Background())
+}
+
+func (o ZonalShiftConfigArgsOutput) ToZonalShiftConfigArgsPtrOutputWithContext(ctx context.Context) ZonalShiftConfigArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v ZonalShiftConfigArgs) *ZonalShiftConfigArgs {
+		return &v
+	}).(ZonalShiftConfigArgsPtrOutput)
+}
+
+func (o ZonalShiftConfigArgsOutput) AllowZoneFallback() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v ZonalShiftConfigArgs) *bool { return v.AllowZoneFallback }).(pulumi.BoolPtrOutput)
+}
+
+func (o ZonalShiftConfigArgsOutput) EvictImpactedNodes() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v ZonalShiftConfigArgs) *bool { return v.EvictImpactedNodes }).(pulumi.BoolPtrOutput)
+}
+
+func (o ZonalShiftConfigArgsOutput) RespectZonalShift() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v ZonalShiftConfigArgs) *bool { return v.RespectZonalShift }).(pulumi.BoolPtrOutput)
+}
+
+type ZonalShiftConfigArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (ZonalShiftConfigArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**ZonalShiftConfigArgs)(nil)).Elem()
+}
+
+func (o ZonalShiftConfigArgsPtrOutput) ToZonalShiftConfigArgsPtrOutput() ZonalShiftConfigArgsPtrOutput {
+	return o
+}
+
+func (o ZonalShiftConfigArgsPtrOutput) ToZonalShiftConfigArgsPtrOutputWithContext(ctx context.Context) ZonalShiftConfigArgsPtrOutput {
+	return o
+}
+
+func (o ZonalShiftConfigArgsPtrOutput) Elem() ZonalShiftConfigArgsOutput {
+	return o.ApplyT(func(v *ZonalShiftConfigArgs) ZonalShiftConfigArgs {
+		if v != nil {
+			return *v
+		}
+		var ret ZonalShiftConfigArgs
+		return ret
+	}).(ZonalShiftConfigArgsOutput)
+}
+
+func (o ZonalShiftConfigArgsPtrOutput) AllowZoneFallback() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *ZonalShiftConfigArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.AllowZoneFallback
+	}).(pulumi.BoolPtrOutput)
+}
+
+func (o ZonalShiftConfigArgsPtrOutput) EvictImpactedNodes() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *ZonalShiftConfigArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.EvictImpactedNodes
+	}).(pulumi.BoolPtrOutput)
+}
+
+func (o ZonalShiftConfigArgsPtrOutput) RespectZonalShift() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *ZonalShiftConfigArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.RespectZonalShift
+	}).(pulumi.BoolPtrOutput)
 }
 
 func init() {
@@ -6056,6 +6393,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*TaintArgsArrayInput)(nil)).Elem(), TaintArgsArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*VerticalScalingArgsInput)(nil)).Elem(), VerticalScalingArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*VerticalScalingArgsPtrInput)(nil)).Elem(), VerticalScalingArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*ZonalShiftConfigArgsInput)(nil)).Elem(), ZonalShiftConfigArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*ZonalShiftConfigArgsPtrInput)(nil)).Elem(), ZonalShiftConfigArgsArgs{})
 	pulumi.RegisterOutputType(AMISelectorTermArgsOutput{})
 	pulumi.RegisterOutputType(AMISelectorTermArgsArrayOutput{})
 	pulumi.RegisterOutputType(AWSNodeClassSpecArgsOutput{})
@@ -6116,4 +6455,6 @@ func init() {
 	pulumi.RegisterOutputType(TaintArgsArrayOutput{})
 	pulumi.RegisterOutputType(VerticalScalingArgsOutput{})
 	pulumi.RegisterOutputType(VerticalScalingArgsPtrOutput{})
+	pulumi.RegisterOutputType(ZonalShiftConfigArgsOutput{})
+	pulumi.RegisterOutputType(ZonalShiftConfigArgsPtrOutput{})
 }

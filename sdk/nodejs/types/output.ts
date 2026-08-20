@@ -154,6 +154,7 @@ export namespace resources {
          * Azure node image family. One of: 'AzureLinux', 'Ubuntu2204'. Example: 'AzureLinux'.
          */
         imageFamily?: string;
+        imageVersion?: string;
         /**
          * Kubelet configuration overrides for Azure nodes.
          */
@@ -368,6 +369,7 @@ export namespace resources {
     }
 
     export interface HPAMetricTriggerArgs {
+        connectorId?: string;
         /**
          * Free-form key-value pairs for external scalers. For Prometheus use serverAddress and query instead.
          */
@@ -424,7 +426,7 @@ export namespace resources {
          */
         maxReplicas?: number;
         /**
-         * Additional metric triggers (e.g. Prometheus). CPU/Memory/Network triggers are auto-generated from primaryMetric — do not redeclare them here.
+         * HPA metric triggers (CPU, Memory, Network*, or external such as prometheus/kafka). Replaces the removed targetUtilization/primaryMetric fields.
          */
         metrics?: outputs.resources.HPAMetricTriggerArgs[];
         /**
@@ -432,21 +434,9 @@ export namespace resources {
          */
         minReplicas?: number;
         /**
-         * Primary metric driving HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
-         */
-        primaryMetric?: string;
-        /**
          * Seconds to wait between scale-down events. Example: 300.
          */
         scaleDownCooldownSeconds?: number;
-        /**
-         * Target memory utilization ratio (0-1), tuned independently of CPU. Example: 0.8.
-         */
-        targetMemoryUtilization?: number;
-        /**
-         * Target CPU utilization ratio (0-1). Example: 0.7.
-         */
-        targetUtilization?: number;
     }
 
     export interface HPAScalingPolicyArgs {
@@ -480,6 +470,7 @@ export namespace resources {
     }
 
     export interface HorizontalScalingArgs {
+        compositeFormula?: string;
         /**
          * Enable horizontal (replica) scaling. Example: true.
          */
@@ -500,10 +491,13 @@ export namespace resources {
          * Minimum number of replicas to maintain. Example: 2.
          */
         minReplicas?: number;
+        networkTargetThroughputBytesPerSec?: number;
         /**
          * Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
          */
         primaryMetric?: string;
+        scaleDownCooldownSeconds?: number;
+        targetMemoryUtilization?: number;
         /**
          * Target utilization ratio (0-1) for the primary metric. Example: 0.7 targets 70% utilization.
          */
@@ -640,14 +634,21 @@ export namespace resources {
     }
 
     export interface ResourceRuleConfigArgs {
+        ceilingPercent?: number;
         /**
          * Enable this resource axis rule. Example: true.
          */
         enabled?: boolean;
+        floorPercent?: number;
+        initialLimit?: number;
+        initialRequest?: number;
+        limitCeilingPercent?: number;
+        limitFloorPercent?: number;
         /**
          * Multiplier applied to the request to derive the resource limit. Example: 1.5.
          */
         limitMultiplier?: number;
+        limitUseRss?: boolean;
         /**
          * Whether to also adjust resource limits alongside requests. Example: true.
          */
@@ -672,6 +673,7 @@ export namespace resources {
          * Minimum resource request (millicores for CPU, bytes for memory/GPU). Example: 100.
          */
         minRequest?: number;
+        requestUseRss?: boolean;
         /**
          * Percentile of usage data used as the recommendation target (0-1). Example: 0.95.
          */
@@ -732,6 +734,7 @@ export namespace resources {
          * Multiplier applied to the request to derive the resource limit. Example: 1.5 sets limit to 150% of request.
          */
         limitMultiplier?: number;
+        limitUseRss?: boolean;
         /**
          * Whether to also adjust resource limits alongside requests. Example: true.
          */
@@ -764,6 +767,7 @@ export namespace resources {
          * Multiplier applied on top of the recommendation to add headroom. Example: 1.15 adds 15% overhead.
          */
         overheadMultiplier?: number;
+        requestUseRss?: boolean;
         /**
          * Percentile of usage data used as the recommendation target (0-1). Example: 0.95 targets the 95th percentile.
          */
@@ -779,6 +783,12 @@ export namespace resources {
             maxScaleUpPercent: (val.maxScaleUpPercent) ?? 1000,
             minDataPoints: (val.minDataPoints) ?? 20,
         };
+    }
+
+    export interface ZonalShiftConfigArgs {
+        allowZoneFallback?: boolean;
+        evictImpactedNodes?: boolean;
+        respectZonalShift?: boolean;
     }
 
 }

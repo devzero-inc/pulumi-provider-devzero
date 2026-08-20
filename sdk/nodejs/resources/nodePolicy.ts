@@ -49,6 +49,7 @@ export class NodePolicy extends pulumi.CustomResource {
      * Capacity purchasing types. Valid values: 'spot', 'on-demand', 'reserved'. Example: {in: ["spot", "on-demand"]}.
      */
     declare public readonly capacityTypes: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
+    declare public readonly cloudProviderId: pulumi.Output<number | undefined>;
     /**
      * Free-form description of the node policy. Example: 'Spot instance policy for production batch workloads'.
      */
@@ -77,6 +78,7 @@ export class NodePolicy extends pulumi.CustomResource {
      * Filter instances by hypervisor type. Example: {in: ["nitro"]}.
      */
     declare public readonly instanceHypervisors: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
+    declare public readonly instanceLocalNvme: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
     /**
      * Filter instances by size label. Example: {in: ["large", "xlarge", "2xlarge"]}.
      */
@@ -93,6 +95,7 @@ export class NodePolicy extends pulumi.CustomResource {
      * Resource limits on total capacity managed by this policy. Example: {cpu: "1000", memory: "1000Gi"}.
      */
     declare public readonly limits: pulumi.Output<outputs.resources.ResourceLimitsArgs | undefined>;
+    declare public readonly masterOverrideRoleName: pulumi.Output<string | undefined>;
     /**
      * Human-friendly name for the node policy. Example: 'prod-spot-policy'.
      */
@@ -113,6 +116,7 @@ export class NodePolicy extends pulumi.CustomResource {
      * Raw Karpenter YAML for full NodePool/NodeClass customization — use only when structured fields are insufficient.
      */
     declare public readonly raw: pulumi.Output<outputs.resources.RawKarpenterSpecArgs[] | undefined>;
+    declare public readonly startupTaints: pulumi.Output<outputs.resources.TaintArgs[] | undefined>;
     /**
      * Taints applied to provisioned nodes to control pod scheduling. Example: [{key: "dedicated", value: "gpu", effect: "NoSchedule"}].
      */
@@ -121,6 +125,7 @@ export class NodePolicy extends pulumi.CustomResource {
      * Priority weight; higher values take precedence when multiple policies match. Example: 100.
      */
     declare public readonly weight: pulumi.Output<number | undefined>;
+    declare public readonly zonalShift: pulumi.Output<outputs.resources.ZonalShiftConfigArgs | undefined>;
     /**
      * Availability zones where nodes may be provisioned. Example: {in: ["us-east-1a", "us-east-1b"]}.
      */
@@ -144,6 +149,7 @@ export class NodePolicy extends pulumi.CustomResource {
             resourceInputs["aws"] = args?.aws;
             resourceInputs["azure"] = args?.azure;
             resourceInputs["capacityTypes"] = args?.capacityTypes;
+            resourceInputs["cloudProviderId"] = args?.cloudProviderId;
             resourceInputs["description"] = args?.description;
             resourceInputs["disruption"] = args?.disruption;
             resourceInputs["instanceCategories"] = args?.instanceCategories;
@@ -151,23 +157,28 @@ export class NodePolicy extends pulumi.CustomResource {
             resourceInputs["instanceFamilies"] = args?.instanceFamilies;
             resourceInputs["instanceGenerations"] = args?.instanceGenerations;
             resourceInputs["instanceHypervisors"] = args?.instanceHypervisors;
+            resourceInputs["instanceLocalNvme"] = args?.instanceLocalNvme;
             resourceInputs["instanceSizes"] = args?.instanceSizes;
             resourceInputs["instanceTypes"] = args?.instanceTypes;
             resourceInputs["labels"] = args?.labels;
             resourceInputs["limits"] = args?.limits;
+            resourceInputs["masterOverrideRoleName"] = args?.masterOverrideRoleName;
             resourceInputs["name"] = args?.name;
             resourceInputs["nodeClassName"] = args?.nodeClassName;
             resourceInputs["nodePoolName"] = args?.nodePoolName;
             resourceInputs["operatingSystems"] = args?.operatingSystems;
             resourceInputs["raw"] = args?.raw;
+            resourceInputs["startupTaints"] = args?.startupTaints;
             resourceInputs["taints"] = args?.taints;
             resourceInputs["weight"] = args?.weight;
+            resourceInputs["zonalShift"] = args?.zonalShift;
             resourceInputs["zones"] = args?.zones;
         } else {
             resourceInputs["architectures"] = undefined /*out*/;
             resourceInputs["aws"] = undefined /*out*/;
             resourceInputs["azure"] = undefined /*out*/;
             resourceInputs["capacityTypes"] = undefined /*out*/;
+            resourceInputs["cloudProviderId"] = undefined /*out*/;
             resourceInputs["description"] = undefined /*out*/;
             resourceInputs["disruption"] = undefined /*out*/;
             resourceInputs["instanceCategories"] = undefined /*out*/;
@@ -175,17 +186,21 @@ export class NodePolicy extends pulumi.CustomResource {
             resourceInputs["instanceFamilies"] = undefined /*out*/;
             resourceInputs["instanceGenerations"] = undefined /*out*/;
             resourceInputs["instanceHypervisors"] = undefined /*out*/;
+            resourceInputs["instanceLocalNvme"] = undefined /*out*/;
             resourceInputs["instanceSizes"] = undefined /*out*/;
             resourceInputs["instanceTypes"] = undefined /*out*/;
             resourceInputs["labels"] = undefined /*out*/;
             resourceInputs["limits"] = undefined /*out*/;
+            resourceInputs["masterOverrideRoleName"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["nodeClassName"] = undefined /*out*/;
             resourceInputs["nodePoolName"] = undefined /*out*/;
             resourceInputs["operatingSystems"] = undefined /*out*/;
             resourceInputs["raw"] = undefined /*out*/;
+            resourceInputs["startupTaints"] = undefined /*out*/;
             resourceInputs["taints"] = undefined /*out*/;
             resourceInputs["weight"] = undefined /*out*/;
+            resourceInputs["zonalShift"] = undefined /*out*/;
             resourceInputs["zones"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
@@ -201,6 +216,7 @@ export interface NodePolicyArgs {
     aws?: pulumi.Input<inputs.resources.AWSNodeClassSpecArgsArgs>;
     azure?: pulumi.Input<inputs.resources.AzureNodeClassSpecArgsArgs>;
     capacityTypes?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
+    cloudProviderId?: pulumi.Input<number>;
     description?: pulumi.Input<string>;
     disruption?: pulumi.Input<inputs.resources.DisruptionPolicyArgsArgs>;
     instanceCategories?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
@@ -208,16 +224,20 @@ export interface NodePolicyArgs {
     instanceFamilies?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
     instanceGenerations?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
     instanceHypervisors?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
+    instanceLocalNvme?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
     instanceSizes?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
     instanceTypes?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
     labels?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
     limits?: pulumi.Input<inputs.resources.ResourceLimitsArgsArgs>;
+    masterOverrideRoleName?: pulumi.Input<string>;
     name: pulumi.Input<string>;
     nodeClassName?: pulumi.Input<string>;
     nodePoolName?: pulumi.Input<string>;
     operatingSystems?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
     raw?: pulumi.Input<pulumi.Input<inputs.resources.RawKarpenterSpecArgsArgs>[]>;
+    startupTaints?: pulumi.Input<pulumi.Input<inputs.resources.TaintArgsArgs>[]>;
     taints?: pulumi.Input<pulumi.Input<inputs.resources.TaintArgsArgs>[]>;
     weight?: pulumi.Input<number>;
+    zonalShift?: pulumi.Input<inputs.resources.ZonalShiftConfigArgsArgs>;
     zones?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
 }

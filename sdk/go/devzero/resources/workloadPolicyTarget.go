@@ -15,14 +15,18 @@ import (
 type WorkloadPolicyTarget struct {
 	pulumi.CustomResourceState
 
+	// Select workloads by annotations (same semantics as label selectors, evaluated against annotations).
+	AnnotationSelector LabelSelectorArgsPtrOutput `pulumi:"annotationSelector"`
 	// Cluster IDs where this target applies.
 	ClusterIds pulumi.StringArrayOutput `pulumi:"clusterIds"`
 	// Free-form description of the target.
 	Description pulumi.StringPtrOutput `pulumi:"description"`
-	// Enable or disable this target.
+	// Enable or disable this target. Defaults to true.
 	Enabled pulumi.BoolPtrOutput `pulumi:"enabled"`
 	// Restrict matching to specific Kubernetes kinds (e.g. Deployment, Pod).
 	KindFilter pulumi.StringArrayOutput `pulumi:"kindFilter"`
+	// Kubernetes kinds to exclude from matching. Same allowed values as kindFilter.
+	KindFilterNotIn pulumi.StringArrayOutput `pulumi:"kindFilterNotIn"`
 	// Human-friendly name for this target.
 	Name pulumi.StringOutput `pulumi:"name"`
 	// Regex to match workload names.
@@ -31,7 +35,9 @@ type WorkloadPolicyTarget struct {
 	NamespacePattern NamePatternArgsPtrOutput `pulumi:"namespacePattern"`
 	// Select namespaces by labels.
 	NamespaceSelector LabelSelectorArgsPtrOutput `pulumi:"namespaceSelector"`
-	// Restrict matching to specific node groups by name.
+	// DEPRECATED: unused by the DevZero API — no longer evaluated by any active target.
+	//
+	// Deprecated: node_group_names is deprecated by the DevZero API and no longer evaluated.
 	NodeGroupNames pulumi.StringArrayOutput `pulumi:"nodeGroupNames"`
 	// Workload policy ID this target is attached to.
 	PolicyId pulumi.StringOutput `pulumi:"policyId"`
@@ -39,6 +45,8 @@ type WorkloadPolicyTarget struct {
 	Priority pulumi.IntPtrOutput `pulumi:"priority"`
 	// Explicit list of workload names to include.
 	WorkloadNames pulumi.StringArrayOutput `pulumi:"workloadNames"`
+	// Explicit list of workload names to exclude.
+	WorkloadNamesNotIn pulumi.StringArrayOutput `pulumi:"workloadNamesNotIn"`
 	// Select workloads by labels.
 	WorkloadSelector LabelSelectorArgsPtrOutput `pulumi:"workloadSelector"`
 }
@@ -92,36 +100,42 @@ func (WorkloadPolicyTargetState) ElementType() reflect.Type {
 }
 
 type workloadPolicyTargetArgs struct {
-	ClusterIds        []string           `pulumi:"clusterIds"`
-	Description       *string            `pulumi:"description"`
-	Enabled           *bool              `pulumi:"enabled"`
-	KindFilter        []string           `pulumi:"kindFilter"`
-	Name              string             `pulumi:"name"`
-	NamePattern       *NamePatternArgs   `pulumi:"namePattern"`
-	NamespacePattern  *NamePatternArgs   `pulumi:"namespacePattern"`
-	NamespaceSelector *LabelSelectorArgs `pulumi:"namespaceSelector"`
-	NodeGroupNames    []string           `pulumi:"nodeGroupNames"`
-	PolicyId          string             `pulumi:"policyId"`
-	Priority          *int               `pulumi:"priority"`
-	WorkloadNames     []string           `pulumi:"workloadNames"`
-	WorkloadSelector  *LabelSelectorArgs `pulumi:"workloadSelector"`
+	AnnotationSelector *LabelSelectorArgs `pulumi:"annotationSelector"`
+	ClusterIds         []string           `pulumi:"clusterIds"`
+	Description        *string            `pulumi:"description"`
+	Enabled            *bool              `pulumi:"enabled"`
+	KindFilter         []string           `pulumi:"kindFilter"`
+	KindFilterNotIn    []string           `pulumi:"kindFilterNotIn"`
+	Name               string             `pulumi:"name"`
+	NamePattern        *NamePatternArgs   `pulumi:"namePattern"`
+	NamespacePattern   *NamePatternArgs   `pulumi:"namespacePattern"`
+	NamespaceSelector  *LabelSelectorArgs `pulumi:"namespaceSelector"`
+	NodeGroupNames     []string           `pulumi:"nodeGroupNames"`
+	PolicyId           string             `pulumi:"policyId"`
+	Priority           *int               `pulumi:"priority"`
+	WorkloadNames      []string           `pulumi:"workloadNames"`
+	WorkloadNamesNotIn []string           `pulumi:"workloadNamesNotIn"`
+	WorkloadSelector   *LabelSelectorArgs `pulumi:"workloadSelector"`
 }
 
 // The set of arguments for constructing a WorkloadPolicyTarget resource.
 type WorkloadPolicyTargetArgs struct {
-	ClusterIds        pulumi.StringArrayInput
-	Description       pulumi.StringPtrInput
-	Enabled           pulumi.BoolPtrInput
-	KindFilter        pulumi.StringArrayInput
-	Name              pulumi.StringInput
-	NamePattern       NamePatternArgsPtrInput
-	NamespacePattern  NamePatternArgsPtrInput
-	NamespaceSelector LabelSelectorArgsPtrInput
-	NodeGroupNames    pulumi.StringArrayInput
-	PolicyId          pulumi.StringInput
-	Priority          pulumi.IntPtrInput
-	WorkloadNames     pulumi.StringArrayInput
-	WorkloadSelector  LabelSelectorArgsPtrInput
+	AnnotationSelector LabelSelectorArgsPtrInput
+	ClusterIds         pulumi.StringArrayInput
+	Description        pulumi.StringPtrInput
+	Enabled            pulumi.BoolPtrInput
+	KindFilter         pulumi.StringArrayInput
+	KindFilterNotIn    pulumi.StringArrayInput
+	Name               pulumi.StringInput
+	NamePattern        NamePatternArgsPtrInput
+	NamespacePattern   NamePatternArgsPtrInput
+	NamespaceSelector  LabelSelectorArgsPtrInput
+	NodeGroupNames     pulumi.StringArrayInput
+	PolicyId           pulumi.StringInput
+	Priority           pulumi.IntPtrInput
+	WorkloadNames      pulumi.StringArrayInput
+	WorkloadNamesNotIn pulumi.StringArrayInput
+	WorkloadSelector   LabelSelectorArgsPtrInput
 }
 
 func (WorkloadPolicyTargetArgs) ElementType() reflect.Type {
@@ -211,6 +225,11 @@ func (o WorkloadPolicyTargetOutput) ToWorkloadPolicyTargetOutputWithContext(ctx 
 	return o
 }
 
+// Select workloads by annotations (same semantics as label selectors, evaluated against annotations).
+func (o WorkloadPolicyTargetOutput) AnnotationSelector() LabelSelectorArgsPtrOutput {
+	return o.ApplyT(func(v *WorkloadPolicyTarget) LabelSelectorArgsPtrOutput { return v.AnnotationSelector }).(LabelSelectorArgsPtrOutput)
+}
+
 // Cluster IDs where this target applies.
 func (o WorkloadPolicyTargetOutput) ClusterIds() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *WorkloadPolicyTarget) pulumi.StringArrayOutput { return v.ClusterIds }).(pulumi.StringArrayOutput)
@@ -221,7 +240,7 @@ func (o WorkloadPolicyTargetOutput) Description() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *WorkloadPolicyTarget) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
 }
 
-// Enable or disable this target.
+// Enable or disable this target. Defaults to true.
 func (o WorkloadPolicyTargetOutput) Enabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *WorkloadPolicyTarget) pulumi.BoolPtrOutput { return v.Enabled }).(pulumi.BoolPtrOutput)
 }
@@ -229,6 +248,11 @@ func (o WorkloadPolicyTargetOutput) Enabled() pulumi.BoolPtrOutput {
 // Restrict matching to specific Kubernetes kinds (e.g. Deployment, Pod).
 func (o WorkloadPolicyTargetOutput) KindFilter() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *WorkloadPolicyTarget) pulumi.StringArrayOutput { return v.KindFilter }).(pulumi.StringArrayOutput)
+}
+
+// Kubernetes kinds to exclude from matching. Same allowed values as kindFilter.
+func (o WorkloadPolicyTargetOutput) KindFilterNotIn() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *WorkloadPolicyTarget) pulumi.StringArrayOutput { return v.KindFilterNotIn }).(pulumi.StringArrayOutput)
 }
 
 // Human-friendly name for this target.
@@ -251,7 +275,9 @@ func (o WorkloadPolicyTargetOutput) NamespaceSelector() LabelSelectorArgsPtrOutp
 	return o.ApplyT(func(v *WorkloadPolicyTarget) LabelSelectorArgsPtrOutput { return v.NamespaceSelector }).(LabelSelectorArgsPtrOutput)
 }
 
-// Restrict matching to specific node groups by name.
+// DEPRECATED: unused by the DevZero API — no longer evaluated by any active target.
+//
+// Deprecated: node_group_names is deprecated by the DevZero API and no longer evaluated.
 func (o WorkloadPolicyTargetOutput) NodeGroupNames() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *WorkloadPolicyTarget) pulumi.StringArrayOutput { return v.NodeGroupNames }).(pulumi.StringArrayOutput)
 }
@@ -269,6 +295,11 @@ func (o WorkloadPolicyTargetOutput) Priority() pulumi.IntPtrOutput {
 // Explicit list of workload names to include.
 func (o WorkloadPolicyTargetOutput) WorkloadNames() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *WorkloadPolicyTarget) pulumi.StringArrayOutput { return v.WorkloadNames }).(pulumi.StringArrayOutput)
+}
+
+// Explicit list of workload names to exclude.
+func (o WorkloadPolicyTargetOutput) WorkloadNamesNotIn() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *WorkloadPolicyTarget) pulumi.StringArrayOutput { return v.WorkloadNamesNotIn }).(pulumi.StringArrayOutput)
 }
 
 // Select workloads by labels.

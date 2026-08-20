@@ -46,6 +46,7 @@ __all__ = [
     'SubnetSelectorTermArgs',
     'TaintArgs',
     'VerticalScalingArgs',
+    'ZonalShiftConfigArgs',
 ]
 
 @pulumi.output_type
@@ -553,6 +554,8 @@ class AzureNodeClassSpecArgs(dict):
             suggest = "fips_mode"
         elif key == "imageFamily":
             suggest = "image_family"
+        elif key == "imageVersion":
+            suggest = "image_version"
         elif key == "maxPods":
             suggest = "max_pods"
         elif key == "osDiskSizeGb":
@@ -574,6 +577,7 @@ class AzureNodeClassSpecArgs(dict):
     def __init__(__self__, *,
                  fips_mode: Optional[_builtins.str] = None,
                  image_family: Optional[_builtins.str] = None,
+                 image_version: Optional[_builtins.str] = None,
                  kubelet: Optional['outputs.AzureKubeletConfigurationArgs'] = None,
                  max_pods: Optional[_builtins.int] = None,
                  os_disk_size_gb: Optional[_builtins.int] = None,
@@ -592,6 +596,8 @@ class AzureNodeClassSpecArgs(dict):
             pulumi.set(__self__, "fips_mode", fips_mode)
         if image_family is not None:
             pulumi.set(__self__, "image_family", image_family)
+        if image_version is not None:
+            pulumi.set(__self__, "image_version", image_version)
         if kubelet is not None:
             pulumi.set(__self__, "kubelet", kubelet)
         if max_pods is not None:
@@ -618,6 +624,11 @@ class AzureNodeClassSpecArgs(dict):
         Azure node image family. One of: 'AzureLinux', 'Ubuntu2204'. Example: 'AzureLinux'.
         """
         return pulumi.get(self, "image_family")
+
+    @_builtins.property
+    @pulumi.getter(name="imageVersion")
+    def image_version(self) -> Optional[_builtins.str]:
+        return pulumi.get(self, "image_version")
 
     @_builtins.property
     @pulumi.getter
@@ -1394,7 +1405,9 @@ class HPAMetricTriggerArgs(dict):
     @staticmethod
     def __key_warning(key: str):
         suggest = None
-        if key == "serverAddress":
+        if key == "connectorId":
+            suggest = "connector_id"
+        elif key == "serverAddress":
             suggest = "server_address"
         elif key == "targetUtilization":
             suggest = "target_utilization"
@@ -1414,6 +1427,7 @@ class HPAMetricTriggerArgs(dict):
 
     def __init__(__self__, *,
                  type: _builtins.str,
+                 connector_id: Optional[_builtins.str] = None,
                  metadata: Optional[Mapping[str, _builtins.str]] = None,
                  query: Optional[_builtins.str] = None,
                  server_address: Optional[_builtins.str] = None,
@@ -1430,6 +1444,8 @@ class HPAMetricTriggerArgs(dict):
         :param _builtins.str weight: Weight for composite formula scaling (0-1 decimal string). Example: '0.5'.
         """
         pulumi.set(__self__, "type", type)
+        if connector_id is not None:
+            pulumi.set(__self__, "connector_id", connector_id)
         if metadata is not None:
             pulumi.set(__self__, "metadata", metadata)
         if query is not None:
@@ -1450,6 +1466,11 @@ class HPAMetricTriggerArgs(dict):
         Metric source type. Built-in: 'CPU', 'Memory', 'NetworkIngress', 'NetworkEgress'. External: 'prometheus'. Example: 'prometheus'.
         """
         return pulumi.get(self, "type")
+
+    @_builtins.property
+    @pulumi.getter(name="connectorId")
+    def connector_id(self) -> Optional[_builtins.str]:
+        return pulumi.get(self, "connector_id")
 
     @_builtins.property
     @pulumi.getter
@@ -1513,14 +1534,8 @@ class HPARuleConfigArgs(dict):
             suggest = "max_replicas"
         elif key == "minReplicas":
             suggest = "min_replicas"
-        elif key == "primaryMetric":
-            suggest = "primary_metric"
         elif key == "scaleDownCooldownSeconds":
             suggest = "scale_down_cooldown_seconds"
-        elif key == "targetMemoryUtilization":
-            suggest = "target_memory_utilization"
-        elif key == "targetUtilization":
-            suggest = "target_utilization"
 
         if suggest:
             pulumi.log.warn(f"Key '{key}' not found in HPARuleConfigArgs. Access the value via the '{suggest}' property getter instead.")
@@ -1542,10 +1557,7 @@ class HPARuleConfigArgs(dict):
                  max_replicas: Optional[_builtins.int] = None,
                  metrics: Optional[Sequence['outputs.HPAMetricTriggerArgs']] = None,
                  min_replicas: Optional[_builtins.int] = None,
-                 primary_metric: Optional[_builtins.str] = None,
-                 scale_down_cooldown_seconds: Optional[_builtins.int] = None,
-                 target_memory_utilization: Optional[_builtins.float] = None,
-                 target_utilization: Optional[_builtins.float] = None):
+                 scale_down_cooldown_seconds: Optional[_builtins.int] = None):
         """
         :param 'HPABehaviorArgs' behavior: Fine-grained scale-up and scale-down behavior policies.
         :param _builtins.str composite_formula: Formula combining multiple metric weights into a single scaling signal. Example: '0.6*cpu + 0.4*memory'.
@@ -1553,12 +1565,9 @@ class HPARuleConfigArgs(dict):
         :param 'HPAFallbackArgs' fallback: Replica fallback configuration when metrics are unavailable.
         :param _builtins.float max_replica_change_percent: Maximum percentage change in replica count per cycle. Example: 50.0.
         :param _builtins.int max_replicas: Maximum number of replicas. Example: 10.
-        :param Sequence['HPAMetricTriggerArgs'] metrics: Additional metric triggers (e.g. Prometheus). CPU/Memory/Network triggers are auto-generated from primaryMetric — do not redeclare them here.
+        :param Sequence['HPAMetricTriggerArgs'] metrics: HPA metric triggers (CPU, Memory, Network*, or external such as prometheus/kafka). Replaces the removed targetUtilization/primaryMetric fields.
         :param _builtins.int min_replicas: Minimum number of replicas. Example: 2.
-        :param _builtins.str primary_metric: Primary metric driving HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
         :param _builtins.int scale_down_cooldown_seconds: Seconds to wait between scale-down events. Example: 300.
-        :param _builtins.float target_memory_utilization: Target memory utilization ratio (0-1), tuned independently of CPU. Example: 0.8.
-        :param _builtins.float target_utilization: Target CPU utilization ratio (0-1). Example: 0.7.
         """
         if behavior is not None:
             pulumi.set(__self__, "behavior", behavior)
@@ -1576,14 +1585,8 @@ class HPARuleConfigArgs(dict):
             pulumi.set(__self__, "metrics", metrics)
         if min_replicas is not None:
             pulumi.set(__self__, "min_replicas", min_replicas)
-        if primary_metric is not None:
-            pulumi.set(__self__, "primary_metric", primary_metric)
         if scale_down_cooldown_seconds is not None:
             pulumi.set(__self__, "scale_down_cooldown_seconds", scale_down_cooldown_seconds)
-        if target_memory_utilization is not None:
-            pulumi.set(__self__, "target_memory_utilization", target_memory_utilization)
-        if target_utilization is not None:
-            pulumi.set(__self__, "target_utilization", target_utilization)
 
     @_builtins.property
     @pulumi.getter
@@ -1637,7 +1640,7 @@ class HPARuleConfigArgs(dict):
     @pulumi.getter
     def metrics(self) -> Optional[Sequence['outputs.HPAMetricTriggerArgs']]:
         """
-        Additional metric triggers (e.g. Prometheus). CPU/Memory/Network triggers are auto-generated from primaryMetric — do not redeclare them here.
+        HPA metric triggers (CPU, Memory, Network*, or external such as prometheus/kafka). Replaces the removed targetUtilization/primaryMetric fields.
         """
         return pulumi.get(self, "metrics")
 
@@ -1650,36 +1653,12 @@ class HPARuleConfigArgs(dict):
         return pulumi.get(self, "min_replicas")
 
     @_builtins.property
-    @pulumi.getter(name="primaryMetric")
-    def primary_metric(self) -> Optional[_builtins.str]:
-        """
-        Primary metric driving HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
-        """
-        return pulumi.get(self, "primary_metric")
-
-    @_builtins.property
     @pulumi.getter(name="scaleDownCooldownSeconds")
     def scale_down_cooldown_seconds(self) -> Optional[_builtins.int]:
         """
         Seconds to wait between scale-down events. Example: 300.
         """
         return pulumi.get(self, "scale_down_cooldown_seconds")
-
-    @_builtins.property
-    @pulumi.getter(name="targetMemoryUtilization")
-    def target_memory_utilization(self) -> Optional[_builtins.float]:
-        """
-        Target memory utilization ratio (0-1), tuned independently of CPU. Example: 0.8.
-        """
-        return pulumi.get(self, "target_memory_utilization")
-
-    @_builtins.property
-    @pulumi.getter(name="targetUtilization")
-    def target_utilization(self) -> Optional[_builtins.float]:
-        """
-        Target CPU utilization ratio (0-1). Example: 0.7.
-        """
-        return pulumi.get(self, "target_utilization")
 
 
 @pulumi.output_type
@@ -1806,7 +1785,9 @@ class HorizontalScalingArgs(dict):
     @staticmethod
     def __key_warning(key: str):
         suggest = None
-        if key == "maxReplicaChangePercent":
+        if key == "compositeFormula":
+            suggest = "composite_formula"
+        elif key == "maxReplicaChangePercent":
             suggest = "max_replica_change_percent"
         elif key == "maxReplicas":
             suggest = "max_replicas"
@@ -1814,8 +1795,14 @@ class HorizontalScalingArgs(dict):
             suggest = "min_data_points"
         elif key == "minReplicas":
             suggest = "min_replicas"
+        elif key == "networkTargetThroughputBytesPerSec":
+            suggest = "network_target_throughput_bytes_per_sec"
         elif key == "primaryMetric":
             suggest = "primary_metric"
+        elif key == "scaleDownCooldownSeconds":
+            suggest = "scale_down_cooldown_seconds"
+        elif key == "targetMemoryUtilization":
+            suggest = "target_memory_utilization"
         elif key == "targetUtilization":
             suggest = "target_utilization"
 
@@ -1831,12 +1818,16 @@ class HorizontalScalingArgs(dict):
         return super().get(key, default)
 
     def __init__(__self__, *,
+                 composite_formula: Optional[_builtins.str] = None,
                  enabled: Optional[_builtins.bool] = None,
                  max_replica_change_percent: Optional[_builtins.float] = None,
                  max_replicas: Optional[_builtins.int] = None,
                  min_data_points: Optional[_builtins.int] = None,
                  min_replicas: Optional[_builtins.int] = None,
+                 network_target_throughput_bytes_per_sec: Optional[_builtins.int] = None,
                  primary_metric: Optional[_builtins.str] = None,
+                 scale_down_cooldown_seconds: Optional[_builtins.int] = None,
+                 target_memory_utilization: Optional[_builtins.float] = None,
                  target_utilization: Optional[_builtins.float] = None):
         """
         :param _builtins.bool enabled: Enable horizontal (replica) scaling. Example: true.
@@ -1847,6 +1838,8 @@ class HorizontalScalingArgs(dict):
         :param _builtins.str primary_metric: Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
         :param _builtins.float target_utilization: Target utilization ratio (0-1) for the primary metric. Example: 0.7 targets 70% utilization.
         """
+        if composite_formula is not None:
+            pulumi.set(__self__, "composite_formula", composite_formula)
         if enabled is not None:
             pulumi.set(__self__, "enabled", enabled)
         if max_replica_change_percent is not None:
@@ -1857,10 +1850,21 @@ class HorizontalScalingArgs(dict):
             pulumi.set(__self__, "min_data_points", min_data_points)
         if min_replicas is not None:
             pulumi.set(__self__, "min_replicas", min_replicas)
+        if network_target_throughput_bytes_per_sec is not None:
+            pulumi.set(__self__, "network_target_throughput_bytes_per_sec", network_target_throughput_bytes_per_sec)
         if primary_metric is not None:
             pulumi.set(__self__, "primary_metric", primary_metric)
+        if scale_down_cooldown_seconds is not None:
+            pulumi.set(__self__, "scale_down_cooldown_seconds", scale_down_cooldown_seconds)
+        if target_memory_utilization is not None:
+            pulumi.set(__self__, "target_memory_utilization", target_memory_utilization)
         if target_utilization is not None:
             pulumi.set(__self__, "target_utilization", target_utilization)
+
+    @_builtins.property
+    @pulumi.getter(name="compositeFormula")
+    def composite_formula(self) -> Optional[_builtins.str]:
+        return pulumi.get(self, "composite_formula")
 
     @_builtins.property
     @pulumi.getter
@@ -1903,12 +1907,27 @@ class HorizontalScalingArgs(dict):
         return pulumi.get(self, "min_replicas")
 
     @_builtins.property
+    @pulumi.getter(name="networkTargetThroughputBytesPerSec")
+    def network_target_throughput_bytes_per_sec(self) -> Optional[_builtins.int]:
+        return pulumi.get(self, "network_target_throughput_bytes_per_sec")
+
+    @_builtins.property
     @pulumi.getter(name="primaryMetric")
     def primary_metric(self) -> Optional[_builtins.str]:
         """
         Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
         """
         return pulumi.get(self, "primary_metric")
+
+    @_builtins.property
+    @pulumi.getter(name="scaleDownCooldownSeconds")
+    def scale_down_cooldown_seconds(self) -> Optional[_builtins.int]:
+        return pulumi.get(self, "scale_down_cooldown_seconds")
+
+    @_builtins.property
+    @pulumi.getter(name="targetMemoryUtilization")
+    def target_memory_utilization(self) -> Optional[_builtins.float]:
+        return pulumi.get(self, "target_memory_utilization")
 
     @_builtins.property
     @pulumi.getter(name="targetUtilization")
@@ -2397,8 +2416,22 @@ class ResourceRuleConfigArgs(dict):
     @staticmethod
     def __key_warning(key: str):
         suggest = None
-        if key == "limitMultiplier":
+        if key == "ceilingPercent":
+            suggest = "ceiling_percent"
+        elif key == "floorPercent":
+            suggest = "floor_percent"
+        elif key == "initialLimit":
+            suggest = "initial_limit"
+        elif key == "initialRequest":
+            suggest = "initial_request"
+        elif key == "limitCeilingPercent":
+            suggest = "limit_ceiling_percent"
+        elif key == "limitFloorPercent":
+            suggest = "limit_floor_percent"
+        elif key == "limitMultiplier":
             suggest = "limit_multiplier"
+        elif key == "limitUseRss":
+            suggest = "limit_use_rss"
         elif key == "limitsAdjustmentEnabled":
             suggest = "limits_adjustment_enabled"
         elif key == "limitsRemovalEnabled":
@@ -2411,6 +2444,8 @@ class ResourceRuleConfigArgs(dict):
             suggest = "max_scale_up_percent"
         elif key == "minRequest":
             suggest = "min_request"
+        elif key == "requestUseRss":
+            suggest = "request_use_rss"
         elif key == "targetPercentile":
             suggest = "target_percentile"
 
@@ -2426,14 +2461,22 @@ class ResourceRuleConfigArgs(dict):
         return super().get(key, default)
 
     def __init__(__self__, *,
+                 ceiling_percent: Optional[_builtins.int] = None,
                  enabled: Optional[_builtins.bool] = None,
+                 floor_percent: Optional[_builtins.int] = None,
+                 initial_limit: Optional[_builtins.int] = None,
+                 initial_request: Optional[_builtins.int] = None,
+                 limit_ceiling_percent: Optional[_builtins.int] = None,
+                 limit_floor_percent: Optional[_builtins.int] = None,
                  limit_multiplier: Optional[_builtins.float] = None,
+                 limit_use_rss: Optional[_builtins.bool] = None,
                  limits_adjustment_enabled: Optional[_builtins.bool] = None,
                  limits_removal_enabled: Optional[_builtins.bool] = None,
                  max_request: Optional[_builtins.int] = None,
                  max_scale_down_percent: Optional[_builtins.float] = None,
                  max_scale_up_percent: Optional[_builtins.float] = None,
                  min_request: Optional[_builtins.int] = None,
+                 request_use_rss: Optional[_builtins.bool] = None,
                  target_percentile: Optional[_builtins.float] = None):
         """
         :param _builtins.bool enabled: Enable this resource axis rule. Example: true.
@@ -2446,10 +2489,24 @@ class ResourceRuleConfigArgs(dict):
         :param _builtins.int min_request: Minimum resource request (millicores for CPU, bytes for memory/GPU). Example: 100.
         :param _builtins.float target_percentile: Percentile of usage data used as the recommendation target (0-1). Example: 0.95.
         """
+        if ceiling_percent is not None:
+            pulumi.set(__self__, "ceiling_percent", ceiling_percent)
         if enabled is not None:
             pulumi.set(__self__, "enabled", enabled)
+        if floor_percent is not None:
+            pulumi.set(__self__, "floor_percent", floor_percent)
+        if initial_limit is not None:
+            pulumi.set(__self__, "initial_limit", initial_limit)
+        if initial_request is not None:
+            pulumi.set(__self__, "initial_request", initial_request)
+        if limit_ceiling_percent is not None:
+            pulumi.set(__self__, "limit_ceiling_percent", limit_ceiling_percent)
+        if limit_floor_percent is not None:
+            pulumi.set(__self__, "limit_floor_percent", limit_floor_percent)
         if limit_multiplier is not None:
             pulumi.set(__self__, "limit_multiplier", limit_multiplier)
+        if limit_use_rss is not None:
+            pulumi.set(__self__, "limit_use_rss", limit_use_rss)
         if limits_adjustment_enabled is not None:
             pulumi.set(__self__, "limits_adjustment_enabled", limits_adjustment_enabled)
         if limits_removal_enabled is not None:
@@ -2462,8 +2519,15 @@ class ResourceRuleConfigArgs(dict):
             pulumi.set(__self__, "max_scale_up_percent", max_scale_up_percent)
         if min_request is not None:
             pulumi.set(__self__, "min_request", min_request)
+        if request_use_rss is not None:
+            pulumi.set(__self__, "request_use_rss", request_use_rss)
         if target_percentile is not None:
             pulumi.set(__self__, "target_percentile", target_percentile)
+
+    @_builtins.property
+    @pulumi.getter(name="ceilingPercent")
+    def ceiling_percent(self) -> Optional[_builtins.int]:
+        return pulumi.get(self, "ceiling_percent")
 
     @_builtins.property
     @pulumi.getter
@@ -2474,12 +2538,42 @@ class ResourceRuleConfigArgs(dict):
         return pulumi.get(self, "enabled")
 
     @_builtins.property
+    @pulumi.getter(name="floorPercent")
+    def floor_percent(self) -> Optional[_builtins.int]:
+        return pulumi.get(self, "floor_percent")
+
+    @_builtins.property
+    @pulumi.getter(name="initialLimit")
+    def initial_limit(self) -> Optional[_builtins.int]:
+        return pulumi.get(self, "initial_limit")
+
+    @_builtins.property
+    @pulumi.getter(name="initialRequest")
+    def initial_request(self) -> Optional[_builtins.int]:
+        return pulumi.get(self, "initial_request")
+
+    @_builtins.property
+    @pulumi.getter(name="limitCeilingPercent")
+    def limit_ceiling_percent(self) -> Optional[_builtins.int]:
+        return pulumi.get(self, "limit_ceiling_percent")
+
+    @_builtins.property
+    @pulumi.getter(name="limitFloorPercent")
+    def limit_floor_percent(self) -> Optional[_builtins.int]:
+        return pulumi.get(self, "limit_floor_percent")
+
+    @_builtins.property
     @pulumi.getter(name="limitMultiplier")
     def limit_multiplier(self) -> Optional[_builtins.float]:
         """
         Multiplier applied to the request to derive the resource limit. Example: 1.5.
         """
         return pulumi.get(self, "limit_multiplier")
+
+    @_builtins.property
+    @pulumi.getter(name="limitUseRss")
+    def limit_use_rss(self) -> Optional[_builtins.bool]:
+        return pulumi.get(self, "limit_use_rss")
 
     @_builtins.property
     @pulumi.getter(name="limitsAdjustmentEnabled")
@@ -2528,6 +2622,11 @@ class ResourceRuleConfigArgs(dict):
         Minimum resource request (millicores for CPU, bytes for memory/GPU). Example: 100.
         """
         return pulumi.get(self, "min_request")
+
+    @_builtins.property
+    @pulumi.getter(name="requestUseRss")
+    def request_use_rss(self) -> Optional[_builtins.bool]:
+        return pulumi.get(self, "request_use_rss")
 
     @_builtins.property
     @pulumi.getter(name="targetPercentile")
@@ -2662,6 +2761,8 @@ class VerticalScalingArgs(dict):
             suggest = "adjust_req_even_if_not_set"
         elif key == "limitMultiplier":
             suggest = "limit_multiplier"
+        elif key == "limitUseRss":
+            suggest = "limit_use_rss"
         elif key == "limitsAdjustmentEnabled":
             suggest = "limits_adjustment_enabled"
         elif key == "limitsRemovalEnabled":
@@ -2678,6 +2779,8 @@ class VerticalScalingArgs(dict):
             suggest = "min_request"
         elif key == "overheadMultiplier":
             suggest = "overhead_multiplier"
+        elif key == "requestUseRss":
+            suggest = "request_use_rss"
         elif key == "targetPercentile":
             suggest = "target_percentile"
 
@@ -2696,6 +2799,7 @@ class VerticalScalingArgs(dict):
                  adjust_req_even_if_not_set: Optional[_builtins.bool] = None,
                  enabled: Optional[_builtins.bool] = None,
                  limit_multiplier: Optional[_builtins.float] = None,
+                 limit_use_rss: Optional[_builtins.bool] = None,
                  limits_adjustment_enabled: Optional[_builtins.bool] = None,
                  limits_removal_enabled: Optional[_builtins.bool] = None,
                  max_request: Optional[_builtins.int] = None,
@@ -2704,6 +2808,7 @@ class VerticalScalingArgs(dict):
                  min_data_points: Optional[_builtins.int] = None,
                  min_request: Optional[_builtins.int] = None,
                  overhead_multiplier: Optional[_builtins.float] = None,
+                 request_use_rss: Optional[_builtins.bool] = None,
                  target_percentile: Optional[_builtins.float] = None):
         """
         :param _builtins.bool adjust_req_even_if_not_set: Recommend requests even when the workload has no existing requests set. Default: false.
@@ -2725,6 +2830,8 @@ class VerticalScalingArgs(dict):
             pulumi.set(__self__, "enabled", enabled)
         if limit_multiplier is not None:
             pulumi.set(__self__, "limit_multiplier", limit_multiplier)
+        if limit_use_rss is not None:
+            pulumi.set(__self__, "limit_use_rss", limit_use_rss)
         if limits_adjustment_enabled is not None:
             pulumi.set(__self__, "limits_adjustment_enabled", limits_adjustment_enabled)
         if limits_removal_enabled is not None:
@@ -2747,6 +2854,8 @@ class VerticalScalingArgs(dict):
             pulumi.set(__self__, "min_request", min_request)
         if overhead_multiplier is not None:
             pulumi.set(__self__, "overhead_multiplier", overhead_multiplier)
+        if request_use_rss is not None:
+            pulumi.set(__self__, "request_use_rss", request_use_rss)
         if target_percentile is not None:
             pulumi.set(__self__, "target_percentile", target_percentile)
 
@@ -2773,6 +2882,11 @@ class VerticalScalingArgs(dict):
         Multiplier applied to the request to derive the resource limit. Example: 1.5 sets limit to 150% of request.
         """
         return pulumi.get(self, "limit_multiplier")
+
+    @_builtins.property
+    @pulumi.getter(name="limitUseRss")
+    def limit_use_rss(self) -> Optional[_builtins.bool]:
+        return pulumi.get(self, "limit_use_rss")
 
     @_builtins.property
     @pulumi.getter(name="limitsAdjustmentEnabled")
@@ -2839,11 +2953,66 @@ class VerticalScalingArgs(dict):
         return pulumi.get(self, "overhead_multiplier")
 
     @_builtins.property
+    @pulumi.getter(name="requestUseRss")
+    def request_use_rss(self) -> Optional[_builtins.bool]:
+        return pulumi.get(self, "request_use_rss")
+
+    @_builtins.property
     @pulumi.getter(name="targetPercentile")
     def target_percentile(self) -> Optional[_builtins.float]:
         """
         Percentile of usage data used as the recommendation target (0-1). Example: 0.95 targets the 95th percentile.
         """
         return pulumi.get(self, "target_percentile")
+
+
+@pulumi.output_type
+class ZonalShiftConfigArgs(dict):
+    @staticmethod
+    def __key_warning(key: str):
+        suggest = None
+        if key == "allowZoneFallback":
+            suggest = "allow_zone_fallback"
+        elif key == "evictImpactedNodes":
+            suggest = "evict_impacted_nodes"
+        elif key == "respectZonalShift":
+            suggest = "respect_zonal_shift"
+
+        if suggest:
+            pulumi.log.warn(f"Key '{key}' not found in ZonalShiftConfigArgs. Access the value via the '{suggest}' property getter instead.")
+
+    def __getitem__(self, key: str) -> Any:
+        ZonalShiftConfigArgs.__key_warning(key)
+        return super().__getitem__(key)
+
+    def get(self, key: str, default = None) -> Any:
+        ZonalShiftConfigArgs.__key_warning(key)
+        return super().get(key, default)
+
+    def __init__(__self__, *,
+                 allow_zone_fallback: Optional[_builtins.bool] = None,
+                 evict_impacted_nodes: Optional[_builtins.bool] = None,
+                 respect_zonal_shift: Optional[_builtins.bool] = None):
+        if allow_zone_fallback is not None:
+            pulumi.set(__self__, "allow_zone_fallback", allow_zone_fallback)
+        if evict_impacted_nodes is not None:
+            pulumi.set(__self__, "evict_impacted_nodes", evict_impacted_nodes)
+        if respect_zonal_shift is not None:
+            pulumi.set(__self__, "respect_zonal_shift", respect_zonal_shift)
+
+    @_builtins.property
+    @pulumi.getter(name="allowZoneFallback")
+    def allow_zone_fallback(self) -> Optional[_builtins.bool]:
+        return pulumi.get(self, "allow_zone_fallback")
+
+    @_builtins.property
+    @pulumi.getter(name="evictImpactedNodes")
+    def evict_impacted_nodes(self) -> Optional[_builtins.bool]:
+        return pulumi.get(self, "evict_impacted_nodes")
+
+    @_builtins.property
+    @pulumi.getter(name="respectZonalShift")
+    def respect_zonal_shift(self) -> Optional[_builtins.bool]:
+        return pulumi.get(self, "respect_zonal_shift")
 
 

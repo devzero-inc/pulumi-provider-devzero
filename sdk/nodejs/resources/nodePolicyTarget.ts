@@ -32,7 +32,7 @@ export class NodePolicyTarget extends pulumi.CustomResource {
     }
 
     /**
-     * Cluster IDs where this node policy applies.
+     * Cluster ID where this node policy applies. The API accepts at most one cluster per target; create one target per cluster.
      */
     declare public readonly clusterIds: pulumi.Output<string[]>;
     /**

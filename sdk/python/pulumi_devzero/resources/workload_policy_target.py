@@ -24,15 +24,18 @@ class WorkloadPolicyTargetArgs:
                  cluster_ids: pulumi.Input[Sequence[pulumi.Input[_builtins.str]]],
                  name: pulumi.Input[_builtins.str],
                  policy_id: pulumi.Input[_builtins.str],
+                 annotation_selector: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  enabled: Optional[pulumi.Input[_builtins.bool]] = None,
                  kind_filter: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 kind_filter_not_in: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  name_pattern: Optional[pulumi.Input['NamePatternArgsArgs']] = None,
                  namespace_pattern: Optional[pulumi.Input['NamePatternArgsArgs']] = None,
                  namespace_selector: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
                  node_group_names: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  priority: Optional[pulumi.Input[_builtins.int]] = None,
                  workload_names: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 workload_names_not_in: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  workload_selector: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None):
         """
         The set of arguments for constructing a WorkloadPolicyTarget resource.
@@ -40,12 +43,16 @@ class WorkloadPolicyTargetArgs:
         pulumi.set(__self__, "cluster_ids", cluster_ids)
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "policy_id", policy_id)
+        if annotation_selector is not None:
+            pulumi.set(__self__, "annotation_selector", annotation_selector)
         if description is not None:
             pulumi.set(__self__, "description", description)
         if enabled is not None:
             pulumi.set(__self__, "enabled", enabled)
         if kind_filter is not None:
             pulumi.set(__self__, "kind_filter", kind_filter)
+        if kind_filter_not_in is not None:
+            pulumi.set(__self__, "kind_filter_not_in", kind_filter_not_in)
         if name_pattern is not None:
             pulumi.set(__self__, "name_pattern", name_pattern)
         if namespace_pattern is not None:
@@ -58,6 +65,8 @@ class WorkloadPolicyTargetArgs:
             pulumi.set(__self__, "priority", priority)
         if workload_names is not None:
             pulumi.set(__self__, "workload_names", workload_names)
+        if workload_names_not_in is not None:
+            pulumi.set(__self__, "workload_names_not_in", workload_names_not_in)
         if workload_selector is not None:
             pulumi.set(__self__, "workload_selector", workload_selector)
 
@@ -89,6 +98,15 @@ class WorkloadPolicyTargetArgs:
         pulumi.set(self, "policy_id", value)
 
     @_builtins.property
+    @pulumi.getter(name="annotationSelector")
+    def annotation_selector(self) -> Optional[pulumi.Input['LabelSelectorArgsArgs']]:
+        return pulumi.get(self, "annotation_selector")
+
+    @annotation_selector.setter
+    def annotation_selector(self, value: Optional[pulumi.Input['LabelSelectorArgsArgs']]):
+        pulumi.set(self, "annotation_selector", value)
+
+    @_builtins.property
     @pulumi.getter
     def description(self) -> Optional[pulumi.Input[_builtins.str]]:
         return pulumi.get(self, "description")
@@ -114,6 +132,15 @@ class WorkloadPolicyTargetArgs:
     @kind_filter.setter
     def kind_filter(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "kind_filter", value)
+
+    @_builtins.property
+    @pulumi.getter(name="kindFilterNotIn")
+    def kind_filter_not_in(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+        return pulumi.get(self, "kind_filter_not_in")
+
+    @kind_filter_not_in.setter
+    def kind_filter_not_in(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "kind_filter_not_in", value)
 
     @_builtins.property
     @pulumi.getter(name="namePattern")
@@ -170,6 +197,15 @@ class WorkloadPolicyTargetArgs:
         pulumi.set(self, "workload_names", value)
 
     @_builtins.property
+    @pulumi.getter(name="workloadNamesNotIn")
+    def workload_names_not_in(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+        return pulumi.get(self, "workload_names_not_in")
+
+    @workload_names_not_in.setter
+    def workload_names_not_in(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "workload_names_not_in", value)
+
+    @_builtins.property
     @pulumi.getter(name="workloadSelector")
     def workload_selector(self) -> Optional[pulumi.Input['LabelSelectorArgsArgs']]:
         return pulumi.get(self, "workload_selector")
@@ -185,10 +221,12 @@ class WorkloadPolicyTarget(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 annotation_selector: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  cluster_ids: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  enabled: Optional[pulumi.Input[_builtins.bool]] = None,
                  kind_filter: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 kind_filter_not_in: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  name_pattern: Optional[pulumi.Input[Union['NamePatternArgsArgs', 'NamePatternArgsArgsDict']]] = None,
                  namespace_pattern: Optional[pulumi.Input[Union['NamePatternArgsArgs', 'NamePatternArgsArgsDict']]] = None,
@@ -197,6 +235,7 @@ class WorkloadPolicyTarget(pulumi.CustomResource):
                  policy_id: Optional[pulumi.Input[_builtins.str]] = None,
                  priority: Optional[pulumi.Input[_builtins.int]] = None,
                  workload_names: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 workload_names_not_in: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  workload_selector: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  __props__=None):
         """
@@ -229,10 +268,12 @@ class WorkloadPolicyTarget(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 annotation_selector: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  cluster_ids: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  enabled: Optional[pulumi.Input[_builtins.bool]] = None,
                  kind_filter: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 kind_filter_not_in: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  name_pattern: Optional[pulumi.Input[Union['NamePatternArgsArgs', 'NamePatternArgsArgsDict']]] = None,
                  namespace_pattern: Optional[pulumi.Input[Union['NamePatternArgsArgs', 'NamePatternArgsArgsDict']]] = None,
@@ -241,6 +282,7 @@ class WorkloadPolicyTarget(pulumi.CustomResource):
                  policy_id: Optional[pulumi.Input[_builtins.str]] = None,
                  priority: Optional[pulumi.Input[_builtins.int]] = None,
                  workload_names: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 workload_names_not_in: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  workload_selector: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
@@ -251,12 +293,14 @@ class WorkloadPolicyTarget(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = WorkloadPolicyTargetArgs.__new__(WorkloadPolicyTargetArgs)
 
+            __props__.__dict__["annotation_selector"] = annotation_selector
             if cluster_ids is None and not opts.urn:
                 raise TypeError("Missing required property 'cluster_ids'")
             __props__.__dict__["cluster_ids"] = cluster_ids
             __props__.__dict__["description"] = description
             __props__.__dict__["enabled"] = enabled
             __props__.__dict__["kind_filter"] = kind_filter
+            __props__.__dict__["kind_filter_not_in"] = kind_filter_not_in
             if name is None and not opts.urn:
                 raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
@@ -269,6 +313,7 @@ class WorkloadPolicyTarget(pulumi.CustomResource):
             __props__.__dict__["policy_id"] = policy_id
             __props__.__dict__["priority"] = priority
             __props__.__dict__["workload_names"] = workload_names
+            __props__.__dict__["workload_names_not_in"] = workload_names_not_in
             __props__.__dict__["workload_selector"] = workload_selector
         super(WorkloadPolicyTarget, __self__).__init__(
             'devzero:resources:WorkloadPolicyTarget',
@@ -292,10 +337,12 @@ class WorkloadPolicyTarget(pulumi.CustomResource):
 
         __props__ = WorkloadPolicyTargetArgs.__new__(WorkloadPolicyTargetArgs)
 
+        __props__.__dict__["annotation_selector"] = None
         __props__.__dict__["cluster_ids"] = None
         __props__.__dict__["description"] = None
         __props__.__dict__["enabled"] = None
         __props__.__dict__["kind_filter"] = None
+        __props__.__dict__["kind_filter_not_in"] = None
         __props__.__dict__["name"] = None
         __props__.__dict__["name_pattern"] = None
         __props__.__dict__["namespace_pattern"] = None
@@ -304,8 +351,17 @@ class WorkloadPolicyTarget(pulumi.CustomResource):
         __props__.__dict__["policy_id"] = None
         __props__.__dict__["priority"] = None
         __props__.__dict__["workload_names"] = None
+        __props__.__dict__["workload_names_not_in"] = None
         __props__.__dict__["workload_selector"] = None
         return WorkloadPolicyTarget(resource_name, opts=opts, __props__=__props__)
+
+    @_builtins.property
+    @pulumi.getter(name="annotationSelector")
+    def annotation_selector(self) -> pulumi.Output[Optional['outputs.LabelSelectorArgs']]:
+        """
+        Select workloads by annotations (same semantics as label selectors, evaluated against annotations).
+        """
+        return pulumi.get(self, "annotation_selector")
 
     @_builtins.property
     @pulumi.getter(name="clusterIds")
@@ -327,7 +383,7 @@ class WorkloadPolicyTarget(pulumi.CustomResource):
     @pulumi.getter
     def enabled(self) -> pulumi.Output[Optional[_builtins.bool]]:
         """
-        Enable or disable this target.
+        Enable or disable this target. Defaults to true.
         """
         return pulumi.get(self, "enabled")
 
@@ -338,6 +394,14 @@ class WorkloadPolicyTarget(pulumi.CustomResource):
         Restrict matching to specific Kubernetes kinds (e.g. Deployment, Pod).
         """
         return pulumi.get(self, "kind_filter")
+
+    @_builtins.property
+    @pulumi.getter(name="kindFilterNotIn")
+    def kind_filter_not_in(self) -> pulumi.Output[Optional[Sequence[_builtins.str]]]:
+        """
+        Kubernetes kinds to exclude from matching. Same allowed values as kindFilter.
+        """
+        return pulumi.get(self, "kind_filter_not_in")
 
     @_builtins.property
     @pulumi.getter
@@ -373,9 +437,10 @@ class WorkloadPolicyTarget(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="nodeGroupNames")
+    @_utilities.deprecated("""node_group_names is deprecated by the DevZero API and no longer evaluated.""")
     def node_group_names(self) -> pulumi.Output[Optional[Sequence[_builtins.str]]]:
         """
-        Restrict matching to specific node groups by name.
+        DEPRECATED: unused by the DevZero API — no longer evaluated by any active target.
         """
         return pulumi.get(self, "node_group_names")
 
@@ -402,6 +467,14 @@ class WorkloadPolicyTarget(pulumi.CustomResource):
         Explicit list of workload names to include.
         """
         return pulumi.get(self, "workload_names")
+
+    @_builtins.property
+    @pulumi.getter(name="workloadNamesNotIn")
+    def workload_names_not_in(self) -> pulumi.Output[Optional[Sequence[_builtins.str]]]:
+        """
+        Explicit list of workload names to exclude.
+        """
+        return pulumi.get(self, "workload_names_not_in")
 
     @_builtins.property
     @pulumi.getter(name="workloadSelector")

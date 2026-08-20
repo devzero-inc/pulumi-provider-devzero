@@ -181,7 +181,7 @@ class NodePolicyTarget(pulumi.CustomResource):
     @pulumi.getter(name="clusterIds")
     def cluster_ids(self) -> pulumi.Output[Sequence[_builtins.str]]:
         """
-        Cluster IDs where this node policy applies.
+        Cluster ID where this node policy applies. The API accepts at most one cluster per target; create one target per cluster.
         """
         return pulumi.get(self, "cluster_ids")
 

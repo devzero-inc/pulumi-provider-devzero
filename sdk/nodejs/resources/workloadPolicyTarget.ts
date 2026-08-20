@@ -34,6 +34,10 @@ export class WorkloadPolicyTarget extends pulumi.CustomResource {
     }
 
     /**
+     * Select workloads by annotations (same semantics as label selectors, evaluated against annotations).
+     */
+    declare public readonly annotationSelector: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
+    /**
      * Cluster IDs where this target applies.
      */
     declare public readonly clusterIds: pulumi.Output<string[]>;
@@ -42,13 +46,17 @@ export class WorkloadPolicyTarget extends pulumi.CustomResource {
      */
     declare public readonly description: pulumi.Output<string | undefined>;
     /**
-     * Enable or disable this target.
+     * Enable or disable this target. Defaults to true.
      */
     declare public readonly enabled: pulumi.Output<boolean | undefined>;
     /**
      * Restrict matching to specific Kubernetes kinds (e.g. Deployment, Pod).
      */
     declare public readonly kindFilter: pulumi.Output<string[] | undefined>;
+    /**
+     * Kubernetes kinds to exclude from matching. Same allowed values as kindFilter.
+     */
+    declare public readonly kindFilterNotIn: pulumi.Output<string[] | undefined>;
     /**
      * Human-friendly name for this target.
      */
@@ -66,7 +74,9 @@ export class WorkloadPolicyTarget extends pulumi.CustomResource {
      */
     declare public readonly namespaceSelector: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
     /**
-     * Restrict matching to specific node groups by name.
+     * DEPRECATED: unused by the DevZero API — no longer evaluated by any active target.
+     *
+     * @deprecated node_group_names is deprecated by the DevZero API and no longer evaluated.
      */
     declare public readonly nodeGroupNames: pulumi.Output<string[] | undefined>;
     /**
@@ -81,6 +91,10 @@ export class WorkloadPolicyTarget extends pulumi.CustomResource {
      * Explicit list of workload names to include.
      */
     declare public readonly workloadNames: pulumi.Output<string[] | undefined>;
+    /**
+     * Explicit list of workload names to exclude.
+     */
+    declare public readonly workloadNamesNotIn: pulumi.Output<string[] | undefined>;
     /**
      * Select workloads by labels.
      */
@@ -106,10 +120,12 @@ export class WorkloadPolicyTarget extends pulumi.CustomResource {
             if (args?.policyId === undefined && !opts.urn) {
                 throw new Error("Missing required property 'policyId'");
             }
+            resourceInputs["annotationSelector"] = args?.annotationSelector;
             resourceInputs["clusterIds"] = args?.clusterIds;
             resourceInputs["description"] = args?.description;
             resourceInputs["enabled"] = args?.enabled;
             resourceInputs["kindFilter"] = args?.kindFilter;
+            resourceInputs["kindFilterNotIn"] = args?.kindFilterNotIn;
             resourceInputs["name"] = args?.name;
             resourceInputs["namePattern"] = args?.namePattern;
             resourceInputs["namespacePattern"] = args?.namespacePattern;
@@ -118,12 +134,15 @@ export class WorkloadPolicyTarget extends pulumi.CustomResource {
             resourceInputs["policyId"] = args?.policyId;
             resourceInputs["priority"] = args?.priority;
             resourceInputs["workloadNames"] = args?.workloadNames;
+            resourceInputs["workloadNamesNotIn"] = args?.workloadNamesNotIn;
             resourceInputs["workloadSelector"] = args?.workloadSelector;
         } else {
+            resourceInputs["annotationSelector"] = undefined /*out*/;
             resourceInputs["clusterIds"] = undefined /*out*/;
             resourceInputs["description"] = undefined /*out*/;
             resourceInputs["enabled"] = undefined /*out*/;
             resourceInputs["kindFilter"] = undefined /*out*/;
+            resourceInputs["kindFilterNotIn"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["namePattern"] = undefined /*out*/;
             resourceInputs["namespacePattern"] = undefined /*out*/;
@@ -132,6 +151,7 @@ export class WorkloadPolicyTarget extends pulumi.CustomResource {
             resourceInputs["policyId"] = undefined /*out*/;
             resourceInputs["priority"] = undefined /*out*/;
             resourceInputs["workloadNames"] = undefined /*out*/;
+            resourceInputs["workloadNamesNotIn"] = undefined /*out*/;
             resourceInputs["workloadSelector"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
@@ -143,10 +163,12 @@ export class WorkloadPolicyTarget extends pulumi.CustomResource {
  * The set of arguments for constructing a WorkloadPolicyTarget resource.
  */
 export interface WorkloadPolicyTargetArgs {
+    annotationSelector?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
     clusterIds: pulumi.Input<pulumi.Input<string>[]>;
     description?: pulumi.Input<string>;
     enabled?: pulumi.Input<boolean>;
     kindFilter?: pulumi.Input<pulumi.Input<string>[]>;
+    kindFilterNotIn?: pulumi.Input<pulumi.Input<string>[]>;
     name: pulumi.Input<string>;
     namePattern?: pulumi.Input<inputs.resources.NamePatternArgsArgs>;
     namespacePattern?: pulumi.Input<inputs.resources.NamePatternArgsArgs>;
@@ -155,5 +177,6 @@ export interface WorkloadPolicyTargetArgs {
     policyId: pulumi.Input<string>;
     priority?: pulumi.Input<number>;
     workloadNames?: pulumi.Input<pulumi.Input<string>[]>;
+    workloadNamesNotIn?: pulumi.Input<pulumi.Input<string>[]>;
     workloadSelector?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
 }

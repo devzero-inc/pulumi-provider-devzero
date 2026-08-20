@@ -69,6 +69,7 @@ export class WorkloadRule extends pulumi.CustomResource {
      * Events that trigger a recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: ["pod_creation"].
      */
     declare public readonly detectionTriggers: pulumi.Output<string[] | undefined>;
+    declare public readonly disabled: pulumi.Output<boolean | undefined>;
     /**
      * Emergency response configuration for OOM and CPU throttle events.
      */
@@ -89,6 +90,7 @@ export class WorkloadRule extends pulumi.CustomResource {
      * Allow live pod migration when applying recommendations. Example: false.
      */
     declare public readonly liveMigrationEnabled: pulumi.Output<boolean | undefined>;
+    declare public readonly lookbackPeriodSeconds: pulumi.Output<number | undefined>;
     /**
      * Memory vertical scaling rule configuration.
      */
@@ -146,11 +148,13 @@ export class WorkloadRule extends pulumi.CustomResource {
             resourceInputs["cronSchedule"] = args?.cronSchedule;
             resourceInputs["defragmentationSchedule"] = args?.defragmentationSchedule;
             resourceInputs["detectionTriggers"] = args?.detectionTriggers;
+            resourceInputs["disabled"] = args?.disabled;
             resourceInputs["emergencyResponse"] = args?.emergencyResponse;
             resourceInputs["gpuRule"] = args?.gpuRule;
             resourceInputs["hpaRule"] = args?.hpaRule;
             resourceInputs["kind"] = args?.kind;
             resourceInputs["liveMigrationEnabled"] = args?.liveMigrationEnabled;
+            resourceInputs["lookbackPeriodSeconds"] = args?.lookbackPeriodSeconds;
             resourceInputs["memoryRule"] = args?.memoryRule;
             resourceInputs["name"] = args?.name;
             resourceInputs["namespace"] = args?.namespace;
@@ -167,11 +171,13 @@ export class WorkloadRule extends pulumi.CustomResource {
             resourceInputs["cronSchedule"] = undefined /*out*/;
             resourceInputs["defragmentationSchedule"] = undefined /*out*/;
             resourceInputs["detectionTriggers"] = undefined /*out*/;
+            resourceInputs["disabled"] = undefined /*out*/;
             resourceInputs["emergencyResponse"] = undefined /*out*/;
             resourceInputs["gpuRule"] = undefined /*out*/;
             resourceInputs["hpaRule"] = undefined /*out*/;
             resourceInputs["kind"] = undefined /*out*/;
             resourceInputs["liveMigrationEnabled"] = undefined /*out*/;
+            resourceInputs["lookbackPeriodSeconds"] = undefined /*out*/;
             resourceInputs["memoryRule"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["namespace"] = undefined /*out*/;
@@ -224,6 +230,7 @@ export interface WorkloadRuleArgs {
      * Events that trigger a recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: ["pod_creation"].
      */
     detectionTriggers?: pulumi.Input<pulumi.Input<string>[]>;
+    disabled?: pulumi.Input<boolean>;
     /**
      * Emergency response configuration for OOM and CPU throttle events.
      */
@@ -244,6 +251,7 @@ export interface WorkloadRuleArgs {
      * Allow live pod migration when applying recommendations. Example: false.
      */
     liveMigrationEnabled?: pulumi.Input<boolean>;
+    lookbackPeriodSeconds?: pulumi.Input<number>;
     /**
      * Memory vertical scaling rule configuration.
      */

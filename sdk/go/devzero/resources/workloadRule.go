@@ -33,6 +33,7 @@ type WorkloadRule struct {
 	DefragmentationSchedule pulumi.StringPtrOutput `pulumi:"defragmentationSchedule"`
 	// Events that trigger a recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: ["pod_creation"].
 	DetectionTriggers pulumi.StringArrayOutput `pulumi:"detectionTriggers"`
+	Disabled          pulumi.BoolPtrOutput     `pulumi:"disabled"`
 	// Emergency response configuration for OOM and CPU throttle events.
 	EmergencyResponse EmergencyResponseConfigArgsPtrOutput `pulumi:"emergencyResponse"`
 	// GPU vertical scaling rule configuration.
@@ -42,7 +43,8 @@ type WorkloadRule struct {
 	// Kubernetes workload kind. One of: 'Deployment', 'StatefulSet', 'DaemonSet', 'CronJob', 'Job'. Example: 'Deployment'.
 	Kind pulumi.StringOutput `pulumi:"kind"`
 	// Allow live pod migration when applying recommendations. Example: false.
-	LiveMigrationEnabled pulumi.BoolPtrOutput `pulumi:"liveMigrationEnabled"`
+	LiveMigrationEnabled  pulumi.BoolPtrOutput `pulumi:"liveMigrationEnabled"`
+	LookbackPeriodSeconds pulumi.IntPtrOutput  `pulumi:"lookbackPeriodSeconds"`
 	// Memory vertical scaling rule configuration.
 	MemoryRule ResourceRuleConfigArgsPtrOutput `pulumi:"memoryRule"`
 	// Name of the Kubernetes workload. Example: 'my-api'.
@@ -127,6 +129,7 @@ type workloadRuleArgs struct {
 	DefragmentationSchedule *string `pulumi:"defragmentationSchedule"`
 	// Events that trigger a recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: ["pod_creation"].
 	DetectionTriggers []string `pulumi:"detectionTriggers"`
+	Disabled          *bool    `pulumi:"disabled"`
 	// Emergency response configuration for OOM and CPU throttle events.
 	EmergencyResponse *EmergencyResponseConfigArgs `pulumi:"emergencyResponse"`
 	// GPU vertical scaling rule configuration.
@@ -136,7 +139,8 @@ type workloadRuleArgs struct {
 	// Kubernetes workload kind. One of: 'Deployment', 'StatefulSet', 'DaemonSet', 'CronJob', 'Job'. Example: 'Deployment'.
 	Kind string `pulumi:"kind"`
 	// Allow live pod migration when applying recommendations. Example: false.
-	LiveMigrationEnabled *bool `pulumi:"liveMigrationEnabled"`
+	LiveMigrationEnabled  *bool `pulumi:"liveMigrationEnabled"`
+	LookbackPeriodSeconds *int  `pulumi:"lookbackPeriodSeconds"`
 	// Memory vertical scaling rule configuration.
 	MemoryRule *ResourceRuleConfigArgs `pulumi:"memoryRule"`
 	// Name of the Kubernetes workload. Example: 'my-api'.
@@ -171,6 +175,7 @@ type WorkloadRuleArgs struct {
 	DefragmentationSchedule pulumi.StringPtrInput
 	// Events that trigger a recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: ["pod_creation"].
 	DetectionTriggers pulumi.StringArrayInput
+	Disabled          pulumi.BoolPtrInput
 	// Emergency response configuration for OOM and CPU throttle events.
 	EmergencyResponse EmergencyResponseConfigArgsPtrInput
 	// GPU vertical scaling rule configuration.
@@ -180,7 +185,8 @@ type WorkloadRuleArgs struct {
 	// Kubernetes workload kind. One of: 'Deployment', 'StatefulSet', 'DaemonSet', 'CronJob', 'Job'. Example: 'Deployment'.
 	Kind pulumi.StringInput
 	// Allow live pod migration when applying recommendations. Example: false.
-	LiveMigrationEnabled pulumi.BoolPtrInput
+	LiveMigrationEnabled  pulumi.BoolPtrInput
+	LookbackPeriodSeconds pulumi.IntPtrInput
 	// Memory vertical scaling rule configuration.
 	MemoryRule ResourceRuleConfigArgsPtrInput
 	// Name of the Kubernetes workload. Example: 'my-api'.
@@ -327,6 +333,10 @@ func (o WorkloadRuleOutput) DetectionTriggers() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *WorkloadRule) pulumi.StringArrayOutput { return v.DetectionTriggers }).(pulumi.StringArrayOutput)
 }
 
+func (o WorkloadRuleOutput) Disabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *WorkloadRule) pulumi.BoolPtrOutput { return v.Disabled }).(pulumi.BoolPtrOutput)
+}
+
 // Emergency response configuration for OOM and CPU throttle events.
 func (o WorkloadRuleOutput) EmergencyResponse() EmergencyResponseConfigArgsPtrOutput {
 	return o.ApplyT(func(v *WorkloadRule) EmergencyResponseConfigArgsPtrOutput { return v.EmergencyResponse }).(EmergencyResponseConfigArgsPtrOutput)
@@ -350,6 +360,10 @@ func (o WorkloadRuleOutput) Kind() pulumi.StringOutput {
 // Allow live pod migration when applying recommendations. Example: false.
 func (o WorkloadRuleOutput) LiveMigrationEnabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *WorkloadRule) pulumi.BoolPtrOutput { return v.LiveMigrationEnabled }).(pulumi.BoolPtrOutput)
+}
+
+func (o WorkloadRuleOutput) LookbackPeriodSeconds() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *WorkloadRule) pulumi.IntPtrOutput { return v.LookbackPeriodSeconds }).(pulumi.IntPtrOutput)
 }
 
 // Memory vertical scaling rule configuration.

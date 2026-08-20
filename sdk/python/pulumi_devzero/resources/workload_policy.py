@@ -23,24 +23,44 @@ class WorkloadPolicyArgs:
     def __init__(__self__, *,
                  name: pulumi.Input[_builtins.str],
                  action_triggers: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 allow_in_place_memory_limit_decrease: Optional[pulumi.Input[_builtins.bool]] = None,
                  cooldown_minutes: Optional[pulumi.Input[_builtins.int]] = None,
+                 cpu_ceiling_percent: Optional[pulumi.Input[_builtins.int]] = None,
+                 cpu_floor_percent: Optional[pulumi.Input[_builtins.int]] = None,
+                 cpu_limit_ceiling_percent: Optional[pulumi.Input[_builtins.int]] = None,
+                 cpu_limit_floor_percent: Optional[pulumi.Input[_builtins.int]] = None,
                  cpu_vertical_scaling: Optional[pulumi.Input['VerticalScalingArgsArgs']] = None,
                  cron_schedule: Optional[pulumi.Input[_builtins.str]] = None,
                  defragmentation_schedule: Optional[pulumi.Input[_builtins.str]] = None,
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  detection_triggers: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  drift_delta_percent: Optional[pulumi.Input[_builtins.float]] = None,
+                 enable_in_place_vertical_scaling: Optional[pulumi.Input[_builtins.bool]] = None,
                  enable_pmax_protection: Optional[pulumi.Input[_builtins.bool]] = None,
                  gpu_vertical_scaling: Optional[pulumi.Input['VerticalScalingArgsArgs']] = None,
                  gpu_vram_vertical_scaling: Optional[pulumi.Input['VerticalScalingArgsArgs']] = None,
                  horizontal_scaling: Optional[pulumi.Input['HorizontalScalingArgsArgs']] = None,
                  hysteresis_vs_target: Optional[pulumi.Input[_builtins.float]] = None,
+                 jvm_cpu_startup_floor_millicores: Optional[pulumi.Input[_builtins.int]] = None,
+                 jvm_heap_headroom_multiplier: Optional[pulumi.Input[_builtins.float]] = None,
+                 jvm_heap_optimization_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
+                 jvm_heap_target_percentile: Optional[pulumi.Input[_builtins.float]] = None,
+                 jvm_max_heap_bytes: Optional[pulumi.Input[_builtins.int]] = None,
+                 jvm_min_heap_bytes: Optional[pulumi.Input[_builtins.int]] = None,
+                 jvm_non_heap_overhead_bytes: Optional[pulumi.Input[_builtins.int]] = None,
+                 jvm_non_heap_overhead_percent: Optional[pulumi.Input[_builtins.float]] = None,
+                 jvm_prefer_container_support: Optional[pulumi.Input[_builtins.bool]] = None,
                  live_migration_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
                  loopback_period_seconds: Optional[pulumi.Input[_builtins.int]] = None,
+                 memory_ceiling_percent: Optional[pulumi.Input[_builtins.int]] = None,
+                 memory_floor_percent: Optional[pulumi.Input[_builtins.int]] = None,
+                 memory_limit_ceiling_percent: Optional[pulumi.Input[_builtins.int]] = None,
+                 memory_limit_floor_percent: Optional[pulumi.Input[_builtins.int]] = None,
                  memory_vertical_scaling: Optional[pulumi.Input['VerticalScalingArgsArgs']] = None,
                  min_change_percent: Optional[pulumi.Input[_builtins.float]] = None,
                  min_data_points: Optional[pulumi.Input[_builtins.int]] = None,
                  min_vpa_window_data_points: Optional[pulumi.Input[_builtins.int]] = None,
+                 pdb_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
                  pmax_ratio_threshold: Optional[pulumi.Input[_builtins.float]] = None,
                  scheduler_plugins: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  stability_cv_max: Optional[pulumi.Input[_builtins.float]] = None,
@@ -73,10 +93,20 @@ class WorkloadPolicyArgs:
         pulumi.set(__self__, "name", name)
         if action_triggers is not None:
             pulumi.set(__self__, "action_triggers", action_triggers)
+        if allow_in_place_memory_limit_decrease is not None:
+            pulumi.set(__self__, "allow_in_place_memory_limit_decrease", allow_in_place_memory_limit_decrease)
         if cooldown_minutes is None:
             cooldown_minutes = 300
         if cooldown_minutes is not None:
             pulumi.set(__self__, "cooldown_minutes", cooldown_minutes)
+        if cpu_ceiling_percent is not None:
+            pulumi.set(__self__, "cpu_ceiling_percent", cpu_ceiling_percent)
+        if cpu_floor_percent is not None:
+            pulumi.set(__self__, "cpu_floor_percent", cpu_floor_percent)
+        if cpu_limit_ceiling_percent is not None:
+            pulumi.set(__self__, "cpu_limit_ceiling_percent", cpu_limit_ceiling_percent)
+        if cpu_limit_floor_percent is not None:
+            pulumi.set(__self__, "cpu_limit_floor_percent", cpu_limit_floor_percent)
         if cpu_vertical_scaling is not None:
             pulumi.set(__self__, "cpu_vertical_scaling", cpu_vertical_scaling)
         if cron_schedule is not None:
@@ -89,6 +119,8 @@ class WorkloadPolicyArgs:
             pulumi.set(__self__, "detection_triggers", detection_triggers)
         if drift_delta_percent is not None:
             pulumi.set(__self__, "drift_delta_percent", drift_delta_percent)
+        if enable_in_place_vertical_scaling is not None:
+            pulumi.set(__self__, "enable_in_place_vertical_scaling", enable_in_place_vertical_scaling)
         if enable_pmax_protection is not None:
             pulumi.set(__self__, "enable_pmax_protection", enable_pmax_protection)
         if gpu_vertical_scaling is not None:
@@ -99,12 +131,38 @@ class WorkloadPolicyArgs:
             pulumi.set(__self__, "horizontal_scaling", horizontal_scaling)
         if hysteresis_vs_target is not None:
             pulumi.set(__self__, "hysteresis_vs_target", hysteresis_vs_target)
+        if jvm_cpu_startup_floor_millicores is not None:
+            pulumi.set(__self__, "jvm_cpu_startup_floor_millicores", jvm_cpu_startup_floor_millicores)
+        if jvm_heap_headroom_multiplier is not None:
+            pulumi.set(__self__, "jvm_heap_headroom_multiplier", jvm_heap_headroom_multiplier)
+        if jvm_heap_optimization_enabled is not None:
+            pulumi.set(__self__, "jvm_heap_optimization_enabled", jvm_heap_optimization_enabled)
+        if jvm_heap_target_percentile is not None:
+            pulumi.set(__self__, "jvm_heap_target_percentile", jvm_heap_target_percentile)
+        if jvm_max_heap_bytes is not None:
+            pulumi.set(__self__, "jvm_max_heap_bytes", jvm_max_heap_bytes)
+        if jvm_min_heap_bytes is not None:
+            pulumi.set(__self__, "jvm_min_heap_bytes", jvm_min_heap_bytes)
+        if jvm_non_heap_overhead_bytes is not None:
+            pulumi.set(__self__, "jvm_non_heap_overhead_bytes", jvm_non_heap_overhead_bytes)
+        if jvm_non_heap_overhead_percent is not None:
+            pulumi.set(__self__, "jvm_non_heap_overhead_percent", jvm_non_heap_overhead_percent)
+        if jvm_prefer_container_support is not None:
+            pulumi.set(__self__, "jvm_prefer_container_support", jvm_prefer_container_support)
         if live_migration_enabled is not None:
             pulumi.set(__self__, "live_migration_enabled", live_migration_enabled)
         if loopback_period_seconds is None:
             loopback_period_seconds = 86400
         if loopback_period_seconds is not None:
             pulumi.set(__self__, "loopback_period_seconds", loopback_period_seconds)
+        if memory_ceiling_percent is not None:
+            pulumi.set(__self__, "memory_ceiling_percent", memory_ceiling_percent)
+        if memory_floor_percent is not None:
+            pulumi.set(__self__, "memory_floor_percent", memory_floor_percent)
+        if memory_limit_ceiling_percent is not None:
+            pulumi.set(__self__, "memory_limit_ceiling_percent", memory_limit_ceiling_percent)
+        if memory_limit_floor_percent is not None:
+            pulumi.set(__self__, "memory_limit_floor_percent", memory_limit_floor_percent)
         if memory_vertical_scaling is not None:
             pulumi.set(__self__, "memory_vertical_scaling", memory_vertical_scaling)
         if min_change_percent is None:
@@ -119,6 +177,8 @@ class WorkloadPolicyArgs:
             min_vpa_window_data_points = 30
         if min_vpa_window_data_points is not None:
             pulumi.set(__self__, "min_vpa_window_data_points", min_vpa_window_data_points)
+        if pdb_enabled is not None:
+            pulumi.set(__self__, "pdb_enabled", pdb_enabled)
         if pmax_ratio_threshold is None:
             pmax_ratio_threshold = 3
         if pmax_ratio_threshold is not None:
@@ -155,6 +215,15 @@ class WorkloadPolicyArgs:
         pulumi.set(self, "action_triggers", value)
 
     @_builtins.property
+    @pulumi.getter(name="allowInPlaceMemoryLimitDecrease")
+    def allow_in_place_memory_limit_decrease(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        return pulumi.get(self, "allow_in_place_memory_limit_decrease")
+
+    @allow_in_place_memory_limit_decrease.setter
+    def allow_in_place_memory_limit_decrease(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "allow_in_place_memory_limit_decrease", value)
+
+    @_builtins.property
     @pulumi.getter(name="cooldownMinutes")
     def cooldown_minutes(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
@@ -165,6 +234,42 @@ class WorkloadPolicyArgs:
     @cooldown_minutes.setter
     def cooldown_minutes(self, value: Optional[pulumi.Input[_builtins.int]]):
         pulumi.set(self, "cooldown_minutes", value)
+
+    @_builtins.property
+    @pulumi.getter(name="cpuCeilingPercent")
+    def cpu_ceiling_percent(self) -> Optional[pulumi.Input[_builtins.int]]:
+        return pulumi.get(self, "cpu_ceiling_percent")
+
+    @cpu_ceiling_percent.setter
+    def cpu_ceiling_percent(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "cpu_ceiling_percent", value)
+
+    @_builtins.property
+    @pulumi.getter(name="cpuFloorPercent")
+    def cpu_floor_percent(self) -> Optional[pulumi.Input[_builtins.int]]:
+        return pulumi.get(self, "cpu_floor_percent")
+
+    @cpu_floor_percent.setter
+    def cpu_floor_percent(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "cpu_floor_percent", value)
+
+    @_builtins.property
+    @pulumi.getter(name="cpuLimitCeilingPercent")
+    def cpu_limit_ceiling_percent(self) -> Optional[pulumi.Input[_builtins.int]]:
+        return pulumi.get(self, "cpu_limit_ceiling_percent")
+
+    @cpu_limit_ceiling_percent.setter
+    def cpu_limit_ceiling_percent(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "cpu_limit_ceiling_percent", value)
+
+    @_builtins.property
+    @pulumi.getter(name="cpuLimitFloorPercent")
+    def cpu_limit_floor_percent(self) -> Optional[pulumi.Input[_builtins.int]]:
+        return pulumi.get(self, "cpu_limit_floor_percent")
+
+    @cpu_limit_floor_percent.setter
+    def cpu_limit_floor_percent(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "cpu_limit_floor_percent", value)
 
     @_builtins.property
     @pulumi.getter(name="cpuVerticalScaling")
@@ -236,6 +341,15 @@ class WorkloadPolicyArgs:
         pulumi.set(self, "drift_delta_percent", value)
 
     @_builtins.property
+    @pulumi.getter(name="enableInPlaceVerticalScaling")
+    def enable_in_place_vertical_scaling(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        return pulumi.get(self, "enable_in_place_vertical_scaling")
+
+    @enable_in_place_vertical_scaling.setter
+    def enable_in_place_vertical_scaling(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "enable_in_place_vertical_scaling", value)
+
+    @_builtins.property
     @pulumi.getter(name="enablePmaxProtection")
     def enable_pmax_protection(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
@@ -293,6 +407,87 @@ class WorkloadPolicyArgs:
         pulumi.set(self, "hysteresis_vs_target", value)
 
     @_builtins.property
+    @pulumi.getter(name="jvmCpuStartupFloorMillicores")
+    def jvm_cpu_startup_floor_millicores(self) -> Optional[pulumi.Input[_builtins.int]]:
+        return pulumi.get(self, "jvm_cpu_startup_floor_millicores")
+
+    @jvm_cpu_startup_floor_millicores.setter
+    def jvm_cpu_startup_floor_millicores(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "jvm_cpu_startup_floor_millicores", value)
+
+    @_builtins.property
+    @pulumi.getter(name="jvmHeapHeadroomMultiplier")
+    def jvm_heap_headroom_multiplier(self) -> Optional[pulumi.Input[_builtins.float]]:
+        return pulumi.get(self, "jvm_heap_headroom_multiplier")
+
+    @jvm_heap_headroom_multiplier.setter
+    def jvm_heap_headroom_multiplier(self, value: Optional[pulumi.Input[_builtins.float]]):
+        pulumi.set(self, "jvm_heap_headroom_multiplier", value)
+
+    @_builtins.property
+    @pulumi.getter(name="jvmHeapOptimizationEnabled")
+    def jvm_heap_optimization_enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        return pulumi.get(self, "jvm_heap_optimization_enabled")
+
+    @jvm_heap_optimization_enabled.setter
+    def jvm_heap_optimization_enabled(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "jvm_heap_optimization_enabled", value)
+
+    @_builtins.property
+    @pulumi.getter(name="jvmHeapTargetPercentile")
+    def jvm_heap_target_percentile(self) -> Optional[pulumi.Input[_builtins.float]]:
+        return pulumi.get(self, "jvm_heap_target_percentile")
+
+    @jvm_heap_target_percentile.setter
+    def jvm_heap_target_percentile(self, value: Optional[pulumi.Input[_builtins.float]]):
+        pulumi.set(self, "jvm_heap_target_percentile", value)
+
+    @_builtins.property
+    @pulumi.getter(name="jvmMaxHeapBytes")
+    def jvm_max_heap_bytes(self) -> Optional[pulumi.Input[_builtins.int]]:
+        return pulumi.get(self, "jvm_max_heap_bytes")
+
+    @jvm_max_heap_bytes.setter
+    def jvm_max_heap_bytes(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "jvm_max_heap_bytes", value)
+
+    @_builtins.property
+    @pulumi.getter(name="jvmMinHeapBytes")
+    def jvm_min_heap_bytes(self) -> Optional[pulumi.Input[_builtins.int]]:
+        return pulumi.get(self, "jvm_min_heap_bytes")
+
+    @jvm_min_heap_bytes.setter
+    def jvm_min_heap_bytes(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "jvm_min_heap_bytes", value)
+
+    @_builtins.property
+    @pulumi.getter(name="jvmNonHeapOverheadBytes")
+    def jvm_non_heap_overhead_bytes(self) -> Optional[pulumi.Input[_builtins.int]]:
+        return pulumi.get(self, "jvm_non_heap_overhead_bytes")
+
+    @jvm_non_heap_overhead_bytes.setter
+    def jvm_non_heap_overhead_bytes(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "jvm_non_heap_overhead_bytes", value)
+
+    @_builtins.property
+    @pulumi.getter(name="jvmNonHeapOverheadPercent")
+    def jvm_non_heap_overhead_percent(self) -> Optional[pulumi.Input[_builtins.float]]:
+        return pulumi.get(self, "jvm_non_heap_overhead_percent")
+
+    @jvm_non_heap_overhead_percent.setter
+    def jvm_non_heap_overhead_percent(self, value: Optional[pulumi.Input[_builtins.float]]):
+        pulumi.set(self, "jvm_non_heap_overhead_percent", value)
+
+    @_builtins.property
+    @pulumi.getter(name="jvmPreferContainerSupport")
+    def jvm_prefer_container_support(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        return pulumi.get(self, "jvm_prefer_container_support")
+
+    @jvm_prefer_container_support.setter
+    def jvm_prefer_container_support(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "jvm_prefer_container_support", value)
+
+    @_builtins.property
     @pulumi.getter(name="liveMigrationEnabled")
     def live_migration_enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
@@ -315,6 +510,42 @@ class WorkloadPolicyArgs:
     @loopback_period_seconds.setter
     def loopback_period_seconds(self, value: Optional[pulumi.Input[_builtins.int]]):
         pulumi.set(self, "loopback_period_seconds", value)
+
+    @_builtins.property
+    @pulumi.getter(name="memoryCeilingPercent")
+    def memory_ceiling_percent(self) -> Optional[pulumi.Input[_builtins.int]]:
+        return pulumi.get(self, "memory_ceiling_percent")
+
+    @memory_ceiling_percent.setter
+    def memory_ceiling_percent(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "memory_ceiling_percent", value)
+
+    @_builtins.property
+    @pulumi.getter(name="memoryFloorPercent")
+    def memory_floor_percent(self) -> Optional[pulumi.Input[_builtins.int]]:
+        return pulumi.get(self, "memory_floor_percent")
+
+    @memory_floor_percent.setter
+    def memory_floor_percent(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "memory_floor_percent", value)
+
+    @_builtins.property
+    @pulumi.getter(name="memoryLimitCeilingPercent")
+    def memory_limit_ceiling_percent(self) -> Optional[pulumi.Input[_builtins.int]]:
+        return pulumi.get(self, "memory_limit_ceiling_percent")
+
+    @memory_limit_ceiling_percent.setter
+    def memory_limit_ceiling_percent(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "memory_limit_ceiling_percent", value)
+
+    @_builtins.property
+    @pulumi.getter(name="memoryLimitFloorPercent")
+    def memory_limit_floor_percent(self) -> Optional[pulumi.Input[_builtins.int]]:
+        return pulumi.get(self, "memory_limit_floor_percent")
+
+    @memory_limit_floor_percent.setter
+    def memory_limit_floor_percent(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "memory_limit_floor_percent", value)
 
     @_builtins.property
     @pulumi.getter(name="memoryVerticalScaling")
@@ -360,6 +591,15 @@ class WorkloadPolicyArgs:
     @min_vpa_window_data_points.setter
     def min_vpa_window_data_points(self, value: Optional[pulumi.Input[_builtins.int]]):
         pulumi.set(self, "min_vpa_window_data_points", value)
+
+    @_builtins.property
+    @pulumi.getter(name="pdbEnabled")
+    def pdb_enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        return pulumi.get(self, "pdb_enabled")
+
+    @pdb_enabled.setter
+    def pdb_enabled(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "pdb_enabled", value)
 
     @_builtins.property
     @pulumi.getter(name="pmaxRatioThreshold")
@@ -417,25 +657,45 @@ class WorkloadPolicy(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  action_triggers: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 allow_in_place_memory_limit_decrease: Optional[pulumi.Input[_builtins.bool]] = None,
                  cooldown_minutes: Optional[pulumi.Input[_builtins.int]] = None,
+                 cpu_ceiling_percent: Optional[pulumi.Input[_builtins.int]] = None,
+                 cpu_floor_percent: Optional[pulumi.Input[_builtins.int]] = None,
+                 cpu_limit_ceiling_percent: Optional[pulumi.Input[_builtins.int]] = None,
+                 cpu_limit_floor_percent: Optional[pulumi.Input[_builtins.int]] = None,
                  cpu_vertical_scaling: Optional[pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']]] = None,
                  cron_schedule: Optional[pulumi.Input[_builtins.str]] = None,
                  defragmentation_schedule: Optional[pulumi.Input[_builtins.str]] = None,
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  detection_triggers: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  drift_delta_percent: Optional[pulumi.Input[_builtins.float]] = None,
+                 enable_in_place_vertical_scaling: Optional[pulumi.Input[_builtins.bool]] = None,
                  enable_pmax_protection: Optional[pulumi.Input[_builtins.bool]] = None,
                  gpu_vertical_scaling: Optional[pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']]] = None,
                  gpu_vram_vertical_scaling: Optional[pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']]] = None,
                  horizontal_scaling: Optional[pulumi.Input[Union['HorizontalScalingArgsArgs', 'HorizontalScalingArgsArgsDict']]] = None,
                  hysteresis_vs_target: Optional[pulumi.Input[_builtins.float]] = None,
+                 jvm_cpu_startup_floor_millicores: Optional[pulumi.Input[_builtins.int]] = None,
+                 jvm_heap_headroom_multiplier: Optional[pulumi.Input[_builtins.float]] = None,
+                 jvm_heap_optimization_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
+                 jvm_heap_target_percentile: Optional[pulumi.Input[_builtins.float]] = None,
+                 jvm_max_heap_bytes: Optional[pulumi.Input[_builtins.int]] = None,
+                 jvm_min_heap_bytes: Optional[pulumi.Input[_builtins.int]] = None,
+                 jvm_non_heap_overhead_bytes: Optional[pulumi.Input[_builtins.int]] = None,
+                 jvm_non_heap_overhead_percent: Optional[pulumi.Input[_builtins.float]] = None,
+                 jvm_prefer_container_support: Optional[pulumi.Input[_builtins.bool]] = None,
                  live_migration_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
                  loopback_period_seconds: Optional[pulumi.Input[_builtins.int]] = None,
+                 memory_ceiling_percent: Optional[pulumi.Input[_builtins.int]] = None,
+                 memory_floor_percent: Optional[pulumi.Input[_builtins.int]] = None,
+                 memory_limit_ceiling_percent: Optional[pulumi.Input[_builtins.int]] = None,
+                 memory_limit_floor_percent: Optional[pulumi.Input[_builtins.int]] = None,
                  memory_vertical_scaling: Optional[pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']]] = None,
                  min_change_percent: Optional[pulumi.Input[_builtins.float]] = None,
                  min_data_points: Optional[pulumi.Input[_builtins.int]] = None,
                  min_vpa_window_data_points: Optional[pulumi.Input[_builtins.int]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
+                 pdb_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
                  pmax_ratio_threshold: Optional[pulumi.Input[_builtins.float]] = None,
                  scheduler_plugins: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  stability_cv_max: Optional[pulumi.Input[_builtins.float]] = None,
@@ -493,25 +753,45 @@ class WorkloadPolicy(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  action_triggers: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 allow_in_place_memory_limit_decrease: Optional[pulumi.Input[_builtins.bool]] = None,
                  cooldown_minutes: Optional[pulumi.Input[_builtins.int]] = None,
+                 cpu_ceiling_percent: Optional[pulumi.Input[_builtins.int]] = None,
+                 cpu_floor_percent: Optional[pulumi.Input[_builtins.int]] = None,
+                 cpu_limit_ceiling_percent: Optional[pulumi.Input[_builtins.int]] = None,
+                 cpu_limit_floor_percent: Optional[pulumi.Input[_builtins.int]] = None,
                  cpu_vertical_scaling: Optional[pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']]] = None,
                  cron_schedule: Optional[pulumi.Input[_builtins.str]] = None,
                  defragmentation_schedule: Optional[pulumi.Input[_builtins.str]] = None,
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  detection_triggers: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  drift_delta_percent: Optional[pulumi.Input[_builtins.float]] = None,
+                 enable_in_place_vertical_scaling: Optional[pulumi.Input[_builtins.bool]] = None,
                  enable_pmax_protection: Optional[pulumi.Input[_builtins.bool]] = None,
                  gpu_vertical_scaling: Optional[pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']]] = None,
                  gpu_vram_vertical_scaling: Optional[pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']]] = None,
                  horizontal_scaling: Optional[pulumi.Input[Union['HorizontalScalingArgsArgs', 'HorizontalScalingArgsArgsDict']]] = None,
                  hysteresis_vs_target: Optional[pulumi.Input[_builtins.float]] = None,
+                 jvm_cpu_startup_floor_millicores: Optional[pulumi.Input[_builtins.int]] = None,
+                 jvm_heap_headroom_multiplier: Optional[pulumi.Input[_builtins.float]] = None,
+                 jvm_heap_optimization_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
+                 jvm_heap_target_percentile: Optional[pulumi.Input[_builtins.float]] = None,
+                 jvm_max_heap_bytes: Optional[pulumi.Input[_builtins.int]] = None,
+                 jvm_min_heap_bytes: Optional[pulumi.Input[_builtins.int]] = None,
+                 jvm_non_heap_overhead_bytes: Optional[pulumi.Input[_builtins.int]] = None,
+                 jvm_non_heap_overhead_percent: Optional[pulumi.Input[_builtins.float]] = None,
+                 jvm_prefer_container_support: Optional[pulumi.Input[_builtins.bool]] = None,
                  live_migration_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
                  loopback_period_seconds: Optional[pulumi.Input[_builtins.int]] = None,
+                 memory_ceiling_percent: Optional[pulumi.Input[_builtins.int]] = None,
+                 memory_floor_percent: Optional[pulumi.Input[_builtins.int]] = None,
+                 memory_limit_ceiling_percent: Optional[pulumi.Input[_builtins.int]] = None,
+                 memory_limit_floor_percent: Optional[pulumi.Input[_builtins.int]] = None,
                  memory_vertical_scaling: Optional[pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']]] = None,
                  min_change_percent: Optional[pulumi.Input[_builtins.float]] = None,
                  min_data_points: Optional[pulumi.Input[_builtins.int]] = None,
                  min_vpa_window_data_points: Optional[pulumi.Input[_builtins.int]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
+                 pdb_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
                  pmax_ratio_threshold: Optional[pulumi.Input[_builtins.float]] = None,
                  scheduler_plugins: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  stability_cv_max: Optional[pulumi.Input[_builtins.float]] = None,
@@ -526,24 +806,43 @@ class WorkloadPolicy(pulumi.CustomResource):
             __props__ = WorkloadPolicyArgs.__new__(WorkloadPolicyArgs)
 
             __props__.__dict__["action_triggers"] = action_triggers
+            __props__.__dict__["allow_in_place_memory_limit_decrease"] = allow_in_place_memory_limit_decrease
             if cooldown_minutes is None:
                 cooldown_minutes = 300
             __props__.__dict__["cooldown_minutes"] = cooldown_minutes
+            __props__.__dict__["cpu_ceiling_percent"] = cpu_ceiling_percent
+            __props__.__dict__["cpu_floor_percent"] = cpu_floor_percent
+            __props__.__dict__["cpu_limit_ceiling_percent"] = cpu_limit_ceiling_percent
+            __props__.__dict__["cpu_limit_floor_percent"] = cpu_limit_floor_percent
             __props__.__dict__["cpu_vertical_scaling"] = cpu_vertical_scaling
             __props__.__dict__["cron_schedule"] = cron_schedule
             __props__.__dict__["defragmentation_schedule"] = defragmentation_schedule
             __props__.__dict__["description"] = description
             __props__.__dict__["detection_triggers"] = detection_triggers
             __props__.__dict__["drift_delta_percent"] = drift_delta_percent
+            __props__.__dict__["enable_in_place_vertical_scaling"] = enable_in_place_vertical_scaling
             __props__.__dict__["enable_pmax_protection"] = enable_pmax_protection
             __props__.__dict__["gpu_vertical_scaling"] = gpu_vertical_scaling
             __props__.__dict__["gpu_vram_vertical_scaling"] = gpu_vram_vertical_scaling
             __props__.__dict__["horizontal_scaling"] = horizontal_scaling
             __props__.__dict__["hysteresis_vs_target"] = hysteresis_vs_target
+            __props__.__dict__["jvm_cpu_startup_floor_millicores"] = jvm_cpu_startup_floor_millicores
+            __props__.__dict__["jvm_heap_headroom_multiplier"] = jvm_heap_headroom_multiplier
+            __props__.__dict__["jvm_heap_optimization_enabled"] = jvm_heap_optimization_enabled
+            __props__.__dict__["jvm_heap_target_percentile"] = jvm_heap_target_percentile
+            __props__.__dict__["jvm_max_heap_bytes"] = jvm_max_heap_bytes
+            __props__.__dict__["jvm_min_heap_bytes"] = jvm_min_heap_bytes
+            __props__.__dict__["jvm_non_heap_overhead_bytes"] = jvm_non_heap_overhead_bytes
+            __props__.__dict__["jvm_non_heap_overhead_percent"] = jvm_non_heap_overhead_percent
+            __props__.__dict__["jvm_prefer_container_support"] = jvm_prefer_container_support
             __props__.__dict__["live_migration_enabled"] = live_migration_enabled
             if loopback_period_seconds is None:
                 loopback_period_seconds = 86400
             __props__.__dict__["loopback_period_seconds"] = loopback_period_seconds
+            __props__.__dict__["memory_ceiling_percent"] = memory_ceiling_percent
+            __props__.__dict__["memory_floor_percent"] = memory_floor_percent
+            __props__.__dict__["memory_limit_ceiling_percent"] = memory_limit_ceiling_percent
+            __props__.__dict__["memory_limit_floor_percent"] = memory_limit_floor_percent
             __props__.__dict__["memory_vertical_scaling"] = memory_vertical_scaling
             if min_change_percent is None:
                 min_change_percent = 0.2
@@ -557,6 +856,7 @@ class WorkloadPolicy(pulumi.CustomResource):
             if name is None and not opts.urn:
                 raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
+            __props__.__dict__["pdb_enabled"] = pdb_enabled
             if pmax_ratio_threshold is None:
                 pmax_ratio_threshold = 3
             __props__.__dict__["pmax_ratio_threshold"] = pmax_ratio_threshold
@@ -586,25 +886,45 @@ class WorkloadPolicy(pulumi.CustomResource):
         __props__ = WorkloadPolicyArgs.__new__(WorkloadPolicyArgs)
 
         __props__.__dict__["action_triggers"] = None
+        __props__.__dict__["allow_in_place_memory_limit_decrease"] = None
         __props__.__dict__["cooldown_minutes"] = None
+        __props__.__dict__["cpu_ceiling_percent"] = None
+        __props__.__dict__["cpu_floor_percent"] = None
+        __props__.__dict__["cpu_limit_ceiling_percent"] = None
+        __props__.__dict__["cpu_limit_floor_percent"] = None
         __props__.__dict__["cpu_vertical_scaling"] = None
         __props__.__dict__["cron_schedule"] = None
         __props__.__dict__["defragmentation_schedule"] = None
         __props__.__dict__["description"] = None
         __props__.__dict__["detection_triggers"] = None
         __props__.__dict__["drift_delta_percent"] = None
+        __props__.__dict__["enable_in_place_vertical_scaling"] = None
         __props__.__dict__["enable_pmax_protection"] = None
         __props__.__dict__["gpu_vertical_scaling"] = None
         __props__.__dict__["gpu_vram_vertical_scaling"] = None
         __props__.__dict__["horizontal_scaling"] = None
         __props__.__dict__["hysteresis_vs_target"] = None
+        __props__.__dict__["jvm_cpu_startup_floor_millicores"] = None
+        __props__.__dict__["jvm_heap_headroom_multiplier"] = None
+        __props__.__dict__["jvm_heap_optimization_enabled"] = None
+        __props__.__dict__["jvm_heap_target_percentile"] = None
+        __props__.__dict__["jvm_max_heap_bytes"] = None
+        __props__.__dict__["jvm_min_heap_bytes"] = None
+        __props__.__dict__["jvm_non_heap_overhead_bytes"] = None
+        __props__.__dict__["jvm_non_heap_overhead_percent"] = None
+        __props__.__dict__["jvm_prefer_container_support"] = None
         __props__.__dict__["live_migration_enabled"] = None
         __props__.__dict__["loopback_period_seconds"] = None
+        __props__.__dict__["memory_ceiling_percent"] = None
+        __props__.__dict__["memory_floor_percent"] = None
+        __props__.__dict__["memory_limit_ceiling_percent"] = None
+        __props__.__dict__["memory_limit_floor_percent"] = None
         __props__.__dict__["memory_vertical_scaling"] = None
         __props__.__dict__["min_change_percent"] = None
         __props__.__dict__["min_data_points"] = None
         __props__.__dict__["min_vpa_window_data_points"] = None
         __props__.__dict__["name"] = None
+        __props__.__dict__["pdb_enabled"] = None
         __props__.__dict__["pmax_ratio_threshold"] = None
         __props__.__dict__["scheduler_plugins"] = None
         __props__.__dict__["stability_cv_max"] = None
@@ -620,12 +940,37 @@ class WorkloadPolicy(pulumi.CustomResource):
         return pulumi.get(self, "action_triggers")
 
     @_builtins.property
+    @pulumi.getter(name="allowInPlaceMemoryLimitDecrease")
+    def allow_in_place_memory_limit_decrease(self) -> pulumi.Output[Optional[_builtins.bool]]:
+        return pulumi.get(self, "allow_in_place_memory_limit_decrease")
+
+    @_builtins.property
     @pulumi.getter(name="cooldownMinutes")
     def cooldown_minutes(self) -> pulumi.Output[Optional[_builtins.int]]:
         """
         Minimum minutes to wait between consecutive recommendation applications. Example: 300 (5 h, default).
         """
         return pulumi.get(self, "cooldown_minutes")
+
+    @_builtins.property
+    @pulumi.getter(name="cpuCeilingPercent")
+    def cpu_ceiling_percent(self) -> pulumi.Output[Optional[_builtins.int]]:
+        return pulumi.get(self, "cpu_ceiling_percent")
+
+    @_builtins.property
+    @pulumi.getter(name="cpuFloorPercent")
+    def cpu_floor_percent(self) -> pulumi.Output[Optional[_builtins.int]]:
+        return pulumi.get(self, "cpu_floor_percent")
+
+    @_builtins.property
+    @pulumi.getter(name="cpuLimitCeilingPercent")
+    def cpu_limit_ceiling_percent(self) -> pulumi.Output[Optional[_builtins.int]]:
+        return pulumi.get(self, "cpu_limit_ceiling_percent")
+
+    @_builtins.property
+    @pulumi.getter(name="cpuLimitFloorPercent")
+    def cpu_limit_floor_percent(self) -> pulumi.Output[Optional[_builtins.int]]:
+        return pulumi.get(self, "cpu_limit_floor_percent")
 
     @_builtins.property
     @pulumi.getter(name="cpuVerticalScaling")
@@ -673,6 +1018,11 @@ class WorkloadPolicy(pulumi.CustomResource):
         return pulumi.get(self, "drift_delta_percent")
 
     @_builtins.property
+    @pulumi.getter(name="enableInPlaceVerticalScaling")
+    def enable_in_place_vertical_scaling(self) -> pulumi.Output[Optional[_builtins.bool]]:
+        return pulumi.get(self, "enable_in_place_vertical_scaling")
+
+    @_builtins.property
     @pulumi.getter(name="enablePmaxProtection")
     def enable_pmax_protection(self) -> pulumi.Output[Optional[_builtins.bool]]:
         """
@@ -710,6 +1060,51 @@ class WorkloadPolicy(pulumi.CustomResource):
         return pulumi.get(self, "hysteresis_vs_target")
 
     @_builtins.property
+    @pulumi.getter(name="jvmCpuStartupFloorMillicores")
+    def jvm_cpu_startup_floor_millicores(self) -> pulumi.Output[Optional[_builtins.int]]:
+        return pulumi.get(self, "jvm_cpu_startup_floor_millicores")
+
+    @_builtins.property
+    @pulumi.getter(name="jvmHeapHeadroomMultiplier")
+    def jvm_heap_headroom_multiplier(self) -> pulumi.Output[Optional[_builtins.float]]:
+        return pulumi.get(self, "jvm_heap_headroom_multiplier")
+
+    @_builtins.property
+    @pulumi.getter(name="jvmHeapOptimizationEnabled")
+    def jvm_heap_optimization_enabled(self) -> pulumi.Output[Optional[_builtins.bool]]:
+        return pulumi.get(self, "jvm_heap_optimization_enabled")
+
+    @_builtins.property
+    @pulumi.getter(name="jvmHeapTargetPercentile")
+    def jvm_heap_target_percentile(self) -> pulumi.Output[Optional[_builtins.float]]:
+        return pulumi.get(self, "jvm_heap_target_percentile")
+
+    @_builtins.property
+    @pulumi.getter(name="jvmMaxHeapBytes")
+    def jvm_max_heap_bytes(self) -> pulumi.Output[Optional[_builtins.int]]:
+        return pulumi.get(self, "jvm_max_heap_bytes")
+
+    @_builtins.property
+    @pulumi.getter(name="jvmMinHeapBytes")
+    def jvm_min_heap_bytes(self) -> pulumi.Output[Optional[_builtins.int]]:
+        return pulumi.get(self, "jvm_min_heap_bytes")
+
+    @_builtins.property
+    @pulumi.getter(name="jvmNonHeapOverheadBytes")
+    def jvm_non_heap_overhead_bytes(self) -> pulumi.Output[Optional[_builtins.int]]:
+        return pulumi.get(self, "jvm_non_heap_overhead_bytes")
+
+    @_builtins.property
+    @pulumi.getter(name="jvmNonHeapOverheadPercent")
+    def jvm_non_heap_overhead_percent(self) -> pulumi.Output[Optional[_builtins.float]]:
+        return pulumi.get(self, "jvm_non_heap_overhead_percent")
+
+    @_builtins.property
+    @pulumi.getter(name="jvmPreferContainerSupport")
+    def jvm_prefer_container_support(self) -> pulumi.Output[Optional[_builtins.bool]]:
+        return pulumi.get(self, "jvm_prefer_container_support")
+
+    @_builtins.property
     @pulumi.getter(name="liveMigrationEnabled")
     def live_migration_enabled(self) -> pulumi.Output[Optional[_builtins.bool]]:
         """
@@ -724,6 +1119,26 @@ class WorkloadPolicy(pulumi.CustomResource):
         Seconds of historical usage data considered per recommendation. Example: 86400 (24 h, default).
         """
         return pulumi.get(self, "loopback_period_seconds")
+
+    @_builtins.property
+    @pulumi.getter(name="memoryCeilingPercent")
+    def memory_ceiling_percent(self) -> pulumi.Output[Optional[_builtins.int]]:
+        return pulumi.get(self, "memory_ceiling_percent")
+
+    @_builtins.property
+    @pulumi.getter(name="memoryFloorPercent")
+    def memory_floor_percent(self) -> pulumi.Output[Optional[_builtins.int]]:
+        return pulumi.get(self, "memory_floor_percent")
+
+    @_builtins.property
+    @pulumi.getter(name="memoryLimitCeilingPercent")
+    def memory_limit_ceiling_percent(self) -> pulumi.Output[Optional[_builtins.int]]:
+        return pulumi.get(self, "memory_limit_ceiling_percent")
+
+    @_builtins.property
+    @pulumi.getter(name="memoryLimitFloorPercent")
+    def memory_limit_floor_percent(self) -> pulumi.Output[Optional[_builtins.int]]:
+        return pulumi.get(self, "memory_limit_floor_percent")
 
     @_builtins.property
     @pulumi.getter(name="memoryVerticalScaling")
@@ -761,6 +1176,11 @@ class WorkloadPolicy(pulumi.CustomResource):
         Human-friendly name for the policy. Example: 'production-vpa-policy'.
         """
         return pulumi.get(self, "name")
+
+    @_builtins.property
+    @pulumi.getter(name="pdbEnabled")
+    def pdb_enabled(self) -> pulumi.Output[Optional[_builtins.bool]]:
+        return pulumi.get(self, "pdb_enabled")
 
     @_builtins.property
     @pulumi.getter(name="pmaxRatioThreshold")

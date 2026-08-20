@@ -15,7 +15,7 @@ import (
 type NodePolicyTarget struct {
 	pulumi.CustomResourceState
 
-	// Cluster IDs where this node policy applies.
+	// Cluster ID where this node policy applies. The API accepts at most one cluster per target; create one target per cluster.
 	ClusterIds pulumi.StringArrayOutput `pulumi:"clusterIds"`
 	// Free-form description of the target.
 	Description pulumi.StringPtrOutput `pulumi:"description"`
@@ -179,7 +179,7 @@ func (o NodePolicyTargetOutput) ToNodePolicyTargetOutputWithContext(ctx context.
 	return o
 }
 
-// Cluster IDs where this node policy applies.
+// Cluster ID where this node policy applies. The API accepts at most one cluster per target; create one target per cluster.
 func (o NodePolicyTargetOutput) ClusterIds() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *NodePolicyTarget) pulumi.StringArrayOutput { return v.ClusterIds }).(pulumi.StringArrayOutput)
 }
