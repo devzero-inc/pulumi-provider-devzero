@@ -148,7 +148,7 @@ func (w *WorkloadPolicyTarget) Read(ctx context.Context, req infer.ReadRequest[W
 
 	resp, err := cs.RecommendationClient.GetWorkloadPolicyTarget(ctx, getReq)
 	if err != nil {
-		if connect.CodeOf(err) == connect.CodeNotFound {
+		if isNotFound(err) {
 			// Deleted out of band — drop from state.
 			return infer.ReadResponse[WorkloadPolicyTargetArgs, WorkloadPolicyTargetState]{}, nil
 		}
@@ -210,7 +210,7 @@ func (w *WorkloadPolicyTarget) Delete(ctx context.Context, req infer.DeleteReque
 	deleteReq.Header().Set("Authorization", "Bearer "+cs.Token)
 
 	_, err := cs.RecommendationClient.DeleteWorkloadPolicyTarget(ctx, deleteReq)
-	if err != nil && connect.CodeOf(err) != connect.CodeNotFound {
+	if err != nil && !isNotFound(err) {
 		return infer.DeleteResponse{}, fmt.Errorf("DeleteWorkloadPolicyTarget: %w", err)
 	}
 	return infer.DeleteResponse{}, nil

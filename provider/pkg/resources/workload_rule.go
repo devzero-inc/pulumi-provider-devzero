@@ -297,7 +297,7 @@ func (w *WorkloadRule) Read(ctx context.Context, req infer.ReadRequest[WorkloadR
 		RuleId: req.ID,
 	}))
 	if err != nil {
-		if connect.CodeOf(err) == connect.CodeNotFound {
+		if isNotFound(err) {
 			// Deleted out of band — drop from state.
 			return infer.ReadResponse[WorkloadRuleArgs, WorkloadRuleState]{}, nil
 		}
@@ -415,7 +415,7 @@ func (w *WorkloadRule) Delete(ctx context.Context, req infer.DeleteRequest[Workl
 		TeamId: cs.TeamID,
 		RuleId: req.ID,
 	}))
-	if err != nil && connect.CodeOf(err) != connect.CodeNotFound {
+	if err != nil && !isNotFound(err) {
 		return infer.DeleteResponse{}, fmt.Errorf("DeleteWorkloadRule: %w", err)
 	}
 	return infer.DeleteResponse{}, nil
@@ -504,8 +504,7 @@ func ruleProtoToArgs(r *apiv1.WorkloadRule) WorkloadRuleArgs {
 		Containers:                containerRuleConfigsFromProto(r.Containers),
 	}
 	if r.Disabled {
-		v := true
-		a.Disabled = &v
+		a.Disabled = truePtr()
 	}
 	if r.LookbackPeriodSeconds != nil {
 		v := int(*r.LookbackPeriodSeconds)
@@ -623,19 +622,19 @@ func resourceRuleConfigFromProto(p *apiv1.ResourceRuleConfig) *ResourceRuleConfi
 		r.MaxRequest = &v
 	}
 	if p.LimitMultiplier != nil {
-		v := f32(*p.LimitMultiplier)
+		v := f32to64(*p.LimitMultiplier)
 		r.LimitMultiplier = &v
 	}
 	if p.TargetPercentile != nil {
-		v := f32(*p.TargetPercentile)
+		v := f32to64(*p.TargetPercentile)
 		r.TargetPercentile = &v
 	}
 	if p.MaxScaleUpPercent != nil {
-		v := f32(*p.MaxScaleUpPercent)
+		v := f32to64(*p.MaxScaleUpPercent)
 		r.MaxScaleUpPercent = &v
 	}
 	if p.MaxScaleDownPercent != nil {
-		v := f32(*p.MaxScaleDownPercent)
+		v := f32to64(*p.MaxScaleDownPercent)
 		r.MaxScaleDownPercent = &v
 	}
 	r.InitialRequest = int64PtrToIntPtr(p.InitialRequest)
@@ -703,7 +702,7 @@ func hpaRuleConfigFromProto(p *apiv1.HPARuleConfig) *HPARuleConfigArgs {
 		h.MaxReplicas = &v
 	}
 	if p.MaxReplicaChangePercent != nil {
-		v := f32(*p.MaxReplicaChangePercent)
+		v := f32to64(*p.MaxReplicaChangePercent)
 		h.MaxReplicaChangePercent = &v
 	}
 	if p.ScaleDownCooldownSeconds != nil {
@@ -877,12 +876,12 @@ func emergencyResponseFromProto(p *apiv1.EmergencyResponseConfig) *EmergencyResp
 	}
 	return &EmergencyResponseConfigArgs{
 		OomEnabled:              p.OomEnabled,
-		OomMemoryMultiplier:     f32(p.OomMemoryMultiplier),
+		OomMemoryMultiplier:     f32to64(p.OomMemoryMultiplier),
 		OomMaxReactions:         int(p.OomMaxReactions),
 		OomCooldownSeconds:      int(p.OomCooldownSeconds),
 		CpuThrottlingEnabled:    p.CpuThrottlingEnabled,
-		CpuThrottlingThreshold:  f32(p.CpuThrottlingThreshold),
-		CpuThrottlingMultiplier: f32(p.CpuThrottlingMultiplier),
+		CpuThrottlingThreshold:  f32to64(p.CpuThrottlingThreshold),
+		CpuThrottlingMultiplier: f32to64(p.CpuThrottlingMultiplier),
 	}
 }
 
@@ -968,11 +967,11 @@ func containerResourceConfigFromProto(p *apiv1.ContainerResourceConfig) *Resourc
 		r.MaxRequest = &v
 	}
 	if p.LimitMultiplier != nil {
-		v := f32(*p.LimitMultiplier)
+		v := f32to64(*p.LimitMultiplier)
 		r.LimitMultiplier = &v
 	}
 	if p.TargetPercentile != nil {
-		v := f32(*p.TargetPercentile)
+		v := f32to64(*p.TargetPercentile)
 		r.TargetPercentile = &v
 	}
 	r.RequestUseRss = p.RequestUseRss

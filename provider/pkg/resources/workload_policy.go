@@ -213,7 +213,7 @@ func (w *WorkloadPolicy) Read(ctx context.Context, req infer.ReadRequest[Workloa
 		PolicyId: req.ID,
 	}))
 	if err != nil {
-		if connect.CodeOf(err) == connect.CodeNotFound {
+		if isNotFound(err) {
 			// Deleted out of band — drop from state.
 			return infer.ReadResponse[WorkloadPolicyArgs, WorkloadPolicyState]{}, nil
 		}
@@ -272,7 +272,7 @@ func (w *WorkloadPolicy) Delete(ctx context.Context, req infer.DeleteRequest[Wor
 		TeamId:   cs.TeamID,
 		PolicyId: req.ID,
 	}))
-	if err != nil && connect.CodeOf(err) != connect.CodeNotFound {
+	if err != nil && !isNotFound(err) {
 		return infer.DeleteResponse{}, fmt.Errorf("DeleteWorkloadRecommendationPolicy: %w", err)
 	}
 	return infer.DeleteResponse{}, nil
@@ -412,7 +412,7 @@ func float32PtrToFloat64Ptr(v *float32) *float64 {
 	if v == nil {
 		return nil
 	}
-	x := f32(*v)
+	x := f32to64(*v)
 	return &x
 }
 
@@ -447,7 +447,7 @@ func protoToArgs(p *apiv1.WorkloadRecommendationPolicy) WorkloadPolicyArgs {
 		a.StartupPeriodSeconds = &v
 	}
 	if p.MinChangePercent != nil {
-		v := f32(*p.MinChangePercent)
+		v := f32to64(*p.MinChangePercent)
 		a.MinChangePercent = &v
 	}
 	if p.MinDataPoints != nil {
@@ -455,15 +455,15 @@ func protoToArgs(p *apiv1.WorkloadRecommendationPolicy) WorkloadPolicyArgs {
 		a.MinDataPoints = &v
 	}
 	if p.StabilityCvMax != nil {
-		v := f32(*p.StabilityCvMax)
+		v := f32to64(*p.StabilityCvMax)
 		a.StabilityCvMax = &v
 	}
 	if p.HysteresisVsTarget != nil {
-		v := f32(*p.HysteresisVsTarget)
+		v := f32to64(*p.HysteresisVsTarget)
 		a.HysteresisVsTarget = &v
 	}
 	if p.DriftDeltaPercent != nil {
-		v := f32(*p.DriftDeltaPercent)
+		v := f32to64(*p.DriftDeltaPercent)
 		a.DriftDeltaPercent = &v
 	}
 	if p.MinVpaWindowDataPoints != nil {
@@ -475,25 +475,21 @@ func protoToArgs(p *apiv1.WorkloadRecommendationPolicy) WorkloadPolicyArgs {
 		a.CooldownMinutes = &v
 	}
 	if p.EnablePmaxProtection {
-		v := true
-		a.EnablePmaxProtection = &v
+		a.EnablePmaxProtection = truePtr()
 	}
 	if p.PmaxRatioThreshold != nil {
-		v := f32(*p.PmaxRatioThreshold)
+		v := f32to64(*p.PmaxRatioThreshold)
 		a.PmaxRatioThreshold = &v
 	}
 
 	if p.EnableInPlaceVerticalScaling {
-		v := true
-		a.EnableInPlaceVerticalScaling = &v
+		a.EnableInPlaceVerticalScaling = truePtr()
 	}
 	if p.AllowInPlaceMemoryLimitDecrease {
-		v := true
-		a.AllowInPlaceMemoryLimitDecrease = &v
+		a.AllowInPlaceMemoryLimitDecrease = truePtr()
 	}
 	if p.PdbEnabled {
-		v := true
-		a.PdbEnabled = &v
+		a.PdbEnabled = truePtr()
 	}
 
 	a.CpuFloorPercent = int64PtrToIntPtr(p.CpuFloorPercent)
@@ -506,8 +502,7 @@ func protoToArgs(p *apiv1.WorkloadRecommendationPolicy) WorkloadPolicyArgs {
 	a.MemoryLimitCeilingPercent = int64PtrToIntPtr(p.MemoryLimitCeilingPercent)
 
 	if p.JvmHeapOptimizationEnabled {
-		v := true
-		a.JvmHeapOptimizationEnabled = &v
+		a.JvmHeapOptimizationEnabled = truePtr()
 	}
 	a.JvmHeapTargetPercentile = float32PtrToFloat64Ptr(p.JvmHeapTargetPercentile)
 	a.JvmHeapHeadroomMultiplier = float32PtrToFloat64Ptr(p.JvmHeapHeadroomMultiplier)
@@ -516,8 +511,7 @@ func protoToArgs(p *apiv1.WorkloadRecommendationPolicy) WorkloadPolicyArgs {
 	a.JvmMinHeapBytes = int64PtrToIntPtr(p.JvmMinHeapBytes)
 	a.JvmMaxHeapBytes = int64PtrToIntPtr(p.JvmMaxHeapBytes)
 	if p.JvmPreferContainerSupport {
-		v := true
-		a.JvmPreferContainerSupport = &v
+		a.JvmPreferContainerSupport = truePtr()
 	}
 	a.JvmCpuStartupFloorMillicores = int64PtrToIntPtr(p.JvmCpuStartupFloorMillicores)
 
@@ -655,26 +649,26 @@ func verticalScalingFromProto(t *apiv1.VerticalScalingOptimizationTarget) *Verti
 		v.MaxRequest = &x
 	}
 	if t.OverheadMultiplier != nil {
-		x := f32(*t.OverheadMultiplier)
+		x := f32to64(*t.OverheadMultiplier)
 		v.OverheadMultiplier = &x
 	}
 	if t.TargetPercentile != nil {
-		x := f32(*t.TargetPercentile)
+		x := f32to64(*t.TargetPercentile)
 		v.TargetPercentile = &x
 	}
 	if t.MaxScaleUpPercent != nil {
-		x := f32(*t.MaxScaleUpPercent)
+		x := f32to64(*t.MaxScaleUpPercent)
 		v.MaxScaleUpPercent = &x
 	}
 	if t.MaxScaleDownPercent != nil {
-		x := f32(*t.MaxScaleDownPercent)
+		x := f32to64(*t.MaxScaleDownPercent)
 		v.MaxScaleDownPercent = &x
 	}
 	if t.LimitsAdjustmentEnabled != nil {
 		v.LimitsAdjustmentEnabled = t.LimitsAdjustmentEnabled
 	}
 	if t.LimitMultiplier != nil {
-		x := f32(*t.LimitMultiplier)
+		x := f32to64(*t.LimitMultiplier)
 		v.LimitMultiplier = &x
 	}
 	if t.MinDataPoints != nil {
@@ -682,12 +676,10 @@ func verticalScalingFromProto(t *apiv1.VerticalScalingOptimizationTarget) *Verti
 		v.MinDataPoints = &x
 	}
 	if t.AdjustReqEvenIfNotSet {
-		adj := true
-		v.AdjustReqEvenIfNotSet = &adj
+		v.AdjustReqEvenIfNotSet = truePtr()
 	}
 	if t.LimitsRemovalEnabled {
-		lre := true
-		v.LimitsRemovalEnabled = &lre
+		v.LimitsRemovalEnabled = truePtr()
 	}
 	v.RequestUseRss = t.RequestUseRss
 	v.LimitUseRss = t.LimitUseRss
@@ -750,7 +742,7 @@ func horizontalScalingFromProto(t *apiv1.HorizontalScalingOptimizationTarget) *H
 		h.MaxReplicas = &x
 	}
 	if t.TargetUtilization != nil {
-		x := f32(*t.TargetUtilization)
+		x := f32to64(*t.TargetUtilization)
 		h.TargetUtilization = &x
 	}
 	if t.PrimaryMetric != nil {
@@ -761,7 +753,7 @@ func horizontalScalingFromProto(t *apiv1.HorizontalScalingOptimizationTarget) *H
 		h.MinDataPoints = &x
 	}
 	if t.MaxReplicaChangePercent != nil {
-		x := f32(*t.MaxReplicaChangePercent)
+		x := f32to64(*t.MaxReplicaChangePercent)
 		h.MaxReplicaChangePercent = &x
 	}
 	h.NetworkTargetThroughputBytesPerSec = int64PtrToIntPtr(t.NetworkTargetThroughputBytesPerSec)
@@ -818,11 +810,11 @@ func hpaMetricFromProto(m *apiv1.HPAMetricType) *string {
 	return &s
 }
 
-// f32(v) converts a float32 coming from the API into the float64 the Pulumi
+// f32to64(v) converts a float32 coming from the API into the float64 the Pulumi
 // SDKs use, picking the shortest decimal that round-trips (so a stored 0.7
 // comes back as 0.7, not 0.699999988079071 — which would show as a perpetual
 // diff after refresh).
-func f32(v float32) float64 {
+func f32to64(v float32) float64 {
 	f, _ := strconv.ParseFloat(strconv.FormatFloat(float64(v), 'g', -1, 32), 64)
 	return f
 }

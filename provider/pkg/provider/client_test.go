@@ -50,25 +50,25 @@ func TestRetryInterceptor_SuccessOnFirstAttempt(t *testing.T) {
 	}
 }
 
-// fakeIdempotentRequest wraps a connect request and reports a Get-style
+// fakeProcedureRequest wraps a connect request and reports a Get-style
 // procedure, since retryInterceptor only retries idempotent (read) RPCs.
-type fakeIdempotentRequest struct {
+type fakeProcedureRequest struct {
 	connect.AnyRequest
 	procedure string
 }
 
-func (f *fakeIdempotentRequest) Spec() connect.Spec {
+func (f *fakeProcedureRequest) Spec() connect.Spec {
 	return connect.Spec{Procedure: f.procedure}
 }
 
 func newIdempotentRequest() connect.AnyRequest {
 	req, _ := http.NewRequest(http.MethodPost, "http://example.com", nil)
-	return &fakeIdempotentRequest{AnyRequest: connect.NewRequest(req), procedure: "/api.v1.K8sService/GetCluster"}
+	return &fakeProcedureRequest{AnyRequest: connect.NewRequest(req), procedure: "/api.v1.K8sService/GetCluster"}
 }
 
 func newMutatingRequest() connect.AnyRequest {
 	req, _ := http.NewRequest(http.MethodPost, "http://example.com", nil)
-	return &fakeIdempotentRequest{AnyRequest: connect.NewRequest(req), procedure: "/api.v1.K8sRecommendationService/CreateNodePolicies"}
+	return &fakeProcedureRequest{AnyRequest: connect.NewRequest(req), procedure: "/api.v1.K8sRecommendationService/CreateNodePolicies"}
 }
 
 func TestRetryInterceptor_RetriesOnUnavailable(t *testing.T) {

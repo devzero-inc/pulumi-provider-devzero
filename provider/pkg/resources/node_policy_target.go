@@ -155,7 +155,7 @@ func (n *NodePolicyTarget) Delete(ctx context.Context, req infer.DeleteRequest[N
 	_, err := cs.RecommendationClient.UpdateNodePolicyTarget(ctx, connect.NewRequest(&apiv1.UpdateNodePolicyTargetRequest{
 		Target: target,
 	}))
-	if err != nil && connect.CodeOf(err) != connect.CodeNotFound {
+	if err != nil && !isNotFound(err) {
 		return infer.DeleteResponse{}, fmt.Errorf("disable node policy target on destroy: %w", err)
 	}
 	return infer.DeleteResponse{}, nil

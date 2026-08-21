@@ -77,7 +77,7 @@ func (c *Cluster) Read(ctx context.Context, req infer.ReadRequest[ClusterArgs, C
 		ClusterId: req.ID,
 	}))
 	if err != nil {
-		if connect.CodeOf(err) == connect.CodeNotFound {
+		if isNotFound(err) {
 			// Deleted out of band — drop from state.
 			return infer.ReadResponse[ClusterArgs, ClusterState]{}, nil
 		}
@@ -158,7 +158,7 @@ func (c *Cluster) Delete(ctx context.Context, req infer.DeleteRequest[ClusterSta
 		TeamId:    cs.TeamID,
 		ClusterId: req.ID,
 	}))
-	if err != nil && connect.CodeOf(err) != connect.CodeNotFound {
+	if err != nil && !isNotFound(err) {
 		return infer.DeleteResponse{}, fmt.Errorf("DeleteCluster: %w", err)
 	}
 	return infer.DeleteResponse{}, nil

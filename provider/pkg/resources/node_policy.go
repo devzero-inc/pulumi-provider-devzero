@@ -517,7 +517,7 @@ func (n *NodePolicy) Delete(ctx context.Context, req infer.DeleteRequest[NodePol
 		TeamId:   cs.TeamID,
 		PolicyId: req.ID,
 	}))
-	if err != nil && connect.CodeOf(err) != connect.CodeNotFound {
+	if err != nil && !isNotFound(err) {
 		return infer.DeleteResponse{}, fmt.Errorf("DeleteNodePolicy: %w", err)
 	}
 	return infer.DeleteResponse{}, nil

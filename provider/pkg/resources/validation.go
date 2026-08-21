@@ -4,7 +4,22 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+
+	"connectrpc.com/connect"
 )
+
+// isNotFound reports whether err is a connect NotFound — the shared shape for
+// "tolerate on delete, drop from state on read".
+func isNotFound(err error) bool {
+	return connect.CodeOf(err) == connect.CodeNotFound
+}
+
+// truePtr returns a *bool for proto-bool → optional-pointer read-backs where
+// only an explicit true should materialize.
+func truePtr() *bool {
+	v := true
+	return &v
+}
 
 // The DevZero API silently ignores unknown enum values (an unknown trigger is
 // dropped, an unknown kind becomes UNSPECIFIED and matches nothing), so the
