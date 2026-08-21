@@ -26,6 +26,7 @@ class NodePolicyArgs:
                  aws: Optional[pulumi.Input['AWSNodeClassSpecArgsArgs']] = None,
                  azure: Optional[pulumi.Input['AzureNodeClassSpecArgsArgs']] = None,
                  capacity_types: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
+                 cloud_provider_id: Optional[pulumi.Input[_builtins.int]] = None,
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  disruption: Optional[pulumi.Input['DisruptionPolicyArgsArgs']] = None,
                  instance_categories: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
@@ -33,16 +34,20 @@ class NodePolicyArgs:
                  instance_families: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
                  instance_generations: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
                  instance_hypervisors: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
+                 instance_local_nvme: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
                  instance_sizes: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
                  instance_types: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
                  labels: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  limits: Optional[pulumi.Input['ResourceLimitsArgsArgs']] = None,
+                 master_override_role_name: Optional[pulumi.Input[_builtins.str]] = None,
                  node_class_name: Optional[pulumi.Input[_builtins.str]] = None,
                  node_pool_name: Optional[pulumi.Input[_builtins.str]] = None,
                  operating_systems: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
                  raw: Optional[pulumi.Input[Sequence[pulumi.Input['RawKarpenterSpecArgsArgs']]]] = None,
+                 startup_taints: Optional[pulumi.Input[Sequence[pulumi.Input['TaintArgsArgs']]]] = None,
                  taints: Optional[pulumi.Input[Sequence[pulumi.Input['TaintArgsArgs']]]] = None,
                  weight: Optional[pulumi.Input[_builtins.int]] = None,
+                 zonal_shift: Optional[pulumi.Input['ZonalShiftConfigArgsArgs']] = None,
                  zones: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None):
         """
         The set of arguments for constructing a NodePolicy resource.
@@ -56,6 +61,8 @@ class NodePolicyArgs:
             pulumi.set(__self__, "azure", azure)
         if capacity_types is not None:
             pulumi.set(__self__, "capacity_types", capacity_types)
+        if cloud_provider_id is not None:
+            pulumi.set(__self__, "cloud_provider_id", cloud_provider_id)
         if description is not None:
             pulumi.set(__self__, "description", description)
         if disruption is not None:
@@ -70,6 +77,8 @@ class NodePolicyArgs:
             pulumi.set(__self__, "instance_generations", instance_generations)
         if instance_hypervisors is not None:
             pulumi.set(__self__, "instance_hypervisors", instance_hypervisors)
+        if instance_local_nvme is not None:
+            pulumi.set(__self__, "instance_local_nvme", instance_local_nvme)
         if instance_sizes is not None:
             pulumi.set(__self__, "instance_sizes", instance_sizes)
         if instance_types is not None:
@@ -78,6 +87,8 @@ class NodePolicyArgs:
             pulumi.set(__self__, "labels", labels)
         if limits is not None:
             pulumi.set(__self__, "limits", limits)
+        if master_override_role_name is not None:
+            pulumi.set(__self__, "master_override_role_name", master_override_role_name)
         if node_class_name is not None:
             pulumi.set(__self__, "node_class_name", node_class_name)
         if node_pool_name is not None:
@@ -86,10 +97,14 @@ class NodePolicyArgs:
             pulumi.set(__self__, "operating_systems", operating_systems)
         if raw is not None:
             pulumi.set(__self__, "raw", raw)
+        if startup_taints is not None:
+            pulumi.set(__self__, "startup_taints", startup_taints)
         if taints is not None:
             pulumi.set(__self__, "taints", taints)
         if weight is not None:
             pulumi.set(__self__, "weight", weight)
+        if zonal_shift is not None:
+            pulumi.set(__self__, "zonal_shift", zonal_shift)
         if zones is not None:
             pulumi.set(__self__, "zones", zones)
 
@@ -137,6 +152,15 @@ class NodePolicyArgs:
     @capacity_types.setter
     def capacity_types(self, value: Optional[pulumi.Input['LabelSelectorArgsArgs']]):
         pulumi.set(self, "capacity_types", value)
+
+    @_builtins.property
+    @pulumi.getter(name="cloudProviderId")
+    def cloud_provider_id(self) -> Optional[pulumi.Input[_builtins.int]]:
+        return pulumi.get(self, "cloud_provider_id")
+
+    @cloud_provider_id.setter
+    def cloud_provider_id(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "cloud_provider_id", value)
 
     @_builtins.property
     @pulumi.getter
@@ -202,6 +226,15 @@ class NodePolicyArgs:
         pulumi.set(self, "instance_hypervisors", value)
 
     @_builtins.property
+    @pulumi.getter(name="instanceLocalNvme")
+    def instance_local_nvme(self) -> Optional[pulumi.Input['LabelSelectorArgsArgs']]:
+        return pulumi.get(self, "instance_local_nvme")
+
+    @instance_local_nvme.setter
+    def instance_local_nvme(self, value: Optional[pulumi.Input['LabelSelectorArgsArgs']]):
+        pulumi.set(self, "instance_local_nvme", value)
+
+    @_builtins.property
     @pulumi.getter(name="instanceSizes")
     def instance_sizes(self) -> Optional[pulumi.Input['LabelSelectorArgsArgs']]:
         return pulumi.get(self, "instance_sizes")
@@ -236,6 +269,15 @@ class NodePolicyArgs:
     @limits.setter
     def limits(self, value: Optional[pulumi.Input['ResourceLimitsArgsArgs']]):
         pulumi.set(self, "limits", value)
+
+    @_builtins.property
+    @pulumi.getter(name="masterOverrideRoleName")
+    def master_override_role_name(self) -> Optional[pulumi.Input[_builtins.str]]:
+        return pulumi.get(self, "master_override_role_name")
+
+    @master_override_role_name.setter
+    def master_override_role_name(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "master_override_role_name", value)
 
     @_builtins.property
     @pulumi.getter(name="nodeClassName")
@@ -274,6 +316,15 @@ class NodePolicyArgs:
         pulumi.set(self, "raw", value)
 
     @_builtins.property
+    @pulumi.getter(name="startupTaints")
+    def startup_taints(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['TaintArgsArgs']]]]:
+        return pulumi.get(self, "startup_taints")
+
+    @startup_taints.setter
+    def startup_taints(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['TaintArgsArgs']]]]):
+        pulumi.set(self, "startup_taints", value)
+
+    @_builtins.property
     @pulumi.getter
     def taints(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['TaintArgsArgs']]]]:
         return pulumi.get(self, "taints")
@@ -290,6 +341,15 @@ class NodePolicyArgs:
     @weight.setter
     def weight(self, value: Optional[pulumi.Input[_builtins.int]]):
         pulumi.set(self, "weight", value)
+
+    @_builtins.property
+    @pulumi.getter(name="zonalShift")
+    def zonal_shift(self) -> Optional[pulumi.Input['ZonalShiftConfigArgsArgs']]:
+        return pulumi.get(self, "zonal_shift")
+
+    @zonal_shift.setter
+    def zonal_shift(self, value: Optional[pulumi.Input['ZonalShiftConfigArgsArgs']]):
+        pulumi.set(self, "zonal_shift", value)
 
     @_builtins.property
     @pulumi.getter
@@ -311,6 +371,7 @@ class NodePolicy(pulumi.CustomResource):
                  aws: Optional[pulumi.Input[Union['AWSNodeClassSpecArgsArgs', 'AWSNodeClassSpecArgsArgsDict']]] = None,
                  azure: Optional[pulumi.Input[Union['AzureNodeClassSpecArgsArgs', 'AzureNodeClassSpecArgsArgsDict']]] = None,
                  capacity_types: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
+                 cloud_provider_id: Optional[pulumi.Input[_builtins.int]] = None,
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  disruption: Optional[pulumi.Input[Union['DisruptionPolicyArgsArgs', 'DisruptionPolicyArgsArgsDict']]] = None,
                  instance_categories: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
@@ -318,17 +379,21 @@ class NodePolicy(pulumi.CustomResource):
                  instance_families: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_generations: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_hypervisors: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
+                 instance_local_nvme: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_sizes: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_types: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  labels: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  limits: Optional[pulumi.Input[Union['ResourceLimitsArgsArgs', 'ResourceLimitsArgsArgsDict']]] = None,
+                 master_override_role_name: Optional[pulumi.Input[_builtins.str]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  node_class_name: Optional[pulumi.Input[_builtins.str]] = None,
                  node_pool_name: Optional[pulumi.Input[_builtins.str]] = None,
                  operating_systems: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  raw: Optional[pulumi.Input[Sequence[pulumi.Input[Union['RawKarpenterSpecArgsArgs', 'RawKarpenterSpecArgsArgsDict']]]]] = None,
+                 startup_taints: Optional[pulumi.Input[Sequence[pulumi.Input[Union['TaintArgsArgs', 'TaintArgsArgsDict']]]]] = None,
                  taints: Optional[pulumi.Input[Sequence[pulumi.Input[Union['TaintArgsArgs', 'TaintArgsArgsDict']]]]] = None,
                  weight: Optional[pulumi.Input[_builtins.int]] = None,
+                 zonal_shift: Optional[pulumi.Input[Union['ZonalShiftConfigArgsArgs', 'ZonalShiftConfigArgsArgsDict']]] = None,
                  zones: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  __props__=None):
         """
@@ -365,6 +430,7 @@ class NodePolicy(pulumi.CustomResource):
                  aws: Optional[pulumi.Input[Union['AWSNodeClassSpecArgsArgs', 'AWSNodeClassSpecArgsArgsDict']]] = None,
                  azure: Optional[pulumi.Input[Union['AzureNodeClassSpecArgsArgs', 'AzureNodeClassSpecArgsArgsDict']]] = None,
                  capacity_types: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
+                 cloud_provider_id: Optional[pulumi.Input[_builtins.int]] = None,
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  disruption: Optional[pulumi.Input[Union['DisruptionPolicyArgsArgs', 'DisruptionPolicyArgsArgsDict']]] = None,
                  instance_categories: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
@@ -372,17 +438,21 @@ class NodePolicy(pulumi.CustomResource):
                  instance_families: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_generations: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_hypervisors: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
+                 instance_local_nvme: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_sizes: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_types: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  labels: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  limits: Optional[pulumi.Input[Union['ResourceLimitsArgsArgs', 'ResourceLimitsArgsArgsDict']]] = None,
+                 master_override_role_name: Optional[pulumi.Input[_builtins.str]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  node_class_name: Optional[pulumi.Input[_builtins.str]] = None,
                  node_pool_name: Optional[pulumi.Input[_builtins.str]] = None,
                  operating_systems: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  raw: Optional[pulumi.Input[Sequence[pulumi.Input[Union['RawKarpenterSpecArgsArgs', 'RawKarpenterSpecArgsArgsDict']]]]] = None,
+                 startup_taints: Optional[pulumi.Input[Sequence[pulumi.Input[Union['TaintArgsArgs', 'TaintArgsArgsDict']]]]] = None,
                  taints: Optional[pulumi.Input[Sequence[pulumi.Input[Union['TaintArgsArgs', 'TaintArgsArgsDict']]]]] = None,
                  weight: Optional[pulumi.Input[_builtins.int]] = None,
+                 zonal_shift: Optional[pulumi.Input[Union['ZonalShiftConfigArgsArgs', 'ZonalShiftConfigArgsArgsDict']]] = None,
                  zones: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
@@ -397,6 +467,7 @@ class NodePolicy(pulumi.CustomResource):
             __props__.__dict__["aws"] = aws
             __props__.__dict__["azure"] = azure
             __props__.__dict__["capacity_types"] = capacity_types
+            __props__.__dict__["cloud_provider_id"] = cloud_provider_id
             __props__.__dict__["description"] = description
             __props__.__dict__["disruption"] = disruption
             __props__.__dict__["instance_categories"] = instance_categories
@@ -404,10 +475,12 @@ class NodePolicy(pulumi.CustomResource):
             __props__.__dict__["instance_families"] = instance_families
             __props__.__dict__["instance_generations"] = instance_generations
             __props__.__dict__["instance_hypervisors"] = instance_hypervisors
+            __props__.__dict__["instance_local_nvme"] = instance_local_nvme
             __props__.__dict__["instance_sizes"] = instance_sizes
             __props__.__dict__["instance_types"] = instance_types
             __props__.__dict__["labels"] = labels
             __props__.__dict__["limits"] = limits
+            __props__.__dict__["master_override_role_name"] = master_override_role_name
             if name is None and not opts.urn:
                 raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
@@ -415,8 +488,10 @@ class NodePolicy(pulumi.CustomResource):
             __props__.__dict__["node_pool_name"] = node_pool_name
             __props__.__dict__["operating_systems"] = operating_systems
             __props__.__dict__["raw"] = raw
+            __props__.__dict__["startup_taints"] = startup_taints
             __props__.__dict__["taints"] = taints
             __props__.__dict__["weight"] = weight
+            __props__.__dict__["zonal_shift"] = zonal_shift
             __props__.__dict__["zones"] = zones
         super(NodePolicy, __self__).__init__(
             'devzero:resources:NodePolicy',
@@ -444,6 +519,7 @@ class NodePolicy(pulumi.CustomResource):
         __props__.__dict__["aws"] = None
         __props__.__dict__["azure"] = None
         __props__.__dict__["capacity_types"] = None
+        __props__.__dict__["cloud_provider_id"] = None
         __props__.__dict__["description"] = None
         __props__.__dict__["disruption"] = None
         __props__.__dict__["instance_categories"] = None
@@ -451,17 +527,21 @@ class NodePolicy(pulumi.CustomResource):
         __props__.__dict__["instance_families"] = None
         __props__.__dict__["instance_generations"] = None
         __props__.__dict__["instance_hypervisors"] = None
+        __props__.__dict__["instance_local_nvme"] = None
         __props__.__dict__["instance_sizes"] = None
         __props__.__dict__["instance_types"] = None
         __props__.__dict__["labels"] = None
         __props__.__dict__["limits"] = None
+        __props__.__dict__["master_override_role_name"] = None
         __props__.__dict__["name"] = None
         __props__.__dict__["node_class_name"] = None
         __props__.__dict__["node_pool_name"] = None
         __props__.__dict__["operating_systems"] = None
         __props__.__dict__["raw"] = None
+        __props__.__dict__["startup_taints"] = None
         __props__.__dict__["taints"] = None
         __props__.__dict__["weight"] = None
+        __props__.__dict__["zonal_shift"] = None
         __props__.__dict__["zones"] = None
         return NodePolicy(resource_name, opts=opts, __props__=__props__)
 
@@ -496,6 +576,11 @@ class NodePolicy(pulumi.CustomResource):
         Capacity purchasing types. Valid values: 'spot', 'on-demand', 'reserved'. Example: {in: ["spot", "on-demand"]}.
         """
         return pulumi.get(self, "capacity_types")
+
+    @_builtins.property
+    @pulumi.getter(name="cloudProviderId")
+    def cloud_provider_id(self) -> pulumi.Output[Optional[_builtins.int]]:
+        return pulumi.get(self, "cloud_provider_id")
 
     @_builtins.property
     @pulumi.getter
@@ -554,6 +639,11 @@ class NodePolicy(pulumi.CustomResource):
         return pulumi.get(self, "instance_hypervisors")
 
     @_builtins.property
+    @pulumi.getter(name="instanceLocalNvme")
+    def instance_local_nvme(self) -> pulumi.Output[Optional['outputs.LabelSelectorArgs']]:
+        return pulumi.get(self, "instance_local_nvme")
+
+    @_builtins.property
     @pulumi.getter(name="instanceSizes")
     def instance_sizes(self) -> pulumi.Output[Optional['outputs.LabelSelectorArgs']]:
         """
@@ -584,6 +674,11 @@ class NodePolicy(pulumi.CustomResource):
         Resource limits on total capacity managed by this policy. Example: {cpu: "1000", memory: "1000Gi"}.
         """
         return pulumi.get(self, "limits")
+
+    @_builtins.property
+    @pulumi.getter(name="masterOverrideRoleName")
+    def master_override_role_name(self) -> pulumi.Output[Optional[_builtins.str]]:
+        return pulumi.get(self, "master_override_role_name")
 
     @_builtins.property
     @pulumi.getter
@@ -626,6 +721,11 @@ class NodePolicy(pulumi.CustomResource):
         return pulumi.get(self, "raw")
 
     @_builtins.property
+    @pulumi.getter(name="startupTaints")
+    def startup_taints(self) -> pulumi.Output[Optional[Sequence['outputs.TaintArgs']]]:
+        return pulumi.get(self, "startup_taints")
+
+    @_builtins.property
     @pulumi.getter
     def taints(self) -> pulumi.Output[Optional[Sequence['outputs.TaintArgs']]]:
         """
@@ -640,6 +740,11 @@ class NodePolicy(pulumi.CustomResource):
         Priority weight; higher values take precedence when multiple policies match. Example: 100.
         """
         return pulumi.get(self, "weight")
+
+    @_builtins.property
+    @pulumi.getter(name="zonalShift")
+    def zonal_shift(self) -> pulumi.Output[Optional['outputs.ZonalShiftConfigArgs']]:
+        return pulumi.get(self, "zonal_shift")
 
     @_builtins.property
     @pulumi.getter

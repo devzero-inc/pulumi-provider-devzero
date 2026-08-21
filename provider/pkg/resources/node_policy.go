@@ -298,6 +298,8 @@ type AzureNodeClassSpecArgs struct {
 	Tags         map[string]string              `pulumi:"tags,optional"`
 	Kubelet      *AzureKubeletConfigurationArgs `pulumi:"kubelet,optional"`
 	MaxPods      *int                           `pulumi:"maxPods,optional"`
+	// Pinned node image version. Requires the DevZero node operator >= 1.8.4.
+	ImageVersion *string `pulumi:"imageVersion,optional"`
 }
 
 // Annotate provides SDK documentation for AzureNodeClassSpecArgs fields.
@@ -345,8 +347,9 @@ type NodePolicyArgs struct {
 	OperatingSystems *LabelSelectorArgs `pulumi:"operatingSystems,optional"`
 
 	// Node metadata
-	Labels map[string]string `pulumi:"labels,optional"`
-	Taints []TaintArgs       `pulumi:"taints,optional"`
+	Labels        map[string]string `pulumi:"labels,optional"`
+	Taints        []TaintArgs       `pulumi:"taints,optional"`
+	StartupTaints []TaintArgs       `pulumi:"startupTaints,optional"`
 
 	// Policy configuration
 	Disruption *DisruptionPolicyArgs `pulumi:"disruption,optional"`
@@ -359,6 +362,15 @@ type NodePolicyArgs struct {
 	// Cloud-specific configuration
 	Aws   *AWSNodeClassSpecArgs   `pulumi:"aws,optional"`
 	Azure *AzureNodeClassSpecArgs `pulumi:"azure,optional"`
+
+	// AWS-only: behavior during an ARC zonal shift.
+	ZonalShift *ZonalShiftConfigArgs `pulumi:"zonalShift,optional"`
+	// AWS-only: ephemeral NVMe storage per node in GiB (karpenter.k8s.aws/instance-local-nvme).
+	InstanceLocalNvme *LabelSelectorArgs `pulumi:"instanceLocalNvme,optional"`
+	// Informational: 1 = AWS, 2 = Azure, 3 = GCP, 4 = OCI. Compilation always uses the target cluster's provider.
+	CloudProviderId *int `pulumi:"cloudProviderId,optional"`
+	// AWS fallback for aws.role when neither role nor instanceProfile is set.
+	MasterOverrideRoleName *string `pulumi:"masterOverrideRoleName,optional"`
 
 	// Raw Karpenter YAML (escape hatch for full customization)
 	Raw []RawKarpenterSpecArgs `pulumi:"raw,optional"`
@@ -444,7 +456,14 @@ func (n *NodePolicy) Read(ctx context.Context, req infer.ReadRequest[NodePolicyA
 			fmt.Errorf("ListNodePolicies: %w", err)
 	}
 
+	// ListNodePolicies also returns read-only virtual policies mirrored from
+	// non-dakr Karpenter resources; skip exactly those (source == "cluster")
+	// rather than any unknown source, so a future backend source tag cannot
+	// silently orphan a managed policy.
 	for _, p := range resp.Msg.Policies {
+		if p.Source == "cluster" {
+			continue
+		}
 		if p.Id == req.ID {
 			updatedArgs := nodePolicyProtoToArgs(p)
 			return infer.ReadResponse[NodePolicyArgs, NodePolicyState]{
@@ -455,8 +474,9 @@ func (n *NodePolicy) Read(ctx context.Context, req infer.ReadRequest[NodePolicyA
 		}
 	}
 
-	return infer.ReadResponse[NodePolicyArgs, NodePolicyState]{ID: req.ID, Inputs: req.Inputs, State: req.State},
-		fmt.Errorf("ListNodePolicies: policy %q not found", req.ID)
+	// Deleted out of band — return an empty response so the engine drops the
+	// resource from state instead of failing the refresh.
+	return infer.ReadResponse[NodePolicyArgs, NodePolicyState]{}, nil
 }
 
 func (n *NodePolicy) Update(ctx context.Context, req infer.UpdateRequest[NodePolicyArgs, NodePolicyState]) (infer.UpdateResponse[NodePolicyState], error) {
@@ -485,8 +505,21 @@ func (n *NodePolicy) Update(ctx context.Context, req infer.UpdateRequest[NodePol
 	}, nil
 }
 
-// Delete removes the resource from Pulumi state only — no delete endpoint exists for NodePolicy.
-func (n *NodePolicy) Delete(_ context.Context, _ infer.DeleteRequest[NodePolicyState]) (infer.DeleteResponse, error) {
+// Delete removes the node policy via DeleteNodePolicy (which also cascades
+// its targets server-side). A policy already gone is treated as deleted.
+func (n *NodePolicy) Delete(ctx context.Context, req infer.DeleteRequest[NodePolicyState]) (infer.DeleteResponse, error) {
+	cs := clientset.Get()
+	if cs == nil {
+		return infer.DeleteResponse{}, fmt.Errorf("devzero: provider not configured (ClientSet is nil)")
+	}
+
+	_, err := cs.RecommendationClient.DeleteNodePolicy(ctx, connect.NewRequest(&apiv1.DeleteNodePolicyRequest{
+		TeamId:   cs.TeamID,
+		PolicyId: req.ID,
+	}))
+	if err != nil && !isNotFound(err) {
+		return infer.DeleteResponse{}, fmt.Errorf("DeleteNodePolicy: %w", err)
+	}
 	return infer.DeleteResponse{}, nil
 }
 
@@ -513,14 +546,30 @@ func nodePolicyArgsToProto(teamID, id string, a NodePolicyArgs) *apiv1.NodePolic
 		CapacityTypes:       labelSelectorToProto(a.CapacityTypes),
 		OperatingSystems:    labelSelectorToProto(a.OperatingSystems),
 		Taints:              taintsToProto(a.Taints),
+		StartupTaints:       taintsToProto(a.StartupTaints),
 		Disruption:          disruptionPolicyToProto(a.Disruption),
 		Limits:              resourceLimitsToProto(a.Limits),
 		Aws:                 awsNodeClassSpecToProto(a.Aws),
 		Azure:               azureNodeClassSpecToProto(a.Azure),
 		Raw:                 rawKarpenterSpecsToProto(a.Raw),
+		InstanceLocalNvme:   labelSelectorToProto(a.InstanceLocalNvme),
 	}
 	if a.Description != nil {
 		p.Description = *a.Description
+	}
+	if a.ZonalShift != nil {
+		p.ZonalShift = &apiv1.ZonalShiftConfig{
+			RespectZonalShift:  a.ZonalShift.RespectZonalShift,
+			EvictImpactedNodes: a.ZonalShift.EvictImpactedNodes,
+			AllowZoneFallback:  a.ZonalShift.AllowZoneFallback,
+		}
+	}
+	if a.CloudProviderId != nil {
+		v := int64(*a.CloudProviderId)
+		p.CloudProviderId = &v
+	}
+	if a.MasterOverrideRoleName != nil {
+		p.MasterOverrideRoleName = *a.MasterOverrideRoleName
 	}
 	return p
 }
@@ -544,16 +593,36 @@ func nodePolicyProtoToArgs(p *apiv1.NodePolicy) NodePolicyArgs {
 		CapacityTypes:       labelSelectorFromProto(p.CapacityTypes),
 		OperatingSystems:    labelSelectorFromProto(p.OperatingSystems),
 		Taints:              taintsFromProto(p.Taints),
+		StartupTaints:       taintsFromProto(p.StartupTaints),
 		Disruption:          disruptionPolicyFromProto(p.Disruption),
 		Limits:              resourceLimitsFromProto(p.Limits),
 		Aws:                 awsNodeClassSpecFromProto(p.Aws),
 		Azure:               azureNodeClassSpecFromProto(p.Azure),
 		Raw:                 rawKarpenterSpecsFromProto(p.Raw),
+		InstanceLocalNvme:   labelSelectorFromProto(p.InstanceLocalNvme),
 	}
 	if p.Description != "" {
 		a.Description = &p.Description
 	}
+	if p.ZonalShift != nil {
+		a.ZonalShift = &ZonalShiftConfigArgs{
+			RespectZonalShift:  p.ZonalShift.RespectZonalShift,
+			EvictImpactedNodes: p.ZonalShift.EvictImpactedNodes,
+			AllowZoneFallback:  p.ZonalShift.AllowZoneFallback,
+		}
+	}
+	a.CloudProviderId = int64PtrToIntPtr(p.CloudProviderId)
+	if p.MasterOverrideRoleName != "" {
+		a.MasterOverrideRoleName = &p.MasterOverrideRoleName
+	}
 	return a
+}
+
+// ZonalShiftConfigArgs configures behavior during an AWS ARC zonal shift (AWS only).
+type ZonalShiftConfigArgs struct {
+	RespectZonalShift  bool `pulumi:"respectZonalShift,optional"`
+	EvictImpactedNodes bool `pulumi:"evictImpactedNodes,optional"`
+	AllowZoneFallback  bool `pulumi:"allowZoneFallback,optional"`
 }
 
 // ---------- taint helpers ----------
@@ -1037,6 +1106,9 @@ func azureNodeClassSpecToProto(a *AzureNodeClassSpecArgs) *apiv1.AzureNodeClassS
 		v := int32(*a.MaxPods)
 		spec.MaxPods = &v
 	}
+	if a.ImageVersion != nil {
+		spec.ImageVersion = a.ImageVersion
+	}
 	return spec
 }
 
@@ -1065,6 +1137,7 @@ func azureNodeClassSpecFromProto(spec *apiv1.AzureNodeClassSpec) *AzureNodeClass
 		v := int(*spec.MaxPods)
 		a.MaxPods = &v
 	}
+	a.ImageVersion = spec.ImageVersion
 	return a
 }
 

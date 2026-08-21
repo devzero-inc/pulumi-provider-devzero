@@ -52,19 +52,22 @@ func (l *LabelSelectorArgs) Annotate(a infer.Annotator) {
 
 // WorkloadPolicyTargetArgs are the user-configurable inputs for a WorkloadPolicyTarget resource.
 type WorkloadPolicyTargetArgs struct {
-	Name              string             `pulumi:"name"`
-	PolicyId          string             `pulumi:"policyId"`
-	ClusterIds        []string           `pulumi:"clusterIds"`
-	Description       *string            `pulumi:"description,optional"`
-	Priority          int                `pulumi:"priority,optional"`
-	Enabled           bool               `pulumi:"enabled,optional"`
-	WorkloadNames     []string           `pulumi:"workloadNames,optional"`
-	NodeGroupNames    []string           `pulumi:"nodeGroupNames,optional"`
-	KindFilter        []string           `pulumi:"kindFilter,optional"`
-	NamePattern       *NamePatternArgs   `pulumi:"namePattern,optional"`
-	NamespacePattern  *NamePatternArgs   `pulumi:"namespacePattern,optional"`
-	NamespaceSelector *LabelSelectorArgs `pulumi:"namespaceSelector,optional"`
-	WorkloadSelector  *LabelSelectorArgs `pulumi:"workloadSelector,optional"`
+	Name               string             `pulumi:"name"`
+	PolicyId           string             `pulumi:"policyId"`
+	ClusterIds         []string           `pulumi:"clusterIds"`
+	Description        *string            `pulumi:"description,optional"`
+	Priority           int                `pulumi:"priority,optional"`
+	Enabled            *bool              `pulumi:"enabled,optional"`
+	WorkloadNames      []string           `pulumi:"workloadNames,optional"`
+	WorkloadNamesNotIn []string           `pulumi:"workloadNamesNotIn,optional"`
+	NodeGroupNames     []string           `pulumi:"nodeGroupNames,optional"`
+	KindFilter         []string           `pulumi:"kindFilter,optional"`
+	KindFilterNotIn    []string           `pulumi:"kindFilterNotIn,optional"`
+	AnnotationSelector *LabelSelectorArgs `pulumi:"annotationSelector,optional"`
+	NamePattern        *NamePatternArgs   `pulumi:"namePattern,optional"`
+	NamespacePattern   *NamePatternArgs   `pulumi:"namespacePattern,optional"`
+	NamespaceSelector  *LabelSelectorArgs `pulumi:"namespaceSelector,optional"`
+	WorkloadSelector   *LabelSelectorArgs `pulumi:"workloadSelector,optional"`
 }
 
 // WorkloadPolicyTargetState is the full persisted state (identical to args — no additional computed fields).
@@ -79,9 +82,14 @@ func (s *WorkloadPolicyTargetState) Annotate(a infer.Annotator) {
 	a.Describe(&s.ClusterIds, "Cluster IDs where this target applies.")
 	a.Describe(&s.Description, "Free-form description of the target.")
 	a.Describe(&s.Priority, "Evaluation priority; higher values take precedence when targets overlap.")
-	a.Describe(&s.Enabled, "Enable or disable this target.")
+	a.Describe(&s.Enabled, "Enable or disable this target. Defaults to true.")
+	a.SetDefault(&s.Enabled, true)
 	a.Describe(&s.WorkloadNames, "Explicit list of workload names to include.")
-	a.Describe(&s.NodeGroupNames, "Restrict matching to specific node groups by name.")
+	a.Describe(&s.WorkloadNamesNotIn, "Explicit list of workload names to exclude.")
+	a.Describe(&s.KindFilterNotIn, "Kubernetes kinds to exclude from matching. Same allowed values as kindFilter.")
+	a.Describe(&s.AnnotationSelector, "Select workloads by annotations (same semantics as label selectors, evaluated against annotations).")
+	a.Describe(&s.NodeGroupNames, "DEPRECATED: unused by the DevZero API — no longer evaluated by any active target.")
+	a.Deprecate(&s.NodeGroupNames, "node_group_names is deprecated by the DevZero API and no longer evaluated.")
 	a.Describe(&s.KindFilter, "Restrict matching to specific Kubernetes kinds (e.g. Deployment, Pod).")
 	a.Describe(&s.NamePattern, "Regex to match workload names.")
 	a.Describe(&s.NamespacePattern, "Regex to match namespace names.")
@@ -95,6 +103,10 @@ type WorkloadPolicyTarget struct{}
 // ---------- CRUD ----------
 
 func (w *WorkloadPolicyTarget) Create(ctx context.Context, req infer.CreateRequest[WorkloadPolicyTargetArgs]) (infer.CreateResponse[WorkloadPolicyTargetState], error) {
+	if err := validateWorkloadPolicyTargetArgs(req.Inputs); err != nil {
+		return infer.CreateResponse[WorkloadPolicyTargetState]{}, err
+	}
+
 	if req.DryRun {
 		return infer.CreateResponse[WorkloadPolicyTargetState]{Output: WorkloadPolicyTargetState{WorkloadPolicyTargetArgs: req.Inputs}}, nil
 	}
@@ -136,12 +148,15 @@ func (w *WorkloadPolicyTarget) Read(ctx context.Context, req infer.ReadRequest[W
 
 	resp, err := cs.RecommendationClient.GetWorkloadPolicyTarget(ctx, getReq)
 	if err != nil {
+		if isNotFound(err) {
+			// Deleted out of band — drop from state.
+			return infer.ReadResponse[WorkloadPolicyTargetArgs, WorkloadPolicyTargetState]{}, nil
+		}
 		return infer.ReadResponse[WorkloadPolicyTargetArgs, WorkloadPolicyTargetState]{ID: req.ID, Inputs: req.Inputs, State: req.State},
 			fmt.Errorf("GetWorkloadPolicyTarget: %w", err)
 	}
 	if resp.Msg.Target == nil {
-		return infer.ReadResponse[WorkloadPolicyTargetArgs, WorkloadPolicyTargetState]{ID: req.ID, Inputs: req.Inputs, State: req.State},
-			fmt.Errorf("GetWorkloadPolicyTarget: target not found")
+		return infer.ReadResponse[WorkloadPolicyTargetArgs, WorkloadPolicyTargetState]{}, nil
 	}
 
 	updatedArgs := targetProtoToArgs(resp.Msg.Target)
@@ -153,6 +168,10 @@ func (w *WorkloadPolicyTarget) Read(ctx context.Context, req infer.ReadRequest[W
 }
 
 func (w *WorkloadPolicyTarget) Update(ctx context.Context, req infer.UpdateRequest[WorkloadPolicyTargetArgs, WorkloadPolicyTargetState]) (infer.UpdateResponse[WorkloadPolicyTargetState], error) {
+	if err := validateWorkloadPolicyTargetArgs(req.Inputs); err != nil {
+		return infer.UpdateResponse[WorkloadPolicyTargetState]{}, err
+	}
+
 	if req.DryRun {
 		return infer.UpdateResponse[WorkloadPolicyTargetState]{Output: WorkloadPolicyTargetState{WorkloadPolicyTargetArgs: req.Inputs}}, nil
 	}
@@ -191,7 +210,7 @@ func (w *WorkloadPolicyTarget) Delete(ctx context.Context, req infer.DeleteReque
 	deleteReq.Header().Set("Authorization", "Bearer "+cs.Token)
 
 	_, err := cs.RecommendationClient.DeleteWorkloadPolicyTarget(ctx, deleteReq)
-	if err != nil {
+	if err != nil && !isNotFound(err) {
 		return infer.DeleteResponse{}, fmt.Errorf("DeleteWorkloadPolicyTarget: %w", err)
 	}
 	return infer.DeleteResponse{}, nil
@@ -201,19 +220,22 @@ func (w *WorkloadPolicyTarget) Delete(ctx context.Context, req infer.DeleteReque
 
 func targetArgsToCreateRequest(teamID string, a WorkloadPolicyTargetArgs) *apiv1.CreateWorkloadPolicyTargetRequest {
 	r := &apiv1.CreateWorkloadPolicyTargetRequest{
-		TeamId:            teamID,
-		PolicyId:          a.PolicyId,
-		Name:              a.Name,
-		Priority:          int32(a.Priority),
-		Enabled:           a.Enabled,
-		ClusterIds:        a.ClusterIds,
-		WorkloadNames:     a.WorkloadNames,
-		NodeGroupNames:    a.NodeGroupNames,
-		KindFilter:        kindFilterToProto(a.KindFilter),
-		NamePattern:       namePatternToProto(a.NamePattern),
-		NamespacePattern:  namePatternToProto(a.NamespacePattern),
-		NamespaceSelector: labelSelectorToProto(a.NamespaceSelector),
-		WorkloadSelector:  labelSelectorToProto(a.WorkloadSelector),
+		TeamId:             teamID,
+		PolicyId:           a.PolicyId,
+		Name:               a.Name,
+		Priority:           int32(a.Priority),
+		Enabled:            a.EnabledOrDefault(),
+		ClusterIds:         a.ClusterIds,
+		WorkloadNames:      a.WorkloadNames,
+		WorkloadNamesNotIn: a.WorkloadNamesNotIn,
+		NodeGroupNames:     a.NodeGroupNames,
+		KindFilter:         kindFilterToProto(a.KindFilter),
+		KindFilterNotIn:    kindFilterToProto(a.KindFilterNotIn),
+		NamePattern:        namePatternToProto(a.NamePattern),
+		NamespacePattern:   namePatternToProto(a.NamespacePattern),
+		NamespaceSelector:  labelSelectorToProto(a.NamespaceSelector),
+		WorkloadSelector:   labelSelectorToProto(a.WorkloadSelector),
+		AnnotationSelector: labelSelectorToProto(a.AnnotationSelector),
 	}
 	if a.Description != nil {
 		r.Description = *a.Description
@@ -224,20 +246,23 @@ func targetArgsToCreateRequest(teamID string, a WorkloadPolicyTargetArgs) *apiv1
 func targetArgsToUpdateRequest(teamID, targetID string, a WorkloadPolicyTargetArgs) *apiv1.UpdateWorkloadPolicyTargetRequest {
 	policyID := a.PolicyId
 	r := &apiv1.UpdateWorkloadPolicyTargetRequest{
-		TeamId:            teamID,
-		TargetId:          targetID,
-		PolicyId:          &policyID,
-		Name:              a.Name,
-		Priority:          int32(a.Priority),
-		Enabled:           a.Enabled,
-		ClusterIds:        a.ClusterIds,
-		WorkloadNames:     a.WorkloadNames,
-		NodeGroupNames:    a.NodeGroupNames,
-		KindFilter:        kindFilterToProto(a.KindFilter),
-		NamePattern:       namePatternToProto(a.NamePattern),
-		NamespacePattern:  namePatternToProto(a.NamespacePattern),
-		NamespaceSelector: labelSelectorToProto(a.NamespaceSelector),
-		WorkloadSelector:  labelSelectorToProto(a.WorkloadSelector),
+		TeamId:             teamID,
+		TargetId:           targetID,
+		PolicyId:           &policyID,
+		Name:               a.Name,
+		Priority:           int32(a.Priority),
+		Enabled:            a.EnabledOrDefault(),
+		ClusterIds:         a.ClusterIds,
+		WorkloadNames:      a.WorkloadNames,
+		WorkloadNamesNotIn: a.WorkloadNamesNotIn,
+		NodeGroupNames:     a.NodeGroupNames,
+		KindFilter:         kindFilterToProto(a.KindFilter),
+		KindFilterNotIn:    kindFilterToProto(a.KindFilterNotIn),
+		NamePattern:        namePatternToProto(a.NamePattern),
+		NamespacePattern:   namePatternToProto(a.NamespacePattern),
+		NamespaceSelector:  labelSelectorToProto(a.NamespaceSelector),
+		WorkloadSelector:   labelSelectorToProto(a.WorkloadSelector),
+		AnnotationSelector: labelSelectorToProto(a.AnnotationSelector),
 	}
 	if a.Description != nil {
 		r.Description = *a.Description
@@ -247,18 +272,21 @@ func targetArgsToUpdateRequest(teamID, targetID string, a WorkloadPolicyTargetAr
 
 func targetProtoToArgs(t *apiv1.WorkloadPolicyTarget) WorkloadPolicyTargetArgs {
 	a := WorkloadPolicyTargetArgs{
-		Name:              t.Name,
-		PolicyId:          t.PolicyId,
-		ClusterIds:        t.ClusterIds,
-		Priority:          int(t.Priority),
-		Enabled:           t.Enabled,
-		WorkloadNames:     t.WorkloadNames,
-		NodeGroupNames:    t.NodeGroupNames,
-		KindFilter:        kindFilterFromProto(t.KindFilter),
-		NamePattern:       namePatternFromProto(t.NamePattern),
-		NamespacePattern:  namePatternFromProto(t.NamespacePattern),
-		NamespaceSelector: labelSelectorFromProto(t.NamespaceSelector),
-		WorkloadSelector:  labelSelectorFromProto(t.WorkloadSelector),
+		Name:               t.Name,
+		PolicyId:           t.PolicyId,
+		ClusterIds:         t.ClusterIds,
+		Priority:           int(t.Priority),
+		Enabled:            boolPtr(t.Enabled),
+		WorkloadNames:      t.WorkloadNames,
+		WorkloadNamesNotIn: t.WorkloadNamesNotIn,
+		NodeGroupNames:     t.NodeGroupNames,
+		KindFilter:         kindFilterFromProto(t.KindFilter),
+		KindFilterNotIn:    kindFilterFromProto(t.KindFilterNotIn),
+		NamePattern:        namePatternFromProto(t.NamePattern),
+		NamespacePattern:   namePatternFromProto(t.NamespacePattern),
+		NamespaceSelector:  labelSelectorFromProto(t.NamespaceSelector),
+		WorkloadSelector:   labelSelectorFromProto(t.WorkloadSelector),
+		AnnotationSelector: labelSelectorFromProto(t.AnnotationSelector),
 	}
 	if t.Description != "" {
 		a.Description = &t.Description
@@ -389,6 +417,10 @@ func labelSelectorOperatorToProto(op string) commonv1.LabelSelectorOperator {
 		return commonv1.LabelSelectorOperator_LABEL_SELECTOR_OPERATOR_EXISTS
 	case "DoesNotExist":
 		return commonv1.LabelSelectorOperator_LABEL_SELECTOR_OPERATOR_DOES_NOT_EXIST
+	case "Gt":
+		return commonv1.LabelSelectorOperator_LABEL_SELECTOR_OPERATOR_GT
+	case "Lt":
+		return commonv1.LabelSelectorOperator_LABEL_SELECTOR_OPERATOR_LT
 	default:
 		return commonv1.LabelSelectorOperator_LABEL_SELECTOR_OPERATOR_UNSPECIFIED
 	}
@@ -404,7 +436,21 @@ func labelSelectorOperatorFromProto(op commonv1.LabelSelectorOperator) string {
 		return "Exists"
 	case commonv1.LabelSelectorOperator_LABEL_SELECTOR_OPERATOR_DOES_NOT_EXIST:
 		return "DoesNotExist"
+	case commonv1.LabelSelectorOperator_LABEL_SELECTOR_OPERATOR_GT:
+		return "Gt"
+	case commonv1.LabelSelectorOperator_LABEL_SELECTOR_OPERATOR_LT:
+		return "Lt"
 	default:
 		return ""
 	}
 }
+
+// EnabledOrDefault returns the effective enabled flag (default true).
+func (a WorkloadPolicyTargetArgs) EnabledOrDefault() bool {
+	if a.Enabled == nil {
+		return true
+	}
+	return *a.Enabled
+}
+
+func boolPtr(b bool) *bool { return &b }

@@ -254,7 +254,7 @@ func TestWorkloadPolicyTarget_Read_Success(t *testing.T) {
 	if resp.Inputs.Description == nil || *resp.Inputs.Description != desc {
 		t.Errorf("description: got %v, want %q", resp.Inputs.Description, desc)
 	}
-	if !resp.Inputs.Enabled {
+	if resp.Inputs.Enabled == nil || !*resp.Inputs.Enabled {
 		t.Error("enabled should be true")
 	}
 	if resp.Inputs.Priority != 5 {
@@ -279,7 +279,7 @@ func TestWorkloadPolicyTarget_Read_NilClientSet(t *testing.T) {
 func TestWorkloadPolicyTarget_Read_APIError(t *testing.T) {
 	rec := &mockRecommendationClientFull{
 		getTargetFn: func(_ context.Context, _ *connect.Request[apiv1.GetWorkloadPolicyTargetRequest]) (*connect.Response[apiv1.GetWorkloadPolicyTargetResponse], error) {
-			return nil, connect.NewError(connect.CodeNotFound, errors.New("not found"))
+			return nil, connect.NewError(connect.CodeInternal, errors.New("backend exploded"))
 		},
 	}
 	withMockTargetClientSet(t, rec)
@@ -394,7 +394,7 @@ func TestWorkloadPolicyTarget_Delete_Success(t *testing.T) {
 func TestWorkloadPolicyTarget_Delete_APIError(t *testing.T) {
 	rec := &mockRecommendationClientFull{
 		deleteTargetFn: func(_ context.Context, _ *connect.Request[apiv1.DeleteWorkloadPolicyTargetRequest]) (*connect.Response[apiv1.DeleteWorkloadPolicyTargetResponse], error) {
-			return nil, connect.NewError(connect.CodeNotFound, errors.New("not found"))
+			return nil, connect.NewError(connect.CodeInternal, errors.New("backend exploded"))
 		},
 	}
 	withMockTargetClientSet(t, rec)

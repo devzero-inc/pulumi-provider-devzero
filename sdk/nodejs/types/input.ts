@@ -154,6 +154,7 @@ export namespace resources {
          * Azure node image family. One of: 'AzureLinux', 'Ubuntu2204'. Example: 'AzureLinux'.
          */
         imageFamily?: pulumi.Input<string>;
+        imageVersion?: pulumi.Input<string>;
         /**
          * Kubelet configuration overrides for Azure nodes.
          */
@@ -368,6 +369,7 @@ export namespace resources {
     }
 
     export interface HPAMetricTriggerArgsArgs {
+        connectorId?: pulumi.Input<string>;
         /**
          * Free-form key-value pairs for external scalers. For Prometheus use serverAddress and query instead.
          */
@@ -424,7 +426,7 @@ export namespace resources {
          */
         maxReplicas?: pulumi.Input<number>;
         /**
-         * Additional metric triggers (e.g. Prometheus). CPU/Memory/Network triggers are auto-generated from primaryMetric — do not redeclare them here.
+         * HPA metric triggers (CPU, Memory, Network*, or external such as prometheus/kafka). Replaces the removed targetUtilization/primaryMetric fields.
          */
         metrics?: pulumi.Input<pulumi.Input<inputs.resources.HPAMetricTriggerArgsArgs>[]>;
         /**
@@ -432,21 +434,9 @@ export namespace resources {
          */
         minReplicas?: pulumi.Input<number>;
         /**
-         * Primary metric driving HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
-         */
-        primaryMetric?: pulumi.Input<string>;
-        /**
          * Seconds to wait between scale-down events. Example: 300.
          */
         scaleDownCooldownSeconds?: pulumi.Input<number>;
-        /**
-         * Target memory utilization ratio (0-1), tuned independently of CPU. Example: 0.8.
-         */
-        targetMemoryUtilization?: pulumi.Input<number>;
-        /**
-         * Target CPU utilization ratio (0-1). Example: 0.7.
-         */
-        targetUtilization?: pulumi.Input<number>;
     }
 
     export interface HPAScalingPolicyArgsArgs {
@@ -480,6 +470,7 @@ export namespace resources {
     }
 
     export interface HorizontalScalingArgsArgs {
+        compositeFormula?: pulumi.Input<string>;
         /**
          * Enable horizontal (replica) scaling. Example: true.
          */
@@ -500,10 +491,13 @@ export namespace resources {
          * Minimum number of replicas to maintain. Example: 2.
          */
         minReplicas?: pulumi.Input<number>;
+        networkTargetThroughputBytesPerSec?: pulumi.Input<number>;
         /**
          * Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.
          */
         primaryMetric?: pulumi.Input<string>;
+        scaleDownCooldownSeconds?: pulumi.Input<number>;
+        targetMemoryUtilization?: pulumi.Input<number>;
         /**
          * Target utilization ratio (0-1) for the primary metric. Example: 0.7 targets 70% utilization.
          */
@@ -640,14 +634,21 @@ export namespace resources {
     }
 
     export interface ResourceRuleConfigArgsArgs {
+        ceilingPercent?: pulumi.Input<number>;
         /**
          * Enable this resource axis rule. Example: true.
          */
         enabled?: pulumi.Input<boolean>;
+        floorPercent?: pulumi.Input<number>;
+        initialLimit?: pulumi.Input<number>;
+        initialRequest?: pulumi.Input<number>;
+        limitCeilingPercent?: pulumi.Input<number>;
+        limitFloorPercent?: pulumi.Input<number>;
         /**
          * Multiplier applied to the request to derive the resource limit. Example: 1.5.
          */
         limitMultiplier?: pulumi.Input<number>;
+        limitUseRss?: pulumi.Input<boolean>;
         /**
          * Whether to also adjust resource limits alongside requests. Example: true.
          */
@@ -672,6 +673,7 @@ export namespace resources {
          * Minimum resource request (millicores for CPU, bytes for memory/GPU). Example: 100.
          */
         minRequest?: pulumi.Input<number>;
+        requestUseRss?: pulumi.Input<boolean>;
         /**
          * Percentile of usage data used as the recommendation target (0-1). Example: 0.95.
          */
@@ -732,6 +734,7 @@ export namespace resources {
          * Multiplier applied to the request to derive the resource limit. Example: 1.5 sets limit to 150% of request.
          */
         limitMultiplier?: pulumi.Input<number>;
+        limitUseRss?: pulumi.Input<boolean>;
         /**
          * Whether to also adjust resource limits alongside requests. Example: true.
          */
@@ -764,6 +767,7 @@ export namespace resources {
          * Multiplier applied on top of the recommendation to add headroom. Example: 1.15 adds 15% overhead.
          */
         overheadMultiplier?: pulumi.Input<number>;
+        requestUseRss?: pulumi.Input<boolean>;
         /**
          * Percentile of usage data used as the recommendation target (0-1). Example: 0.95 targets the 95th percentile.
          */
@@ -779,5 +783,11 @@ export namespace resources {
             maxScaleUpPercent: (val.maxScaleUpPercent) ?? 1000,
             minDataPoints: (val.minDataPoints) ?? 20,
         };
+    }
+
+    export interface ZonalShiftConfigArgsArgs {
+        allowZoneFallback?: pulumi.Input<boolean>;
+        evictImpactedNodes?: pulumi.Input<boolean>;
+        respectZonalShift?: pulumi.Input<boolean>;
     }
 }

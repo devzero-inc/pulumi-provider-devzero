@@ -3,6 +3,7 @@ package resources
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"connectrpc.com/connect"
 	"github.com/pulumi/pulumi-go-provider/infer"
@@ -25,6 +26,8 @@ type VerticalScalingArgs struct {
 	MinDataPoints           *int     `pulumi:"minDataPoints,optional"`
 	AdjustReqEvenIfNotSet   *bool    `pulumi:"adjustReqEvenIfNotSet,optional"`
 	LimitsRemovalEnabled    *bool    `pulumi:"limitsRemovalEnabled,optional"`
+	RequestUseRss           *bool    `pulumi:"requestUseRss,optional"`
+	LimitUseRss             *bool    `pulumi:"limitUseRss,optional"`
 }
 
 // Annotate provides SDK documentation for VerticalScalingArgs fields.
@@ -56,6 +59,11 @@ type HorizontalScalingArgs struct {
 	PrimaryMetric           *string  `pulumi:"primaryMetric,optional"`
 	MinDataPoints           *int     `pulumi:"minDataPoints,optional"`
 	MaxReplicaChangePercent *float64 `pulumi:"maxReplicaChangePercent,optional"`
+
+	NetworkTargetThroughputBytesPerSec *int     `pulumi:"networkTargetThroughputBytesPerSec,optional"`
+	TargetMemoryUtilization            *float64 `pulumi:"targetMemoryUtilization,optional"`
+	CompositeFormula                   *string  `pulumi:"compositeFormula,optional"`
+	ScaleDownCooldownSeconds           *int     `pulumi:"scaleDownCooldownSeconds,optional"`
 }
 
 // Annotate provides SDK documentation for HorizontalScalingArgs fields.
@@ -95,6 +103,29 @@ type WorkloadPolicyArgs struct {
 	CooldownMinutes         *int                   `pulumi:"cooldownMinutes,optional"`
 	EnablePmaxProtection    *bool                  `pulumi:"enablePmaxProtection,optional"`
 	PmaxRatioThreshold      *float64               `pulumi:"pmaxRatioThreshold,optional"`
+
+	EnableInPlaceVerticalScaling    *bool `pulumi:"enableInPlaceVerticalScaling,optional"`
+	AllowInPlaceMemoryLimitDecrease *bool `pulumi:"allowInPlaceMemoryLimitDecrease,optional"`
+	PdbEnabled                      *bool `pulumi:"pdbEnabled,optional"`
+
+	CpuFloorPercent           *int `pulumi:"cpuFloorPercent,optional"`
+	CpuCeilingPercent         *int `pulumi:"cpuCeilingPercent,optional"`
+	MemoryFloorPercent        *int `pulumi:"memoryFloorPercent,optional"`
+	MemoryCeilingPercent      *int `pulumi:"memoryCeilingPercent,optional"`
+	CpuLimitFloorPercent      *int `pulumi:"cpuLimitFloorPercent,optional"`
+	CpuLimitCeilingPercent    *int `pulumi:"cpuLimitCeilingPercent,optional"`
+	MemoryLimitFloorPercent   *int `pulumi:"memoryLimitFloorPercent,optional"`
+	MemoryLimitCeilingPercent *int `pulumi:"memoryLimitCeilingPercent,optional"`
+
+	JvmHeapOptimizationEnabled   *bool    `pulumi:"jvmHeapOptimizationEnabled,optional"`
+	JvmHeapTargetPercentile      *float64 `pulumi:"jvmHeapTargetPercentile,optional"`
+	JvmHeapHeadroomMultiplier    *float64 `pulumi:"jvmHeapHeadroomMultiplier,optional"`
+	JvmNonHeapOverheadPercent    *float64 `pulumi:"jvmNonHeapOverheadPercent,optional"`
+	JvmNonHeapOverheadBytes      *int     `pulumi:"jvmNonHeapOverheadBytes,optional"`
+	JvmMinHeapBytes              *int     `pulumi:"jvmMinHeapBytes,optional"`
+	JvmMaxHeapBytes              *int     `pulumi:"jvmMaxHeapBytes,optional"`
+	JvmPreferContainerSupport    *bool    `pulumi:"jvmPreferContainerSupport,optional"`
+	JvmCpuStartupFloorMillicores *int     `pulumi:"jvmCpuStartupFloorMillicores,optional"`
 }
 
 // Annotate provides SDK documentation and default values for WorkloadPolicyArgs fields.
@@ -140,6 +171,10 @@ type WorkloadPolicy struct{}
 // ---------- CRUD ----------
 
 func (w *WorkloadPolicy) Create(ctx context.Context, req infer.CreateRequest[WorkloadPolicyArgs]) (infer.CreateResponse[WorkloadPolicyState], error) {
+	if err := validateWorkloadPolicyArgs(req.Inputs); err != nil {
+		return infer.CreateResponse[WorkloadPolicyState]{}, err
+	}
+
 	if req.DryRun {
 		return infer.CreateResponse[WorkloadPolicyState]{Output: WorkloadPolicyState{WorkloadPolicyArgs: req.Inputs}}, nil
 	}
@@ -178,12 +213,15 @@ func (w *WorkloadPolicy) Read(ctx context.Context, req infer.ReadRequest[Workloa
 		PolicyId: req.ID,
 	}))
 	if err != nil {
+		if isNotFound(err) {
+			// Deleted out of band — drop from state.
+			return infer.ReadResponse[WorkloadPolicyArgs, WorkloadPolicyState]{}, nil
+		}
 		return infer.ReadResponse[WorkloadPolicyArgs, WorkloadPolicyState]{ID: req.ID, Inputs: req.Inputs, State: req.State},
 			fmt.Errorf("GetWorkloadRecommendationPolicy: %w", err)
 	}
 	if resp.Msg.Policy == nil {
-		return infer.ReadResponse[WorkloadPolicyArgs, WorkloadPolicyState]{ID: req.ID, Inputs: req.Inputs, State: req.State},
-			fmt.Errorf("GetWorkloadRecommendationPolicy: policy not found")
+		return infer.ReadResponse[WorkloadPolicyArgs, WorkloadPolicyState]{}, nil
 	}
 
 	updatedArgs := protoToArgs(resp.Msg.Policy)
@@ -195,6 +233,10 @@ func (w *WorkloadPolicy) Read(ctx context.Context, req infer.ReadRequest[Workloa
 }
 
 func (w *WorkloadPolicy) Update(ctx context.Context, req infer.UpdateRequest[WorkloadPolicyArgs, WorkloadPolicyState]) (infer.UpdateResponse[WorkloadPolicyState], error) {
+	if err := validateWorkloadPolicyArgs(req.Inputs); err != nil {
+		return infer.UpdateResponse[WorkloadPolicyState]{}, err
+	}
+
 	if req.DryRun {
 		return infer.UpdateResponse[WorkloadPolicyState]{Output: WorkloadPolicyState{WorkloadPolicyArgs: req.Inputs}}, nil
 	}
@@ -230,7 +272,7 @@ func (w *WorkloadPolicy) Delete(ctx context.Context, req infer.DeleteRequest[Wor
 		TeamId:   cs.TeamID,
 		PolicyId: req.ID,
 	}))
-	if err != nil {
+	if err != nil && !isNotFound(err) {
 		return infer.DeleteResponse{}, fmt.Errorf("DeleteWorkloadRecommendationPolicy: %w", err)
 	}
 	return infer.DeleteResponse{}, nil
@@ -305,7 +347,73 @@ func argsToProto(teamID, policyID string, a WorkloadPolicyArgs) *apiv1.WorkloadR
 		v := float32(*a.PmaxRatioThreshold)
 		p.PmaxRatioThreshold = &v
 	}
+
+	if a.EnableInPlaceVerticalScaling != nil {
+		p.EnableInPlaceVerticalScaling = *a.EnableInPlaceVerticalScaling
+	}
+	if a.AllowInPlaceMemoryLimitDecrease != nil {
+		p.AllowInPlaceMemoryLimitDecrease = *a.AllowInPlaceMemoryLimitDecrease
+	}
+	if a.PdbEnabled != nil {
+		p.PdbEnabled = *a.PdbEnabled
+	}
+
+	p.CpuFloorPercent = intPtrToInt64Ptr(a.CpuFloorPercent)
+	p.CpuCeilingPercent = intPtrToInt64Ptr(a.CpuCeilingPercent)
+	p.MemoryFloorPercent = intPtrToInt64Ptr(a.MemoryFloorPercent)
+	p.MemoryCeilingPercent = intPtrToInt64Ptr(a.MemoryCeilingPercent)
+	p.CpuLimitFloorPercent = intPtrToInt64Ptr(a.CpuLimitFloorPercent)
+	p.CpuLimitCeilingPercent = intPtrToInt64Ptr(a.CpuLimitCeilingPercent)
+	p.MemoryLimitFloorPercent = intPtrToInt64Ptr(a.MemoryLimitFloorPercent)
+	p.MemoryLimitCeilingPercent = intPtrToInt64Ptr(a.MemoryLimitCeilingPercent)
+
+	if a.JvmHeapOptimizationEnabled != nil {
+		p.JvmHeapOptimizationEnabled = *a.JvmHeapOptimizationEnabled
+	}
+	p.JvmHeapTargetPercentile = float64PtrToFloat32Ptr(a.JvmHeapTargetPercentile)
+	p.JvmHeapHeadroomMultiplier = float64PtrToFloat32Ptr(a.JvmHeapHeadroomMultiplier)
+	p.JvmNonHeapOverheadPercent = float64PtrToFloat32Ptr(a.JvmNonHeapOverheadPercent)
+	p.JvmNonHeapOverheadBytes = intPtrToInt64Ptr(a.JvmNonHeapOverheadBytes)
+	p.JvmMinHeapBytes = intPtrToInt64Ptr(a.JvmMinHeapBytes)
+	p.JvmMaxHeapBytes = intPtrToInt64Ptr(a.JvmMaxHeapBytes)
+	if a.JvmPreferContainerSupport != nil {
+		p.JvmPreferContainerSupport = *a.JvmPreferContainerSupport
+	}
+	p.JvmCpuStartupFloorMillicores = intPtrToInt64Ptr(a.JvmCpuStartupFloorMillicores)
+
 	return p
+}
+
+func intPtrToInt64Ptr(v *int) *int64 {
+	if v == nil {
+		return nil
+	}
+	x := int64(*v)
+	return &x
+}
+
+func int64PtrToIntPtr(v *int64) *int {
+	if v == nil {
+		return nil
+	}
+	x := int(*v)
+	return &x
+}
+
+func float64PtrToFloat32Ptr(v *float64) *float32 {
+	if v == nil {
+		return nil
+	}
+	x := float32(*v)
+	return &x
+}
+
+func float32PtrToFloat64Ptr(v *float32) *float64 {
+	if v == nil {
+		return nil
+	}
+	x := f32to64(*v)
+	return &x
 }
 
 func protoToArgs(p *apiv1.WorkloadRecommendationPolicy) WorkloadPolicyArgs {
@@ -339,7 +447,7 @@ func protoToArgs(p *apiv1.WorkloadRecommendationPolicy) WorkloadPolicyArgs {
 		a.StartupPeriodSeconds = &v
 	}
 	if p.MinChangePercent != nil {
-		v := float64(*p.MinChangePercent)
+		v := f32to64(*p.MinChangePercent)
 		a.MinChangePercent = &v
 	}
 	if p.MinDataPoints != nil {
@@ -347,15 +455,15 @@ func protoToArgs(p *apiv1.WorkloadRecommendationPolicy) WorkloadPolicyArgs {
 		a.MinDataPoints = &v
 	}
 	if p.StabilityCvMax != nil {
-		v := float64(*p.StabilityCvMax)
+		v := f32to64(*p.StabilityCvMax)
 		a.StabilityCvMax = &v
 	}
 	if p.HysteresisVsTarget != nil {
-		v := float64(*p.HysteresisVsTarget)
+		v := f32to64(*p.HysteresisVsTarget)
 		a.HysteresisVsTarget = &v
 	}
 	if p.DriftDeltaPercent != nil {
-		v := float64(*p.DriftDeltaPercent)
+		v := f32to64(*p.DriftDeltaPercent)
 		a.DriftDeltaPercent = &v
 	}
 	if p.MinVpaWindowDataPoints != nil {
@@ -366,12 +474,47 @@ func protoToArgs(p *apiv1.WorkloadRecommendationPolicy) WorkloadPolicyArgs {
 		v := int(*p.CooldownMinutes)
 		a.CooldownMinutes = &v
 	}
-	v := p.EnablePmaxProtection
-	a.EnablePmaxProtection = &v
+	if p.EnablePmaxProtection {
+		a.EnablePmaxProtection = truePtr()
+	}
 	if p.PmaxRatioThreshold != nil {
-		v := float64(*p.PmaxRatioThreshold)
+		v := f32to64(*p.PmaxRatioThreshold)
 		a.PmaxRatioThreshold = &v
 	}
+
+	if p.EnableInPlaceVerticalScaling {
+		a.EnableInPlaceVerticalScaling = truePtr()
+	}
+	if p.AllowInPlaceMemoryLimitDecrease {
+		a.AllowInPlaceMemoryLimitDecrease = truePtr()
+	}
+	if p.PdbEnabled {
+		a.PdbEnabled = truePtr()
+	}
+
+	a.CpuFloorPercent = int64PtrToIntPtr(p.CpuFloorPercent)
+	a.CpuCeilingPercent = int64PtrToIntPtr(p.CpuCeilingPercent)
+	a.MemoryFloorPercent = int64PtrToIntPtr(p.MemoryFloorPercent)
+	a.MemoryCeilingPercent = int64PtrToIntPtr(p.MemoryCeilingPercent)
+	a.CpuLimitFloorPercent = int64PtrToIntPtr(p.CpuLimitFloorPercent)
+	a.CpuLimitCeilingPercent = int64PtrToIntPtr(p.CpuLimitCeilingPercent)
+	a.MemoryLimitFloorPercent = int64PtrToIntPtr(p.MemoryLimitFloorPercent)
+	a.MemoryLimitCeilingPercent = int64PtrToIntPtr(p.MemoryLimitCeilingPercent)
+
+	if p.JvmHeapOptimizationEnabled {
+		a.JvmHeapOptimizationEnabled = truePtr()
+	}
+	a.JvmHeapTargetPercentile = float32PtrToFloat64Ptr(p.JvmHeapTargetPercentile)
+	a.JvmHeapHeadroomMultiplier = float32PtrToFloat64Ptr(p.JvmHeapHeadroomMultiplier)
+	a.JvmNonHeapOverheadPercent = float32PtrToFloat64Ptr(p.JvmNonHeapOverheadPercent)
+	a.JvmNonHeapOverheadBytes = int64PtrToIntPtr(p.JvmNonHeapOverheadBytes)
+	a.JvmMinHeapBytes = int64PtrToIntPtr(p.JvmMinHeapBytes)
+	a.JvmMaxHeapBytes = int64PtrToIntPtr(p.JvmMaxHeapBytes)
+	if p.JvmPreferContainerSupport {
+		a.JvmPreferContainerSupport = truePtr()
+	}
+	a.JvmCpuStartupFloorMillicores = int64PtrToIntPtr(p.JvmCpuStartupFloorMillicores)
+
 	return a
 }
 
@@ -485,6 +628,8 @@ func verticalScalingToProto(v *VerticalScalingArgs) *apiv1.VerticalScalingOptimi
 	if v.LimitsRemovalEnabled != nil {
 		t.LimitsRemovalEnabled = *v.LimitsRemovalEnabled
 	}
+	t.RequestUseRss = v.RequestUseRss
+	t.LimitUseRss = v.LimitUseRss
 	return t
 }
 
@@ -504,36 +649,40 @@ func verticalScalingFromProto(t *apiv1.VerticalScalingOptimizationTarget) *Verti
 		v.MaxRequest = &x
 	}
 	if t.OverheadMultiplier != nil {
-		x := float64(*t.OverheadMultiplier)
+		x := f32to64(*t.OverheadMultiplier)
 		v.OverheadMultiplier = &x
 	}
 	if t.TargetPercentile != nil {
-		x := float64(*t.TargetPercentile)
+		x := f32to64(*t.TargetPercentile)
 		v.TargetPercentile = &x
 	}
 	if t.MaxScaleUpPercent != nil {
-		x := float64(*t.MaxScaleUpPercent)
+		x := f32to64(*t.MaxScaleUpPercent)
 		v.MaxScaleUpPercent = &x
 	}
 	if t.MaxScaleDownPercent != nil {
-		x := float64(*t.MaxScaleDownPercent)
+		x := f32to64(*t.MaxScaleDownPercent)
 		v.MaxScaleDownPercent = &x
 	}
 	if t.LimitsAdjustmentEnabled != nil {
 		v.LimitsAdjustmentEnabled = t.LimitsAdjustmentEnabled
 	}
 	if t.LimitMultiplier != nil {
-		x := float64(*t.LimitMultiplier)
+		x := f32to64(*t.LimitMultiplier)
 		v.LimitMultiplier = &x
 	}
 	if t.MinDataPoints != nil {
 		x := int(*t.MinDataPoints)
 		v.MinDataPoints = &x
 	}
-	adj := t.AdjustReqEvenIfNotSet
-	v.AdjustReqEvenIfNotSet = &adj
-	lre := t.LimitsRemovalEnabled
-	v.LimitsRemovalEnabled = &lre
+	if t.AdjustReqEvenIfNotSet {
+		v.AdjustReqEvenIfNotSet = truePtr()
+	}
+	if t.LimitsRemovalEnabled {
+		v.LimitsRemovalEnabled = truePtr()
+	}
+	v.RequestUseRss = t.RequestUseRss
+	v.LimitUseRss = t.LimitUseRss
 	return v
 }
 
@@ -567,6 +716,13 @@ func horizontalScalingToProto(h *HorizontalScalingArgs) *apiv1.HorizontalScaling
 		x := float32(*h.MaxReplicaChangePercent)
 		t.MaxReplicaChangePercent = &x
 	}
+	t.NetworkTargetThroughputBytesPerSec = intPtrToInt64Ptr(h.NetworkTargetThroughputBytesPerSec)
+	t.TargetMemoryUtilization = float64PtrToFloat32Ptr(h.TargetMemoryUtilization)
+	t.CompositeFormula = h.CompositeFormula
+	if h.ScaleDownCooldownSeconds != nil {
+		x := int32(*h.ScaleDownCooldownSeconds)
+		t.ScaleDownCooldownSeconds = &x
+	}
 	return t
 }
 
@@ -586,7 +742,7 @@ func horizontalScalingFromProto(t *apiv1.HorizontalScalingOptimizationTarget) *H
 		h.MaxReplicas = &x
 	}
 	if t.TargetUtilization != nil {
-		x := float64(*t.TargetUtilization)
+		x := f32to64(*t.TargetUtilization)
 		h.TargetUtilization = &x
 	}
 	if t.PrimaryMetric != nil {
@@ -597,8 +753,15 @@ func horizontalScalingFromProto(t *apiv1.HorizontalScalingOptimizationTarget) *H
 		h.MinDataPoints = &x
 	}
 	if t.MaxReplicaChangePercent != nil {
-		x := float64(*t.MaxReplicaChangePercent)
+		x := f32to64(*t.MaxReplicaChangePercent)
 		h.MaxReplicaChangePercent = &x
+	}
+	h.NetworkTargetThroughputBytesPerSec = int64PtrToIntPtr(t.NetworkTargetThroughputBytesPerSec)
+	h.TargetMemoryUtilization = float32PtrToFloat64Ptr(t.TargetMemoryUtilization)
+	h.CompositeFormula = t.CompositeFormula
+	if t.ScaleDownCooldownSeconds != nil {
+		x := int(*t.ScaleDownCooldownSeconds)
+		h.ScaleDownCooldownSeconds = &x
 	}
 	return h
 }
@@ -645,4 +808,13 @@ func hpaMetricFromProto(m *apiv1.HPAMetricType) *string {
 		return nil
 	}
 	return &s
+}
+
+// f32to64(v) converts a float32 coming from the API into the float64 the Pulumi
+// SDKs use, picking the shortest decimal that round-trips (so a stored 0.7
+// comes back as 0.7, not 0.699999988079071 — which would show as a perpetual
+// diff after refresh).
+func f32to64(v float32) float64 {
+	f, _ := strconv.ParseFloat(strconv.FormatFloat(float64(v), 'g', -1, 32), 64)
+	return f
 }

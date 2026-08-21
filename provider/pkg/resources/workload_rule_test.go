@@ -311,7 +311,7 @@ func TestWorkloadRule_Read_NilClientSet(t *testing.T) {
 func TestWorkloadRule_Read_APIError(t *testing.T) {
 	rec := &mockWorkloadRuleClient{
 		getFn: func(_ context.Context, _ *connect.Request[apiv1.GetWorkloadRuleByIDRequest]) (*connect.Response[apiv1.GetWorkloadRuleByIDResponse], error) {
-			return nil, connect.NewError(connect.CodeNotFound, errors.New("not found"))
+			return nil, connect.NewError(connect.CodeInternal, errors.New("backend exploded"))
 		},
 	}
 	withMockWorkloadRuleClientSet(t, rec)
@@ -463,7 +463,7 @@ func TestWorkloadRule_Delete_NilClientSet(t *testing.T) {
 func TestWorkloadRule_Delete_APIError(t *testing.T) {
 	rec := &mockWorkloadRuleClient{
 		deleteFn: func(_ context.Context, _ *connect.Request[apiv1.DeleteWorkloadRuleRequest]) (*connect.Response[apiv1.DeleteWorkloadRuleResponse], error) {
-			return nil, connect.NewError(connect.CodeNotFound, errors.New("not found"))
+			return nil, connect.NewError(connect.CodeInternal, errors.New("backend exploded"))
 		},
 	}
 	withMockWorkloadRuleClientSet(t, rec)
@@ -538,16 +538,12 @@ func TestResourceRuleConfig_Nil(t *testing.T) {
 func TestHPARuleConfig_RoundTrip(t *testing.T) {
 	minR := 1
 	maxR := 10
-	util := 0.7
-	metric := "cpu"
 	maxChange := 50.0
 
 	h := &HPARuleConfigArgs{
-		Enabled:                true,
-		MinReplicas:            &minR,
-		MaxReplicas:            &maxR,
-		TargetUtilization:      &util,
-		PrimaryMetric:          &metric,
+		Enabled:                 true,
+		MinReplicas:             &minR,
+		MaxReplicas:             &maxR,
 		MaxReplicaChangePercent: &maxChange,
 	}
 
@@ -563,9 +559,6 @@ func TestHPARuleConfig_RoundTrip(t *testing.T) {
 	}
 	if back.MaxReplicas == nil || *back.MaxReplicas != maxR {
 		t.Errorf("MaxReplicas: got %v, want %d", back.MaxReplicas, maxR)
-	}
-	if back.PrimaryMetric == nil || *back.PrimaryMetric != metric {
-		t.Errorf("PrimaryMetric: got %v, want %q", back.PrimaryMetric, metric)
 	}
 	if back.MaxReplicaChangePercent == nil || *back.MaxReplicaChangePercent != maxChange {
 		t.Errorf("MaxReplicaChangePercent: got %v, want %f", back.MaxReplicaChangePercent, maxChange)

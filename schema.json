@@ -277,6 +277,9 @@
                     "type": "string",
                     "description": "Azure node image family. One of: 'AzureLinux', 'Ubuntu2204'. Example: 'AzureLinux'."
                 },
+                "imageVersion": {
+                    "type": "string"
+                },
                 "kubelet": {
                     "$ref": "#/types/devzero:resources:AzureKubeletConfigurationArgs",
                     "description": "Kubelet configuration overrides for Azure nodes."
@@ -533,6 +536,9 @@
         },
         "devzero:resources:HPAMetricTriggerArgs": {
             "properties": {
+                "connectorId": {
+                    "type": "string"
+                },
                 "metadata": {
                     "type": "object",
                     "additionalProperties": {
@@ -601,27 +607,15 @@
                     "items": {
                         "$ref": "#/types/devzero:resources:HPAMetricTriggerArgs"
                     },
-                    "description": "Additional metric triggers (e.g. Prometheus). CPU/Memory/Network triggers are auto-generated from primaryMetric \u2014 do not redeclare them here."
+                    "description": "HPA metric triggers (CPU, Memory, Network*, or external such as prometheus/kafka). Replaces the removed targetUtilization/primaryMetric fields."
                 },
                 "minReplicas": {
                     "type": "integer",
                     "description": "Minimum number of replicas. Example: 2."
                 },
-                "primaryMetric": {
-                    "type": "string",
-                    "description": "Primary metric driving HPA. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'."
-                },
                 "scaleDownCooldownSeconds": {
                     "type": "integer",
                     "description": "Seconds to wait between scale-down events. Example: 300."
-                },
-                "targetMemoryUtilization": {
-                    "type": "number",
-                    "description": "Target memory utilization ratio (0-1), tuned independently of CPU. Example: 0.8."
-                },
-                "targetUtilization": {
-                    "type": "number",
-                    "description": "Target CPU utilization ratio (0-1). Example: 0.7."
                 }
             },
             "type": "object"
@@ -670,6 +664,9 @@
         },
         "devzero:resources:HorizontalScalingArgs": {
             "properties": {
+                "compositeFormula": {
+                    "type": "string"
+                },
                 "enabled": {
                     "type": "boolean",
                     "description": "Enable horizontal (replica) scaling. Example: true."
@@ -690,6 +687,9 @@
                     "type": "integer",
                     "description": "Minimum number of replicas to maintain. Example: 2."
                 },
+                "networkTargetThroughputBytesPerSec": {
+                    "type": "integer"
+                },
                 "primaryMetric": {
                     "type": "string",
                     "description": "Primary metric for HPA decisions. One of: 'cpu', 'memory', 'gpu', 'network_ingress', 'network_egress'. Example: 'cpu'.",
@@ -700,6 +700,12 @@
                         "network_ingress",
                         "network_egress"
                     ]
+                },
+                "scaleDownCooldownSeconds": {
+                    "type": "integer"
+                },
+                "targetMemoryUtilization": {
+                    "type": "number"
                 },
                 "targetUtilization": {
                     "type": "number",
@@ -886,13 +892,34 @@
         },
         "devzero:resources:ResourceRuleConfigArgs": {
             "properties": {
+                "ceilingPercent": {
+                    "type": "integer"
+                },
                 "enabled": {
                     "type": "boolean",
                     "description": "Enable this resource axis rule. Example: true."
                 },
+                "floorPercent": {
+                    "type": "integer"
+                },
+                "initialLimit": {
+                    "type": "integer"
+                },
+                "initialRequest": {
+                    "type": "integer"
+                },
+                "limitCeilingPercent": {
+                    "type": "integer"
+                },
+                "limitFloorPercent": {
+                    "type": "integer"
+                },
                 "limitMultiplier": {
                     "type": "number",
                     "description": "Multiplier applied to the request to derive the resource limit. Example: 1.5."
+                },
+                "limitUseRss": {
+                    "type": "boolean"
                 },
                 "limitsAdjustmentEnabled": {
                     "type": "boolean",
@@ -917,6 +944,9 @@
                 "minRequest": {
                     "type": "integer",
                     "description": "Minimum resource request (millicores for CPU, bytes for memory/GPU). Example: 100."
+                },
+                "requestUseRss": {
+                    "type": "boolean"
                 },
                 "targetPercentile": {
                     "type": "number",
@@ -1001,6 +1031,9 @@
                     "type": "number",
                     "description": "Multiplier applied to the request to derive the resource limit. Example: 1.5 sets limit to 150% of request."
                 },
+                "limitUseRss": {
+                    "type": "boolean"
+                },
                 "limitsAdjustmentEnabled": {
                     "type": "boolean",
                     "description": "Whether to also adjust resource limits alongside requests. Example: true."
@@ -1036,9 +1069,26 @@
                     "type": "number",
                     "description": "Multiplier applied on top of the recommendation to add headroom. Example: 1.15 adds 15% overhead."
                 },
+                "requestUseRss": {
+                    "type": "boolean"
+                },
                 "targetPercentile": {
                     "type": "number",
                     "description": "Percentile of usage data used as the recommendation target (0-1). Example: 0.95 targets the 95th percentile."
+                }
+            },
+            "type": "object"
+        },
+        "devzero:resources:ZonalShiftConfigArgs": {
+            "properties": {
+                "allowZoneFallback": {
+                    "type": "boolean"
+                },
+                "evictImpactedNodes": {
+                    "type": "boolean"
+                },
+                "respectZonalShift": {
+                    "type": "boolean"
                 }
             },
             "type": "object"
@@ -1088,6 +1138,9 @@
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
                     "description": "Capacity purchasing types. Valid values: 'spot', 'on-demand', 'reserved'. Example: {in: [\"spot\", \"on-demand\"]}."
                 },
+                "cloudProviderId": {
+                    "type": "integer"
+                },
                 "description": {
                     "type": "string",
                     "description": "Free-form description of the node policy. Example: 'Spot instance policy for production batch workloads'."
@@ -1116,6 +1169,9 @@
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
                     "description": "Filter instances by hypervisor type. Example: {in: [\"nitro\"]}."
                 },
+                "instanceLocalNvme": {
+                    "$ref": "#/types/devzero:resources:LabelSelectorArgs"
+                },
                 "instanceSizes": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
                     "description": "Filter instances by size label. Example: {in: [\"large\", \"xlarge\", \"2xlarge\"]}."
@@ -1134,6 +1190,9 @@
                 "limits": {
                     "$ref": "#/types/devzero:resources:ResourceLimitsArgs",
                     "description": "Resource limits on total capacity managed by this policy. Example: {cpu: \"1000\", memory: \"1000Gi\"}."
+                },
+                "masterOverrideRoleName": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string",
@@ -1158,6 +1217,12 @@
                     },
                     "description": "Raw Karpenter YAML for full NodePool/NodeClass customization \u2014 use only when structured fields are insufficient."
                 },
+                "startupTaints": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/types/devzero:resources:TaintArgs"
+                    }
+                },
                 "taints": {
                     "type": "array",
                     "items": {
@@ -1168,6 +1233,9 @@
                 "weight": {
                     "type": "integer",
                     "description": "Priority weight; higher values take precedence when multiple policies match. Example: 100."
+                },
+                "zonalShift": {
+                    "$ref": "#/types/devzero:resources:ZonalShiftConfigArgs"
                 },
                 "zones": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
@@ -1190,6 +1258,9 @@
                 "capacityTypes": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs"
                 },
+                "cloudProviderId": {
+                    "type": "integer"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -1211,6 +1282,9 @@
                 "instanceHypervisors": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs"
                 },
+                "instanceLocalNvme": {
+                    "$ref": "#/types/devzero:resources:LabelSelectorArgs"
+                },
                 "instanceSizes": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs"
                 },
@@ -1225,6 +1299,9 @@
                 },
                 "limits": {
                     "$ref": "#/types/devzero:resources:ResourceLimitsArgs"
+                },
+                "masterOverrideRoleName": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
@@ -1244,6 +1321,12 @@
                         "$ref": "#/types/devzero:resources:RawKarpenterSpecArgs"
                     }
                 },
+                "startupTaints": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/types/devzero:resources:TaintArgs"
+                    }
+                },
                 "taints": {
                     "type": "array",
                     "items": {
@@ -1252,6 +1335,9 @@
                 },
                 "weight": {
                     "type": "integer"
+                },
+                "zonalShift": {
+                    "$ref": "#/types/devzero:resources:ZonalShiftConfigArgs"
                 },
                 "zones": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs"
@@ -1268,7 +1354,7 @@
                     "items": {
                         "type": "string"
                     },
-                    "description": "Cluster IDs where this node policy applies."
+                    "description": "Cluster ID where this node policy applies. The API accepts at most one cluster per target; create one target per cluster."
                 },
                 "description": {
                     "type": "string",
@@ -1276,7 +1362,8 @@
                 },
                 "enabled": {
                     "type": "boolean",
-                    "description": "Whether this target is active. Defaults to true."
+                    "description": "Whether this target is active. Defaults to true.",
+                    "default": true
                 },
                 "name": {
                     "type": "string",
@@ -1327,10 +1414,25 @@
                     },
                     "description": "When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: [\"on_detection\"]."
                 },
+                "allowInPlaceMemoryLimitDecrease": {
+                    "type": "boolean"
+                },
                 "cooldownMinutes": {
                     "type": "integer",
                     "description": "Minimum minutes to wait between consecutive recommendation applications. Example: 300 (5 h, default).",
                     "default": 300
+                },
+                "cpuCeilingPercent": {
+                    "type": "integer"
+                },
+                "cpuFloorPercent": {
+                    "type": "integer"
+                },
+                "cpuLimitCeilingPercent": {
+                    "type": "integer"
+                },
+                "cpuLimitFloorPercent": {
+                    "type": "integer"
                 },
                 "cpuVerticalScaling": {
                     "$ref": "#/types/devzero:resources:VerticalScalingArgs"
@@ -1358,6 +1460,9 @@
                     "type": "number",
                     "description": "Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0."
                 },
+                "enableInPlaceVerticalScaling": {
+                    "type": "boolean"
+                },
                 "enablePmaxProtection": {
                     "type": "boolean",
                     "description": "Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false."
@@ -1377,6 +1482,33 @@
                     "type": "number",
                     "description": "Dead-band ratio around the HPA target to suppress oscillation between VPA and HPA. Example: 0.1 (10% band)."
                 },
+                "jvmCpuStartupFloorMillicores": {
+                    "type": "integer"
+                },
+                "jvmHeapHeadroomMultiplier": {
+                    "type": "number"
+                },
+                "jvmHeapOptimizationEnabled": {
+                    "type": "boolean"
+                },
+                "jvmHeapTargetPercentile": {
+                    "type": "number"
+                },
+                "jvmMaxHeapBytes": {
+                    "type": "integer"
+                },
+                "jvmMinHeapBytes": {
+                    "type": "integer"
+                },
+                "jvmNonHeapOverheadBytes": {
+                    "type": "integer"
+                },
+                "jvmNonHeapOverheadPercent": {
+                    "type": "number"
+                },
+                "jvmPreferContainerSupport": {
+                    "type": "boolean"
+                },
                 "liveMigrationEnabled": {
                     "type": "boolean",
                     "description": "Allow live pod migration when applying recommendations without restart. Example: false."
@@ -1385,6 +1517,18 @@
                     "type": "integer",
                     "description": "Seconds of historical usage data considered per recommendation. Example: 86400 (24 h, default).",
                     "default": 86400
+                },
+                "memoryCeilingPercent": {
+                    "type": "integer"
+                },
+                "memoryFloorPercent": {
+                    "type": "integer"
+                },
+                "memoryLimitCeilingPercent": {
+                    "type": "integer"
+                },
+                "memoryLimitFloorPercent": {
+                    "type": "integer"
                 },
                 "memoryVerticalScaling": {
                     "$ref": "#/types/devzero:resources:VerticalScalingArgs"
@@ -1407,6 +1551,9 @@
                 "name": {
                     "type": "string",
                     "description": "Human-friendly name for the policy. Example: 'production-vpa-policy'."
+                },
+                "pdbEnabled": {
+                    "type": "boolean"
                 },
                 "pmaxRatioThreshold": {
                     "type": "number",
@@ -1444,10 +1591,25 @@
                     },
                     "description": "When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: [\"on_detection\"]."
                 },
+                "allowInPlaceMemoryLimitDecrease": {
+                    "type": "boolean"
+                },
                 "cooldownMinutes": {
                     "type": "integer",
                     "description": "Minimum minutes to wait between consecutive recommendation applications. Example: 300 (5 h, default).",
                     "default": 300
+                },
+                "cpuCeilingPercent": {
+                    "type": "integer"
+                },
+                "cpuFloorPercent": {
+                    "type": "integer"
+                },
+                "cpuLimitCeilingPercent": {
+                    "type": "integer"
+                },
+                "cpuLimitFloorPercent": {
+                    "type": "integer"
                 },
                 "cpuVerticalScaling": {
                     "$ref": "#/types/devzero:resources:VerticalScalingArgs"
@@ -1480,6 +1642,9 @@
                     "type": "number",
                     "description": "Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0."
                 },
+                "enableInPlaceVerticalScaling": {
+                    "type": "boolean"
+                },
                 "enablePmaxProtection": {
                     "type": "boolean",
                     "description": "Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false."
@@ -1499,6 +1664,33 @@
                     "type": "number",
                     "description": "Dead-band ratio around the HPA target to suppress oscillation between VPA and HPA. Example: 0.1 (10% band)."
                 },
+                "jvmCpuStartupFloorMillicores": {
+                    "type": "integer"
+                },
+                "jvmHeapHeadroomMultiplier": {
+                    "type": "number"
+                },
+                "jvmHeapOptimizationEnabled": {
+                    "type": "boolean"
+                },
+                "jvmHeapTargetPercentile": {
+                    "type": "number"
+                },
+                "jvmMaxHeapBytes": {
+                    "type": "integer"
+                },
+                "jvmMinHeapBytes": {
+                    "type": "integer"
+                },
+                "jvmNonHeapOverheadBytes": {
+                    "type": "integer"
+                },
+                "jvmNonHeapOverheadPercent": {
+                    "type": "number"
+                },
+                "jvmPreferContainerSupport": {
+                    "type": "boolean"
+                },
                 "liveMigrationEnabled": {
                     "type": "boolean",
                     "description": "Allow live pod migration when applying recommendations without restart. Example: false."
@@ -1507,6 +1699,18 @@
                     "type": "integer",
                     "description": "Seconds of historical usage data considered per recommendation. Example: 86400 (24 h, default).",
                     "default": 86400
+                },
+                "memoryCeilingPercent": {
+                    "type": "integer"
+                },
+                "memoryFloorPercent": {
+                    "type": "integer"
+                },
+                "memoryLimitCeilingPercent": {
+                    "type": "integer"
+                },
+                "memoryLimitFloorPercent": {
+                    "type": "integer"
                 },
                 "memoryVerticalScaling": {
                     "$ref": "#/types/devzero:resources:VerticalScalingArgs"
@@ -1529,6 +1733,9 @@
                 "name": {
                     "type": "string",
                     "description": "Human-friendly name for the policy. Example: 'production-vpa-policy'."
+                },
+                "pdbEnabled": {
+                    "type": "boolean"
                 },
                 "pmaxRatioThreshold": {
                     "type": "number",
@@ -1557,6 +1764,10 @@
         },
         "devzero:resources:WorkloadPolicyTarget": {
             "properties": {
+                "annotationSelector": {
+                    "$ref": "#/types/devzero:resources:LabelSelectorArgs",
+                    "description": "Select workloads by annotations (same semantics as label selectors, evaluated against annotations)."
+                },
                 "clusterIds": {
                     "type": "array",
                     "items": {
@@ -1570,7 +1781,8 @@
                 },
                 "enabled": {
                     "type": "boolean",
-                    "description": "Enable or disable this target."
+                    "description": "Enable or disable this target. Defaults to true.",
+                    "default": true
                 },
                 "kindFilter": {
                     "type": "array",
@@ -1578,6 +1790,13 @@
                         "type": "string"
                     },
                     "description": "Restrict matching to specific Kubernetes kinds (e.g. Deployment, Pod)."
+                },
+                "kindFilterNotIn": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Kubernetes kinds to exclude from matching. Same allowed values as kindFilter."
                 },
                 "name": {
                     "type": "string",
@@ -1600,7 +1819,8 @@
                     "items": {
                         "type": "string"
                     },
-                    "description": "Restrict matching to specific node groups by name."
+                    "description": "DEPRECATED: unused by the DevZero API \u2014 no longer evaluated by any active target.",
+                    "deprecationMessage": "node_group_names is deprecated by the DevZero API and no longer evaluated."
                 },
                 "policyId": {
                     "type": "string",
@@ -1617,6 +1837,13 @@
                     },
                     "description": "Explicit list of workload names to include."
                 },
+                "workloadNamesNotIn": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Explicit list of workload names to exclude."
+                },
                 "workloadSelector": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
                     "description": "Select workloads by labels."
@@ -1628,6 +1855,9 @@
                 "clusterIds"
             ],
             "inputProperties": {
+                "annotationSelector": {
+                    "$ref": "#/types/devzero:resources:LabelSelectorArgs"
+                },
                 "clusterIds": {
                     "type": "array",
                     "items": {
@@ -1657,6 +1887,12 @@
                         ]
                     }
                 },
+                "kindFilterNotIn": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "name": {
                     "type": "string"
                 },
@@ -1682,6 +1918,12 @@
                     "type": "integer"
                 },
                 "workloadNames": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "workloadNamesNotIn": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -1744,6 +1986,9 @@
                     },
                     "description": "Events that trigger a recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: [\"pod_creation\"]."
                 },
+                "disabled": {
+                    "type": "boolean"
+                },
                 "emergencyResponse": {
                     "$ref": "#/types/devzero:resources:EmergencyResponseConfigArgs",
                     "description": "Emergency response configuration for OOM and CPU throttle events."
@@ -1763,6 +2008,9 @@
                 "liveMigrationEnabled": {
                     "type": "boolean",
                     "description": "Allow live pod migration when applying recommendations. Example: false."
+                },
+                "lookbackPeriodSeconds": {
+                    "type": "integer"
                 },
                 "memoryRule": {
                     "$ref": "#/types/devzero:resources:ResourceRuleConfigArgs",
@@ -1844,6 +2092,9 @@
                     },
                     "description": "Events that trigger a recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: [\"pod_creation\"]."
                 },
+                "disabled": {
+                    "type": "boolean"
+                },
                 "emergencyResponse": {
                     "$ref": "#/types/devzero:resources:EmergencyResponseConfigArgs",
                     "description": "Emergency response configuration for OOM and CPU throttle events."
@@ -1863,6 +2114,9 @@
                 "liveMigrationEnabled": {
                     "type": "boolean",
                     "description": "Allow live pod migration when applying recommendations. Example: false."
+                },
+                "lookbackPeriodSeconds": {
+                    "type": "integer"
                 },
                 "memoryRule": {
                     "$ref": "#/types/devzero:resources:ResourceRuleConfigArgs",

@@ -237,32 +237,41 @@ func TestCluster_Update_Success(t *testing.T) {
 	}
 }
 
-func TestCluster_Update_RotatesTokenWhenEmpty(t *testing.T) {
+// The provider must never rotate the cluster token as a side effect of an
+// unrelated update — that would silently invalidate the credential the
+// running in-cluster agent is using. An imported cluster keeps an empty token.
+func TestCluster_Update_DoesNotRotateToken(t *testing.T) {
+	rotated := false
 	mut := &mockMutationClient{
-		updateFn: func(_ context.Context, req *connect.Request[apiv1.UpdateClusterRequest]) (*connect.Response[apiv1.UpdateClusterResponse], error) {
+		updateFn: func(_ context.Context, _ *connect.Request[apiv1.UpdateClusterRequest]) (*connect.Response[apiv1.UpdateClusterResponse], error) {
 			return connect.NewResponse(&apiv1.UpdateClusterResponse{
-				Cluster: &apiv1.Cluster{CustomName: req.Msg.ClusterName},
+				Cluster: &apiv1.Cluster{Id: "cluster-123", CustomName: "renamed"},
 			}), nil
 		},
 		resetTokenFn: func(_ context.Context, _ *connect.Request[apiv1.ResetClusterTokenRequest]) (*connect.Response[apiv1.ResetClusterTokenResponse], error) {
-			return connect.NewResponse(&apiv1.ResetClusterTokenResponse{Token: "new-rotated-token"}), nil
+			rotated = true
+			return connect.NewResponse(&apiv1.ResetClusterTokenResponse{Token: "new-token"}), nil
 		},
 	}
 	withMockClientSet(t, mut, &mockK8SClient{})
 
 	c := &Cluster{}
-	// State.Token is empty — triggers rotation
 	resp, err := c.Update(context.Background(), infer.UpdateRequest[ClusterArgs, ClusterState]{
 		ID:     "cluster-123",
-		State:  ClusterState{ClusterArgs: ClusterArgs{Name: "name"}, Token: ""},
-		Inputs: ClusterArgs{Name: "name"},
+		Inputs: ClusterArgs{Name: "renamed"},
+		State:  ClusterState{ClusterArgs: ClusterArgs{Name: "old"}, Token: ""},
 	})
-
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if resp.Output.Token != "new-rotated-token" {
-		t.Errorf("token: got %q, want %q", resp.Output.Token, "new-rotated-token")
+	if rotated {
+		t.Fatal("expected token NOT to be rotated on update")
+	}
+	if resp.Output.Token != "" {
+		t.Fatalf("expected the (empty) state token to be preserved, got %q", resp.Output.Token)
+	}
+	if resp.Output.Name != "renamed" {
+		t.Fatalf("Name: got %q", resp.Output.Name)
 	}
 }
 
@@ -313,7 +322,7 @@ func TestCluster_Delete_Success(t *testing.T) {
 func TestCluster_Delete_APIError(t *testing.T) {
 	mut := &mockMutationClient{
 		deleteFn: func(_ context.Context, _ *connect.Request[apiv1.DeleteClusterRequest]) (*connect.Response[apiv1.DeleteClusterResponse], error) {
-			return nil, connect.NewError(connect.CodeNotFound, errors.New("not found"))
+			return nil, connect.NewError(connect.CodeInternal, errors.New("backend exploded"))
 		},
 	}
 	withMockClientSet(t, mut, &mockK8SClient{})

@@ -18,6 +18,11 @@ type mockRecommendationClientNodePolicy struct {
 	createNodePoliciesFn func(context.Context, *connect.Request[apiv1.CreateNodePoliciesRequest]) (*connect.Response[apiv1.CreateNodePoliciesResponse], error)
 	listNodePoliciesFn   func(context.Context, *connect.Request[apiv1.ListNodePoliciesRequest]) (*connect.Response[apiv1.ListNodePoliciesResponse], error)
 	updateNodePolicyFn   func(context.Context, *connect.Request[apiv1.UpdateNodePolicyRequest]) (*connect.Response[apiv1.UpdateNodePolicyResponse], error)
+	deleteNodePolicyFn   func(context.Context, *connect.Request[apiv1.DeleteNodePolicyRequest]) (*connect.Response[apiv1.DeleteNodePolicyResponse], error)
+}
+
+func (m *mockRecommendationClientNodePolicy) DeleteNodePolicy(ctx context.Context, req *connect.Request[apiv1.DeleteNodePolicyRequest]) (*connect.Response[apiv1.DeleteNodePolicyResponse], error) {
+	return m.deleteNodePolicyFn(ctx, req)
 }
 
 func (m *mockRecommendationClientNodePolicy) CreateNodePolicies(ctx context.Context, req *connect.Request[apiv1.CreateNodePoliciesRequest]) (*connect.Response[apiv1.CreateNodePoliciesResponse], error) {
@@ -198,11 +203,36 @@ func TestNodePolicy_Read_NotFound(t *testing.T) {
 	withMockNodePolicyClientSet(t, rec)
 
 	n := &NodePolicy{}
-	_, err := n.Read(context.Background(), infer.ReadRequest[NodePolicyArgs, NodePolicyState]{
+	resp, err := n.Read(context.Background(), infer.ReadRequest[NodePolicyArgs, NodePolicyState]{
 		ID: "np-missing",
 	})
-	if err == nil {
-		t.Fatal("expected error for not-found, got nil")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.ID != "" {
+		t.Fatalf("expected empty response (drop from state) for a policy deleted out of band, got ID %q", resp.ID)
+	}
+}
+
+// ListNodePolicies mixes in read-only virtual policies mirrored from non-dakr
+// Karpenter resources (source == "cluster"); Read must never adopt them.
+func TestNodePolicy_Read_SkipsClusterSourcedPolicies(t *testing.T) {
+	rec := &mockRecommendationClientNodePolicy{
+		listNodePoliciesFn: func(_ context.Context, _ *connect.Request[apiv1.ListNodePoliciesRequest]) (*connect.Response[apiv1.ListNodePoliciesResponse], error) {
+			return connect.NewResponse(&apiv1.ListNodePoliciesResponse{
+				Policies: []*apiv1.NodePolicy{{Id: "np-virtual", Name: "cluster-managed", Source: "cluster"}},
+			}), nil
+		},
+	}
+	withMockNodePolicyClientSet(t, rec)
+
+	n := &NodePolicy{}
+	resp, err := n.Read(context.Background(), infer.ReadRequest[NodePolicyArgs, NodePolicyState]{ID: "np-virtual"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.ID != "" {
+		t.Fatalf("expected the cluster-sourced virtual policy to be skipped, got ID %q", resp.ID)
 	}
 }
 
@@ -339,8 +369,19 @@ func TestNodePolicy_Update_EmptyResponse(t *testing.T) {
 
 // ---------- Delete ----------
 
-func TestNodePolicy_Delete_StateOnly(t *testing.T) {
-	// Delete should always succeed without calling any API.
+func TestNodePolicy_Delete_CallsAPI(t *testing.T) {
+	deleted := false
+	rec := &mockRecommendationClientNodePolicy{
+		deleteNodePolicyFn: func(_ context.Context, req *connect.Request[apiv1.DeleteNodePolicyRequest]) (*connect.Response[apiv1.DeleteNodePolicyResponse], error) {
+			if req.Msg.PolicyId != "np-123" {
+				t.Errorf("PolicyId: got %q, want %q", req.Msg.PolicyId, "np-123")
+			}
+			deleted = true
+			return connect.NewResponse(&apiv1.DeleteNodePolicyResponse{Success: true}), nil
+		},
+	}
+	withMockNodePolicyClientSet(t, rec)
+
 	n := &NodePolicy{}
 	_, err := n.Delete(context.Background(), infer.DeleteRequest[NodePolicyState]{
 		ID:    "np-123",
@@ -349,18 +390,34 @@ func TestNodePolicy_Delete_StateOnly(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+	if !deleted {
+		t.Fatal("expected DeleteNodePolicy to be called")
+	}
+}
+
+func TestNodePolicy_Delete_ToleratesNotFound(t *testing.T) {
+	rec := &mockRecommendationClientNodePolicy{
+		deleteNodePolicyFn: func(_ context.Context, _ *connect.Request[apiv1.DeleteNodePolicyRequest]) (*connect.Response[apiv1.DeleteNodePolicyResponse], error) {
+			return nil, connect.NewError(connect.CodeNotFound, errors.New("resource not found"))
+		},
+	}
+	withMockNodePolicyClientSet(t, rec)
+
+	n := &NodePolicy{}
+	if _, err := n.Delete(context.Background(), infer.DeleteRequest[NodePolicyState]{ID: "np-gone"}); err != nil {
+		t.Fatalf("expected NotFound to be tolerated, got: %v", err)
+	}
 }
 
 func TestNodePolicy_Delete_NilClientSet(t *testing.T) {
-	// Even with nil clientset, delete must succeed (state-only).
 	prev := clientset.Get()
 	clientset.Set(nil)
 	t.Cleanup(func() { clientset.Set(prev) })
 
 	n := &NodePolicy{}
 	_, err := n.Delete(context.Background(), infer.DeleteRequest[NodePolicyState]{ID: "np-123"})
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
+	if err == nil {
+		t.Fatal("expected error when provider is not configured")
 	}
 }
 

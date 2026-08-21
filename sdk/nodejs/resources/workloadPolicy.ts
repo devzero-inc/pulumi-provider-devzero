@@ -37,10 +37,15 @@ export class WorkloadPolicy extends pulumi.CustomResource {
      * When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: ["on_detection"].
      */
     declare public readonly actionTriggers: pulumi.Output<string[] | undefined>;
+    declare public readonly allowInPlaceMemoryLimitDecrease: pulumi.Output<boolean | undefined>;
     /**
      * Minimum minutes to wait between consecutive recommendation applications. Example: 300 (5 h, default).
      */
     declare public readonly cooldownMinutes: pulumi.Output<number | undefined>;
+    declare public readonly cpuCeilingPercent: pulumi.Output<number | undefined>;
+    declare public readonly cpuFloorPercent: pulumi.Output<number | undefined>;
+    declare public readonly cpuLimitCeilingPercent: pulumi.Output<number | undefined>;
+    declare public readonly cpuLimitFloorPercent: pulumi.Output<number | undefined>;
     declare public readonly cpuVerticalScaling: pulumi.Output<outputs.resources.VerticalScalingArgs | undefined>;
     /**
      * Cron expression for scheduled application (5-field UTC format). Required when actionTriggers includes 'on_schedule'. Example: '0 2 * * *' (daily at 2 am UTC).
@@ -62,6 +67,7 @@ export class WorkloadPolicy extends pulumi.CustomResource {
      * Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
      */
     declare public readonly driftDeltaPercent: pulumi.Output<number | undefined>;
+    declare public readonly enableInPlaceVerticalScaling: pulumi.Output<boolean | undefined>;
     /**
      * Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.
      */
@@ -79,6 +85,15 @@ export class WorkloadPolicy extends pulumi.CustomResource {
      * Dead-band ratio around the HPA target to suppress oscillation between VPA and HPA. Example: 0.1 (10% band).
      */
     declare public readonly hysteresisVsTarget: pulumi.Output<number | undefined>;
+    declare public readonly jvmCpuStartupFloorMillicores: pulumi.Output<number | undefined>;
+    declare public readonly jvmHeapHeadroomMultiplier: pulumi.Output<number | undefined>;
+    declare public readonly jvmHeapOptimizationEnabled: pulumi.Output<boolean | undefined>;
+    declare public readonly jvmHeapTargetPercentile: pulumi.Output<number | undefined>;
+    declare public readonly jvmMaxHeapBytes: pulumi.Output<number | undefined>;
+    declare public readonly jvmMinHeapBytes: pulumi.Output<number | undefined>;
+    declare public readonly jvmNonHeapOverheadBytes: pulumi.Output<number | undefined>;
+    declare public readonly jvmNonHeapOverheadPercent: pulumi.Output<number | undefined>;
+    declare public readonly jvmPreferContainerSupport: pulumi.Output<boolean | undefined>;
     /**
      * Allow live pod migration when applying recommendations without restart. Example: false.
      */
@@ -87,6 +102,10 @@ export class WorkloadPolicy extends pulumi.CustomResource {
      * Seconds of historical usage data considered per recommendation. Example: 86400 (24 h, default).
      */
     declare public readonly loopbackPeriodSeconds: pulumi.Output<number | undefined>;
+    declare public readonly memoryCeilingPercent: pulumi.Output<number | undefined>;
+    declare public readonly memoryFloorPercent: pulumi.Output<number | undefined>;
+    declare public readonly memoryLimitCeilingPercent: pulumi.Output<number | undefined>;
+    declare public readonly memoryLimitFloorPercent: pulumi.Output<number | undefined>;
     declare public readonly memoryVerticalScaling: pulumi.Output<outputs.resources.VerticalScalingArgs | undefined>;
     /**
      * Minimum relative change (0-1) required before a recommendation is applied globally. Example: 0.2 means 20% change needed (default).
@@ -104,6 +123,7 @@ export class WorkloadPolicy extends pulumi.CustomResource {
      * Human-friendly name for the policy. Example: 'production-vpa-policy'.
      */
     declare public readonly name: pulumi.Output<string>;
+    declare public readonly pdbEnabled: pulumi.Output<boolean | undefined>;
     /**
      * Peak-to-recommendation ratio above which pmax protection activates. Example: 3.0 (default) — triggers when peak is 3× the recommendation.
      */
@@ -136,50 +156,90 @@ export class WorkloadPolicy extends pulumi.CustomResource {
                 throw new Error("Missing required property 'name'");
             }
             resourceInputs["actionTriggers"] = args?.actionTriggers;
+            resourceInputs["allowInPlaceMemoryLimitDecrease"] = args?.allowInPlaceMemoryLimitDecrease;
             resourceInputs["cooldownMinutes"] = (args?.cooldownMinutes) ?? 300;
+            resourceInputs["cpuCeilingPercent"] = args?.cpuCeilingPercent;
+            resourceInputs["cpuFloorPercent"] = args?.cpuFloorPercent;
+            resourceInputs["cpuLimitCeilingPercent"] = args?.cpuLimitCeilingPercent;
+            resourceInputs["cpuLimitFloorPercent"] = args?.cpuLimitFloorPercent;
             resourceInputs["cpuVerticalScaling"] = args ? (args.cpuVerticalScaling ? pulumi.output(args.cpuVerticalScaling).apply(inputs.resources.verticalScalingArgsArgsProvideDefaults) : undefined) : undefined;
             resourceInputs["cronSchedule"] = args?.cronSchedule;
             resourceInputs["defragmentationSchedule"] = args?.defragmentationSchedule;
             resourceInputs["description"] = args?.description;
             resourceInputs["detectionTriggers"] = args?.detectionTriggers;
             resourceInputs["driftDeltaPercent"] = args?.driftDeltaPercent;
+            resourceInputs["enableInPlaceVerticalScaling"] = args?.enableInPlaceVerticalScaling;
             resourceInputs["enablePmaxProtection"] = args?.enablePmaxProtection;
             resourceInputs["gpuVerticalScaling"] = args ? (args.gpuVerticalScaling ? pulumi.output(args.gpuVerticalScaling).apply(inputs.resources.verticalScalingArgsArgsProvideDefaults) : undefined) : undefined;
             resourceInputs["gpuVramVerticalScaling"] = args ? (args.gpuVramVerticalScaling ? pulumi.output(args.gpuVramVerticalScaling).apply(inputs.resources.verticalScalingArgsArgsProvideDefaults) : undefined) : undefined;
             resourceInputs["horizontalScaling"] = args?.horizontalScaling;
             resourceInputs["hysteresisVsTarget"] = args?.hysteresisVsTarget;
+            resourceInputs["jvmCpuStartupFloorMillicores"] = args?.jvmCpuStartupFloorMillicores;
+            resourceInputs["jvmHeapHeadroomMultiplier"] = args?.jvmHeapHeadroomMultiplier;
+            resourceInputs["jvmHeapOptimizationEnabled"] = args?.jvmHeapOptimizationEnabled;
+            resourceInputs["jvmHeapTargetPercentile"] = args?.jvmHeapTargetPercentile;
+            resourceInputs["jvmMaxHeapBytes"] = args?.jvmMaxHeapBytes;
+            resourceInputs["jvmMinHeapBytes"] = args?.jvmMinHeapBytes;
+            resourceInputs["jvmNonHeapOverheadBytes"] = args?.jvmNonHeapOverheadBytes;
+            resourceInputs["jvmNonHeapOverheadPercent"] = args?.jvmNonHeapOverheadPercent;
+            resourceInputs["jvmPreferContainerSupport"] = args?.jvmPreferContainerSupport;
             resourceInputs["liveMigrationEnabled"] = args?.liveMigrationEnabled;
             resourceInputs["loopbackPeriodSeconds"] = (args?.loopbackPeriodSeconds) ?? 86400;
+            resourceInputs["memoryCeilingPercent"] = args?.memoryCeilingPercent;
+            resourceInputs["memoryFloorPercent"] = args?.memoryFloorPercent;
+            resourceInputs["memoryLimitCeilingPercent"] = args?.memoryLimitCeilingPercent;
+            resourceInputs["memoryLimitFloorPercent"] = args?.memoryLimitFloorPercent;
             resourceInputs["memoryVerticalScaling"] = args ? (args.memoryVerticalScaling ? pulumi.output(args.memoryVerticalScaling).apply(inputs.resources.verticalScalingArgsArgsProvideDefaults) : undefined) : undefined;
             resourceInputs["minChangePercent"] = (args?.minChangePercent) ?? 0.2;
             resourceInputs["minDataPoints"] = (args?.minDataPoints) ?? 15;
             resourceInputs["minVpaWindowDataPoints"] = (args?.minVpaWindowDataPoints) ?? 30;
             resourceInputs["name"] = args?.name;
+            resourceInputs["pdbEnabled"] = args?.pdbEnabled;
             resourceInputs["pmaxRatioThreshold"] = (args?.pmaxRatioThreshold) ?? 3;
             resourceInputs["schedulerPlugins"] = args?.schedulerPlugins;
             resourceInputs["stabilityCvMax"] = args?.stabilityCvMax;
             resourceInputs["startupPeriodSeconds"] = args?.startupPeriodSeconds;
         } else {
             resourceInputs["actionTriggers"] = undefined /*out*/;
+            resourceInputs["allowInPlaceMemoryLimitDecrease"] = undefined /*out*/;
             resourceInputs["cooldownMinutes"] = undefined /*out*/;
+            resourceInputs["cpuCeilingPercent"] = undefined /*out*/;
+            resourceInputs["cpuFloorPercent"] = undefined /*out*/;
+            resourceInputs["cpuLimitCeilingPercent"] = undefined /*out*/;
+            resourceInputs["cpuLimitFloorPercent"] = undefined /*out*/;
             resourceInputs["cpuVerticalScaling"] = undefined /*out*/;
             resourceInputs["cronSchedule"] = undefined /*out*/;
             resourceInputs["defragmentationSchedule"] = undefined /*out*/;
             resourceInputs["description"] = undefined /*out*/;
             resourceInputs["detectionTriggers"] = undefined /*out*/;
             resourceInputs["driftDeltaPercent"] = undefined /*out*/;
+            resourceInputs["enableInPlaceVerticalScaling"] = undefined /*out*/;
             resourceInputs["enablePmaxProtection"] = undefined /*out*/;
             resourceInputs["gpuVerticalScaling"] = undefined /*out*/;
             resourceInputs["gpuVramVerticalScaling"] = undefined /*out*/;
             resourceInputs["horizontalScaling"] = undefined /*out*/;
             resourceInputs["hysteresisVsTarget"] = undefined /*out*/;
+            resourceInputs["jvmCpuStartupFloorMillicores"] = undefined /*out*/;
+            resourceInputs["jvmHeapHeadroomMultiplier"] = undefined /*out*/;
+            resourceInputs["jvmHeapOptimizationEnabled"] = undefined /*out*/;
+            resourceInputs["jvmHeapTargetPercentile"] = undefined /*out*/;
+            resourceInputs["jvmMaxHeapBytes"] = undefined /*out*/;
+            resourceInputs["jvmMinHeapBytes"] = undefined /*out*/;
+            resourceInputs["jvmNonHeapOverheadBytes"] = undefined /*out*/;
+            resourceInputs["jvmNonHeapOverheadPercent"] = undefined /*out*/;
+            resourceInputs["jvmPreferContainerSupport"] = undefined /*out*/;
             resourceInputs["liveMigrationEnabled"] = undefined /*out*/;
             resourceInputs["loopbackPeriodSeconds"] = undefined /*out*/;
+            resourceInputs["memoryCeilingPercent"] = undefined /*out*/;
+            resourceInputs["memoryFloorPercent"] = undefined /*out*/;
+            resourceInputs["memoryLimitCeilingPercent"] = undefined /*out*/;
+            resourceInputs["memoryLimitFloorPercent"] = undefined /*out*/;
             resourceInputs["memoryVerticalScaling"] = undefined /*out*/;
             resourceInputs["minChangePercent"] = undefined /*out*/;
             resourceInputs["minDataPoints"] = undefined /*out*/;
             resourceInputs["minVpaWindowDataPoints"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
+            resourceInputs["pdbEnabled"] = undefined /*out*/;
             resourceInputs["pmaxRatioThreshold"] = undefined /*out*/;
             resourceInputs["schedulerPlugins"] = undefined /*out*/;
             resourceInputs["stabilityCvMax"] = undefined /*out*/;
@@ -198,10 +258,15 @@ export interface WorkloadPolicyArgs {
      * When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: ["on_detection"].
      */
     actionTriggers?: pulumi.Input<pulumi.Input<string>[]>;
+    allowInPlaceMemoryLimitDecrease?: pulumi.Input<boolean>;
     /**
      * Minimum minutes to wait between consecutive recommendation applications. Example: 300 (5 h, default).
      */
     cooldownMinutes?: pulumi.Input<number>;
+    cpuCeilingPercent?: pulumi.Input<number>;
+    cpuFloorPercent?: pulumi.Input<number>;
+    cpuLimitCeilingPercent?: pulumi.Input<number>;
+    cpuLimitFloorPercent?: pulumi.Input<number>;
     cpuVerticalScaling?: pulumi.Input<inputs.resources.VerticalScalingArgsArgs>;
     /**
      * Cron expression for scheduled application (5-field UTC format). Required when actionTriggers includes 'on_schedule'. Example: '0 2 * * *' (daily at 2 am UTC).
@@ -223,6 +288,7 @@ export interface WorkloadPolicyArgs {
      * Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
      */
     driftDeltaPercent?: pulumi.Input<number>;
+    enableInPlaceVerticalScaling?: pulumi.Input<boolean>;
     /**
      * Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.
      */
@@ -240,6 +306,15 @@ export interface WorkloadPolicyArgs {
      * Dead-band ratio around the HPA target to suppress oscillation between VPA and HPA. Example: 0.1 (10% band).
      */
     hysteresisVsTarget?: pulumi.Input<number>;
+    jvmCpuStartupFloorMillicores?: pulumi.Input<number>;
+    jvmHeapHeadroomMultiplier?: pulumi.Input<number>;
+    jvmHeapOptimizationEnabled?: pulumi.Input<boolean>;
+    jvmHeapTargetPercentile?: pulumi.Input<number>;
+    jvmMaxHeapBytes?: pulumi.Input<number>;
+    jvmMinHeapBytes?: pulumi.Input<number>;
+    jvmNonHeapOverheadBytes?: pulumi.Input<number>;
+    jvmNonHeapOverheadPercent?: pulumi.Input<number>;
+    jvmPreferContainerSupport?: pulumi.Input<boolean>;
     /**
      * Allow live pod migration when applying recommendations without restart. Example: false.
      */
@@ -248,6 +323,10 @@ export interface WorkloadPolicyArgs {
      * Seconds of historical usage data considered per recommendation. Example: 86400 (24 h, default).
      */
     loopbackPeriodSeconds?: pulumi.Input<number>;
+    memoryCeilingPercent?: pulumi.Input<number>;
+    memoryFloorPercent?: pulumi.Input<number>;
+    memoryLimitCeilingPercent?: pulumi.Input<number>;
+    memoryLimitFloorPercent?: pulumi.Input<number>;
     memoryVerticalScaling?: pulumi.Input<inputs.resources.VerticalScalingArgsArgs>;
     /**
      * Minimum relative change (0-1) required before a recommendation is applied globally. Example: 0.2 means 20% change needed (default).
@@ -265,6 +344,7 @@ export interface WorkloadPolicyArgs {
      * Human-friendly name for the policy. Example: 'production-vpa-policy'.
      */
     name: pulumi.Input<string>;
+    pdbEnabled?: pulumi.Input<boolean>;
     /**
      * Peak-to-recommendation ratio above which pmax protection activates. Example: 3.0 (default) — triggers when peak is 3× the recommendation.
      */

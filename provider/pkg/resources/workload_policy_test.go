@@ -309,7 +309,7 @@ func TestWorkloadPolicy_Read_NilClientSet(t *testing.T) {
 func TestWorkloadPolicy_Read_APIError(t *testing.T) {
 	rec := &mockRecommendationClient{
 		getFn: func(_ context.Context, _ *connect.Request[apiv1.GetWorkloadRecommendationPolicyRequest]) (*connect.Response[apiv1.GetWorkloadRecommendationPolicyResponse], error) {
-			return nil, connect.NewError(connect.CodeNotFound, errors.New("not found"))
+			return nil, connect.NewError(connect.CodeInternal, errors.New("backend exploded"))
 		},
 	}
 	withMockRecommendationClientSet(t, rec)
@@ -418,7 +418,7 @@ func TestWorkloadPolicy_Delete_Success(t *testing.T) {
 func TestWorkloadPolicy_Delete_APIError(t *testing.T) {
 	rec := &mockRecommendationClient{
 		deleteFn: func(_ context.Context, _ *connect.Request[apiv1.DeleteWorkloadRecommendationPolicyRequest]) (*connect.Response[apiv1.DeleteWorkloadRecommendationPolicyResponse], error) {
-			return nil, connect.NewError(connect.CodeNotFound, errors.New("not found"))
+			return nil, connect.NewError(connect.CodeInternal, errors.New("backend exploded"))
 		},
 	}
 	withMockRecommendationClientSet(t, rec)

@@ -33,10 +33,12 @@ class WorkloadRuleArgs:
                  cron_schedule: Optional[pulumi.Input[_builtins.str]] = None,
                  defragmentation_schedule: Optional[pulumi.Input[_builtins.str]] = None,
                  detection_triggers: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 disabled: Optional[pulumi.Input[_builtins.bool]] = None,
                  emergency_response: Optional[pulumi.Input['EmergencyResponseConfigArgsArgs']] = None,
                  gpu_rule: Optional[pulumi.Input['ResourceRuleConfigArgsArgs']] = None,
                  hpa_rule: Optional[pulumi.Input['HPARuleConfigArgsArgs']] = None,
                  live_migration_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
+                 lookback_period_seconds: Optional[pulumi.Input[_builtins.int]] = None,
                  memory_rule: Optional[pulumi.Input['ResourceRuleConfigArgsArgs']] = None,
                  scheduler_plugins: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  startup_period_seconds: Optional[pulumi.Input[_builtins.int]] = None,
@@ -85,6 +87,8 @@ class WorkloadRuleArgs:
             pulumi.set(__self__, "defragmentation_schedule", defragmentation_schedule)
         if detection_triggers is not None:
             pulumi.set(__self__, "detection_triggers", detection_triggers)
+        if disabled is not None:
+            pulumi.set(__self__, "disabled", disabled)
         if emergency_response is not None:
             pulumi.set(__self__, "emergency_response", emergency_response)
         if gpu_rule is not None:
@@ -93,6 +97,8 @@ class WorkloadRuleArgs:
             pulumi.set(__self__, "hpa_rule", hpa_rule)
         if live_migration_enabled is not None:
             pulumi.set(__self__, "live_migration_enabled", live_migration_enabled)
+        if lookback_period_seconds is not None:
+            pulumi.set(__self__, "lookback_period_seconds", lookback_period_seconds)
         if memory_rule is not None:
             pulumi.set(__self__, "memory_rule", memory_rule)
         if scheduler_plugins is not None:
@@ -247,6 +253,15 @@ class WorkloadRuleArgs:
         pulumi.set(self, "detection_triggers", value)
 
     @_builtins.property
+    @pulumi.getter
+    def disabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        return pulumi.get(self, "disabled")
+
+    @disabled.setter
+    def disabled(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "disabled", value)
+
+    @_builtins.property
     @pulumi.getter(name="emergencyResponse")
     def emergency_response(self) -> Optional[pulumi.Input['EmergencyResponseConfigArgsArgs']]:
         """
@@ -293,6 +308,15 @@ class WorkloadRuleArgs:
     @live_migration_enabled.setter
     def live_migration_enabled(self, value: Optional[pulumi.Input[_builtins.bool]]):
         pulumi.set(self, "live_migration_enabled", value)
+
+    @_builtins.property
+    @pulumi.getter(name="lookbackPeriodSeconds")
+    def lookback_period_seconds(self) -> Optional[pulumi.Input[_builtins.int]]:
+        return pulumi.get(self, "lookback_period_seconds")
+
+    @lookback_period_seconds.setter
+    def lookback_period_seconds(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "lookback_period_seconds", value)
 
     @_builtins.property
     @pulumi.getter(name="memoryRule")
@@ -358,11 +382,13 @@ class WorkloadRule(pulumi.CustomResource):
                  cron_schedule: Optional[pulumi.Input[_builtins.str]] = None,
                  defragmentation_schedule: Optional[pulumi.Input[_builtins.str]] = None,
                  detection_triggers: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 disabled: Optional[pulumi.Input[_builtins.bool]] = None,
                  emergency_response: Optional[pulumi.Input[Union['EmergencyResponseConfigArgsArgs', 'EmergencyResponseConfigArgsArgsDict']]] = None,
                  gpu_rule: Optional[pulumi.Input[Union['ResourceRuleConfigArgsArgs', 'ResourceRuleConfigArgsArgsDict']]] = None,
                  hpa_rule: Optional[pulumi.Input[Union['HPARuleConfigArgsArgs', 'HPARuleConfigArgsArgsDict']]] = None,
                  kind: Optional[pulumi.Input[_builtins.str]] = None,
                  live_migration_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
+                 lookback_period_seconds: Optional[pulumi.Input[_builtins.int]] = None,
                  memory_rule: Optional[pulumi.Input[Union['ResourceRuleConfigArgsArgs', 'ResourceRuleConfigArgsArgsDict']]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  namespace: Optional[pulumi.Input[_builtins.str]] = None,
@@ -429,11 +455,13 @@ class WorkloadRule(pulumi.CustomResource):
                  cron_schedule: Optional[pulumi.Input[_builtins.str]] = None,
                  defragmentation_schedule: Optional[pulumi.Input[_builtins.str]] = None,
                  detection_triggers: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 disabled: Optional[pulumi.Input[_builtins.bool]] = None,
                  emergency_response: Optional[pulumi.Input[Union['EmergencyResponseConfigArgsArgs', 'EmergencyResponseConfigArgsArgsDict']]] = None,
                  gpu_rule: Optional[pulumi.Input[Union['ResourceRuleConfigArgsArgs', 'ResourceRuleConfigArgsArgsDict']]] = None,
                  hpa_rule: Optional[pulumi.Input[Union['HPARuleConfigArgsArgs', 'HPARuleConfigArgsArgsDict']]] = None,
                  kind: Optional[pulumi.Input[_builtins.str]] = None,
                  live_migration_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
+                 lookback_period_seconds: Optional[pulumi.Input[_builtins.int]] = None,
                  memory_rule: Optional[pulumi.Input[Union['ResourceRuleConfigArgsArgs', 'ResourceRuleConfigArgsArgsDict']]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  namespace: Optional[pulumi.Input[_builtins.str]] = None,
@@ -460,6 +488,7 @@ class WorkloadRule(pulumi.CustomResource):
             __props__.__dict__["cron_schedule"] = cron_schedule
             __props__.__dict__["defragmentation_schedule"] = defragmentation_schedule
             __props__.__dict__["detection_triggers"] = detection_triggers
+            __props__.__dict__["disabled"] = disabled
             __props__.__dict__["emergency_response"] = emergency_response
             __props__.__dict__["gpu_rule"] = gpu_rule
             __props__.__dict__["hpa_rule"] = hpa_rule
@@ -467,6 +496,7 @@ class WorkloadRule(pulumi.CustomResource):
                 raise TypeError("Missing required property 'kind'")
             __props__.__dict__["kind"] = kind
             __props__.__dict__["live_migration_enabled"] = live_migration_enabled
+            __props__.__dict__["lookback_period_seconds"] = lookback_period_seconds
             __props__.__dict__["memory_rule"] = memory_rule
             if name is None and not opts.urn:
                 raise TypeError("Missing required property 'name'")
@@ -508,11 +538,13 @@ class WorkloadRule(pulumi.CustomResource):
         __props__.__dict__["cron_schedule"] = None
         __props__.__dict__["defragmentation_schedule"] = None
         __props__.__dict__["detection_triggers"] = None
+        __props__.__dict__["disabled"] = None
         __props__.__dict__["emergency_response"] = None
         __props__.__dict__["gpu_rule"] = None
         __props__.__dict__["hpa_rule"] = None
         __props__.__dict__["kind"] = None
         __props__.__dict__["live_migration_enabled"] = None
+        __props__.__dict__["lookback_period_seconds"] = None
         __props__.__dict__["memory_rule"] = None
         __props__.__dict__["name"] = None
         __props__.__dict__["namespace"] = None
@@ -594,6 +626,11 @@ class WorkloadRule(pulumi.CustomResource):
         return pulumi.get(self, "detection_triggers")
 
     @_builtins.property
+    @pulumi.getter
+    def disabled(self) -> pulumi.Output[Optional[_builtins.bool]]:
+        return pulumi.get(self, "disabled")
+
+    @_builtins.property
     @pulumi.getter(name="emergencyResponse")
     def emergency_response(self) -> pulumi.Output[Optional['outputs.EmergencyResponseConfigArgs']]:
         """
@@ -632,6 +669,11 @@ class WorkloadRule(pulumi.CustomResource):
         Allow live pod migration when applying recommendations. Example: false.
         """
         return pulumi.get(self, "live_migration_enabled")
+
+    @_builtins.property
+    @pulumi.getter(name="lookbackPeriodSeconds")
+    def lookback_period_seconds(self) -> pulumi.Output[Optional[_builtins.int]]:
+        return pulumi.get(self, "lookback_period_seconds")
 
     @_builtins.property
     @pulumi.getter(name="memoryRule")
