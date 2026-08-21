@@ -32,6 +32,9 @@ var (
 	validHPAMetrics = map[string]bool{
 		"cpu": true, "memory": true, "gpu": true, "network_ingress": true, "network_egress": true,
 	}
+	validRuleKinds = map[string]bool{
+		"Deployment": true, "StatefulSet": true, "DaemonSet": true, "CronJob": true, "Job": true,
+	}
 )
 
 func sortedKeys(m map[string]bool) string {
@@ -94,6 +97,9 @@ func validateWorkloadPolicyTargetArgs(a WorkloadPolicyTargetArgs) error {
 }
 
 func validateWorkloadRuleArgs(a WorkloadRuleArgs) error {
+	if !validRuleKinds[a.Kind] {
+		return fmt.Errorf("kind: unknown value %q (valid values: %s)", a.Kind, sortedKeys(validRuleKinds))
+	}
 	if err := validateEnumList("actionTriggers", a.ActionTriggers, validActionTriggers); err != nil {
 		return err
 	}

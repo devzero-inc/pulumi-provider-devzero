@@ -877,12 +877,12 @@ func emergencyResponseFromProto(p *apiv1.EmergencyResponseConfig) *EmergencyResp
 	}
 	return &EmergencyResponseConfigArgs{
 		OomEnabled:              p.OomEnabled,
-		OomMemoryMultiplier:     float64(p.OomMemoryMultiplier),
+		OomMemoryMultiplier:     f32(p.OomMemoryMultiplier),
 		OomMaxReactions:         int(p.OomMaxReactions),
 		OomCooldownSeconds:      int(p.OomCooldownSeconds),
 		CpuThrottlingEnabled:    p.CpuThrottlingEnabled,
-		CpuThrottlingThreshold:  float64(p.CpuThrottlingThreshold),
-		CpuThrottlingMultiplier: float64(p.CpuThrottlingMultiplier),
+		CpuThrottlingThreshold:  f32(p.CpuThrottlingThreshold),
+		CpuThrottlingMultiplier: f32(p.CpuThrottlingMultiplier),
 	}
 }
 

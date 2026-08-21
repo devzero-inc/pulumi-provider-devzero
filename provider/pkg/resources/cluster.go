@@ -25,7 +25,7 @@ type ClusterState struct {
 // Annotate provides descriptions for SDK documentation and marks secret fields.
 func (s *ClusterState) Annotate(a infer.Annotator) {
 	a.Describe(&s.Name, "The name of the cluster.")
-	a.Describe(&s.Token, "Authentication token for the cluster. Rotated automatically if empty on update (e.g. after import).")
+	a.Describe(&s.Token, "Bearer token minted for the cluster at creation. Not retrievable afterwards; imported clusters have an empty token (rotate it deliberately from the DevZero UI if you need it in state).")
 }
 
 // Cluster is the resource implementation.
@@ -106,7 +106,6 @@ func (c *Cluster) Read(ctx context.Context, req infer.ReadRequest[ClusterArgs, C
 }
 
 // Update calls ClusterMutationService.UpdateCluster.
-// If the existing token is empty (e.g. after import), it also calls ResetClusterToken.
 func (c *Cluster) Update(ctx context.Context, req infer.UpdateRequest[ClusterArgs, ClusterState]) (infer.UpdateResponse[ClusterState], error) {
 	if req.DryRun {
 		return infer.UpdateResponse[ClusterState]{Output: ClusterState{ClusterArgs: req.Inputs, Token: req.State.Token}}, nil

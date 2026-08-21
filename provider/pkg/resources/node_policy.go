@@ -457,9 +457,11 @@ func (n *NodePolicy) Read(ctx context.Context, req infer.ReadRequest[NodePolicyA
 	}
 
 	// ListNodePolicies also returns read-only virtual policies mirrored from
-	// non-dakr Karpenter resources (source == "cluster"); skip them.
+	// non-dakr Karpenter resources; skip exactly those (source == "cluster")
+	// rather than any unknown source, so a future backend source tag cannot
+	// silently orphan a managed policy.
 	for _, p := range resp.Msg.Policies {
-		if p.Source != "" && p.Source != "dakr" {
+		if p.Source == "cluster" {
 			continue
 		}
 		if p.Id == req.ID {

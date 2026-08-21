@@ -45,7 +45,10 @@ cat > package.json <<'PKG'
 {
   "name": "consumer-test",
   "version": "1.0.0",
-  "private": true
+  "private": true,
+  "overrides": {
+    "@types/node": "^18"
+  }
 }
 PKG
 

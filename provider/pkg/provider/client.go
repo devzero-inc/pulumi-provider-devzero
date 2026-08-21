@@ -62,7 +62,7 @@ func isIdempotentProcedure(procedure string) bool {
 func retryInterceptor(maxAttempts int, initialDelay time.Duration) connect.UnaryInterceptorFunc {
 	return func(next connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
-			if !isIdempotentProcedure(req.Spec().Procedure) {
+			if maxAttempts < 1 || !isIdempotentProcedure(req.Spec().Procedure) {
 				return next(ctx, req)
 			}
 			delay := initialDelay
