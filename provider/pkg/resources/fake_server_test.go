@@ -182,6 +182,89 @@ func (f *fakeBackend) DeleteWorkloadRecommendationPolicy(_ context.Context, req 
 	return connect.NewResponse(&apiv1.DeleteWorkloadRecommendationPolicyResponse{Success: true}), nil
 }
 
+func (f *fakeBackend) CreateWorkloadPolicyTarget(_ context.Context, req *connect.Request[apiv1.CreateWorkloadPolicyTargetRequest]) (*connect.Response[apiv1.CreateWorkloadPolicyTargetResponse], error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if len(req.Msg.ClusterIds) == 0 {
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("cluster_ids must name at least one cluster"))
+	}
+	t := &apiv1.WorkloadPolicyTarget{
+		TargetId:           f.id("wpt"),
+		PolicyId:           req.Msg.PolicyId,
+		TeamId:             req.Msg.TeamId,
+		Name:               req.Msg.Name,
+		Description:        req.Msg.Description,
+		Priority:           req.Msg.Priority,
+		Enabled:            req.Msg.Enabled,
+		NamespaceSelector:  req.Msg.NamespaceSelector,
+		WorkloadSelector:   req.Msg.WorkloadSelector,
+		AnnotationSelector: req.Msg.AnnotationSelector,
+		KindFilter:         req.Msg.KindFilter,
+		KindFilterNotIn:    req.Msg.KindFilterNotIn,
+		NamePattern:        req.Msg.NamePattern,
+		NamespacePattern:   req.Msg.NamespacePattern,
+		WorkloadNames:      req.Msg.WorkloadNames,
+		WorkloadNamesNotIn: req.Msg.WorkloadNamesNotIn,
+		ClusterIds:         req.Msg.ClusterIds,
+	}
+	t.NodeGroupNames = req.Msg.NodeGroupNames //nolint:staticcheck // deprecated upstream but still round-tripped
+	f.wpt[t.TargetId] = t
+	return connect.NewResponse(&apiv1.CreateWorkloadPolicyTargetResponse{Target: t}), nil
+}
+
+func (f *fakeBackend) GetWorkloadPolicyTarget(_ context.Context, req *connect.Request[apiv1.GetWorkloadPolicyTargetRequest]) (*connect.Response[apiv1.GetWorkloadPolicyTargetResponse], error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	t, ok := f.wpt[req.Msg.TargetId]
+	if !ok {
+		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("target not found"))
+	}
+	return connect.NewResponse(&apiv1.GetWorkloadPolicyTargetResponse{Target: t}), nil
+}
+
+func (f *fakeBackend) UpdateWorkloadPolicyTarget(_ context.Context, req *connect.Request[apiv1.UpdateWorkloadPolicyTargetRequest]) (*connect.Response[apiv1.UpdateWorkloadPolicyTargetResponse], error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	t, ok := f.wpt[req.Msg.TargetId]
+	if !ok {
+		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("target not found"))
+	}
+	t.Name = req.Msg.Name
+	t.Description = req.Msg.Description
+	t.Priority = req.Msg.Priority
+	t.Enabled = req.Msg.Enabled
+	t.NamespaceSelector = req.Msg.NamespaceSelector
+	t.WorkloadSelector = req.Msg.WorkloadSelector
+	t.AnnotationSelector = req.Msg.AnnotationSelector
+	t.KindFilter = req.Msg.KindFilter
+	t.KindFilterNotIn = req.Msg.KindFilterNotIn
+	t.NamePattern = req.Msg.NamePattern
+	t.NamespacePattern = req.Msg.NamespacePattern
+	t.WorkloadNames = req.Msg.WorkloadNames
+	t.WorkloadNamesNotIn = req.Msg.WorkloadNamesNotIn
+	t.NodeGroupNames = req.Msg.NodeGroupNames //nolint:staticcheck // deprecated upstream but still round-tripped
+	if len(req.Msg.ClusterIds) > 0 {
+		t.ClusterIds = req.Msg.ClusterIds
+	}
+	return connect.NewResponse(&apiv1.UpdateWorkloadPolicyTargetResponse{Target: t}), nil
+}
+
+func (f *fakeBackend) DeleteWorkloadPolicyTarget(_ context.Context, req *connect.Request[apiv1.DeleteWorkloadPolicyTargetRequest]) (*connect.Response[apiv1.DeleteWorkloadPolicyTargetResponse], error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	found := false
+	for _, id := range req.Msg.TargetIds {
+		if _, ok := f.wpt[id]; ok {
+			delete(f.wpt, id)
+			found = true
+		}
+	}
+	if !found {
+		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("no workload policy targets found for deletion"))
+	}
+	return connect.NewResponse(&apiv1.DeleteWorkloadPolicyTargetResponse{}), nil
+}
+
 func (f *fakeBackend) UpsertManualWorkloadRule(_ context.Context, req *connect.Request[apiv1.UpsertManualWorkloadRuleRequest]) (*connect.Response[apiv1.UpsertManualWorkloadRuleResponse], error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
@@ -517,5 +600,74 @@ func TestLifecycle_NodePolicyTarget_EnabledDefaultsTrue(t *testing.T) {
 	fake.mu.Unlock()
 	if tgt == nil || !tgt.Enabled {
 		t.Fatalf("expected the target to be created enabled, got %+v", tgt)
+	}
+}
+
+func TestLifecycle_WorkloadPolicyTarget(t *testing.T) {
+	ctx := context.Background()
+	fake := withFakeServer(t)
+	w := &WorkloadPolicyTarget{}
+
+	desc := "team a targets"
+	args := WorkloadPolicyTargetArgs{
+		Name:               "t1",
+		PolicyId:           "wp-0001",
+		ClusterIds:         []string{"c1"},
+		Description:        &desc,
+		KindFilter:         []string{"Deployment"},
+		KindFilterNotIn:    []string{"CronJob"},
+		WorkloadNamesNotIn: []string{"excluded"},
+		AnnotationSelector: &LabelSelectorArgs{MatchLabels: map[string]string{"team": "a"}},
+	}
+
+	created, err := w.Create(ctx, infer.CreateRequest[WorkloadPolicyTargetArgs]{Inputs: args})
+	if err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+	out := created.Output
+	if out.AnnotationSelector == nil || out.AnnotationSelector.MatchLabels["team"] != "a" {
+		t.Fatalf("annotationSelector did not round-trip: %+v", out.AnnotationSelector)
+	}
+	if len(out.KindFilterNotIn) != 1 || len(out.WorkloadNamesNotIn) != 1 {
+		t.Fatalf("notIn filters did not round-trip: %+v", out)
+	}
+	if out.Enabled == nil || !*out.Enabled {
+		t.Fatal("enabled must default to true")
+	}
+
+	// Update: disable + rename.
+	disabled := false
+	updatedArgs := args
+	updatedArgs.Name = "t1-renamed"
+	updatedArgs.Enabled = &disabled
+	updated, err := w.Update(ctx, infer.UpdateRequest[WorkloadPolicyTargetArgs, WorkloadPolicyTargetState]{
+		ID: created.ID, Inputs: updatedArgs, State: created.Output,
+	})
+	if err != nil {
+		t.Fatalf("Update: %v", err)
+	}
+	if updated.Output.Name != "t1-renamed" || updated.Output.Enabled == nil || *updated.Output.Enabled {
+		t.Fatalf("update did not round-trip: %+v", updated.Output)
+	}
+	fake.mu.Lock()
+	stored := fake.wpt[created.ID]
+	fake.mu.Unlock()
+	if stored == nil || stored.Name != "t1-renamed" || stored.Enabled {
+		t.Fatalf("update not propagated backend-side: %+v", stored)
+	}
+
+	// Out-of-band delete → Read drops from state; Delete tolerates NotFound.
+	fake.mu.Lock()
+	delete(fake.wpt, created.ID)
+	fake.mu.Unlock()
+	gone, err := w.Read(ctx, infer.ReadRequest[WorkloadPolicyTargetArgs, WorkloadPolicyTargetState]{ID: created.ID, Inputs: updatedArgs, State: updated.Output})
+	if err != nil {
+		t.Fatalf("Read after out-of-band delete: %v", err)
+	}
+	if gone.ID != "" {
+		t.Fatalf("expected drop-from-state, got ID %q", gone.ID)
+	}
+	if _, err := w.Delete(ctx, infer.DeleteRequest[WorkloadPolicyTargetState]{ID: created.ID, State: updated.Output}); err != nil {
+		t.Fatalf("Delete (already gone): %v", err)
 	}
 }
