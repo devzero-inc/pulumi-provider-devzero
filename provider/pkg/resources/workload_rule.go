@@ -176,6 +176,114 @@ func (e *EmergencyResponseConfigArgs) Annotate(a infer.Annotator) {
 	a.Describe(&e.CpuThrottlingMultiplier, "Multiplier applied to CPU request on throttle reaction. Example: 1.5.")
 }
 
+// JvmHeapRuleConfigArgs configures JVM heap sizing overrides on a WorkloadRule.
+type JvmHeapRuleConfigArgs struct {
+	Enabled                bool     `pulumi:"enabled,optional"`
+	TargetPercentile       *float64 `pulumi:"targetPercentile,optional"`
+	HeadroomMultiplier     *float64 `pulumi:"headroomMultiplier,optional"`
+	NonHeapOverheadPercent *float64 `pulumi:"nonHeapOverheadPercent,optional"`
+	NonHeapOverheadBytes   *int     `pulumi:"nonHeapOverheadBytes,optional"`
+	MinHeapBytes           *int     `pulumi:"minHeapBytes,optional"`
+	MaxHeapBytes           *int     `pulumi:"maxHeapBytes,optional"`
+	PreferContainerSupport bool     `pulumi:"preferContainerSupport,optional"`
+}
+
+// Annotate provides SDK documentation for JvmHeapRuleConfigArgs fields.
+func (j *JvmHeapRuleConfigArgs) Annotate(a infer.Annotator) {
+	a.Describe(&j.Enabled, "Enable JVM heap sizing overrides. Example: true.")
+	a.Describe(&j.TargetPercentile, "Percentile of usage data used as the heap sizing target (0-1). Example: 0.95.")
+	a.Describe(&j.HeadroomMultiplier, "Multiplier applied above the target usage to derive the heap size. Example: 1.3.")
+	a.Describe(&j.NonHeapOverheadPercent, "Non-heap memory overhead as a percentage of container memory (0-1). Example: 0.2.")
+	a.Describe(&j.NonHeapOverheadBytes, "Non-heap memory overhead in bytes. Takes precedence over nonHeapOverheadPercent when set. Example: 268435456.")
+	a.Describe(&j.MinHeapBytes, "Minimum JVM heap size in bytes. Example: 134217728.")
+	a.Describe(&j.MaxHeapBytes, "Maximum JVM heap size in bytes. Example: 2147483648.")
+	a.Describe(&j.PreferContainerSupport, "Prefer the JVM's native container-aware heap sizing (-XX:+UseContainerSupport) over explicit -Xmx/-Xms flags. Example: false.")
+}
+
+// KedaAuthenticationRefArgs references a KEDA TriggerAuthentication or ClusterTriggerAuthentication.
+type KedaAuthenticationRefArgs struct {
+	Name string `pulumi:"name"`
+	Kind string `pulumi:"kind,optional"`
+}
+
+// Annotate provides SDK documentation for KedaAuthenticationRefArgs fields.
+func (k *KedaAuthenticationRefArgs) Annotate(a infer.Annotator) {
+	a.Describe(&k.Name, "Name of the referenced TriggerAuthentication/ClusterTriggerAuthentication resource. Example: 'prometheus-auth'.")
+	a.Describe(&k.Kind, "Kind of the referenced resource. One of: 'TriggerAuthentication', 'ClusterTriggerAuthentication'. Example: 'TriggerAuthentication'.")
+}
+
+// KedaTriggerArgs configures a single KEDA ScaledObject trigger.
+type KedaTriggerArgs struct {
+	Type              string                     `pulumi:"type"`
+	Name              string                     `pulumi:"name,optional"`
+	Metadata          map[string]string          `pulumi:"metadata,optional"`
+	MetricType        string                     `pulumi:"metricType,optional"`
+	AuthenticationRef *KedaAuthenticationRefArgs `pulumi:"authenticationRef,optional"`
+	UseCachedMetrics  bool                       `pulumi:"useCachedMetrics,optional"`
+}
+
+// Annotate provides SDK documentation for KedaTriggerArgs fields.
+func (k *KedaTriggerArgs) Annotate(a infer.Annotator) {
+	a.Describe(&k.Type, "KEDA scaler type. Example: 'prometheus'.")
+	a.Describe(&k.Name, "Optional trigger name, used to disambiguate multiple triggers of the same type. Example: 'requests-per-second'.")
+	a.Describe(&k.Metadata, "Scaler-specific configuration key-value pairs. Example: {\"serverAddress\": \"http://prometheus:9090\", \"query\": \"sum(rate(http_requests_total[2m]))\"}.")
+	a.Describe(&k.MetricType, "Metric target type. One of: 'Value', 'AverageValue', 'Utilization'. Example: 'AverageValue'.")
+	a.Describe(&k.AuthenticationRef, "Reference to a TriggerAuthentication or ClusterTriggerAuthentication for this trigger.")
+	a.Describe(&k.UseCachedMetrics, "Use KEDA's metric caching for this trigger. Example: false.")
+}
+
+// KedaFallbackArgs configures replica fallback when KEDA metrics are unavailable.
+type KedaFallbackArgs struct {
+	FailureThreshold int    `pulumi:"failureThreshold"`
+	Replicas         int    `pulumi:"replicas"`
+	Behavior         string `pulumi:"behavior,optional"`
+}
+
+// Annotate provides SDK documentation for KedaFallbackArgs fields.
+func (k *KedaFallbackArgs) Annotate(a infer.Annotator) {
+	a.Describe(&k.FailureThreshold, "Number of consecutive metric failures before activating fallback. Example: 3.")
+	a.Describe(&k.Replicas, "Number of replicas to fall back to when metrics are unavailable. Example: 2.")
+	a.Describe(&k.Behavior, "Fallback strategy. Example: 'static'.")
+}
+
+// KedaAdvancedArgs configures advanced KEDA ScaledObject behavior.
+type KedaAdvancedArgs struct {
+	RestoreToOriginalReplicaCount bool   `pulumi:"restoreToOriginalReplicaCount,optional"`
+	AdvancedBehaviorJson          string `pulumi:"advancedBehaviorJson,optional"`
+}
+
+// Annotate provides SDK documentation for KedaAdvancedArgs fields.
+func (k *KedaAdvancedArgs) Annotate(a infer.Annotator) {
+	a.Describe(&k.RestoreToOriginalReplicaCount, "Restore the original replica count when the ScaledObject is deleted. Example: false.")
+	a.Describe(&k.AdvancedBehaviorJson, "Kubernetes HorizontalPodAutoscalerBehavior encoded as a JSON string, applied to the generated HPA. Example: '{\"scaleDown\":{\"stabilizationWindowSeconds\":300}}'.")
+}
+
+// KedaScaledObjectArgs configures a KEDA ScaledObject managed alongside the workload.
+type KedaScaledObjectArgs struct {
+	Triggers              []KedaTriggerArgs `pulumi:"triggers,optional"`
+	MinReplicaCount       *int              `pulumi:"minReplicaCount,optional"`
+	MaxReplicaCount       *int              `pulumi:"maxReplicaCount,optional"`
+	IdleReplicaCount      *int              `pulumi:"idleReplicaCount,optional"`
+	PollingInterval       *int              `pulumi:"pollingInterval,optional"`
+	CooldownPeriod        *int              `pulumi:"cooldownPeriod,optional"`
+	InitialCooldownPeriod *int              `pulumi:"initialCooldownPeriod,optional"`
+	Fallback              *KedaFallbackArgs `pulumi:"fallback,optional"`
+	Advanced              *KedaAdvancedArgs `pulumi:"advanced,optional"`
+}
+
+// Annotate provides SDK documentation for KedaScaledObjectArgs fields.
+func (k *KedaScaledObjectArgs) Annotate(a infer.Annotator) {
+	a.Describe(&k.Triggers, "KEDA scaler triggers driving this ScaledObject.")
+	a.Describe(&k.MinReplicaCount, "Minimum number of replicas. Example: 0.")
+	a.Describe(&k.MaxReplicaCount, "Maximum number of replicas. Example: 10.")
+	a.Describe(&k.IdleReplicaCount, "Replica count to scale to when idle. Must be less than minReplicaCount. Example: 0.")
+	a.Describe(&k.PollingInterval, "Seconds between checks of trigger metrics. Example: 30.")
+	a.Describe(&k.CooldownPeriod, "Seconds to wait after the last trigger reports active=false before scaling to minReplicaCount. Example: 300.")
+	a.Describe(&k.InitialCooldownPeriod, "Cooldown period applied only during the initial scaling of the ScaledObject. Example: 0.")
+	a.Describe(&k.Fallback, "Replica fallback configuration when KEDA metrics are unavailable.")
+	a.Describe(&k.Advanced, "Advanced ScaledObject behavior configuration.")
+}
+
 // ContainerResourceRuleConfigArgs holds per-container resource rules.
 type ContainerResourceRuleConfigArgs struct {
 	ContainerName string                  `pulumi:"containerName"`
@@ -194,28 +302,32 @@ func (c *ContainerResourceRuleConfigArgs) Annotate(a infer.Annotator) {
 
 // WorkloadRuleArgs are the user-configurable inputs for a WorkloadRule resource.
 type WorkloadRuleArgs struct {
-	ClusterID                 string                            `pulumi:"clusterId"`
-	Namespace                 string                            `pulumi:"namespace"`
-	Kind                      string                            `pulumi:"kind"`
-	Name                      string                            `pulumi:"name"`
-	AutoGenerate              *bool                             `pulumi:"autoGenerate,optional"`
-	CpuRule                   *ResourceRuleConfigArgs           `pulumi:"cpuRule,optional"`
-	MemoryRule                *ResourceRuleConfigArgs           `pulumi:"memoryRule,optional"`
-	GpuRule                   *ResourceRuleConfigArgs           `pulumi:"gpuRule,optional"`
-	HpaRule                   *HPARuleConfigArgs                `pulumi:"hpaRule,optional"`
-	EmergencyResponse         *EmergencyResponseConfigArgs      `pulumi:"emergencyResponse,optional"`
-	ActionTriggers            []string                          `pulumi:"actionTriggers,optional"`
-	StartupPeriodSeconds      *int                              `pulumi:"startupPeriodSeconds,optional"`
-	CronSchedule              *string                           `pulumi:"cronSchedule,optional"`
-	CooldownMinutes           *int                              `pulumi:"cooldownMinutes,optional"`
-	DetectionTriggers         []string                          `pulumi:"detectionTriggers,optional"`
-	SchedulerPlugins          []string                          `pulumi:"schedulerPlugins,optional"`
-	DefragmentationSchedule   *string                           `pulumi:"defragmentationSchedule,optional"`
-	LiveMigrationEnabled      bool                              `pulumi:"liveMigrationEnabled,optional"`
-	UseInPlaceVerticalScaling bool                              `pulumi:"useInPlaceVerticalScaling,optional"`
-	Containers                []ContainerResourceRuleConfigArgs `pulumi:"containers,optional"`
-	Disabled                  *bool                             `pulumi:"disabled,optional"`
-	LookbackPeriodSeconds     *int                              `pulumi:"lookbackPeriodSeconds,optional"`
+	ClusterID                       string                            `pulumi:"clusterId"`
+	Namespace                       string                            `pulumi:"namespace"`
+	Kind                            string                            `pulumi:"kind"`
+	Name                            string                            `pulumi:"name"`
+	AutoGenerate                    *bool                             `pulumi:"autoGenerate,optional"`
+	CpuRule                         *ResourceRuleConfigArgs           `pulumi:"cpuRule,optional"`
+	MemoryRule                      *ResourceRuleConfigArgs           `pulumi:"memoryRule,optional"`
+	GpuRule                         *ResourceRuleConfigArgs           `pulumi:"gpuRule,optional"`
+	HpaRule                         *HPARuleConfigArgs                `pulumi:"hpaRule,optional"`
+	EmergencyResponse               *EmergencyResponseConfigArgs      `pulumi:"emergencyResponse,optional"`
+	ActionTriggers                  []string                          `pulumi:"actionTriggers,optional"`
+	StartupPeriodSeconds            *int                              `pulumi:"startupPeriodSeconds,optional"`
+	CronSchedule                    *string                           `pulumi:"cronSchedule,optional"`
+	CooldownMinutes                 *int                              `pulumi:"cooldownMinutes,optional"`
+	DetectionTriggers               []string                          `pulumi:"detectionTriggers,optional"`
+	SchedulerPlugins                []string                          `pulumi:"schedulerPlugins,optional"`
+	DefragmentationSchedule         *string                           `pulumi:"defragmentationSchedule,optional"`
+	LiveMigrationEnabled            bool                              `pulumi:"liveMigrationEnabled,optional"`
+	UseInPlaceVerticalScaling       bool                              `pulumi:"useInPlaceVerticalScaling,optional"`
+	Containers                      []ContainerResourceRuleConfigArgs `pulumi:"containers,optional"`
+	Disabled                        *bool                             `pulumi:"disabled,optional"`
+	LookbackPeriodSeconds           *int                              `pulumi:"lookbackPeriodSeconds,optional"`
+	AllowInPlaceMemoryLimitDecrease bool                              `pulumi:"allowInPlaceMemoryLimitDecrease,optional"`
+	JvmHeapRule                     *JvmHeapRuleConfigArgs            `pulumi:"jvmHeapRule,optional"`
+	JvmCpuStartupFloorMillicores    *int                              `pulumi:"jvmCpuStartupFloorMillicores,optional"`
+	KedaScaledObject                *KedaScaledObjectArgs             `pulumi:"kedaScaledObject,optional"`
 }
 
 // Annotate provides SDK documentation for WorkloadRuleArgs fields.
@@ -240,6 +352,10 @@ func (a *WorkloadRuleArgs) Annotate(ann infer.Annotator) {
 	ann.Describe(&a.LiveMigrationEnabled, "Allow live pod migration when applying recommendations. Example: false.")
 	ann.Describe(&a.UseInPlaceVerticalScaling, "Use in-place pod vertical scaling instead of pod restarts. Example: false.")
 	ann.Describe(&a.Containers, "Per-container resource rule configurations. When empty, workload-level rules apply to all containers.")
+	ann.Describe(&a.AllowInPlaceMemoryLimitDecrease, "Allow in-place vertical scaling to decrease the memory limit (normally only requests shrink; limits only grow). Example: false.")
+	ann.Describe(&a.JvmHeapRule, "JVM heap sizing overrides applied to detected Java containers.")
+	ann.Describe(&a.JvmCpuStartupFloorMillicores, "Minimum CPU request in millicores during JVM startup, to avoid slow JIT warmup on undersized CPU. Example: 500.")
+	ann.Describe(&a.KedaScaledObject, "KEDA ScaledObject configuration managed alongside this workload.")
 }
 
 // WorkloadRuleState is the full persisted state.
@@ -449,17 +565,24 @@ func ruleArgsToUpsertRequest(teamID string, a WorkloadRuleArgs, includeDisabled 
 		return req
 	}
 	req.Fields = &apiv1.ManualRuleFields{
-		CpuRule:                   resourceRuleConfigToProto(a.CpuRule),
-		MemoryRule:                resourceRuleConfigToProto(a.MemoryRule),
-		GpuRule:                   resourceRuleConfigToProto(a.GpuRule),
-		HpaRule:                   hpaRuleConfigToProto(a.HpaRule),
-		EmergencyResponse:         emergencyResponseToProto(a.EmergencyResponse),
-		ActionTriggers:            actionTriggersToProto(a.ActionTriggers),
-		DetectionTriggers:         detectionTriggersToProto(a.DetectionTriggers),
-		SchedulerPlugins:          a.SchedulerPlugins,
-		LiveMigrationEnabled:      a.LiveMigrationEnabled,
-		UseInPlaceVerticalScaling: a.UseInPlaceVerticalScaling,
-		Containers:                containerRuleConfigsToProto(a.Containers),
+		CpuRule:                         resourceRuleConfigToProto(a.CpuRule),
+		MemoryRule:                      resourceRuleConfigToProto(a.MemoryRule),
+		GpuRule:                         resourceRuleConfigToProto(a.GpuRule),
+		HpaRule:                         hpaRuleConfigToProto(a.HpaRule),
+		EmergencyResponse:               emergencyResponseToProto(a.EmergencyResponse),
+		ActionTriggers:                  actionTriggersToProto(a.ActionTriggers),
+		DetectionTriggers:               detectionTriggersToProto(a.DetectionTriggers),
+		SchedulerPlugins:                a.SchedulerPlugins,
+		LiveMigrationEnabled:            a.LiveMigrationEnabled,
+		UseInPlaceVerticalScaling:       a.UseInPlaceVerticalScaling,
+		Containers:                      containerRuleConfigsToProto(a.Containers),
+		AllowInPlaceMemoryLimitDecrease: a.AllowInPlaceMemoryLimitDecrease,
+		JvmHeapRule:                     jvmHeapRuleToProto(a.JvmHeapRule),
+		KedaScaledObject:                kedaScaledObjectToProto(a.KedaScaledObject),
+	}
+	if a.JvmCpuStartupFloorMillicores != nil {
+		v := int64(*a.JvmCpuStartupFloorMillicores)
+		req.Fields.JvmCpuStartupFloorMillicores = &v
 	}
 	if a.StartupPeriodSeconds != nil {
 		v := int64(*a.StartupPeriodSeconds)
@@ -487,21 +610,28 @@ func ruleArgsToUpsertRequest(teamID string, a WorkloadRuleArgs, includeDisabled 
 
 func ruleProtoToArgs(r *apiv1.WorkloadRule) WorkloadRuleArgs {
 	a := WorkloadRuleArgs{
-		ClusterID:                 r.ClusterId,
-		Namespace:                 r.Namespace,
-		Kind:                      r.Kind,
-		Name:                      r.Name,
-		CpuRule:                   resourceRuleConfigFromProto(r.CpuRule),
-		MemoryRule:                resourceRuleConfigFromProto(r.MemoryRule),
-		GpuRule:                   resourceRuleConfigFromProto(r.GpuRule),
-		HpaRule:                   hpaRuleConfigFromProto(r.HpaRule),
-		EmergencyResponse:         emergencyResponseFromProto(r.EmergencyResponse),
-		ActionTriggers:            actionTriggersFromProto(r.ActionTriggers),
-		DetectionTriggers:         detectionTriggersFromProto(r.DetectionTriggers),
-		SchedulerPlugins:          r.SchedulerPlugins,
-		LiveMigrationEnabled:      r.LiveMigrationEnabled,
-		UseInPlaceVerticalScaling: r.UseInPlaceVerticalScaling,
-		Containers:                containerRuleConfigsFromProto(r.Containers),
+		ClusterID:                       r.ClusterId,
+		Namespace:                       r.Namespace,
+		Kind:                            r.Kind,
+		Name:                            r.Name,
+		CpuRule:                         resourceRuleConfigFromProto(r.CpuRule),
+		MemoryRule:                      resourceRuleConfigFromProto(r.MemoryRule),
+		GpuRule:                         resourceRuleConfigFromProto(r.GpuRule),
+		HpaRule:                         hpaRuleConfigFromProto(r.HpaRule),
+		EmergencyResponse:               emergencyResponseFromProto(r.EmergencyResponse),
+		ActionTriggers:                  actionTriggersFromProto(r.ActionTriggers),
+		DetectionTriggers:               detectionTriggersFromProto(r.DetectionTriggers),
+		SchedulerPlugins:                r.SchedulerPlugins,
+		LiveMigrationEnabled:            r.LiveMigrationEnabled,
+		UseInPlaceVerticalScaling:       r.UseInPlaceVerticalScaling,
+		Containers:                      containerRuleConfigsFromProto(r.Containers),
+		AllowInPlaceMemoryLimitDecrease: r.AllowInPlaceMemoryLimitDecrease,
+		JvmHeapRule:                     jvmHeapRuleFromProto(r.JvmHeapRule),
+		KedaScaledObject:                kedaScaledObjectFromProto(r.KedaScaledObject),
+	}
+	if r.JvmCpuStartupFloorMillicores != nil {
+		v := int(*r.JvmCpuStartupFloorMillicores)
+		a.JvmCpuStartupFloorMillicores = &v
 	}
 	if r.Disabled {
 		a.Disabled = truePtr()
@@ -977,4 +1107,247 @@ func containerResourceConfigFromProto(p *apiv1.ContainerResourceConfig) *Resourc
 	r.RequestUseRss = p.RequestUseRss
 	r.LimitUseRss = p.LimitUseRss
 	return r
+}
+
+func jvmHeapRuleToProto(j *JvmHeapRuleConfigArgs) *apiv1.JVMHeapRuleConfig {
+	if j == nil {
+		return nil
+	}
+	p := &apiv1.JVMHeapRuleConfig{
+		Enabled:                j.Enabled,
+		PreferContainerSupport: j.PreferContainerSupport,
+	}
+	if j.TargetPercentile != nil {
+		v := float32(*j.TargetPercentile)
+		p.TargetPercentile = &v
+	}
+	if j.HeadroomMultiplier != nil {
+		v := float32(*j.HeadroomMultiplier)
+		p.HeadroomMultiplier = &v
+	}
+	if j.NonHeapOverheadPercent != nil {
+		v := float32(*j.NonHeapOverheadPercent)
+		p.NonHeapOverheadPercent = &v
+	}
+	if j.NonHeapOverheadBytes != nil {
+		v := int64(*j.NonHeapOverheadBytes)
+		p.NonHeapOverheadBytes = &v
+	}
+	if j.MinHeapBytes != nil {
+		v := int64(*j.MinHeapBytes)
+		p.MinHeapBytes = &v
+	}
+	if j.MaxHeapBytes != nil {
+		v := int64(*j.MaxHeapBytes)
+		p.MaxHeapBytes = &v
+	}
+	return p
+}
+
+func jvmHeapRuleFromProto(p *apiv1.JVMHeapRuleConfig) *JvmHeapRuleConfigArgs {
+	if p == nil {
+		return nil
+	}
+	j := &JvmHeapRuleConfigArgs{
+		Enabled:                p.Enabled,
+		PreferContainerSupport: p.PreferContainerSupport,
+	}
+	if p.TargetPercentile != nil {
+		v := f32to64(*p.TargetPercentile)
+		j.TargetPercentile = &v
+	}
+	if p.HeadroomMultiplier != nil {
+		v := f32to64(*p.HeadroomMultiplier)
+		j.HeadroomMultiplier = &v
+	}
+	if p.NonHeapOverheadPercent != nil {
+		v := f32to64(*p.NonHeapOverheadPercent)
+		j.NonHeapOverheadPercent = &v
+	}
+	if p.NonHeapOverheadBytes != nil {
+		v := int(*p.NonHeapOverheadBytes)
+		j.NonHeapOverheadBytes = &v
+	}
+	if p.MinHeapBytes != nil {
+		v := int(*p.MinHeapBytes)
+		j.MinHeapBytes = &v
+	}
+	if p.MaxHeapBytes != nil {
+		v := int(*p.MaxHeapBytes)
+		j.MaxHeapBytes = &v
+	}
+	return j
+}
+
+func kedaScaledObjectToProto(k *KedaScaledObjectArgs) *apiv1.KEDAScaledObjectTemplate {
+	if k == nil {
+		return nil
+	}
+	p := &apiv1.KEDAScaledObjectTemplate{
+		Triggers: kedaTriggersToProto(k.Triggers),
+		Fallback: kedaFallbackToProto(k.Fallback),
+		Advanced: kedaAdvancedToProto(k.Advanced),
+	}
+	if k.MinReplicaCount != nil {
+		v := int32(*k.MinReplicaCount)
+		p.MinReplicaCount = &v
+	}
+	if k.MaxReplicaCount != nil {
+		v := int32(*k.MaxReplicaCount)
+		p.MaxReplicaCount = &v
+	}
+	if k.IdleReplicaCount != nil {
+		v := int32(*k.IdleReplicaCount)
+		p.IdleReplicaCount = &v
+	}
+	if k.PollingInterval != nil {
+		v := int32(*k.PollingInterval)
+		p.PollingInterval = &v
+	}
+	if k.CooldownPeriod != nil {
+		v := int32(*k.CooldownPeriod)
+		p.CooldownPeriod = &v
+	}
+	if k.InitialCooldownPeriod != nil {
+		v := int32(*k.InitialCooldownPeriod)
+		p.InitialCooldownPeriod = &v
+	}
+	return p
+}
+
+func kedaScaledObjectFromProto(p *apiv1.KEDAScaledObjectTemplate) *KedaScaledObjectArgs {
+	if p == nil {
+		return nil
+	}
+	k := &KedaScaledObjectArgs{
+		Triggers: kedaTriggersFromProto(p.Triggers),
+		Fallback: kedaFallbackFromProto(p.Fallback),
+		Advanced: kedaAdvancedFromProto(p.Advanced),
+	}
+	if p.MinReplicaCount != nil {
+		v := int(*p.MinReplicaCount)
+		k.MinReplicaCount = &v
+	}
+	if p.MaxReplicaCount != nil {
+		v := int(*p.MaxReplicaCount)
+		k.MaxReplicaCount = &v
+	}
+	if p.IdleReplicaCount != nil {
+		v := int(*p.IdleReplicaCount)
+		k.IdleReplicaCount = &v
+	}
+	if p.PollingInterval != nil {
+		v := int(*p.PollingInterval)
+		k.PollingInterval = &v
+	}
+	if p.CooldownPeriod != nil {
+		v := int(*p.CooldownPeriod)
+		k.CooldownPeriod = &v
+	}
+	if p.InitialCooldownPeriod != nil {
+		v := int(*p.InitialCooldownPeriod)
+		k.InitialCooldownPeriod = &v
+	}
+	return k
+}
+
+func kedaTriggersToProto(ts []KedaTriggerArgs) []*apiv1.KEDATrigger {
+	if len(ts) == 0 {
+		return nil
+	}
+	result := make([]*apiv1.KEDATrigger, len(ts))
+	for i, t := range ts {
+		result[i] = &apiv1.KEDATrigger{
+			Type:              t.Type,
+			Name:              t.Name,
+			Metadata:          t.Metadata,
+			MetricType:        t.MetricType,
+			AuthenticationRef: kedaAuthenticationRefToProto(t.AuthenticationRef),
+			UseCachedMetrics:  t.UseCachedMetrics,
+		}
+	}
+	return result
+}
+
+func kedaTriggersFromProto(ps []*apiv1.KEDATrigger) []KedaTriggerArgs {
+	if len(ps) == 0 {
+		return nil
+	}
+	result := make([]KedaTriggerArgs, 0, len(ps))
+	for _, p := range ps {
+		if p == nil {
+			continue
+		}
+		result = append(result, KedaTriggerArgs{
+			Type:              p.Type,
+			Name:              p.Name,
+			Metadata:          p.Metadata,
+			MetricType:        p.MetricType,
+			AuthenticationRef: kedaAuthenticationRefFromProto(p.AuthenticationRef),
+			UseCachedMetrics:  p.UseCachedMetrics,
+		})
+	}
+	return result
+}
+
+func kedaAuthenticationRefToProto(a *KedaAuthenticationRefArgs) *apiv1.KEDAAuthenticationRef {
+	if a == nil {
+		return nil
+	}
+	return &apiv1.KEDAAuthenticationRef{
+		Name: a.Name,
+		Kind: a.Kind,
+	}
+}
+
+func kedaAuthenticationRefFromProto(p *apiv1.KEDAAuthenticationRef) *KedaAuthenticationRefArgs {
+	if p == nil {
+		return nil
+	}
+	return &KedaAuthenticationRefArgs{
+		Name: p.Name,
+		Kind: p.Kind,
+	}
+}
+
+func kedaFallbackToProto(f *KedaFallbackArgs) *apiv1.KEDAFallback {
+	if f == nil {
+		return nil
+	}
+	return &apiv1.KEDAFallback{
+		FailureThreshold: int32(f.FailureThreshold),
+		Replicas:         int32(f.Replicas),
+		Behavior:         f.Behavior,
+	}
+}
+
+func kedaFallbackFromProto(p *apiv1.KEDAFallback) *KedaFallbackArgs {
+	if p == nil {
+		return nil
+	}
+	return &KedaFallbackArgs{
+		FailureThreshold: int(p.FailureThreshold),
+		Replicas:         int(p.Replicas),
+		Behavior:         p.Behavior,
+	}
+}
+
+func kedaAdvancedToProto(a *KedaAdvancedArgs) *apiv1.KEDAAdvanced {
+	if a == nil {
+		return nil
+	}
+	return &apiv1.KEDAAdvanced{
+		RestoreToOriginalReplicaCount: a.RestoreToOriginalReplicaCount,
+		AdvancedBehaviorJson:          a.AdvancedBehaviorJson,
+	}
+}
+
+func kedaAdvancedFromProto(p *apiv1.KEDAAdvanced) *KedaAdvancedArgs {
+	if p == nil {
+		return nil
+	}
+	return &KedaAdvancedArgs{
+		RestoreToOriginalReplicaCount: p.RestoreToOriginalReplicaCount,
+		AdvancedBehaviorJson:          p.AdvancedBehaviorJson,
+	}
 }
