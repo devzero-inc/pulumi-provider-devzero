@@ -126,6 +126,8 @@ type WorkloadPolicyArgs struct {
 	JvmMaxHeapBytes              *int     `pulumi:"jvmMaxHeapBytes,optional"`
 	JvmPreferContainerSupport    *bool    `pulumi:"jvmPreferContainerSupport,optional"`
 	JvmCpuStartupFloorMillicores *int     `pulumi:"jvmCpuStartupFloorMillicores,optional"`
+
+	EmergencyResponse *EmergencyResponseConfigArgs `pulumi:"emergencyResponse,optional"`
 }
 
 // Annotate provides SDK documentation and default values for WorkloadPolicyArgs fields.
@@ -152,6 +154,7 @@ func (a *WorkloadPolicyArgs) Annotate(ann infer.Annotator) {
 	ann.Describe(&a.GpuVramVerticalScaling, "Vertical scaling configuration for GPU VRAM. Uses the same fields as cpuVerticalScaling; units are bytes.")
 	ann.Describe(&a.EnablePmaxProtection, "Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.")
 	ann.Describe(&a.PmaxRatioThreshold, "Peak-to-recommendation ratio above which pmax protection activates. Example: 3.0 (default) — triggers when peak is 3× the recommendation.")
+	ann.Describe(&a.EmergencyResponse, "Emergency response configuration for OOM and CPU throttle events.")
 	ann.SetDefault(&a.PmaxRatioThreshold, 3.0)
 	ann.SetDefault(&a.LoopbackPeriodSeconds, 86400)
 	ann.SetDefault(&a.MinDataPoints, 15)
@@ -294,6 +297,7 @@ func argsToProto(teamID, policyID string, a WorkloadPolicyArgs) *apiv1.WorkloadR
 		GpuVerticalScaling:     verticalScalingToProto(a.GpuVerticalScaling),
 		GpuVramVerticalScaling: verticalScalingToProto(a.GpuVramVerticalScaling),
 		HorizontalScaling:      horizontalScalingToProto(a.HorizontalScaling),
+		EmergencyResponse:      emergencyResponseToProto(a.EmergencyResponse),
 	}
 	if a.Description != nil {
 		p.Description = *a.Description
@@ -428,6 +432,7 @@ func protoToArgs(p *apiv1.WorkloadRecommendationPolicy) WorkloadPolicyArgs {
 		GpuVerticalScaling:     verticalScalingFromProto(p.GpuVerticalScaling),
 		GpuVramVerticalScaling: verticalScalingFromProto(p.GpuVramVerticalScaling),
 		HorizontalScaling:      horizontalScalingFromProto(p.HorizontalScaling),
+		EmergencyResponse:      emergencyResponseFromProto(p.EmergencyResponse),
 	}
 	if p.Description != "" {
 		a.Description = &p.Description
