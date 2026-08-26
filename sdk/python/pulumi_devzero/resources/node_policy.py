@@ -29,12 +29,16 @@ class NodePolicyArgs:
                  cloud_provider_id: Optional[pulumi.Input[_builtins.int]] = None,
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  disruption: Optional[pulumi.Input['DisruptionPolicyArgsArgs']] = None,
+                 gcp: Optional[pulumi.Input['GCPNodeClassSpecArgsArgs']] = None,
                  instance_categories: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
                  instance_cpus: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
                  instance_families: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
                  instance_generations: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
                  instance_hypervisors: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
                  instance_local_nvme: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
+                 instance_local_nvme_tip: Optional[pulumi.Input[_builtins.str]] = None,
+                 instance_shapes: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
+                 instance_shapes_tip: Optional[pulumi.Input[_builtins.str]] = None,
                  instance_sizes: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
                  instance_types: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
                  labels: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
@@ -42,9 +46,11 @@ class NodePolicyArgs:
                  master_override_role_name: Optional[pulumi.Input[_builtins.str]] = None,
                  node_class_name: Optional[pulumi.Input[_builtins.str]] = None,
                  node_pool_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 oci: Optional[pulumi.Input['OCINodeClassSpecArgsArgs']] = None,
                  operating_systems: Optional[pulumi.Input['LabelSelectorArgsArgs']] = None,
                  raw: Optional[pulumi.Input[Sequence[pulumi.Input['RawKarpenterSpecArgsArgs']]]] = None,
                  startup_taints: Optional[pulumi.Input[Sequence[pulumi.Input['TaintArgsArgs']]]] = None,
+                 startup_taints_tip: Optional[pulumi.Input[_builtins.str]] = None,
                  taints: Optional[pulumi.Input[Sequence[pulumi.Input['TaintArgsArgs']]]] = None,
                  weight: Optional[pulumi.Input[_builtins.int]] = None,
                  zonal_shift: Optional[pulumi.Input['ZonalShiftConfigArgsArgs']] = None,
@@ -67,6 +73,8 @@ class NodePolicyArgs:
             pulumi.set(__self__, "description", description)
         if disruption is not None:
             pulumi.set(__self__, "disruption", disruption)
+        if gcp is not None:
+            pulumi.set(__self__, "gcp", gcp)
         if instance_categories is not None:
             pulumi.set(__self__, "instance_categories", instance_categories)
         if instance_cpus is not None:
@@ -79,6 +87,12 @@ class NodePolicyArgs:
             pulumi.set(__self__, "instance_hypervisors", instance_hypervisors)
         if instance_local_nvme is not None:
             pulumi.set(__self__, "instance_local_nvme", instance_local_nvme)
+        if instance_local_nvme_tip is not None:
+            pulumi.set(__self__, "instance_local_nvme_tip", instance_local_nvme_tip)
+        if instance_shapes is not None:
+            pulumi.set(__self__, "instance_shapes", instance_shapes)
+        if instance_shapes_tip is not None:
+            pulumi.set(__self__, "instance_shapes_tip", instance_shapes_tip)
         if instance_sizes is not None:
             pulumi.set(__self__, "instance_sizes", instance_sizes)
         if instance_types is not None:
@@ -93,12 +107,16 @@ class NodePolicyArgs:
             pulumi.set(__self__, "node_class_name", node_class_name)
         if node_pool_name is not None:
             pulumi.set(__self__, "node_pool_name", node_pool_name)
+        if oci is not None:
+            pulumi.set(__self__, "oci", oci)
         if operating_systems is not None:
             pulumi.set(__self__, "operating_systems", operating_systems)
         if raw is not None:
             pulumi.set(__self__, "raw", raw)
         if startup_taints is not None:
             pulumi.set(__self__, "startup_taints", startup_taints)
+        if startup_taints_tip is not None:
+            pulumi.set(__self__, "startup_taints_tip", startup_taints_tip)
         if taints is not None:
             pulumi.set(__self__, "taints", taints)
         if weight is not None:
@@ -181,6 +199,15 @@ class NodePolicyArgs:
         pulumi.set(self, "disruption", value)
 
     @_builtins.property
+    @pulumi.getter
+    def gcp(self) -> Optional[pulumi.Input['GCPNodeClassSpecArgsArgs']]:
+        return pulumi.get(self, "gcp")
+
+    @gcp.setter
+    def gcp(self, value: Optional[pulumi.Input['GCPNodeClassSpecArgsArgs']]):
+        pulumi.set(self, "gcp", value)
+
+    @_builtins.property
     @pulumi.getter(name="instanceCategories")
     def instance_categories(self) -> Optional[pulumi.Input['LabelSelectorArgsArgs']]:
         return pulumi.get(self, "instance_categories")
@@ -233,6 +260,33 @@ class NodePolicyArgs:
     @instance_local_nvme.setter
     def instance_local_nvme(self, value: Optional[pulumi.Input['LabelSelectorArgsArgs']]):
         pulumi.set(self, "instance_local_nvme", value)
+
+    @_builtins.property
+    @pulumi.getter(name="instanceLocalNvmeTip")
+    def instance_local_nvme_tip(self) -> Optional[pulumi.Input[_builtins.str]]:
+        return pulumi.get(self, "instance_local_nvme_tip")
+
+    @instance_local_nvme_tip.setter
+    def instance_local_nvme_tip(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "instance_local_nvme_tip", value)
+
+    @_builtins.property
+    @pulumi.getter(name="instanceShapes")
+    def instance_shapes(self) -> Optional[pulumi.Input['LabelSelectorArgsArgs']]:
+        return pulumi.get(self, "instance_shapes")
+
+    @instance_shapes.setter
+    def instance_shapes(self, value: Optional[pulumi.Input['LabelSelectorArgsArgs']]):
+        pulumi.set(self, "instance_shapes", value)
+
+    @_builtins.property
+    @pulumi.getter(name="instanceShapesTip")
+    def instance_shapes_tip(self) -> Optional[pulumi.Input[_builtins.str]]:
+        return pulumi.get(self, "instance_shapes_tip")
+
+    @instance_shapes_tip.setter
+    def instance_shapes_tip(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "instance_shapes_tip", value)
 
     @_builtins.property
     @pulumi.getter(name="instanceSizes")
@@ -298,6 +352,15 @@ class NodePolicyArgs:
         pulumi.set(self, "node_pool_name", value)
 
     @_builtins.property
+    @pulumi.getter
+    def oci(self) -> Optional[pulumi.Input['OCINodeClassSpecArgsArgs']]:
+        return pulumi.get(self, "oci")
+
+    @oci.setter
+    def oci(self, value: Optional[pulumi.Input['OCINodeClassSpecArgsArgs']]):
+        pulumi.set(self, "oci", value)
+
+    @_builtins.property
     @pulumi.getter(name="operatingSystems")
     def operating_systems(self) -> Optional[pulumi.Input['LabelSelectorArgsArgs']]:
         return pulumi.get(self, "operating_systems")
@@ -323,6 +386,15 @@ class NodePolicyArgs:
     @startup_taints.setter
     def startup_taints(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['TaintArgsArgs']]]]):
         pulumi.set(self, "startup_taints", value)
+
+    @_builtins.property
+    @pulumi.getter(name="startupTaintsTip")
+    def startup_taints_tip(self) -> Optional[pulumi.Input[_builtins.str]]:
+        return pulumi.get(self, "startup_taints_tip")
+
+    @startup_taints_tip.setter
+    def startup_taints_tip(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "startup_taints_tip", value)
 
     @_builtins.property
     @pulumi.getter
@@ -374,12 +446,16 @@ class NodePolicy(pulumi.CustomResource):
                  cloud_provider_id: Optional[pulumi.Input[_builtins.int]] = None,
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  disruption: Optional[pulumi.Input[Union['DisruptionPolicyArgsArgs', 'DisruptionPolicyArgsArgsDict']]] = None,
+                 gcp: Optional[pulumi.Input[Union['GCPNodeClassSpecArgsArgs', 'GCPNodeClassSpecArgsArgsDict']]] = None,
                  instance_categories: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_cpus: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_families: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_generations: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_hypervisors: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_local_nvme: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
+                 instance_local_nvme_tip: Optional[pulumi.Input[_builtins.str]] = None,
+                 instance_shapes: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
+                 instance_shapes_tip: Optional[pulumi.Input[_builtins.str]] = None,
                  instance_sizes: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_types: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  labels: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
@@ -388,9 +464,11 @@ class NodePolicy(pulumi.CustomResource):
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  node_class_name: Optional[pulumi.Input[_builtins.str]] = None,
                  node_pool_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 oci: Optional[pulumi.Input[Union['OCINodeClassSpecArgsArgs', 'OCINodeClassSpecArgsArgsDict']]] = None,
                  operating_systems: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  raw: Optional[pulumi.Input[Sequence[pulumi.Input[Union['RawKarpenterSpecArgsArgs', 'RawKarpenterSpecArgsArgsDict']]]]] = None,
                  startup_taints: Optional[pulumi.Input[Sequence[pulumi.Input[Union['TaintArgsArgs', 'TaintArgsArgsDict']]]]] = None,
+                 startup_taints_tip: Optional[pulumi.Input[_builtins.str]] = None,
                  taints: Optional[pulumi.Input[Sequence[pulumi.Input[Union['TaintArgsArgs', 'TaintArgsArgsDict']]]]] = None,
                  weight: Optional[pulumi.Input[_builtins.int]] = None,
                  zonal_shift: Optional[pulumi.Input[Union['ZonalShiftConfigArgsArgs', 'ZonalShiftConfigArgsArgsDict']]] = None,
@@ -433,12 +511,16 @@ class NodePolicy(pulumi.CustomResource):
                  cloud_provider_id: Optional[pulumi.Input[_builtins.int]] = None,
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  disruption: Optional[pulumi.Input[Union['DisruptionPolicyArgsArgs', 'DisruptionPolicyArgsArgsDict']]] = None,
+                 gcp: Optional[pulumi.Input[Union['GCPNodeClassSpecArgsArgs', 'GCPNodeClassSpecArgsArgsDict']]] = None,
                  instance_categories: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_cpus: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_families: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_generations: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_hypervisors: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_local_nvme: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
+                 instance_local_nvme_tip: Optional[pulumi.Input[_builtins.str]] = None,
+                 instance_shapes: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
+                 instance_shapes_tip: Optional[pulumi.Input[_builtins.str]] = None,
                  instance_sizes: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  instance_types: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  labels: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
@@ -447,9 +529,11 @@ class NodePolicy(pulumi.CustomResource):
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  node_class_name: Optional[pulumi.Input[_builtins.str]] = None,
                  node_pool_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 oci: Optional[pulumi.Input[Union['OCINodeClassSpecArgsArgs', 'OCINodeClassSpecArgsArgsDict']]] = None,
                  operating_systems: Optional[pulumi.Input[Union['LabelSelectorArgsArgs', 'LabelSelectorArgsArgsDict']]] = None,
                  raw: Optional[pulumi.Input[Sequence[pulumi.Input[Union['RawKarpenterSpecArgsArgs', 'RawKarpenterSpecArgsArgsDict']]]]] = None,
                  startup_taints: Optional[pulumi.Input[Sequence[pulumi.Input[Union['TaintArgsArgs', 'TaintArgsArgsDict']]]]] = None,
+                 startup_taints_tip: Optional[pulumi.Input[_builtins.str]] = None,
                  taints: Optional[pulumi.Input[Sequence[pulumi.Input[Union['TaintArgsArgs', 'TaintArgsArgsDict']]]]] = None,
                  weight: Optional[pulumi.Input[_builtins.int]] = None,
                  zonal_shift: Optional[pulumi.Input[Union['ZonalShiftConfigArgsArgs', 'ZonalShiftConfigArgsArgsDict']]] = None,
@@ -470,12 +554,16 @@ class NodePolicy(pulumi.CustomResource):
             __props__.__dict__["cloud_provider_id"] = cloud_provider_id
             __props__.__dict__["description"] = description
             __props__.__dict__["disruption"] = disruption
+            __props__.__dict__["gcp"] = gcp
             __props__.__dict__["instance_categories"] = instance_categories
             __props__.__dict__["instance_cpus"] = instance_cpus
             __props__.__dict__["instance_families"] = instance_families
             __props__.__dict__["instance_generations"] = instance_generations
             __props__.__dict__["instance_hypervisors"] = instance_hypervisors
             __props__.__dict__["instance_local_nvme"] = instance_local_nvme
+            __props__.__dict__["instance_local_nvme_tip"] = instance_local_nvme_tip
+            __props__.__dict__["instance_shapes"] = instance_shapes
+            __props__.__dict__["instance_shapes_tip"] = instance_shapes_tip
             __props__.__dict__["instance_sizes"] = instance_sizes
             __props__.__dict__["instance_types"] = instance_types
             __props__.__dict__["labels"] = labels
@@ -486,9 +574,11 @@ class NodePolicy(pulumi.CustomResource):
             __props__.__dict__["name"] = name
             __props__.__dict__["node_class_name"] = node_class_name
             __props__.__dict__["node_pool_name"] = node_pool_name
+            __props__.__dict__["oci"] = oci
             __props__.__dict__["operating_systems"] = operating_systems
             __props__.__dict__["raw"] = raw
             __props__.__dict__["startup_taints"] = startup_taints
+            __props__.__dict__["startup_taints_tip"] = startup_taints_tip
             __props__.__dict__["taints"] = taints
             __props__.__dict__["weight"] = weight
             __props__.__dict__["zonal_shift"] = zonal_shift
@@ -522,12 +612,16 @@ class NodePolicy(pulumi.CustomResource):
         __props__.__dict__["cloud_provider_id"] = None
         __props__.__dict__["description"] = None
         __props__.__dict__["disruption"] = None
+        __props__.__dict__["gcp"] = None
         __props__.__dict__["instance_categories"] = None
         __props__.__dict__["instance_cpus"] = None
         __props__.__dict__["instance_families"] = None
         __props__.__dict__["instance_generations"] = None
         __props__.__dict__["instance_hypervisors"] = None
         __props__.__dict__["instance_local_nvme"] = None
+        __props__.__dict__["instance_local_nvme_tip"] = None
+        __props__.__dict__["instance_shapes"] = None
+        __props__.__dict__["instance_shapes_tip"] = None
         __props__.__dict__["instance_sizes"] = None
         __props__.__dict__["instance_types"] = None
         __props__.__dict__["labels"] = None
@@ -536,9 +630,11 @@ class NodePolicy(pulumi.CustomResource):
         __props__.__dict__["name"] = None
         __props__.__dict__["node_class_name"] = None
         __props__.__dict__["node_pool_name"] = None
+        __props__.__dict__["oci"] = None
         __props__.__dict__["operating_systems"] = None
         __props__.__dict__["raw"] = None
         __props__.__dict__["startup_taints"] = None
+        __props__.__dict__["startup_taints_tip"] = None
         __props__.__dict__["taints"] = None
         __props__.__dict__["weight"] = None
         __props__.__dict__["zonal_shift"] = None
@@ -599,6 +695,14 @@ class NodePolicy(pulumi.CustomResource):
         return pulumi.get(self, "disruption")
 
     @_builtins.property
+    @pulumi.getter
+    def gcp(self) -> pulumi.Output[Optional['outputs.GCPNodeClassSpecArgs']]:
+        """
+        GCP-specific GCENodeClass configuration (service account, images, disks, etc.).
+        """
+        return pulumi.get(self, "gcp")
+
+    @_builtins.property
     @pulumi.getter(name="instanceCategories")
     def instance_categories(self) -> pulumi.Output[Optional['outputs.LabelSelectorArgs']]:
         """
@@ -642,6 +746,30 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter(name="instanceLocalNvme")
     def instance_local_nvme(self) -> pulumi.Output[Optional['outputs.LabelSelectorArgs']]:
         return pulumi.get(self, "instance_local_nvme")
+
+    @_builtins.property
+    @pulumi.getter(name="instanceLocalNvmeTip")
+    def instance_local_nvme_tip(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        UI tooltip text shown alongside the instanceLocalNvme selector.
+        """
+        return pulumi.get(self, "instance_local_nvme_tip")
+
+    @_builtins.property
+    @pulumi.getter(name="instanceShapes")
+    def instance_shapes(self) -> pulumi.Output[Optional['outputs.LabelSelectorArgs']]:
+        """
+        GCP-only: filter by standard/highcpu/highmem custom shape token. Example: {in: ["standard", "highmem"]}.
+        """
+        return pulumi.get(self, "instance_shapes")
+
+    @_builtins.property
+    @pulumi.getter(name="instanceShapesTip")
+    def instance_shapes_tip(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        UI tooltip text shown alongside the instanceShapes selector.
+        """
+        return pulumi.get(self, "instance_shapes_tip")
 
     @_builtins.property
     @pulumi.getter(name="instanceSizes")
@@ -705,6 +833,14 @@ class NodePolicy(pulumi.CustomResource):
         return pulumi.get(self, "node_pool_name")
 
     @_builtins.property
+    @pulumi.getter
+    def oci(self) -> pulumi.Output[Optional['outputs.OCINodeClassSpecArgs']]:
+        """
+        OCI-specific NodeClass configuration (VCN, subnets, images, block volumes, etc.).
+        """
+        return pulumi.get(self, "oci")
+
+    @_builtins.property
     @pulumi.getter(name="operatingSystems")
     def operating_systems(self) -> pulumi.Output[Optional['outputs.LabelSelectorArgs']]:
         """
@@ -724,6 +860,14 @@ class NodePolicy(pulumi.CustomResource):
     @pulumi.getter(name="startupTaints")
     def startup_taints(self) -> pulumi.Output[Optional[Sequence['outputs.TaintArgs']]]:
         return pulumi.get(self, "startup_taints")
+
+    @_builtins.property
+    @pulumi.getter(name="startupTaintsTip")
+    def startup_taints_tip(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        UI tooltip text shown alongside startupTaints.
+        """
+        return pulumi.get(self, "startup_taints_tip")
 
     @_builtins.property
     @pulumi.getter

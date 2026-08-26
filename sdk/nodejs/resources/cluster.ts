@@ -36,7 +36,7 @@ export class Cluster extends pulumi.CustomResource {
      */
     declare public readonly name: pulumi.Output<string>;
     /**
-     * Authentication token for the cluster. Rotated automatically if empty on update (e.g. after import).
+     * Bearer token minted for the cluster at creation. Not retrievable afterwards; imported clusters have an empty token (rotate it deliberately from the DevZero UI if you need it in state).
      */
     declare public /*out*/ readonly token: pulumi.Output<string>;
 

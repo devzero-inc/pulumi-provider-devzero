@@ -28,6 +28,8 @@ type NodePolicy struct {
 	Description pulumi.StringPtrOutput `pulumi:"description"`
 	// Karpenter disruption policy controlling consolidation, expiry, and budgets.
 	Disruption DisruptionPolicyArgsPtrOutput `pulumi:"disruption"`
+	// GCP-specific GCENodeClass configuration (service account, images, disks, etc.).
+	Gcp GCPNodeClassSpecArgsPtrOutput `pulumi:"gcp"`
 	// Filter instances by category letter (cloud-specific). Example: {in: ["m", "c", "r"]} for AWS, {in: ["D", "E"]} for Azure.
 	InstanceCategories LabelSelectorArgsPtrOutput `pulumi:"instanceCategories"`
 	// Filter instances by vCPU count. Example: {in: ["4", "8", "16"]}.
@@ -39,6 +41,12 @@ type NodePolicy struct {
 	// Filter instances by hypervisor type. Example: {in: ["nitro"]}.
 	InstanceHypervisors LabelSelectorArgsPtrOutput `pulumi:"instanceHypervisors"`
 	InstanceLocalNvme   LabelSelectorArgsPtrOutput `pulumi:"instanceLocalNvme"`
+	// UI tooltip text shown alongside the instanceLocalNvme selector.
+	InstanceLocalNvmeTip pulumi.StringPtrOutput `pulumi:"instanceLocalNvmeTip"`
+	// GCP-only: filter by standard/highcpu/highmem custom shape token. Example: {in: ["standard", "highmem"]}.
+	InstanceShapes LabelSelectorArgsPtrOutput `pulumi:"instanceShapes"`
+	// UI tooltip text shown alongside the instanceShapes selector.
+	InstanceShapesTip pulumi.StringPtrOutput `pulumi:"instanceShapesTip"`
 	// Filter instances by size label. Example: {in: ["large", "xlarge", "2xlarge"]}.
 	InstanceSizes LabelSelectorArgsPtrOutput `pulumi:"instanceSizes"`
 	// Explicitly allow specific instance types. Example: {in: ["m5.large", "c6i.large"]}.
@@ -54,11 +62,15 @@ type NodePolicy struct {
 	NodeClassName pulumi.StringPtrOutput `pulumi:"nodeClassName"`
 	// Override name for the generated Karpenter NodePool resource. Example: 'prod-spot-nodepool'.
 	NodePoolName pulumi.StringPtrOutput `pulumi:"nodePoolName"`
+	// OCI-specific NodeClass configuration (VCN, subnets, images, block volumes, etc.).
+	Oci OCINodeClassSpecArgsPtrOutput `pulumi:"oci"`
 	// Operating systems for nodes. Example: {in: ["linux"]}.
 	OperatingSystems LabelSelectorArgsPtrOutput `pulumi:"operatingSystems"`
 	// Raw Karpenter YAML for full NodePool/NodeClass customization — use only when structured fields are insufficient.
 	Raw           RawKarpenterSpecArgsArrayOutput `pulumi:"raw"`
 	StartupTaints TaintArgsArrayOutput            `pulumi:"startupTaints"`
+	// UI tooltip text shown alongside startupTaints.
+	StartupTaintsTip pulumi.StringPtrOutput `pulumi:"startupTaintsTip"`
 	// Taints applied to provisioned nodes to control pod scheduling. Example: [{key: "dedicated", value: "gpu", effect: "NoSchedule"}].
 	Taints TaintArgsArrayOutput `pulumi:"taints"`
 	// Priority weight; higher values take precedence when multiple policies match. Example: 100.
@@ -118,12 +130,16 @@ type nodePolicyArgs struct {
 	CloudProviderId        *int                    `pulumi:"cloudProviderId"`
 	Description            *string                 `pulumi:"description"`
 	Disruption             *DisruptionPolicyArgs   `pulumi:"disruption"`
+	Gcp                    *GCPNodeClassSpecArgs   `pulumi:"gcp"`
 	InstanceCategories     *LabelSelectorArgs      `pulumi:"instanceCategories"`
 	InstanceCpus           *LabelSelectorArgs      `pulumi:"instanceCpus"`
 	InstanceFamilies       *LabelSelectorArgs      `pulumi:"instanceFamilies"`
 	InstanceGenerations    *LabelSelectorArgs      `pulumi:"instanceGenerations"`
 	InstanceHypervisors    *LabelSelectorArgs      `pulumi:"instanceHypervisors"`
 	InstanceLocalNvme      *LabelSelectorArgs      `pulumi:"instanceLocalNvme"`
+	InstanceLocalNvmeTip   *string                 `pulumi:"instanceLocalNvmeTip"`
+	InstanceShapes         *LabelSelectorArgs      `pulumi:"instanceShapes"`
+	InstanceShapesTip      *string                 `pulumi:"instanceShapesTip"`
 	InstanceSizes          *LabelSelectorArgs      `pulumi:"instanceSizes"`
 	InstanceTypes          *LabelSelectorArgs      `pulumi:"instanceTypes"`
 	Labels                 map[string]string       `pulumi:"labels"`
@@ -132,9 +148,11 @@ type nodePolicyArgs struct {
 	Name                   string                  `pulumi:"name"`
 	NodeClassName          *string                 `pulumi:"nodeClassName"`
 	NodePoolName           *string                 `pulumi:"nodePoolName"`
+	Oci                    *OCINodeClassSpecArgs   `pulumi:"oci"`
 	OperatingSystems       *LabelSelectorArgs      `pulumi:"operatingSystems"`
 	Raw                    []RawKarpenterSpecArgs  `pulumi:"raw"`
 	StartupTaints          []TaintArgs             `pulumi:"startupTaints"`
+	StartupTaintsTip       *string                 `pulumi:"startupTaintsTip"`
 	Taints                 []TaintArgs             `pulumi:"taints"`
 	Weight                 *int                    `pulumi:"weight"`
 	ZonalShift             *ZonalShiftConfigArgs   `pulumi:"zonalShift"`
@@ -150,12 +168,16 @@ type NodePolicyArgs struct {
 	CloudProviderId        pulumi.IntPtrInput
 	Description            pulumi.StringPtrInput
 	Disruption             DisruptionPolicyArgsPtrInput
+	Gcp                    GCPNodeClassSpecArgsPtrInput
 	InstanceCategories     LabelSelectorArgsPtrInput
 	InstanceCpus           LabelSelectorArgsPtrInput
 	InstanceFamilies       LabelSelectorArgsPtrInput
 	InstanceGenerations    LabelSelectorArgsPtrInput
 	InstanceHypervisors    LabelSelectorArgsPtrInput
 	InstanceLocalNvme      LabelSelectorArgsPtrInput
+	InstanceLocalNvmeTip   pulumi.StringPtrInput
+	InstanceShapes         LabelSelectorArgsPtrInput
+	InstanceShapesTip      pulumi.StringPtrInput
 	InstanceSizes          LabelSelectorArgsPtrInput
 	InstanceTypes          LabelSelectorArgsPtrInput
 	Labels                 pulumi.StringMapInput
@@ -164,9 +186,11 @@ type NodePolicyArgs struct {
 	Name                   pulumi.StringInput
 	NodeClassName          pulumi.StringPtrInput
 	NodePoolName           pulumi.StringPtrInput
+	Oci                    OCINodeClassSpecArgsPtrInput
 	OperatingSystems       LabelSelectorArgsPtrInput
 	Raw                    RawKarpenterSpecArgsArrayInput
 	StartupTaints          TaintArgsArrayInput
+	StartupTaintsTip       pulumi.StringPtrInput
 	Taints                 TaintArgsArrayInput
 	Weight                 pulumi.IntPtrInput
 	ZonalShift             ZonalShiftConfigArgsPtrInput
@@ -294,6 +318,11 @@ func (o NodePolicyOutput) Disruption() DisruptionPolicyArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) DisruptionPolicyArgsPtrOutput { return v.Disruption }).(DisruptionPolicyArgsPtrOutput)
 }
 
+// GCP-specific GCENodeClass configuration (service account, images, disks, etc.).
+func (o NodePolicyOutput) Gcp() GCPNodeClassSpecArgsPtrOutput {
+	return o.ApplyT(func(v *NodePolicy) GCPNodeClassSpecArgsPtrOutput { return v.Gcp }).(GCPNodeClassSpecArgsPtrOutput)
+}
+
 // Filter instances by category letter (cloud-specific). Example: {in: ["m", "c", "r"]} for AWS, {in: ["D", "E"]} for Azure.
 func (o NodePolicyOutput) InstanceCategories() LabelSelectorArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) LabelSelectorArgsPtrOutput { return v.InstanceCategories }).(LabelSelectorArgsPtrOutput)
@@ -321,6 +350,21 @@ func (o NodePolicyOutput) InstanceHypervisors() LabelSelectorArgsPtrOutput {
 
 func (o NodePolicyOutput) InstanceLocalNvme() LabelSelectorArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) LabelSelectorArgsPtrOutput { return v.InstanceLocalNvme }).(LabelSelectorArgsPtrOutput)
+}
+
+// UI tooltip text shown alongside the instanceLocalNvme selector.
+func (o NodePolicyOutput) InstanceLocalNvmeTip() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *NodePolicy) pulumi.StringPtrOutput { return v.InstanceLocalNvmeTip }).(pulumi.StringPtrOutput)
+}
+
+// GCP-only: filter by standard/highcpu/highmem custom shape token. Example: {in: ["standard", "highmem"]}.
+func (o NodePolicyOutput) InstanceShapes() LabelSelectorArgsPtrOutput {
+	return o.ApplyT(func(v *NodePolicy) LabelSelectorArgsPtrOutput { return v.InstanceShapes }).(LabelSelectorArgsPtrOutput)
+}
+
+// UI tooltip text shown alongside the instanceShapes selector.
+func (o NodePolicyOutput) InstanceShapesTip() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *NodePolicy) pulumi.StringPtrOutput { return v.InstanceShapesTip }).(pulumi.StringPtrOutput)
 }
 
 // Filter instances by size label. Example: {in: ["large", "xlarge", "2xlarge"]}.
@@ -362,6 +406,11 @@ func (o NodePolicyOutput) NodePoolName() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) pulumi.StringPtrOutput { return v.NodePoolName }).(pulumi.StringPtrOutput)
 }
 
+// OCI-specific NodeClass configuration (VCN, subnets, images, block volumes, etc.).
+func (o NodePolicyOutput) Oci() OCINodeClassSpecArgsPtrOutput {
+	return o.ApplyT(func(v *NodePolicy) OCINodeClassSpecArgsPtrOutput { return v.Oci }).(OCINodeClassSpecArgsPtrOutput)
+}
+
 // Operating systems for nodes. Example: {in: ["linux"]}.
 func (o NodePolicyOutput) OperatingSystems() LabelSelectorArgsPtrOutput {
 	return o.ApplyT(func(v *NodePolicy) LabelSelectorArgsPtrOutput { return v.OperatingSystems }).(LabelSelectorArgsPtrOutput)
@@ -374,6 +423,11 @@ func (o NodePolicyOutput) Raw() RawKarpenterSpecArgsArrayOutput {
 
 func (o NodePolicyOutput) StartupTaints() TaintArgsArrayOutput {
 	return o.ApplyT(func(v *NodePolicy) TaintArgsArrayOutput { return v.StartupTaints }).(TaintArgsArrayOutput)
+}
+
+// UI tooltip text shown alongside startupTaints.
+func (o NodePolicyOutput) StartupTaintsTip() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *NodePolicy) pulumi.StringPtrOutput { return v.StartupTaintsTip }).(pulumi.StringPtrOutput)
 }
 
 // Taints applied to provisioned nodes to control pod scheduling. Example: [{key: "dedicated", value: "gpu", effect: "NoSchedule"}].

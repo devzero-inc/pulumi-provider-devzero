@@ -342,6 +342,75 @@ export namespace resources {
         oomMemoryMultiplier?: number;
     }
 
+    export interface GCPDiskArgs {
+        /**
+         * Whether this disk is the boot disk. Example: true.
+         */
+        boot?: boolean;
+        /**
+         * GCP disk type. Example: 'pd-ssd'.
+         */
+        category?: string;
+        /**
+         * Secondary boot image used for container-image fast boot. Example: 'projects/my-project/global/images/my-cache-image'.
+         */
+        secondaryBootImage?: string;
+        /**
+         * Secondary boot mode. Example: 'CONTAINER_IMAGE_CACHE'.
+         */
+        secondaryBootMode?: string;
+        /**
+         * Disk size in GiB. Example: 100.
+         */
+        sizeGib?: number;
+    }
+
+    export interface GCPImageSelectorTermArgs {
+        /**
+         * Well-known alias for the GCP node image family. Example: 'cos@latest'.
+         */
+        alias?: string;
+        /**
+         * Explicit GCP image ID. Example: 'projects/cos-cloud/global/images/cos-105-17412-156-59'.
+         */
+        id?: string;
+    }
+
+    export interface GCPNodeClassSpecArgs {
+        /**
+         * Disks attached to provisioned nodes. Example: [{sizeGib: 100, category: "pd-ssd", boot: true}].
+         */
+        disks?: outputs.resources.GCPDiskArgs[];
+        /**
+         * GCP node image family shorthand used when no imageSelectorTerms are specified. Example: 'cos'.
+         */
+        imageFamily?: string;
+        /**
+         * Selectors for the node images used to launch nodes. Example: [{alias: "cos@latest"}].
+         */
+        imageSelectorTerms?: outputs.resources.GCPImageSelectorTermArgs[];
+        /**
+         * Kubelet configuration overrides applied to all nodes in this class.
+         */
+        kubelet?: outputs.resources.KubeletConfigurationArgs;
+        /**
+         * GCP labels applied to all resources created by this node class. Example: {"environment": "production"}.
+         */
+        labels?: {[key: string]: string};
+        /**
+         * GCE instance metadata applied to provisioned nodes. Example: {"disable-legacy-endpoints": "true"}.
+         */
+        metadata?: {[key: string]: string};
+        /**
+         * GCP network tags applied to provisioned nodes for firewall targeting. Example: ["karpenter-node"].
+         */
+        networkTags?: string[];
+        /**
+         * GCP service account email attached to provisioned nodes. Example: 'karpenter@my-project.iam.gserviceaccount.com'.
+         */
+        serviceAccount?: string;
+    }
+
     export interface HPABehaviorArgs {
         /**
          * Scale-down behavior rules.
@@ -504,6 +573,144 @@ export namespace resources {
         targetUtilization?: number;
     }
 
+    export interface JvmHeapRuleConfigArgs {
+        /**
+         * Enable JVM heap sizing overrides. Example: true.
+         */
+        enabled?: boolean;
+        /**
+         * Multiplier applied above the target usage to derive the heap size. Example: 1.3.
+         */
+        headroomMultiplier?: number;
+        /**
+         * Maximum JVM heap size in bytes. Example: 2147483648.
+         */
+        maxHeapBytes?: number;
+        /**
+         * Minimum JVM heap size in bytes. Example: 134217728.
+         */
+        minHeapBytes?: number;
+        /**
+         * Non-heap memory overhead in bytes. Takes precedence over nonHeapOverheadPercent when set. Example: 268435456.
+         */
+        nonHeapOverheadBytes?: number;
+        /**
+         * Non-heap memory overhead as a percentage of container memory (0-1). Example: 0.2.
+         */
+        nonHeapOverheadPercent?: number;
+        /**
+         * Prefer the JVM's native container-aware heap sizing (-XX:+UseContainerSupport) over explicit -Xmx/-Xms flags. Example: false.
+         */
+        preferContainerSupport?: boolean;
+        /**
+         * Percentile of usage data used as the heap sizing target (0-1). Example: 0.95.
+         */
+        targetPercentile?: number;
+    }
+
+    export interface KedaAdvancedArgs {
+        /**
+         * Kubernetes HorizontalPodAutoscalerBehavior encoded as a JSON string, applied to the generated HPA. Example: '{"scaleDown":{"stabilizationWindowSeconds":300}}'.
+         */
+        advancedBehaviorJson?: string;
+        /**
+         * Restore the original replica count when the ScaledObject is deleted. Example: false.
+         */
+        restoreToOriginalReplicaCount?: boolean;
+    }
+
+    export interface KedaAuthenticationRefArgs {
+        /**
+         * Kind of the referenced resource. One of: 'TriggerAuthentication', 'ClusterTriggerAuthentication'. Example: 'TriggerAuthentication'.
+         */
+        kind?: string;
+        /**
+         * Name of the referenced TriggerAuthentication/ClusterTriggerAuthentication resource. Example: 'prometheus-auth'.
+         */
+        name: string;
+    }
+
+    export interface KedaFallbackArgs {
+        /**
+         * Fallback strategy. Example: 'static'.
+         */
+        behavior?: string;
+        /**
+         * Number of consecutive metric failures before activating fallback. Example: 3.
+         */
+        failureThreshold: number;
+        /**
+         * Number of replicas to fall back to when metrics are unavailable. Example: 2.
+         */
+        replicas: number;
+    }
+
+    export interface KedaScaledObjectArgs {
+        /**
+         * Advanced ScaledObject behavior configuration.
+         */
+        advanced?: outputs.resources.KedaAdvancedArgs;
+        /**
+         * Seconds to wait after the last trigger reports active=false before scaling to minReplicaCount. Example: 300.
+         */
+        cooldownPeriod?: number;
+        /**
+         * Replica fallback configuration when KEDA metrics are unavailable.
+         */
+        fallback?: outputs.resources.KedaFallbackArgs;
+        /**
+         * Replica count to scale to when idle. Must be less than minReplicaCount. Example: 0.
+         */
+        idleReplicaCount?: number;
+        /**
+         * Cooldown period applied only during the initial scaling of the ScaledObject. Example: 0.
+         */
+        initialCooldownPeriod?: number;
+        /**
+         * Maximum number of replicas. Example: 10.
+         */
+        maxReplicaCount?: number;
+        /**
+         * Minimum number of replicas. Example: 0.
+         */
+        minReplicaCount?: number;
+        /**
+         * Seconds between checks of trigger metrics. Example: 30.
+         */
+        pollingInterval?: number;
+        /**
+         * KEDA scaler triggers driving this ScaledObject.
+         */
+        triggers?: outputs.resources.KedaTriggerArgs[];
+    }
+
+    export interface KedaTriggerArgs {
+        /**
+         * Reference to a TriggerAuthentication or ClusterTriggerAuthentication for this trigger.
+         */
+        authenticationRef?: outputs.resources.KedaAuthenticationRefArgs;
+        /**
+         * Scaler-specific configuration key-value pairs. Example: {"serverAddress": "http://prometheus:9090", "query": "sum(rate(http_requests_total[2m]))"}.
+         */
+        metadata?: {[key: string]: string};
+        /**
+         * Metric target type. One of: 'Value', 'AverageValue', 'Utilization'. Example: 'AverageValue'.
+         */
+        metricType?: string;
+        /**
+         * Optional trigger name, used to disambiguate multiple triggers of the same type. Example: 'requests-per-second'.
+         */
+        name?: string;
+        /**
+         * KEDA scaler type. Example: 'prometheus'.
+         */
+        type: string;
+        /**
+         * Use KEDA's metric caching for this trigger. Example: false.
+         */
+        useCachedMetrics?: boolean;
+    }
+
     export interface KubeletConfigurationArgs {
         /**
          * DNS server IP addresses passed to kubelet. Example: ["10.96.0.10"].
@@ -609,6 +816,147 @@ export namespace resources {
          * Regular expression pattern to match workload names.
          */
         pattern?: string;
+    }
+
+    export interface OCIBootConfigArgs {
+        /**
+         * Boot volume size in GB. Example: 100.
+         */
+        bootVolumeSizeInGbs?: number;
+        /**
+         * Boot volume performance units per GB. Example: 10.
+         */
+        bootVolumeVpusPerGb?: number;
+    }
+
+    export interface OCIImageSelectorTermArgs {
+        /**
+         * OCID of the compartment containing the image. Example: 'ocid1.compartment.oc1..aaaaaaaa'.
+         */
+        compartmentId?: string;
+        /**
+         * Explicit OCI image OCID. Example: 'ocid1.image.oc1..aaaaaaaa'.
+         */
+        id?: string;
+        /**
+         * OCI image display name filter. Example: 'Oracle-Linux-8.9'.
+         */
+        name?: string;
+    }
+
+    export interface OCILaunchOptionsArgs {
+        /**
+         * Emulation type for the boot volume. Example: 'PARAVIRTUALIZED'.
+         */
+        bootVolumeType?: string;
+        /**
+         * Firmware used to boot the instance. Example: 'UEFI_64'.
+         */
+        firmware?: string;
+        /**
+         * Whether consistent volume naming is enabled for the instance. Example: true.
+         */
+        isConsistentVolumeNamingEnabled?: boolean;
+        /**
+         * Emulation type for the network interface. Example: 'PARAVIRTUALIZED'.
+         */
+        networkType?: string;
+        /**
+         * Emulation type for remote data volumes. Example: 'PARAVIRTUALIZED'.
+         */
+        remoteDataVolumeType?: string;
+    }
+
+    export interface OCINodeClassSpecArgs {
+        /**
+         * OCI compute instance agent plugins to enable. Example: ["Compute Instance Monitoring"].
+         */
+        agentList?: string[];
+        /**
+         * Additional block volumes attached to provisioned nodes.
+         */
+        blockDevices?: outputs.resources.OCIVolumeAttributesArgs[];
+        /**
+         * Boot volume configuration for provisioned nodes.
+         */
+        bootConfig?: outputs.resources.OCIBootConfigArgs;
+        /**
+         * OCI free-form tags applied to all resources created by this node class. Example: {"environment": "production"}.
+         */
+        freeFormTags?: {[key: string]: string};
+        /**
+         * OCI node image family shorthand used when no imageSelector is specified. Example: 'Oracle-Linux-8'.
+         */
+        imageFamily?: string;
+        /**
+         * Selectors for the images used to launch nodes. Example: [{name: "Oracle-Linux-8.9"}].
+         */
+        imageSelector?: outputs.resources.OCIImageSelectorTermArgs[];
+        /**
+         * Instance launch options controlling firmware and network/volume emulation type.
+         */
+        launchOptions?: outputs.resources.OCILaunchOptionsArgs;
+        /**
+         * OCI instance metadata applied to provisioned nodes. Example: {"ssh_authorized_keys": "ssh-rsa ..."}.
+         */
+        metaData?: {[key: string]: string};
+        /**
+         * Script executed before node bootstrap. Example: '#!/bin/bash\necho pre-install'.
+         */
+        preInstallScript?: string;
+        /**
+         * Selectors for network security groups attached to provisioned nodes.
+         */
+        securityGroupSelector?: outputs.resources.OCISecurityGroupSelectorTermArgs[];
+        /**
+         * Selectors for the subnets nodes will be launched into.
+         */
+        subnetSelector?: outputs.resources.OCISubnetSelectorTermArgs[];
+        /**
+         * OCI defined tags applied to all resources created by this node class.
+         */
+        tags?: {[key: string]: string};
+        /**
+         * Custom cloud-init user data merged into the node launch config (base64 or plain text). Example: '#!/bin/bash\necho hello'.
+         */
+        userData?: string;
+        /**
+         * OCID of the VCN nodes will be launched into. Example: 'ocid1.vcn.oc1..aaaaaaaa'.
+         */
+        vcnId?: string;
+    }
+
+    export interface OCISecurityGroupSelectorTermArgs {
+        /**
+         * Explicit OCI network security group OCID. Example: 'ocid1.networksecuritygroup.oc1..aaaaaaaa'.
+         */
+        id?: string;
+        /**
+         * OCI network security group display name filter. Example: 'node-nsg'.
+         */
+        name?: string;
+    }
+
+    export interface OCISubnetSelectorTermArgs {
+        /**
+         * Explicit OCI subnet OCID. Example: 'ocid1.subnet.oc1..aaaaaaaa'.
+         */
+        id?: string;
+        /**
+         * OCI subnet display name filter. Example: 'node-subnet'.
+         */
+        name?: string;
+    }
+
+    export interface OCIVolumeAttributesArgs {
+        /**
+         * Block volume size in GB. Example: 50.
+         */
+        sizeInGbs?: number;
+        /**
+         * Block volume performance units per GB. Example: 10.
+         */
+        vpusPerGb?: number;
     }
 
     export interface RawKarpenterSpecArgs {

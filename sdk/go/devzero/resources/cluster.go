@@ -17,7 +17,7 @@ type Cluster struct {
 
 	// The name of the cluster.
 	Name pulumi.StringOutput `pulumi:"name"`
-	// Authentication token for the cluster. Rotated automatically if empty on update (e.g. after import).
+	// Bearer token minted for the cluster at creation. Not retrievable afterwards; imported clusters have an empty token (rotate it deliberately from the DevZero UI if you need it in state).
 	Token pulumi.StringOutput `pulumi:"token"`
 }
 
@@ -168,7 +168,7 @@ func (o ClusterOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *Cluster) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }
 
-// Authentication token for the cluster. Rotated automatically if empty on update (e.g. after import).
+// Bearer token minted for the cluster at creation. Not retrievable afterwards; imported clusters have an empty token (rotate it deliberately from the DevZero UI if you need it in state).
 func (o ClusterOutput) Token() pulumi.StringOutput {
 	return o.ApplyT(func(v *Cluster) pulumi.StringOutput { return v.Token }).(pulumi.StringOutput)
 }

@@ -2403,6 +2403,515 @@ func (o EmergencyResponseConfigArgsPtrOutput) OomMemoryMultiplier() pulumi.Float
 	}).(pulumi.Float64PtrOutput)
 }
 
+type GCPDiskArgs struct {
+	// Whether this disk is the boot disk. Example: true.
+	Boot *bool `pulumi:"boot"`
+	// GCP disk type. Example: 'pd-ssd'.
+	Category *string `pulumi:"category"`
+	// Secondary boot image used for container-image fast boot. Example: 'projects/my-project/global/images/my-cache-image'.
+	SecondaryBootImage *string `pulumi:"secondaryBootImage"`
+	// Secondary boot mode. Example: 'CONTAINER_IMAGE_CACHE'.
+	SecondaryBootMode *string `pulumi:"secondaryBootMode"`
+	// Disk size in GiB. Example: 100.
+	SizeGib *int `pulumi:"sizeGib"`
+}
+
+// GCPDiskArgsInput is an input type that accepts GCPDiskArgsArgs and GCPDiskArgsOutput values.
+// You can construct a concrete instance of `GCPDiskArgsInput` via:
+//
+//	GCPDiskArgsArgs{...}
+type GCPDiskArgsInput interface {
+	pulumi.Input
+
+	ToGCPDiskArgsOutput() GCPDiskArgsOutput
+	ToGCPDiskArgsOutputWithContext(context.Context) GCPDiskArgsOutput
+}
+
+type GCPDiskArgsArgs struct {
+	// Whether this disk is the boot disk. Example: true.
+	Boot pulumi.BoolPtrInput `pulumi:"boot"`
+	// GCP disk type. Example: 'pd-ssd'.
+	Category pulumi.StringPtrInput `pulumi:"category"`
+	// Secondary boot image used for container-image fast boot. Example: 'projects/my-project/global/images/my-cache-image'.
+	SecondaryBootImage pulumi.StringPtrInput `pulumi:"secondaryBootImage"`
+	// Secondary boot mode. Example: 'CONTAINER_IMAGE_CACHE'.
+	SecondaryBootMode pulumi.StringPtrInput `pulumi:"secondaryBootMode"`
+	// Disk size in GiB. Example: 100.
+	SizeGib pulumi.IntPtrInput `pulumi:"sizeGib"`
+}
+
+func (GCPDiskArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*GCPDiskArgs)(nil)).Elem()
+}
+
+func (i GCPDiskArgsArgs) ToGCPDiskArgsOutput() GCPDiskArgsOutput {
+	return i.ToGCPDiskArgsOutputWithContext(context.Background())
+}
+
+func (i GCPDiskArgsArgs) ToGCPDiskArgsOutputWithContext(ctx context.Context) GCPDiskArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GCPDiskArgsOutput)
+}
+
+// GCPDiskArgsArrayInput is an input type that accepts GCPDiskArgsArray and GCPDiskArgsArrayOutput values.
+// You can construct a concrete instance of `GCPDiskArgsArrayInput` via:
+//
+//	GCPDiskArgsArray{ GCPDiskArgsArgs{...} }
+type GCPDiskArgsArrayInput interface {
+	pulumi.Input
+
+	ToGCPDiskArgsArrayOutput() GCPDiskArgsArrayOutput
+	ToGCPDiskArgsArrayOutputWithContext(context.Context) GCPDiskArgsArrayOutput
+}
+
+type GCPDiskArgsArray []GCPDiskArgsInput
+
+func (GCPDiskArgsArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]GCPDiskArgs)(nil)).Elem()
+}
+
+func (i GCPDiskArgsArray) ToGCPDiskArgsArrayOutput() GCPDiskArgsArrayOutput {
+	return i.ToGCPDiskArgsArrayOutputWithContext(context.Background())
+}
+
+func (i GCPDiskArgsArray) ToGCPDiskArgsArrayOutputWithContext(ctx context.Context) GCPDiskArgsArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GCPDiskArgsArrayOutput)
+}
+
+type GCPDiskArgsOutput struct{ *pulumi.OutputState }
+
+func (GCPDiskArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*GCPDiskArgs)(nil)).Elem()
+}
+
+func (o GCPDiskArgsOutput) ToGCPDiskArgsOutput() GCPDiskArgsOutput {
+	return o
+}
+
+func (o GCPDiskArgsOutput) ToGCPDiskArgsOutputWithContext(ctx context.Context) GCPDiskArgsOutput {
+	return o
+}
+
+// Whether this disk is the boot disk. Example: true.
+func (o GCPDiskArgsOutput) Boot() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v GCPDiskArgs) *bool { return v.Boot }).(pulumi.BoolPtrOutput)
+}
+
+// GCP disk type. Example: 'pd-ssd'.
+func (o GCPDiskArgsOutput) Category() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GCPDiskArgs) *string { return v.Category }).(pulumi.StringPtrOutput)
+}
+
+// Secondary boot image used for container-image fast boot. Example: 'projects/my-project/global/images/my-cache-image'.
+func (o GCPDiskArgsOutput) SecondaryBootImage() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GCPDiskArgs) *string { return v.SecondaryBootImage }).(pulumi.StringPtrOutput)
+}
+
+// Secondary boot mode. Example: 'CONTAINER_IMAGE_CACHE'.
+func (o GCPDiskArgsOutput) SecondaryBootMode() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GCPDiskArgs) *string { return v.SecondaryBootMode }).(pulumi.StringPtrOutput)
+}
+
+// Disk size in GiB. Example: 100.
+func (o GCPDiskArgsOutput) SizeGib() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v GCPDiskArgs) *int { return v.SizeGib }).(pulumi.IntPtrOutput)
+}
+
+type GCPDiskArgsArrayOutput struct{ *pulumi.OutputState }
+
+func (GCPDiskArgsArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]GCPDiskArgs)(nil)).Elem()
+}
+
+func (o GCPDiskArgsArrayOutput) ToGCPDiskArgsArrayOutput() GCPDiskArgsArrayOutput {
+	return o
+}
+
+func (o GCPDiskArgsArrayOutput) ToGCPDiskArgsArrayOutputWithContext(ctx context.Context) GCPDiskArgsArrayOutput {
+	return o
+}
+
+func (o GCPDiskArgsArrayOutput) Index(i pulumi.IntInput) GCPDiskArgsOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) GCPDiskArgs {
+		return vs[0].([]GCPDiskArgs)[vs[1].(int)]
+	}).(GCPDiskArgsOutput)
+}
+
+type GCPImageSelectorTermArgs struct {
+	// Well-known alias for the GCP node image family. Example: 'cos@latest'.
+	Alias *string `pulumi:"alias"`
+	// Explicit GCP image ID. Example: 'projects/cos-cloud/global/images/cos-105-17412-156-59'.
+	Id *string `pulumi:"id"`
+}
+
+// GCPImageSelectorTermArgsInput is an input type that accepts GCPImageSelectorTermArgsArgs and GCPImageSelectorTermArgsOutput values.
+// You can construct a concrete instance of `GCPImageSelectorTermArgsInput` via:
+//
+//	GCPImageSelectorTermArgsArgs{...}
+type GCPImageSelectorTermArgsInput interface {
+	pulumi.Input
+
+	ToGCPImageSelectorTermArgsOutput() GCPImageSelectorTermArgsOutput
+	ToGCPImageSelectorTermArgsOutputWithContext(context.Context) GCPImageSelectorTermArgsOutput
+}
+
+type GCPImageSelectorTermArgsArgs struct {
+	// Well-known alias for the GCP node image family. Example: 'cos@latest'.
+	Alias pulumi.StringPtrInput `pulumi:"alias"`
+	// Explicit GCP image ID. Example: 'projects/cos-cloud/global/images/cos-105-17412-156-59'.
+	Id pulumi.StringPtrInput `pulumi:"id"`
+}
+
+func (GCPImageSelectorTermArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*GCPImageSelectorTermArgs)(nil)).Elem()
+}
+
+func (i GCPImageSelectorTermArgsArgs) ToGCPImageSelectorTermArgsOutput() GCPImageSelectorTermArgsOutput {
+	return i.ToGCPImageSelectorTermArgsOutputWithContext(context.Background())
+}
+
+func (i GCPImageSelectorTermArgsArgs) ToGCPImageSelectorTermArgsOutputWithContext(ctx context.Context) GCPImageSelectorTermArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GCPImageSelectorTermArgsOutput)
+}
+
+// GCPImageSelectorTermArgsArrayInput is an input type that accepts GCPImageSelectorTermArgsArray and GCPImageSelectorTermArgsArrayOutput values.
+// You can construct a concrete instance of `GCPImageSelectorTermArgsArrayInput` via:
+//
+//	GCPImageSelectorTermArgsArray{ GCPImageSelectorTermArgsArgs{...} }
+type GCPImageSelectorTermArgsArrayInput interface {
+	pulumi.Input
+
+	ToGCPImageSelectorTermArgsArrayOutput() GCPImageSelectorTermArgsArrayOutput
+	ToGCPImageSelectorTermArgsArrayOutputWithContext(context.Context) GCPImageSelectorTermArgsArrayOutput
+}
+
+type GCPImageSelectorTermArgsArray []GCPImageSelectorTermArgsInput
+
+func (GCPImageSelectorTermArgsArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]GCPImageSelectorTermArgs)(nil)).Elem()
+}
+
+func (i GCPImageSelectorTermArgsArray) ToGCPImageSelectorTermArgsArrayOutput() GCPImageSelectorTermArgsArrayOutput {
+	return i.ToGCPImageSelectorTermArgsArrayOutputWithContext(context.Background())
+}
+
+func (i GCPImageSelectorTermArgsArray) ToGCPImageSelectorTermArgsArrayOutputWithContext(ctx context.Context) GCPImageSelectorTermArgsArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GCPImageSelectorTermArgsArrayOutput)
+}
+
+type GCPImageSelectorTermArgsOutput struct{ *pulumi.OutputState }
+
+func (GCPImageSelectorTermArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*GCPImageSelectorTermArgs)(nil)).Elem()
+}
+
+func (o GCPImageSelectorTermArgsOutput) ToGCPImageSelectorTermArgsOutput() GCPImageSelectorTermArgsOutput {
+	return o
+}
+
+func (o GCPImageSelectorTermArgsOutput) ToGCPImageSelectorTermArgsOutputWithContext(ctx context.Context) GCPImageSelectorTermArgsOutput {
+	return o
+}
+
+// Well-known alias for the GCP node image family. Example: 'cos@latest'.
+func (o GCPImageSelectorTermArgsOutput) Alias() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GCPImageSelectorTermArgs) *string { return v.Alias }).(pulumi.StringPtrOutput)
+}
+
+// Explicit GCP image ID. Example: 'projects/cos-cloud/global/images/cos-105-17412-156-59'.
+func (o GCPImageSelectorTermArgsOutput) Id() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GCPImageSelectorTermArgs) *string { return v.Id }).(pulumi.StringPtrOutput)
+}
+
+type GCPImageSelectorTermArgsArrayOutput struct{ *pulumi.OutputState }
+
+func (GCPImageSelectorTermArgsArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]GCPImageSelectorTermArgs)(nil)).Elem()
+}
+
+func (o GCPImageSelectorTermArgsArrayOutput) ToGCPImageSelectorTermArgsArrayOutput() GCPImageSelectorTermArgsArrayOutput {
+	return o
+}
+
+func (o GCPImageSelectorTermArgsArrayOutput) ToGCPImageSelectorTermArgsArrayOutputWithContext(ctx context.Context) GCPImageSelectorTermArgsArrayOutput {
+	return o
+}
+
+func (o GCPImageSelectorTermArgsArrayOutput) Index(i pulumi.IntInput) GCPImageSelectorTermArgsOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) GCPImageSelectorTermArgs {
+		return vs[0].([]GCPImageSelectorTermArgs)[vs[1].(int)]
+	}).(GCPImageSelectorTermArgsOutput)
+}
+
+type GCPNodeClassSpecArgs struct {
+	// Disks attached to provisioned nodes. Example: [{sizeGib: 100, category: "pd-ssd", boot: true}].
+	Disks []GCPDiskArgs `pulumi:"disks"`
+	// GCP node image family shorthand used when no imageSelectorTerms are specified. Example: 'cos'.
+	ImageFamily *string `pulumi:"imageFamily"`
+	// Selectors for the node images used to launch nodes. Example: [{alias: "cos@latest"}].
+	ImageSelectorTerms []GCPImageSelectorTermArgs `pulumi:"imageSelectorTerms"`
+	// Kubelet configuration overrides applied to all nodes in this class.
+	Kubelet *KubeletConfigurationArgs `pulumi:"kubelet"`
+	// GCP labels applied to all resources created by this node class. Example: {"environment": "production"}.
+	Labels map[string]string `pulumi:"labels"`
+	// GCE instance metadata applied to provisioned nodes. Example: {"disable-legacy-endpoints": "true"}.
+	Metadata map[string]string `pulumi:"metadata"`
+	// GCP network tags applied to provisioned nodes for firewall targeting. Example: ["karpenter-node"].
+	NetworkTags []string `pulumi:"networkTags"`
+	// GCP service account email attached to provisioned nodes. Example: 'karpenter@my-project.iam.gserviceaccount.com'.
+	ServiceAccount *string `pulumi:"serviceAccount"`
+}
+
+// GCPNodeClassSpecArgsInput is an input type that accepts GCPNodeClassSpecArgsArgs and GCPNodeClassSpecArgsOutput values.
+// You can construct a concrete instance of `GCPNodeClassSpecArgsInput` via:
+//
+//	GCPNodeClassSpecArgsArgs{...}
+type GCPNodeClassSpecArgsInput interface {
+	pulumi.Input
+
+	ToGCPNodeClassSpecArgsOutput() GCPNodeClassSpecArgsOutput
+	ToGCPNodeClassSpecArgsOutputWithContext(context.Context) GCPNodeClassSpecArgsOutput
+}
+
+type GCPNodeClassSpecArgsArgs struct {
+	// Disks attached to provisioned nodes. Example: [{sizeGib: 100, category: "pd-ssd", boot: true}].
+	Disks GCPDiskArgsArrayInput `pulumi:"disks"`
+	// GCP node image family shorthand used when no imageSelectorTerms are specified. Example: 'cos'.
+	ImageFamily pulumi.StringPtrInput `pulumi:"imageFamily"`
+	// Selectors for the node images used to launch nodes. Example: [{alias: "cos@latest"}].
+	ImageSelectorTerms GCPImageSelectorTermArgsArrayInput `pulumi:"imageSelectorTerms"`
+	// Kubelet configuration overrides applied to all nodes in this class.
+	Kubelet KubeletConfigurationArgsPtrInput `pulumi:"kubelet"`
+	// GCP labels applied to all resources created by this node class. Example: {"environment": "production"}.
+	Labels pulumi.StringMapInput `pulumi:"labels"`
+	// GCE instance metadata applied to provisioned nodes. Example: {"disable-legacy-endpoints": "true"}.
+	Metadata pulumi.StringMapInput `pulumi:"metadata"`
+	// GCP network tags applied to provisioned nodes for firewall targeting. Example: ["karpenter-node"].
+	NetworkTags pulumi.StringArrayInput `pulumi:"networkTags"`
+	// GCP service account email attached to provisioned nodes. Example: 'karpenter@my-project.iam.gserviceaccount.com'.
+	ServiceAccount pulumi.StringPtrInput `pulumi:"serviceAccount"`
+}
+
+func (GCPNodeClassSpecArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*GCPNodeClassSpecArgs)(nil)).Elem()
+}
+
+func (i GCPNodeClassSpecArgsArgs) ToGCPNodeClassSpecArgsOutput() GCPNodeClassSpecArgsOutput {
+	return i.ToGCPNodeClassSpecArgsOutputWithContext(context.Background())
+}
+
+func (i GCPNodeClassSpecArgsArgs) ToGCPNodeClassSpecArgsOutputWithContext(ctx context.Context) GCPNodeClassSpecArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GCPNodeClassSpecArgsOutput)
+}
+
+func (i GCPNodeClassSpecArgsArgs) ToGCPNodeClassSpecArgsPtrOutput() GCPNodeClassSpecArgsPtrOutput {
+	return i.ToGCPNodeClassSpecArgsPtrOutputWithContext(context.Background())
+}
+
+func (i GCPNodeClassSpecArgsArgs) ToGCPNodeClassSpecArgsPtrOutputWithContext(ctx context.Context) GCPNodeClassSpecArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GCPNodeClassSpecArgsOutput).ToGCPNodeClassSpecArgsPtrOutputWithContext(ctx)
+}
+
+// GCPNodeClassSpecArgsPtrInput is an input type that accepts GCPNodeClassSpecArgsArgs, GCPNodeClassSpecArgsPtr and GCPNodeClassSpecArgsPtrOutput values.
+// You can construct a concrete instance of `GCPNodeClassSpecArgsPtrInput` via:
+//
+//	        GCPNodeClassSpecArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type GCPNodeClassSpecArgsPtrInput interface {
+	pulumi.Input
+
+	ToGCPNodeClassSpecArgsPtrOutput() GCPNodeClassSpecArgsPtrOutput
+	ToGCPNodeClassSpecArgsPtrOutputWithContext(context.Context) GCPNodeClassSpecArgsPtrOutput
+}
+
+type gcpnodeClassSpecArgsPtrType GCPNodeClassSpecArgsArgs
+
+func GCPNodeClassSpecArgsPtr(v *GCPNodeClassSpecArgsArgs) GCPNodeClassSpecArgsPtrInput {
+	return (*gcpnodeClassSpecArgsPtrType)(v)
+}
+
+func (*gcpnodeClassSpecArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**GCPNodeClassSpecArgs)(nil)).Elem()
+}
+
+func (i *gcpnodeClassSpecArgsPtrType) ToGCPNodeClassSpecArgsPtrOutput() GCPNodeClassSpecArgsPtrOutput {
+	return i.ToGCPNodeClassSpecArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *gcpnodeClassSpecArgsPtrType) ToGCPNodeClassSpecArgsPtrOutputWithContext(ctx context.Context) GCPNodeClassSpecArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GCPNodeClassSpecArgsPtrOutput)
+}
+
+type GCPNodeClassSpecArgsOutput struct{ *pulumi.OutputState }
+
+func (GCPNodeClassSpecArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*GCPNodeClassSpecArgs)(nil)).Elem()
+}
+
+func (o GCPNodeClassSpecArgsOutput) ToGCPNodeClassSpecArgsOutput() GCPNodeClassSpecArgsOutput {
+	return o
+}
+
+func (o GCPNodeClassSpecArgsOutput) ToGCPNodeClassSpecArgsOutputWithContext(ctx context.Context) GCPNodeClassSpecArgsOutput {
+	return o
+}
+
+func (o GCPNodeClassSpecArgsOutput) ToGCPNodeClassSpecArgsPtrOutput() GCPNodeClassSpecArgsPtrOutput {
+	return o.ToGCPNodeClassSpecArgsPtrOutputWithContext(context.Background())
+}
+
+func (o GCPNodeClassSpecArgsOutput) ToGCPNodeClassSpecArgsPtrOutputWithContext(ctx context.Context) GCPNodeClassSpecArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v GCPNodeClassSpecArgs) *GCPNodeClassSpecArgs {
+		return &v
+	}).(GCPNodeClassSpecArgsPtrOutput)
+}
+
+// Disks attached to provisioned nodes. Example: [{sizeGib: 100, category: "pd-ssd", boot: true}].
+func (o GCPNodeClassSpecArgsOutput) Disks() GCPDiskArgsArrayOutput {
+	return o.ApplyT(func(v GCPNodeClassSpecArgs) []GCPDiskArgs { return v.Disks }).(GCPDiskArgsArrayOutput)
+}
+
+// GCP node image family shorthand used when no imageSelectorTerms are specified. Example: 'cos'.
+func (o GCPNodeClassSpecArgsOutput) ImageFamily() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GCPNodeClassSpecArgs) *string { return v.ImageFamily }).(pulumi.StringPtrOutput)
+}
+
+// Selectors for the node images used to launch nodes. Example: [{alias: "cos@latest"}].
+func (o GCPNodeClassSpecArgsOutput) ImageSelectorTerms() GCPImageSelectorTermArgsArrayOutput {
+	return o.ApplyT(func(v GCPNodeClassSpecArgs) []GCPImageSelectorTermArgs { return v.ImageSelectorTerms }).(GCPImageSelectorTermArgsArrayOutput)
+}
+
+// Kubelet configuration overrides applied to all nodes in this class.
+func (o GCPNodeClassSpecArgsOutput) Kubelet() KubeletConfigurationArgsPtrOutput {
+	return o.ApplyT(func(v GCPNodeClassSpecArgs) *KubeletConfigurationArgs { return v.Kubelet }).(KubeletConfigurationArgsPtrOutput)
+}
+
+// GCP labels applied to all resources created by this node class. Example: {"environment": "production"}.
+func (o GCPNodeClassSpecArgsOutput) Labels() pulumi.StringMapOutput {
+	return o.ApplyT(func(v GCPNodeClassSpecArgs) map[string]string { return v.Labels }).(pulumi.StringMapOutput)
+}
+
+// GCE instance metadata applied to provisioned nodes. Example: {"disable-legacy-endpoints": "true"}.
+func (o GCPNodeClassSpecArgsOutput) Metadata() pulumi.StringMapOutput {
+	return o.ApplyT(func(v GCPNodeClassSpecArgs) map[string]string { return v.Metadata }).(pulumi.StringMapOutput)
+}
+
+// GCP network tags applied to provisioned nodes for firewall targeting. Example: ["karpenter-node"].
+func (o GCPNodeClassSpecArgsOutput) NetworkTags() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v GCPNodeClassSpecArgs) []string { return v.NetworkTags }).(pulumi.StringArrayOutput)
+}
+
+// GCP service account email attached to provisioned nodes. Example: 'karpenter@my-project.iam.gserviceaccount.com'.
+func (o GCPNodeClassSpecArgsOutput) ServiceAccount() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GCPNodeClassSpecArgs) *string { return v.ServiceAccount }).(pulumi.StringPtrOutput)
+}
+
+type GCPNodeClassSpecArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (GCPNodeClassSpecArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**GCPNodeClassSpecArgs)(nil)).Elem()
+}
+
+func (o GCPNodeClassSpecArgsPtrOutput) ToGCPNodeClassSpecArgsPtrOutput() GCPNodeClassSpecArgsPtrOutput {
+	return o
+}
+
+func (o GCPNodeClassSpecArgsPtrOutput) ToGCPNodeClassSpecArgsPtrOutputWithContext(ctx context.Context) GCPNodeClassSpecArgsPtrOutput {
+	return o
+}
+
+func (o GCPNodeClassSpecArgsPtrOutput) Elem() GCPNodeClassSpecArgsOutput {
+	return o.ApplyT(func(v *GCPNodeClassSpecArgs) GCPNodeClassSpecArgs {
+		if v != nil {
+			return *v
+		}
+		var ret GCPNodeClassSpecArgs
+		return ret
+	}).(GCPNodeClassSpecArgsOutput)
+}
+
+// Disks attached to provisioned nodes. Example: [{sizeGib: 100, category: "pd-ssd", boot: true}].
+func (o GCPNodeClassSpecArgsPtrOutput) Disks() GCPDiskArgsArrayOutput {
+	return o.ApplyT(func(v *GCPNodeClassSpecArgs) []GCPDiskArgs {
+		if v == nil {
+			return nil
+		}
+		return v.Disks
+	}).(GCPDiskArgsArrayOutput)
+}
+
+// GCP node image family shorthand used when no imageSelectorTerms are specified. Example: 'cos'.
+func (o GCPNodeClassSpecArgsPtrOutput) ImageFamily() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GCPNodeClassSpecArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.ImageFamily
+	}).(pulumi.StringPtrOutput)
+}
+
+// Selectors for the node images used to launch nodes. Example: [{alias: "cos@latest"}].
+func (o GCPNodeClassSpecArgsPtrOutput) ImageSelectorTerms() GCPImageSelectorTermArgsArrayOutput {
+	return o.ApplyT(func(v *GCPNodeClassSpecArgs) []GCPImageSelectorTermArgs {
+		if v == nil {
+			return nil
+		}
+		return v.ImageSelectorTerms
+	}).(GCPImageSelectorTermArgsArrayOutput)
+}
+
+// Kubelet configuration overrides applied to all nodes in this class.
+func (o GCPNodeClassSpecArgsPtrOutput) Kubelet() KubeletConfigurationArgsPtrOutput {
+	return o.ApplyT(func(v *GCPNodeClassSpecArgs) *KubeletConfigurationArgs {
+		if v == nil {
+			return nil
+		}
+		return v.Kubelet
+	}).(KubeletConfigurationArgsPtrOutput)
+}
+
+// GCP labels applied to all resources created by this node class. Example: {"environment": "production"}.
+func (o GCPNodeClassSpecArgsPtrOutput) Labels() pulumi.StringMapOutput {
+	return o.ApplyT(func(v *GCPNodeClassSpecArgs) map[string]string {
+		if v == nil {
+			return nil
+		}
+		return v.Labels
+	}).(pulumi.StringMapOutput)
+}
+
+// GCE instance metadata applied to provisioned nodes. Example: {"disable-legacy-endpoints": "true"}.
+func (o GCPNodeClassSpecArgsPtrOutput) Metadata() pulumi.StringMapOutput {
+	return o.ApplyT(func(v *GCPNodeClassSpecArgs) map[string]string {
+		if v == nil {
+			return nil
+		}
+		return v.Metadata
+	}).(pulumi.StringMapOutput)
+}
+
+// GCP network tags applied to provisioned nodes for firewall targeting. Example: ["karpenter-node"].
+func (o GCPNodeClassSpecArgsPtrOutput) NetworkTags() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *GCPNodeClassSpecArgs) []string {
+		if v == nil {
+			return nil
+		}
+		return v.NetworkTags
+	}).(pulumi.StringArrayOutput)
+}
+
+// GCP service account email attached to provisioned nodes. Example: 'karpenter@my-project.iam.gserviceaccount.com'.
+func (o GCPNodeClassSpecArgsPtrOutput) ServiceAccount() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GCPNodeClassSpecArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.ServiceAccount
+	}).(pulumi.StringPtrOutput)
+}
+
 type HPABehaviorArgs struct {
 	// Scale-down behavior rules.
 	ScaleDown *HPAScalingRulesArgs `pulumi:"scaleDown"`
@@ -3781,6 +4290,1194 @@ func (o HorizontalScalingArgsPtrOutput) TargetUtilization() pulumi.Float64PtrOut
 	}).(pulumi.Float64PtrOutput)
 }
 
+type JvmHeapRuleConfigArgs struct {
+	// Enable JVM heap sizing overrides. Example: true.
+	Enabled *bool `pulumi:"enabled"`
+	// Multiplier applied above the target usage to derive the heap size. Example: 1.3.
+	HeadroomMultiplier *float64 `pulumi:"headroomMultiplier"`
+	// Maximum JVM heap size in bytes. Example: 2147483648.
+	MaxHeapBytes *int `pulumi:"maxHeapBytes"`
+	// Minimum JVM heap size in bytes. Example: 134217728.
+	MinHeapBytes *int `pulumi:"minHeapBytes"`
+	// Non-heap memory overhead in bytes. Takes precedence over nonHeapOverheadPercent when set. Example: 268435456.
+	NonHeapOverheadBytes *int `pulumi:"nonHeapOverheadBytes"`
+	// Non-heap memory overhead as a percentage of container memory (0-1). Example: 0.2.
+	NonHeapOverheadPercent *float64 `pulumi:"nonHeapOverheadPercent"`
+	// Prefer the JVM's native container-aware heap sizing (-XX:+UseContainerSupport) over explicit -Xmx/-Xms flags. Example: false.
+	PreferContainerSupport *bool `pulumi:"preferContainerSupport"`
+	// Percentile of usage data used as the heap sizing target (0-1). Example: 0.95.
+	TargetPercentile *float64 `pulumi:"targetPercentile"`
+}
+
+// JvmHeapRuleConfigArgsInput is an input type that accepts JvmHeapRuleConfigArgsArgs and JvmHeapRuleConfigArgsOutput values.
+// You can construct a concrete instance of `JvmHeapRuleConfigArgsInput` via:
+//
+//	JvmHeapRuleConfigArgsArgs{...}
+type JvmHeapRuleConfigArgsInput interface {
+	pulumi.Input
+
+	ToJvmHeapRuleConfigArgsOutput() JvmHeapRuleConfigArgsOutput
+	ToJvmHeapRuleConfigArgsOutputWithContext(context.Context) JvmHeapRuleConfigArgsOutput
+}
+
+type JvmHeapRuleConfigArgsArgs struct {
+	// Enable JVM heap sizing overrides. Example: true.
+	Enabled pulumi.BoolPtrInput `pulumi:"enabled"`
+	// Multiplier applied above the target usage to derive the heap size. Example: 1.3.
+	HeadroomMultiplier pulumi.Float64PtrInput `pulumi:"headroomMultiplier"`
+	// Maximum JVM heap size in bytes. Example: 2147483648.
+	MaxHeapBytes pulumi.IntPtrInput `pulumi:"maxHeapBytes"`
+	// Minimum JVM heap size in bytes. Example: 134217728.
+	MinHeapBytes pulumi.IntPtrInput `pulumi:"minHeapBytes"`
+	// Non-heap memory overhead in bytes. Takes precedence over nonHeapOverheadPercent when set. Example: 268435456.
+	NonHeapOverheadBytes pulumi.IntPtrInput `pulumi:"nonHeapOverheadBytes"`
+	// Non-heap memory overhead as a percentage of container memory (0-1). Example: 0.2.
+	NonHeapOverheadPercent pulumi.Float64PtrInput `pulumi:"nonHeapOverheadPercent"`
+	// Prefer the JVM's native container-aware heap sizing (-XX:+UseContainerSupport) over explicit -Xmx/-Xms flags. Example: false.
+	PreferContainerSupport pulumi.BoolPtrInput `pulumi:"preferContainerSupport"`
+	// Percentile of usage data used as the heap sizing target (0-1). Example: 0.95.
+	TargetPercentile pulumi.Float64PtrInput `pulumi:"targetPercentile"`
+}
+
+func (JvmHeapRuleConfigArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*JvmHeapRuleConfigArgs)(nil)).Elem()
+}
+
+func (i JvmHeapRuleConfigArgsArgs) ToJvmHeapRuleConfigArgsOutput() JvmHeapRuleConfigArgsOutput {
+	return i.ToJvmHeapRuleConfigArgsOutputWithContext(context.Background())
+}
+
+func (i JvmHeapRuleConfigArgsArgs) ToJvmHeapRuleConfigArgsOutputWithContext(ctx context.Context) JvmHeapRuleConfigArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(JvmHeapRuleConfigArgsOutput)
+}
+
+func (i JvmHeapRuleConfigArgsArgs) ToJvmHeapRuleConfigArgsPtrOutput() JvmHeapRuleConfigArgsPtrOutput {
+	return i.ToJvmHeapRuleConfigArgsPtrOutputWithContext(context.Background())
+}
+
+func (i JvmHeapRuleConfigArgsArgs) ToJvmHeapRuleConfigArgsPtrOutputWithContext(ctx context.Context) JvmHeapRuleConfigArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(JvmHeapRuleConfigArgsOutput).ToJvmHeapRuleConfigArgsPtrOutputWithContext(ctx)
+}
+
+// JvmHeapRuleConfigArgsPtrInput is an input type that accepts JvmHeapRuleConfigArgsArgs, JvmHeapRuleConfigArgsPtr and JvmHeapRuleConfigArgsPtrOutput values.
+// You can construct a concrete instance of `JvmHeapRuleConfigArgsPtrInput` via:
+//
+//	        JvmHeapRuleConfigArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type JvmHeapRuleConfigArgsPtrInput interface {
+	pulumi.Input
+
+	ToJvmHeapRuleConfigArgsPtrOutput() JvmHeapRuleConfigArgsPtrOutput
+	ToJvmHeapRuleConfigArgsPtrOutputWithContext(context.Context) JvmHeapRuleConfigArgsPtrOutput
+}
+
+type jvmHeapRuleConfigArgsPtrType JvmHeapRuleConfigArgsArgs
+
+func JvmHeapRuleConfigArgsPtr(v *JvmHeapRuleConfigArgsArgs) JvmHeapRuleConfigArgsPtrInput {
+	return (*jvmHeapRuleConfigArgsPtrType)(v)
+}
+
+func (*jvmHeapRuleConfigArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**JvmHeapRuleConfigArgs)(nil)).Elem()
+}
+
+func (i *jvmHeapRuleConfigArgsPtrType) ToJvmHeapRuleConfigArgsPtrOutput() JvmHeapRuleConfigArgsPtrOutput {
+	return i.ToJvmHeapRuleConfigArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *jvmHeapRuleConfigArgsPtrType) ToJvmHeapRuleConfigArgsPtrOutputWithContext(ctx context.Context) JvmHeapRuleConfigArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(JvmHeapRuleConfigArgsPtrOutput)
+}
+
+type JvmHeapRuleConfigArgsOutput struct{ *pulumi.OutputState }
+
+func (JvmHeapRuleConfigArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*JvmHeapRuleConfigArgs)(nil)).Elem()
+}
+
+func (o JvmHeapRuleConfigArgsOutput) ToJvmHeapRuleConfigArgsOutput() JvmHeapRuleConfigArgsOutput {
+	return o
+}
+
+func (o JvmHeapRuleConfigArgsOutput) ToJvmHeapRuleConfigArgsOutputWithContext(ctx context.Context) JvmHeapRuleConfigArgsOutput {
+	return o
+}
+
+func (o JvmHeapRuleConfigArgsOutput) ToJvmHeapRuleConfigArgsPtrOutput() JvmHeapRuleConfigArgsPtrOutput {
+	return o.ToJvmHeapRuleConfigArgsPtrOutputWithContext(context.Background())
+}
+
+func (o JvmHeapRuleConfigArgsOutput) ToJvmHeapRuleConfigArgsPtrOutputWithContext(ctx context.Context) JvmHeapRuleConfigArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v JvmHeapRuleConfigArgs) *JvmHeapRuleConfigArgs {
+		return &v
+	}).(JvmHeapRuleConfigArgsPtrOutput)
+}
+
+// Enable JVM heap sizing overrides. Example: true.
+func (o JvmHeapRuleConfigArgsOutput) Enabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v JvmHeapRuleConfigArgs) *bool { return v.Enabled }).(pulumi.BoolPtrOutput)
+}
+
+// Multiplier applied above the target usage to derive the heap size. Example: 1.3.
+func (o JvmHeapRuleConfigArgsOutput) HeadroomMultiplier() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v JvmHeapRuleConfigArgs) *float64 { return v.HeadroomMultiplier }).(pulumi.Float64PtrOutput)
+}
+
+// Maximum JVM heap size in bytes. Example: 2147483648.
+func (o JvmHeapRuleConfigArgsOutput) MaxHeapBytes() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v JvmHeapRuleConfigArgs) *int { return v.MaxHeapBytes }).(pulumi.IntPtrOutput)
+}
+
+// Minimum JVM heap size in bytes. Example: 134217728.
+func (o JvmHeapRuleConfigArgsOutput) MinHeapBytes() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v JvmHeapRuleConfigArgs) *int { return v.MinHeapBytes }).(pulumi.IntPtrOutput)
+}
+
+// Non-heap memory overhead in bytes. Takes precedence over nonHeapOverheadPercent when set. Example: 268435456.
+func (o JvmHeapRuleConfigArgsOutput) NonHeapOverheadBytes() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v JvmHeapRuleConfigArgs) *int { return v.NonHeapOverheadBytes }).(pulumi.IntPtrOutput)
+}
+
+// Non-heap memory overhead as a percentage of container memory (0-1). Example: 0.2.
+func (o JvmHeapRuleConfigArgsOutput) NonHeapOverheadPercent() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v JvmHeapRuleConfigArgs) *float64 { return v.NonHeapOverheadPercent }).(pulumi.Float64PtrOutput)
+}
+
+// Prefer the JVM's native container-aware heap sizing (-XX:+UseContainerSupport) over explicit -Xmx/-Xms flags. Example: false.
+func (o JvmHeapRuleConfigArgsOutput) PreferContainerSupport() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v JvmHeapRuleConfigArgs) *bool { return v.PreferContainerSupport }).(pulumi.BoolPtrOutput)
+}
+
+// Percentile of usage data used as the heap sizing target (0-1). Example: 0.95.
+func (o JvmHeapRuleConfigArgsOutput) TargetPercentile() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v JvmHeapRuleConfigArgs) *float64 { return v.TargetPercentile }).(pulumi.Float64PtrOutput)
+}
+
+type JvmHeapRuleConfigArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (JvmHeapRuleConfigArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**JvmHeapRuleConfigArgs)(nil)).Elem()
+}
+
+func (o JvmHeapRuleConfigArgsPtrOutput) ToJvmHeapRuleConfigArgsPtrOutput() JvmHeapRuleConfigArgsPtrOutput {
+	return o
+}
+
+func (o JvmHeapRuleConfigArgsPtrOutput) ToJvmHeapRuleConfigArgsPtrOutputWithContext(ctx context.Context) JvmHeapRuleConfigArgsPtrOutput {
+	return o
+}
+
+func (o JvmHeapRuleConfigArgsPtrOutput) Elem() JvmHeapRuleConfigArgsOutput {
+	return o.ApplyT(func(v *JvmHeapRuleConfigArgs) JvmHeapRuleConfigArgs {
+		if v != nil {
+			return *v
+		}
+		var ret JvmHeapRuleConfigArgs
+		return ret
+	}).(JvmHeapRuleConfigArgsOutput)
+}
+
+// Enable JVM heap sizing overrides. Example: true.
+func (o JvmHeapRuleConfigArgsPtrOutput) Enabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *JvmHeapRuleConfigArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.Enabled
+	}).(pulumi.BoolPtrOutput)
+}
+
+// Multiplier applied above the target usage to derive the heap size. Example: 1.3.
+func (o JvmHeapRuleConfigArgsPtrOutput) HeadroomMultiplier() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *JvmHeapRuleConfigArgs) *float64 {
+		if v == nil {
+			return nil
+		}
+		return v.HeadroomMultiplier
+	}).(pulumi.Float64PtrOutput)
+}
+
+// Maximum JVM heap size in bytes. Example: 2147483648.
+func (o JvmHeapRuleConfigArgsPtrOutput) MaxHeapBytes() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *JvmHeapRuleConfigArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.MaxHeapBytes
+	}).(pulumi.IntPtrOutput)
+}
+
+// Minimum JVM heap size in bytes. Example: 134217728.
+func (o JvmHeapRuleConfigArgsPtrOutput) MinHeapBytes() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *JvmHeapRuleConfigArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.MinHeapBytes
+	}).(pulumi.IntPtrOutput)
+}
+
+// Non-heap memory overhead in bytes. Takes precedence over nonHeapOverheadPercent when set. Example: 268435456.
+func (o JvmHeapRuleConfigArgsPtrOutput) NonHeapOverheadBytes() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *JvmHeapRuleConfigArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.NonHeapOverheadBytes
+	}).(pulumi.IntPtrOutput)
+}
+
+// Non-heap memory overhead as a percentage of container memory (0-1). Example: 0.2.
+func (o JvmHeapRuleConfigArgsPtrOutput) NonHeapOverheadPercent() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *JvmHeapRuleConfigArgs) *float64 {
+		if v == nil {
+			return nil
+		}
+		return v.NonHeapOverheadPercent
+	}).(pulumi.Float64PtrOutput)
+}
+
+// Prefer the JVM's native container-aware heap sizing (-XX:+UseContainerSupport) over explicit -Xmx/-Xms flags. Example: false.
+func (o JvmHeapRuleConfigArgsPtrOutput) PreferContainerSupport() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *JvmHeapRuleConfigArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.PreferContainerSupport
+	}).(pulumi.BoolPtrOutput)
+}
+
+// Percentile of usage data used as the heap sizing target (0-1). Example: 0.95.
+func (o JvmHeapRuleConfigArgsPtrOutput) TargetPercentile() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *JvmHeapRuleConfigArgs) *float64 {
+		if v == nil {
+			return nil
+		}
+		return v.TargetPercentile
+	}).(pulumi.Float64PtrOutput)
+}
+
+type KedaAdvancedArgs struct {
+	// Kubernetes HorizontalPodAutoscalerBehavior encoded as a JSON string, applied to the generated HPA. Example: '{"scaleDown":{"stabilizationWindowSeconds":300}}'.
+	AdvancedBehaviorJson *string `pulumi:"advancedBehaviorJson"`
+	// Restore the original replica count when the ScaledObject is deleted. Example: false.
+	RestoreToOriginalReplicaCount *bool `pulumi:"restoreToOriginalReplicaCount"`
+}
+
+// KedaAdvancedArgsInput is an input type that accepts KedaAdvancedArgsArgs and KedaAdvancedArgsOutput values.
+// You can construct a concrete instance of `KedaAdvancedArgsInput` via:
+//
+//	KedaAdvancedArgsArgs{...}
+type KedaAdvancedArgsInput interface {
+	pulumi.Input
+
+	ToKedaAdvancedArgsOutput() KedaAdvancedArgsOutput
+	ToKedaAdvancedArgsOutputWithContext(context.Context) KedaAdvancedArgsOutput
+}
+
+type KedaAdvancedArgsArgs struct {
+	// Kubernetes HorizontalPodAutoscalerBehavior encoded as a JSON string, applied to the generated HPA. Example: '{"scaleDown":{"stabilizationWindowSeconds":300}}'.
+	AdvancedBehaviorJson pulumi.StringPtrInput `pulumi:"advancedBehaviorJson"`
+	// Restore the original replica count when the ScaledObject is deleted. Example: false.
+	RestoreToOriginalReplicaCount pulumi.BoolPtrInput `pulumi:"restoreToOriginalReplicaCount"`
+}
+
+func (KedaAdvancedArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*KedaAdvancedArgs)(nil)).Elem()
+}
+
+func (i KedaAdvancedArgsArgs) ToKedaAdvancedArgsOutput() KedaAdvancedArgsOutput {
+	return i.ToKedaAdvancedArgsOutputWithContext(context.Background())
+}
+
+func (i KedaAdvancedArgsArgs) ToKedaAdvancedArgsOutputWithContext(ctx context.Context) KedaAdvancedArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KedaAdvancedArgsOutput)
+}
+
+func (i KedaAdvancedArgsArgs) ToKedaAdvancedArgsPtrOutput() KedaAdvancedArgsPtrOutput {
+	return i.ToKedaAdvancedArgsPtrOutputWithContext(context.Background())
+}
+
+func (i KedaAdvancedArgsArgs) ToKedaAdvancedArgsPtrOutputWithContext(ctx context.Context) KedaAdvancedArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KedaAdvancedArgsOutput).ToKedaAdvancedArgsPtrOutputWithContext(ctx)
+}
+
+// KedaAdvancedArgsPtrInput is an input type that accepts KedaAdvancedArgsArgs, KedaAdvancedArgsPtr and KedaAdvancedArgsPtrOutput values.
+// You can construct a concrete instance of `KedaAdvancedArgsPtrInput` via:
+//
+//	        KedaAdvancedArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type KedaAdvancedArgsPtrInput interface {
+	pulumi.Input
+
+	ToKedaAdvancedArgsPtrOutput() KedaAdvancedArgsPtrOutput
+	ToKedaAdvancedArgsPtrOutputWithContext(context.Context) KedaAdvancedArgsPtrOutput
+}
+
+type kedaAdvancedArgsPtrType KedaAdvancedArgsArgs
+
+func KedaAdvancedArgsPtr(v *KedaAdvancedArgsArgs) KedaAdvancedArgsPtrInput {
+	return (*kedaAdvancedArgsPtrType)(v)
+}
+
+func (*kedaAdvancedArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**KedaAdvancedArgs)(nil)).Elem()
+}
+
+func (i *kedaAdvancedArgsPtrType) ToKedaAdvancedArgsPtrOutput() KedaAdvancedArgsPtrOutput {
+	return i.ToKedaAdvancedArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *kedaAdvancedArgsPtrType) ToKedaAdvancedArgsPtrOutputWithContext(ctx context.Context) KedaAdvancedArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KedaAdvancedArgsPtrOutput)
+}
+
+type KedaAdvancedArgsOutput struct{ *pulumi.OutputState }
+
+func (KedaAdvancedArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*KedaAdvancedArgs)(nil)).Elem()
+}
+
+func (o KedaAdvancedArgsOutput) ToKedaAdvancedArgsOutput() KedaAdvancedArgsOutput {
+	return o
+}
+
+func (o KedaAdvancedArgsOutput) ToKedaAdvancedArgsOutputWithContext(ctx context.Context) KedaAdvancedArgsOutput {
+	return o
+}
+
+func (o KedaAdvancedArgsOutput) ToKedaAdvancedArgsPtrOutput() KedaAdvancedArgsPtrOutput {
+	return o.ToKedaAdvancedArgsPtrOutputWithContext(context.Background())
+}
+
+func (o KedaAdvancedArgsOutput) ToKedaAdvancedArgsPtrOutputWithContext(ctx context.Context) KedaAdvancedArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v KedaAdvancedArgs) *KedaAdvancedArgs {
+		return &v
+	}).(KedaAdvancedArgsPtrOutput)
+}
+
+// Kubernetes HorizontalPodAutoscalerBehavior encoded as a JSON string, applied to the generated HPA. Example: '{"scaleDown":{"stabilizationWindowSeconds":300}}'.
+func (o KedaAdvancedArgsOutput) AdvancedBehaviorJson() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v KedaAdvancedArgs) *string { return v.AdvancedBehaviorJson }).(pulumi.StringPtrOutput)
+}
+
+// Restore the original replica count when the ScaledObject is deleted. Example: false.
+func (o KedaAdvancedArgsOutput) RestoreToOriginalReplicaCount() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v KedaAdvancedArgs) *bool { return v.RestoreToOriginalReplicaCount }).(pulumi.BoolPtrOutput)
+}
+
+type KedaAdvancedArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (KedaAdvancedArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**KedaAdvancedArgs)(nil)).Elem()
+}
+
+func (o KedaAdvancedArgsPtrOutput) ToKedaAdvancedArgsPtrOutput() KedaAdvancedArgsPtrOutput {
+	return o
+}
+
+func (o KedaAdvancedArgsPtrOutput) ToKedaAdvancedArgsPtrOutputWithContext(ctx context.Context) KedaAdvancedArgsPtrOutput {
+	return o
+}
+
+func (o KedaAdvancedArgsPtrOutput) Elem() KedaAdvancedArgsOutput {
+	return o.ApplyT(func(v *KedaAdvancedArgs) KedaAdvancedArgs {
+		if v != nil {
+			return *v
+		}
+		var ret KedaAdvancedArgs
+		return ret
+	}).(KedaAdvancedArgsOutput)
+}
+
+// Kubernetes HorizontalPodAutoscalerBehavior encoded as a JSON string, applied to the generated HPA. Example: '{"scaleDown":{"stabilizationWindowSeconds":300}}'.
+func (o KedaAdvancedArgsPtrOutput) AdvancedBehaviorJson() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *KedaAdvancedArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.AdvancedBehaviorJson
+	}).(pulumi.StringPtrOutput)
+}
+
+// Restore the original replica count when the ScaledObject is deleted. Example: false.
+func (o KedaAdvancedArgsPtrOutput) RestoreToOriginalReplicaCount() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *KedaAdvancedArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.RestoreToOriginalReplicaCount
+	}).(pulumi.BoolPtrOutput)
+}
+
+type KedaAuthenticationRefArgs struct {
+	// Kind of the referenced resource. One of: 'TriggerAuthentication', 'ClusterTriggerAuthentication'. Example: 'TriggerAuthentication'.
+	Kind *string `pulumi:"kind"`
+	// Name of the referenced TriggerAuthentication/ClusterTriggerAuthentication resource. Example: 'prometheus-auth'.
+	Name string `pulumi:"name"`
+}
+
+// KedaAuthenticationRefArgsInput is an input type that accepts KedaAuthenticationRefArgsArgs and KedaAuthenticationRefArgsOutput values.
+// You can construct a concrete instance of `KedaAuthenticationRefArgsInput` via:
+//
+//	KedaAuthenticationRefArgsArgs{...}
+type KedaAuthenticationRefArgsInput interface {
+	pulumi.Input
+
+	ToKedaAuthenticationRefArgsOutput() KedaAuthenticationRefArgsOutput
+	ToKedaAuthenticationRefArgsOutputWithContext(context.Context) KedaAuthenticationRefArgsOutput
+}
+
+type KedaAuthenticationRefArgsArgs struct {
+	// Kind of the referenced resource. One of: 'TriggerAuthentication', 'ClusterTriggerAuthentication'. Example: 'TriggerAuthentication'.
+	Kind pulumi.StringPtrInput `pulumi:"kind"`
+	// Name of the referenced TriggerAuthentication/ClusterTriggerAuthentication resource. Example: 'prometheus-auth'.
+	Name pulumi.StringInput `pulumi:"name"`
+}
+
+func (KedaAuthenticationRefArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*KedaAuthenticationRefArgs)(nil)).Elem()
+}
+
+func (i KedaAuthenticationRefArgsArgs) ToKedaAuthenticationRefArgsOutput() KedaAuthenticationRefArgsOutput {
+	return i.ToKedaAuthenticationRefArgsOutputWithContext(context.Background())
+}
+
+func (i KedaAuthenticationRefArgsArgs) ToKedaAuthenticationRefArgsOutputWithContext(ctx context.Context) KedaAuthenticationRefArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KedaAuthenticationRefArgsOutput)
+}
+
+func (i KedaAuthenticationRefArgsArgs) ToKedaAuthenticationRefArgsPtrOutput() KedaAuthenticationRefArgsPtrOutput {
+	return i.ToKedaAuthenticationRefArgsPtrOutputWithContext(context.Background())
+}
+
+func (i KedaAuthenticationRefArgsArgs) ToKedaAuthenticationRefArgsPtrOutputWithContext(ctx context.Context) KedaAuthenticationRefArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KedaAuthenticationRefArgsOutput).ToKedaAuthenticationRefArgsPtrOutputWithContext(ctx)
+}
+
+// KedaAuthenticationRefArgsPtrInput is an input type that accepts KedaAuthenticationRefArgsArgs, KedaAuthenticationRefArgsPtr and KedaAuthenticationRefArgsPtrOutput values.
+// You can construct a concrete instance of `KedaAuthenticationRefArgsPtrInput` via:
+//
+//	        KedaAuthenticationRefArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type KedaAuthenticationRefArgsPtrInput interface {
+	pulumi.Input
+
+	ToKedaAuthenticationRefArgsPtrOutput() KedaAuthenticationRefArgsPtrOutput
+	ToKedaAuthenticationRefArgsPtrOutputWithContext(context.Context) KedaAuthenticationRefArgsPtrOutput
+}
+
+type kedaAuthenticationRefArgsPtrType KedaAuthenticationRefArgsArgs
+
+func KedaAuthenticationRefArgsPtr(v *KedaAuthenticationRefArgsArgs) KedaAuthenticationRefArgsPtrInput {
+	return (*kedaAuthenticationRefArgsPtrType)(v)
+}
+
+func (*kedaAuthenticationRefArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**KedaAuthenticationRefArgs)(nil)).Elem()
+}
+
+func (i *kedaAuthenticationRefArgsPtrType) ToKedaAuthenticationRefArgsPtrOutput() KedaAuthenticationRefArgsPtrOutput {
+	return i.ToKedaAuthenticationRefArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *kedaAuthenticationRefArgsPtrType) ToKedaAuthenticationRefArgsPtrOutputWithContext(ctx context.Context) KedaAuthenticationRefArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KedaAuthenticationRefArgsPtrOutput)
+}
+
+type KedaAuthenticationRefArgsOutput struct{ *pulumi.OutputState }
+
+func (KedaAuthenticationRefArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*KedaAuthenticationRefArgs)(nil)).Elem()
+}
+
+func (o KedaAuthenticationRefArgsOutput) ToKedaAuthenticationRefArgsOutput() KedaAuthenticationRefArgsOutput {
+	return o
+}
+
+func (o KedaAuthenticationRefArgsOutput) ToKedaAuthenticationRefArgsOutputWithContext(ctx context.Context) KedaAuthenticationRefArgsOutput {
+	return o
+}
+
+func (o KedaAuthenticationRefArgsOutput) ToKedaAuthenticationRefArgsPtrOutput() KedaAuthenticationRefArgsPtrOutput {
+	return o.ToKedaAuthenticationRefArgsPtrOutputWithContext(context.Background())
+}
+
+func (o KedaAuthenticationRefArgsOutput) ToKedaAuthenticationRefArgsPtrOutputWithContext(ctx context.Context) KedaAuthenticationRefArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v KedaAuthenticationRefArgs) *KedaAuthenticationRefArgs {
+		return &v
+	}).(KedaAuthenticationRefArgsPtrOutput)
+}
+
+// Kind of the referenced resource. One of: 'TriggerAuthentication', 'ClusterTriggerAuthentication'. Example: 'TriggerAuthentication'.
+func (o KedaAuthenticationRefArgsOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v KedaAuthenticationRefArgs) *string { return v.Kind }).(pulumi.StringPtrOutput)
+}
+
+// Name of the referenced TriggerAuthentication/ClusterTriggerAuthentication resource. Example: 'prometheus-auth'.
+func (o KedaAuthenticationRefArgsOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v KedaAuthenticationRefArgs) string { return v.Name }).(pulumi.StringOutput)
+}
+
+type KedaAuthenticationRefArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (KedaAuthenticationRefArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**KedaAuthenticationRefArgs)(nil)).Elem()
+}
+
+func (o KedaAuthenticationRefArgsPtrOutput) ToKedaAuthenticationRefArgsPtrOutput() KedaAuthenticationRefArgsPtrOutput {
+	return o
+}
+
+func (o KedaAuthenticationRefArgsPtrOutput) ToKedaAuthenticationRefArgsPtrOutputWithContext(ctx context.Context) KedaAuthenticationRefArgsPtrOutput {
+	return o
+}
+
+func (o KedaAuthenticationRefArgsPtrOutput) Elem() KedaAuthenticationRefArgsOutput {
+	return o.ApplyT(func(v *KedaAuthenticationRefArgs) KedaAuthenticationRefArgs {
+		if v != nil {
+			return *v
+		}
+		var ret KedaAuthenticationRefArgs
+		return ret
+	}).(KedaAuthenticationRefArgsOutput)
+}
+
+// Kind of the referenced resource. One of: 'TriggerAuthentication', 'ClusterTriggerAuthentication'. Example: 'TriggerAuthentication'.
+func (o KedaAuthenticationRefArgsPtrOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *KedaAuthenticationRefArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Kind
+	}).(pulumi.StringPtrOutput)
+}
+
+// Name of the referenced TriggerAuthentication/ClusterTriggerAuthentication resource. Example: 'prometheus-auth'.
+func (o KedaAuthenticationRefArgsPtrOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *KedaAuthenticationRefArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Name
+	}).(pulumi.StringPtrOutput)
+}
+
+type KedaFallbackArgs struct {
+	// Fallback strategy. Example: 'static'.
+	Behavior *string `pulumi:"behavior"`
+	// Number of consecutive metric failures before activating fallback. Example: 3.
+	FailureThreshold int `pulumi:"failureThreshold"`
+	// Number of replicas to fall back to when metrics are unavailable. Example: 2.
+	Replicas int `pulumi:"replicas"`
+}
+
+// KedaFallbackArgsInput is an input type that accepts KedaFallbackArgsArgs and KedaFallbackArgsOutput values.
+// You can construct a concrete instance of `KedaFallbackArgsInput` via:
+//
+//	KedaFallbackArgsArgs{...}
+type KedaFallbackArgsInput interface {
+	pulumi.Input
+
+	ToKedaFallbackArgsOutput() KedaFallbackArgsOutput
+	ToKedaFallbackArgsOutputWithContext(context.Context) KedaFallbackArgsOutput
+}
+
+type KedaFallbackArgsArgs struct {
+	// Fallback strategy. Example: 'static'.
+	Behavior pulumi.StringPtrInput `pulumi:"behavior"`
+	// Number of consecutive metric failures before activating fallback. Example: 3.
+	FailureThreshold pulumi.IntInput `pulumi:"failureThreshold"`
+	// Number of replicas to fall back to when metrics are unavailable. Example: 2.
+	Replicas pulumi.IntInput `pulumi:"replicas"`
+}
+
+func (KedaFallbackArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*KedaFallbackArgs)(nil)).Elem()
+}
+
+func (i KedaFallbackArgsArgs) ToKedaFallbackArgsOutput() KedaFallbackArgsOutput {
+	return i.ToKedaFallbackArgsOutputWithContext(context.Background())
+}
+
+func (i KedaFallbackArgsArgs) ToKedaFallbackArgsOutputWithContext(ctx context.Context) KedaFallbackArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KedaFallbackArgsOutput)
+}
+
+func (i KedaFallbackArgsArgs) ToKedaFallbackArgsPtrOutput() KedaFallbackArgsPtrOutput {
+	return i.ToKedaFallbackArgsPtrOutputWithContext(context.Background())
+}
+
+func (i KedaFallbackArgsArgs) ToKedaFallbackArgsPtrOutputWithContext(ctx context.Context) KedaFallbackArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KedaFallbackArgsOutput).ToKedaFallbackArgsPtrOutputWithContext(ctx)
+}
+
+// KedaFallbackArgsPtrInput is an input type that accepts KedaFallbackArgsArgs, KedaFallbackArgsPtr and KedaFallbackArgsPtrOutput values.
+// You can construct a concrete instance of `KedaFallbackArgsPtrInput` via:
+//
+//	        KedaFallbackArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type KedaFallbackArgsPtrInput interface {
+	pulumi.Input
+
+	ToKedaFallbackArgsPtrOutput() KedaFallbackArgsPtrOutput
+	ToKedaFallbackArgsPtrOutputWithContext(context.Context) KedaFallbackArgsPtrOutput
+}
+
+type kedaFallbackArgsPtrType KedaFallbackArgsArgs
+
+func KedaFallbackArgsPtr(v *KedaFallbackArgsArgs) KedaFallbackArgsPtrInput {
+	return (*kedaFallbackArgsPtrType)(v)
+}
+
+func (*kedaFallbackArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**KedaFallbackArgs)(nil)).Elem()
+}
+
+func (i *kedaFallbackArgsPtrType) ToKedaFallbackArgsPtrOutput() KedaFallbackArgsPtrOutput {
+	return i.ToKedaFallbackArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *kedaFallbackArgsPtrType) ToKedaFallbackArgsPtrOutputWithContext(ctx context.Context) KedaFallbackArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KedaFallbackArgsPtrOutput)
+}
+
+type KedaFallbackArgsOutput struct{ *pulumi.OutputState }
+
+func (KedaFallbackArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*KedaFallbackArgs)(nil)).Elem()
+}
+
+func (o KedaFallbackArgsOutput) ToKedaFallbackArgsOutput() KedaFallbackArgsOutput {
+	return o
+}
+
+func (o KedaFallbackArgsOutput) ToKedaFallbackArgsOutputWithContext(ctx context.Context) KedaFallbackArgsOutput {
+	return o
+}
+
+func (o KedaFallbackArgsOutput) ToKedaFallbackArgsPtrOutput() KedaFallbackArgsPtrOutput {
+	return o.ToKedaFallbackArgsPtrOutputWithContext(context.Background())
+}
+
+func (o KedaFallbackArgsOutput) ToKedaFallbackArgsPtrOutputWithContext(ctx context.Context) KedaFallbackArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v KedaFallbackArgs) *KedaFallbackArgs {
+		return &v
+	}).(KedaFallbackArgsPtrOutput)
+}
+
+// Fallback strategy. Example: 'static'.
+func (o KedaFallbackArgsOutput) Behavior() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v KedaFallbackArgs) *string { return v.Behavior }).(pulumi.StringPtrOutput)
+}
+
+// Number of consecutive metric failures before activating fallback. Example: 3.
+func (o KedaFallbackArgsOutput) FailureThreshold() pulumi.IntOutput {
+	return o.ApplyT(func(v KedaFallbackArgs) int { return v.FailureThreshold }).(pulumi.IntOutput)
+}
+
+// Number of replicas to fall back to when metrics are unavailable. Example: 2.
+func (o KedaFallbackArgsOutput) Replicas() pulumi.IntOutput {
+	return o.ApplyT(func(v KedaFallbackArgs) int { return v.Replicas }).(pulumi.IntOutput)
+}
+
+type KedaFallbackArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (KedaFallbackArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**KedaFallbackArgs)(nil)).Elem()
+}
+
+func (o KedaFallbackArgsPtrOutput) ToKedaFallbackArgsPtrOutput() KedaFallbackArgsPtrOutput {
+	return o
+}
+
+func (o KedaFallbackArgsPtrOutput) ToKedaFallbackArgsPtrOutputWithContext(ctx context.Context) KedaFallbackArgsPtrOutput {
+	return o
+}
+
+func (o KedaFallbackArgsPtrOutput) Elem() KedaFallbackArgsOutput {
+	return o.ApplyT(func(v *KedaFallbackArgs) KedaFallbackArgs {
+		if v != nil {
+			return *v
+		}
+		var ret KedaFallbackArgs
+		return ret
+	}).(KedaFallbackArgsOutput)
+}
+
+// Fallback strategy. Example: 'static'.
+func (o KedaFallbackArgsPtrOutput) Behavior() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *KedaFallbackArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Behavior
+	}).(pulumi.StringPtrOutput)
+}
+
+// Number of consecutive metric failures before activating fallback. Example: 3.
+func (o KedaFallbackArgsPtrOutput) FailureThreshold() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *KedaFallbackArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return &v.FailureThreshold
+	}).(pulumi.IntPtrOutput)
+}
+
+// Number of replicas to fall back to when metrics are unavailable. Example: 2.
+func (o KedaFallbackArgsPtrOutput) Replicas() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *KedaFallbackArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return &v.Replicas
+	}).(pulumi.IntPtrOutput)
+}
+
+type KedaScaledObjectArgs struct {
+	// Advanced ScaledObject behavior configuration.
+	Advanced *KedaAdvancedArgs `pulumi:"advanced"`
+	// Seconds to wait after the last trigger reports active=false before scaling to minReplicaCount. Example: 300.
+	CooldownPeriod *int `pulumi:"cooldownPeriod"`
+	// Replica fallback configuration when KEDA metrics are unavailable.
+	Fallback *KedaFallbackArgs `pulumi:"fallback"`
+	// Replica count to scale to when idle. Must be less than minReplicaCount. Example: 0.
+	IdleReplicaCount *int `pulumi:"idleReplicaCount"`
+	// Cooldown period applied only during the initial scaling of the ScaledObject. Example: 0.
+	InitialCooldownPeriod *int `pulumi:"initialCooldownPeriod"`
+	// Maximum number of replicas. Example: 10.
+	MaxReplicaCount *int `pulumi:"maxReplicaCount"`
+	// Minimum number of replicas. Example: 0.
+	MinReplicaCount *int `pulumi:"minReplicaCount"`
+	// Seconds between checks of trigger metrics. Example: 30.
+	PollingInterval *int `pulumi:"pollingInterval"`
+	// KEDA scaler triggers driving this ScaledObject.
+	Triggers []KedaTriggerArgs `pulumi:"triggers"`
+}
+
+// KedaScaledObjectArgsInput is an input type that accepts KedaScaledObjectArgsArgs and KedaScaledObjectArgsOutput values.
+// You can construct a concrete instance of `KedaScaledObjectArgsInput` via:
+//
+//	KedaScaledObjectArgsArgs{...}
+type KedaScaledObjectArgsInput interface {
+	pulumi.Input
+
+	ToKedaScaledObjectArgsOutput() KedaScaledObjectArgsOutput
+	ToKedaScaledObjectArgsOutputWithContext(context.Context) KedaScaledObjectArgsOutput
+}
+
+type KedaScaledObjectArgsArgs struct {
+	// Advanced ScaledObject behavior configuration.
+	Advanced KedaAdvancedArgsPtrInput `pulumi:"advanced"`
+	// Seconds to wait after the last trigger reports active=false before scaling to minReplicaCount. Example: 300.
+	CooldownPeriod pulumi.IntPtrInput `pulumi:"cooldownPeriod"`
+	// Replica fallback configuration when KEDA metrics are unavailable.
+	Fallback KedaFallbackArgsPtrInput `pulumi:"fallback"`
+	// Replica count to scale to when idle. Must be less than minReplicaCount. Example: 0.
+	IdleReplicaCount pulumi.IntPtrInput `pulumi:"idleReplicaCount"`
+	// Cooldown period applied only during the initial scaling of the ScaledObject. Example: 0.
+	InitialCooldownPeriod pulumi.IntPtrInput `pulumi:"initialCooldownPeriod"`
+	// Maximum number of replicas. Example: 10.
+	MaxReplicaCount pulumi.IntPtrInput `pulumi:"maxReplicaCount"`
+	// Minimum number of replicas. Example: 0.
+	MinReplicaCount pulumi.IntPtrInput `pulumi:"minReplicaCount"`
+	// Seconds between checks of trigger metrics. Example: 30.
+	PollingInterval pulumi.IntPtrInput `pulumi:"pollingInterval"`
+	// KEDA scaler triggers driving this ScaledObject.
+	Triggers KedaTriggerArgsArrayInput `pulumi:"triggers"`
+}
+
+func (KedaScaledObjectArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*KedaScaledObjectArgs)(nil)).Elem()
+}
+
+func (i KedaScaledObjectArgsArgs) ToKedaScaledObjectArgsOutput() KedaScaledObjectArgsOutput {
+	return i.ToKedaScaledObjectArgsOutputWithContext(context.Background())
+}
+
+func (i KedaScaledObjectArgsArgs) ToKedaScaledObjectArgsOutputWithContext(ctx context.Context) KedaScaledObjectArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KedaScaledObjectArgsOutput)
+}
+
+func (i KedaScaledObjectArgsArgs) ToKedaScaledObjectArgsPtrOutput() KedaScaledObjectArgsPtrOutput {
+	return i.ToKedaScaledObjectArgsPtrOutputWithContext(context.Background())
+}
+
+func (i KedaScaledObjectArgsArgs) ToKedaScaledObjectArgsPtrOutputWithContext(ctx context.Context) KedaScaledObjectArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KedaScaledObjectArgsOutput).ToKedaScaledObjectArgsPtrOutputWithContext(ctx)
+}
+
+// KedaScaledObjectArgsPtrInput is an input type that accepts KedaScaledObjectArgsArgs, KedaScaledObjectArgsPtr and KedaScaledObjectArgsPtrOutput values.
+// You can construct a concrete instance of `KedaScaledObjectArgsPtrInput` via:
+//
+//	        KedaScaledObjectArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type KedaScaledObjectArgsPtrInput interface {
+	pulumi.Input
+
+	ToKedaScaledObjectArgsPtrOutput() KedaScaledObjectArgsPtrOutput
+	ToKedaScaledObjectArgsPtrOutputWithContext(context.Context) KedaScaledObjectArgsPtrOutput
+}
+
+type kedaScaledObjectArgsPtrType KedaScaledObjectArgsArgs
+
+func KedaScaledObjectArgsPtr(v *KedaScaledObjectArgsArgs) KedaScaledObjectArgsPtrInput {
+	return (*kedaScaledObjectArgsPtrType)(v)
+}
+
+func (*kedaScaledObjectArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**KedaScaledObjectArgs)(nil)).Elem()
+}
+
+func (i *kedaScaledObjectArgsPtrType) ToKedaScaledObjectArgsPtrOutput() KedaScaledObjectArgsPtrOutput {
+	return i.ToKedaScaledObjectArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *kedaScaledObjectArgsPtrType) ToKedaScaledObjectArgsPtrOutputWithContext(ctx context.Context) KedaScaledObjectArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KedaScaledObjectArgsPtrOutput)
+}
+
+type KedaScaledObjectArgsOutput struct{ *pulumi.OutputState }
+
+func (KedaScaledObjectArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*KedaScaledObjectArgs)(nil)).Elem()
+}
+
+func (o KedaScaledObjectArgsOutput) ToKedaScaledObjectArgsOutput() KedaScaledObjectArgsOutput {
+	return o
+}
+
+func (o KedaScaledObjectArgsOutput) ToKedaScaledObjectArgsOutputWithContext(ctx context.Context) KedaScaledObjectArgsOutput {
+	return o
+}
+
+func (o KedaScaledObjectArgsOutput) ToKedaScaledObjectArgsPtrOutput() KedaScaledObjectArgsPtrOutput {
+	return o.ToKedaScaledObjectArgsPtrOutputWithContext(context.Background())
+}
+
+func (o KedaScaledObjectArgsOutput) ToKedaScaledObjectArgsPtrOutputWithContext(ctx context.Context) KedaScaledObjectArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v KedaScaledObjectArgs) *KedaScaledObjectArgs {
+		return &v
+	}).(KedaScaledObjectArgsPtrOutput)
+}
+
+// Advanced ScaledObject behavior configuration.
+func (o KedaScaledObjectArgsOutput) Advanced() KedaAdvancedArgsPtrOutput {
+	return o.ApplyT(func(v KedaScaledObjectArgs) *KedaAdvancedArgs { return v.Advanced }).(KedaAdvancedArgsPtrOutput)
+}
+
+// Seconds to wait after the last trigger reports active=false before scaling to minReplicaCount. Example: 300.
+func (o KedaScaledObjectArgsOutput) CooldownPeriod() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v KedaScaledObjectArgs) *int { return v.CooldownPeriod }).(pulumi.IntPtrOutput)
+}
+
+// Replica fallback configuration when KEDA metrics are unavailable.
+func (o KedaScaledObjectArgsOutput) Fallback() KedaFallbackArgsPtrOutput {
+	return o.ApplyT(func(v KedaScaledObjectArgs) *KedaFallbackArgs { return v.Fallback }).(KedaFallbackArgsPtrOutput)
+}
+
+// Replica count to scale to when idle. Must be less than minReplicaCount. Example: 0.
+func (o KedaScaledObjectArgsOutput) IdleReplicaCount() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v KedaScaledObjectArgs) *int { return v.IdleReplicaCount }).(pulumi.IntPtrOutput)
+}
+
+// Cooldown period applied only during the initial scaling of the ScaledObject. Example: 0.
+func (o KedaScaledObjectArgsOutput) InitialCooldownPeriod() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v KedaScaledObjectArgs) *int { return v.InitialCooldownPeriod }).(pulumi.IntPtrOutput)
+}
+
+// Maximum number of replicas. Example: 10.
+func (o KedaScaledObjectArgsOutput) MaxReplicaCount() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v KedaScaledObjectArgs) *int { return v.MaxReplicaCount }).(pulumi.IntPtrOutput)
+}
+
+// Minimum number of replicas. Example: 0.
+func (o KedaScaledObjectArgsOutput) MinReplicaCount() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v KedaScaledObjectArgs) *int { return v.MinReplicaCount }).(pulumi.IntPtrOutput)
+}
+
+// Seconds between checks of trigger metrics. Example: 30.
+func (o KedaScaledObjectArgsOutput) PollingInterval() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v KedaScaledObjectArgs) *int { return v.PollingInterval }).(pulumi.IntPtrOutput)
+}
+
+// KEDA scaler triggers driving this ScaledObject.
+func (o KedaScaledObjectArgsOutput) Triggers() KedaTriggerArgsArrayOutput {
+	return o.ApplyT(func(v KedaScaledObjectArgs) []KedaTriggerArgs { return v.Triggers }).(KedaTriggerArgsArrayOutput)
+}
+
+type KedaScaledObjectArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (KedaScaledObjectArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**KedaScaledObjectArgs)(nil)).Elem()
+}
+
+func (o KedaScaledObjectArgsPtrOutput) ToKedaScaledObjectArgsPtrOutput() KedaScaledObjectArgsPtrOutput {
+	return o
+}
+
+func (o KedaScaledObjectArgsPtrOutput) ToKedaScaledObjectArgsPtrOutputWithContext(ctx context.Context) KedaScaledObjectArgsPtrOutput {
+	return o
+}
+
+func (o KedaScaledObjectArgsPtrOutput) Elem() KedaScaledObjectArgsOutput {
+	return o.ApplyT(func(v *KedaScaledObjectArgs) KedaScaledObjectArgs {
+		if v != nil {
+			return *v
+		}
+		var ret KedaScaledObjectArgs
+		return ret
+	}).(KedaScaledObjectArgsOutput)
+}
+
+// Advanced ScaledObject behavior configuration.
+func (o KedaScaledObjectArgsPtrOutput) Advanced() KedaAdvancedArgsPtrOutput {
+	return o.ApplyT(func(v *KedaScaledObjectArgs) *KedaAdvancedArgs {
+		if v == nil {
+			return nil
+		}
+		return v.Advanced
+	}).(KedaAdvancedArgsPtrOutput)
+}
+
+// Seconds to wait after the last trigger reports active=false before scaling to minReplicaCount. Example: 300.
+func (o KedaScaledObjectArgsPtrOutput) CooldownPeriod() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *KedaScaledObjectArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.CooldownPeriod
+	}).(pulumi.IntPtrOutput)
+}
+
+// Replica fallback configuration when KEDA metrics are unavailable.
+func (o KedaScaledObjectArgsPtrOutput) Fallback() KedaFallbackArgsPtrOutput {
+	return o.ApplyT(func(v *KedaScaledObjectArgs) *KedaFallbackArgs {
+		if v == nil {
+			return nil
+		}
+		return v.Fallback
+	}).(KedaFallbackArgsPtrOutput)
+}
+
+// Replica count to scale to when idle. Must be less than minReplicaCount. Example: 0.
+func (o KedaScaledObjectArgsPtrOutput) IdleReplicaCount() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *KedaScaledObjectArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.IdleReplicaCount
+	}).(pulumi.IntPtrOutput)
+}
+
+// Cooldown period applied only during the initial scaling of the ScaledObject. Example: 0.
+func (o KedaScaledObjectArgsPtrOutput) InitialCooldownPeriod() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *KedaScaledObjectArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.InitialCooldownPeriod
+	}).(pulumi.IntPtrOutput)
+}
+
+// Maximum number of replicas. Example: 10.
+func (o KedaScaledObjectArgsPtrOutput) MaxReplicaCount() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *KedaScaledObjectArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.MaxReplicaCount
+	}).(pulumi.IntPtrOutput)
+}
+
+// Minimum number of replicas. Example: 0.
+func (o KedaScaledObjectArgsPtrOutput) MinReplicaCount() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *KedaScaledObjectArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.MinReplicaCount
+	}).(pulumi.IntPtrOutput)
+}
+
+// Seconds between checks of trigger metrics. Example: 30.
+func (o KedaScaledObjectArgsPtrOutput) PollingInterval() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *KedaScaledObjectArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.PollingInterval
+	}).(pulumi.IntPtrOutput)
+}
+
+// KEDA scaler triggers driving this ScaledObject.
+func (o KedaScaledObjectArgsPtrOutput) Triggers() KedaTriggerArgsArrayOutput {
+	return o.ApplyT(func(v *KedaScaledObjectArgs) []KedaTriggerArgs {
+		if v == nil {
+			return nil
+		}
+		return v.Triggers
+	}).(KedaTriggerArgsArrayOutput)
+}
+
+type KedaTriggerArgs struct {
+	// Reference to a TriggerAuthentication or ClusterTriggerAuthentication for this trigger.
+	AuthenticationRef *KedaAuthenticationRefArgs `pulumi:"authenticationRef"`
+	// Scaler-specific configuration key-value pairs. Example: {"serverAddress": "http://prometheus:9090", "query": "sum(rate(http_requests_total[2m]))"}.
+	Metadata map[string]string `pulumi:"metadata"`
+	// Metric target type. One of: 'Value', 'AverageValue', 'Utilization'. Example: 'AverageValue'.
+	MetricType *string `pulumi:"metricType"`
+	// Optional trigger name, used to disambiguate multiple triggers of the same type. Example: 'requests-per-second'.
+	Name *string `pulumi:"name"`
+	// KEDA scaler type. Example: 'prometheus'.
+	Type string `pulumi:"type"`
+	// Use KEDA's metric caching for this trigger. Example: false.
+	UseCachedMetrics *bool `pulumi:"useCachedMetrics"`
+}
+
+// KedaTriggerArgsInput is an input type that accepts KedaTriggerArgsArgs and KedaTriggerArgsOutput values.
+// You can construct a concrete instance of `KedaTriggerArgsInput` via:
+//
+//	KedaTriggerArgsArgs{...}
+type KedaTriggerArgsInput interface {
+	pulumi.Input
+
+	ToKedaTriggerArgsOutput() KedaTriggerArgsOutput
+	ToKedaTriggerArgsOutputWithContext(context.Context) KedaTriggerArgsOutput
+}
+
+type KedaTriggerArgsArgs struct {
+	// Reference to a TriggerAuthentication or ClusterTriggerAuthentication for this trigger.
+	AuthenticationRef KedaAuthenticationRefArgsPtrInput `pulumi:"authenticationRef"`
+	// Scaler-specific configuration key-value pairs. Example: {"serverAddress": "http://prometheus:9090", "query": "sum(rate(http_requests_total[2m]))"}.
+	Metadata pulumi.StringMapInput `pulumi:"metadata"`
+	// Metric target type. One of: 'Value', 'AverageValue', 'Utilization'. Example: 'AverageValue'.
+	MetricType pulumi.StringPtrInput `pulumi:"metricType"`
+	// Optional trigger name, used to disambiguate multiple triggers of the same type. Example: 'requests-per-second'.
+	Name pulumi.StringPtrInput `pulumi:"name"`
+	// KEDA scaler type. Example: 'prometheus'.
+	Type pulumi.StringInput `pulumi:"type"`
+	// Use KEDA's metric caching for this trigger. Example: false.
+	UseCachedMetrics pulumi.BoolPtrInput `pulumi:"useCachedMetrics"`
+}
+
+func (KedaTriggerArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*KedaTriggerArgs)(nil)).Elem()
+}
+
+func (i KedaTriggerArgsArgs) ToKedaTriggerArgsOutput() KedaTriggerArgsOutput {
+	return i.ToKedaTriggerArgsOutputWithContext(context.Background())
+}
+
+func (i KedaTriggerArgsArgs) ToKedaTriggerArgsOutputWithContext(ctx context.Context) KedaTriggerArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KedaTriggerArgsOutput)
+}
+
+// KedaTriggerArgsArrayInput is an input type that accepts KedaTriggerArgsArray and KedaTriggerArgsArrayOutput values.
+// You can construct a concrete instance of `KedaTriggerArgsArrayInput` via:
+//
+//	KedaTriggerArgsArray{ KedaTriggerArgsArgs{...} }
+type KedaTriggerArgsArrayInput interface {
+	pulumi.Input
+
+	ToKedaTriggerArgsArrayOutput() KedaTriggerArgsArrayOutput
+	ToKedaTriggerArgsArrayOutputWithContext(context.Context) KedaTriggerArgsArrayOutput
+}
+
+type KedaTriggerArgsArray []KedaTriggerArgsInput
+
+func (KedaTriggerArgsArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]KedaTriggerArgs)(nil)).Elem()
+}
+
+func (i KedaTriggerArgsArray) ToKedaTriggerArgsArrayOutput() KedaTriggerArgsArrayOutput {
+	return i.ToKedaTriggerArgsArrayOutputWithContext(context.Background())
+}
+
+func (i KedaTriggerArgsArray) ToKedaTriggerArgsArrayOutputWithContext(ctx context.Context) KedaTriggerArgsArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KedaTriggerArgsArrayOutput)
+}
+
+type KedaTriggerArgsOutput struct{ *pulumi.OutputState }
+
+func (KedaTriggerArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*KedaTriggerArgs)(nil)).Elem()
+}
+
+func (o KedaTriggerArgsOutput) ToKedaTriggerArgsOutput() KedaTriggerArgsOutput {
+	return o
+}
+
+func (o KedaTriggerArgsOutput) ToKedaTriggerArgsOutputWithContext(ctx context.Context) KedaTriggerArgsOutput {
+	return o
+}
+
+// Reference to a TriggerAuthentication or ClusterTriggerAuthentication for this trigger.
+func (o KedaTriggerArgsOutput) AuthenticationRef() KedaAuthenticationRefArgsPtrOutput {
+	return o.ApplyT(func(v KedaTriggerArgs) *KedaAuthenticationRefArgs { return v.AuthenticationRef }).(KedaAuthenticationRefArgsPtrOutput)
+}
+
+// Scaler-specific configuration key-value pairs. Example: {"serverAddress": "http://prometheus:9090", "query": "sum(rate(http_requests_total[2m]))"}.
+func (o KedaTriggerArgsOutput) Metadata() pulumi.StringMapOutput {
+	return o.ApplyT(func(v KedaTriggerArgs) map[string]string { return v.Metadata }).(pulumi.StringMapOutput)
+}
+
+// Metric target type. One of: 'Value', 'AverageValue', 'Utilization'. Example: 'AverageValue'.
+func (o KedaTriggerArgsOutput) MetricType() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v KedaTriggerArgs) *string { return v.MetricType }).(pulumi.StringPtrOutput)
+}
+
+// Optional trigger name, used to disambiguate multiple triggers of the same type. Example: 'requests-per-second'.
+func (o KedaTriggerArgsOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v KedaTriggerArgs) *string { return v.Name }).(pulumi.StringPtrOutput)
+}
+
+// KEDA scaler type. Example: 'prometheus'.
+func (o KedaTriggerArgsOutput) Type() pulumi.StringOutput {
+	return o.ApplyT(func(v KedaTriggerArgs) string { return v.Type }).(pulumi.StringOutput)
+}
+
+// Use KEDA's metric caching for this trigger. Example: false.
+func (o KedaTriggerArgsOutput) UseCachedMetrics() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v KedaTriggerArgs) *bool { return v.UseCachedMetrics }).(pulumi.BoolPtrOutput)
+}
+
+type KedaTriggerArgsArrayOutput struct{ *pulumi.OutputState }
+
+func (KedaTriggerArgsArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]KedaTriggerArgs)(nil)).Elem()
+}
+
+func (o KedaTriggerArgsArrayOutput) ToKedaTriggerArgsArrayOutput() KedaTriggerArgsArrayOutput {
+	return o
+}
+
+func (o KedaTriggerArgsArrayOutput) ToKedaTriggerArgsArrayOutputWithContext(ctx context.Context) KedaTriggerArgsArrayOutput {
+	return o
+}
+
+func (o KedaTriggerArgsArrayOutput) Index(i pulumi.IntInput) KedaTriggerArgsOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) KedaTriggerArgs {
+		return vs[0].([]KedaTriggerArgs)[vs[1].(int)]
+	}).(KedaTriggerArgsOutput)
+}
+
 type KubeletConfigurationArgs struct {
 	// DNS server IP addresses passed to kubelet. Example: ["10.96.0.10"].
 	ClusterDns []string `pulumi:"clusterDns"`
@@ -4746,6 +6443,1192 @@ func (o NamePatternArgsPtrOutput) Pattern() pulumi.StringPtrOutput {
 		}
 		return v.Pattern
 	}).(pulumi.StringPtrOutput)
+}
+
+type OCIBootConfigArgs struct {
+	// Boot volume size in GB. Example: 100.
+	BootVolumeSizeInGbs *int `pulumi:"bootVolumeSizeInGbs"`
+	// Boot volume performance units per GB. Example: 10.
+	BootVolumeVpusPerGb *int `pulumi:"bootVolumeVpusPerGb"`
+}
+
+// OCIBootConfigArgsInput is an input type that accepts OCIBootConfigArgsArgs and OCIBootConfigArgsOutput values.
+// You can construct a concrete instance of `OCIBootConfigArgsInput` via:
+//
+//	OCIBootConfigArgsArgs{...}
+type OCIBootConfigArgsInput interface {
+	pulumi.Input
+
+	ToOCIBootConfigArgsOutput() OCIBootConfigArgsOutput
+	ToOCIBootConfigArgsOutputWithContext(context.Context) OCIBootConfigArgsOutput
+}
+
+type OCIBootConfigArgsArgs struct {
+	// Boot volume size in GB. Example: 100.
+	BootVolumeSizeInGbs pulumi.IntPtrInput `pulumi:"bootVolumeSizeInGbs"`
+	// Boot volume performance units per GB. Example: 10.
+	BootVolumeVpusPerGb pulumi.IntPtrInput `pulumi:"bootVolumeVpusPerGb"`
+}
+
+func (OCIBootConfigArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*OCIBootConfigArgs)(nil)).Elem()
+}
+
+func (i OCIBootConfigArgsArgs) ToOCIBootConfigArgsOutput() OCIBootConfigArgsOutput {
+	return i.ToOCIBootConfigArgsOutputWithContext(context.Background())
+}
+
+func (i OCIBootConfigArgsArgs) ToOCIBootConfigArgsOutputWithContext(ctx context.Context) OCIBootConfigArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OCIBootConfigArgsOutput)
+}
+
+func (i OCIBootConfigArgsArgs) ToOCIBootConfigArgsPtrOutput() OCIBootConfigArgsPtrOutput {
+	return i.ToOCIBootConfigArgsPtrOutputWithContext(context.Background())
+}
+
+func (i OCIBootConfigArgsArgs) ToOCIBootConfigArgsPtrOutputWithContext(ctx context.Context) OCIBootConfigArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OCIBootConfigArgsOutput).ToOCIBootConfigArgsPtrOutputWithContext(ctx)
+}
+
+// OCIBootConfigArgsPtrInput is an input type that accepts OCIBootConfigArgsArgs, OCIBootConfigArgsPtr and OCIBootConfigArgsPtrOutput values.
+// You can construct a concrete instance of `OCIBootConfigArgsPtrInput` via:
+//
+//	        OCIBootConfigArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type OCIBootConfigArgsPtrInput interface {
+	pulumi.Input
+
+	ToOCIBootConfigArgsPtrOutput() OCIBootConfigArgsPtrOutput
+	ToOCIBootConfigArgsPtrOutputWithContext(context.Context) OCIBootConfigArgsPtrOutput
+}
+
+type ocibootConfigArgsPtrType OCIBootConfigArgsArgs
+
+func OCIBootConfigArgsPtr(v *OCIBootConfigArgsArgs) OCIBootConfigArgsPtrInput {
+	return (*ocibootConfigArgsPtrType)(v)
+}
+
+func (*ocibootConfigArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**OCIBootConfigArgs)(nil)).Elem()
+}
+
+func (i *ocibootConfigArgsPtrType) ToOCIBootConfigArgsPtrOutput() OCIBootConfigArgsPtrOutput {
+	return i.ToOCIBootConfigArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *ocibootConfigArgsPtrType) ToOCIBootConfigArgsPtrOutputWithContext(ctx context.Context) OCIBootConfigArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OCIBootConfigArgsPtrOutput)
+}
+
+type OCIBootConfigArgsOutput struct{ *pulumi.OutputState }
+
+func (OCIBootConfigArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*OCIBootConfigArgs)(nil)).Elem()
+}
+
+func (o OCIBootConfigArgsOutput) ToOCIBootConfigArgsOutput() OCIBootConfigArgsOutput {
+	return o
+}
+
+func (o OCIBootConfigArgsOutput) ToOCIBootConfigArgsOutputWithContext(ctx context.Context) OCIBootConfigArgsOutput {
+	return o
+}
+
+func (o OCIBootConfigArgsOutput) ToOCIBootConfigArgsPtrOutput() OCIBootConfigArgsPtrOutput {
+	return o.ToOCIBootConfigArgsPtrOutputWithContext(context.Background())
+}
+
+func (o OCIBootConfigArgsOutput) ToOCIBootConfigArgsPtrOutputWithContext(ctx context.Context) OCIBootConfigArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v OCIBootConfigArgs) *OCIBootConfigArgs {
+		return &v
+	}).(OCIBootConfigArgsPtrOutput)
+}
+
+// Boot volume size in GB. Example: 100.
+func (o OCIBootConfigArgsOutput) BootVolumeSizeInGbs() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v OCIBootConfigArgs) *int { return v.BootVolumeSizeInGbs }).(pulumi.IntPtrOutput)
+}
+
+// Boot volume performance units per GB. Example: 10.
+func (o OCIBootConfigArgsOutput) BootVolumeVpusPerGb() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v OCIBootConfigArgs) *int { return v.BootVolumeVpusPerGb }).(pulumi.IntPtrOutput)
+}
+
+type OCIBootConfigArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (OCIBootConfigArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**OCIBootConfigArgs)(nil)).Elem()
+}
+
+func (o OCIBootConfigArgsPtrOutput) ToOCIBootConfigArgsPtrOutput() OCIBootConfigArgsPtrOutput {
+	return o
+}
+
+func (o OCIBootConfigArgsPtrOutput) ToOCIBootConfigArgsPtrOutputWithContext(ctx context.Context) OCIBootConfigArgsPtrOutput {
+	return o
+}
+
+func (o OCIBootConfigArgsPtrOutput) Elem() OCIBootConfigArgsOutput {
+	return o.ApplyT(func(v *OCIBootConfigArgs) OCIBootConfigArgs {
+		if v != nil {
+			return *v
+		}
+		var ret OCIBootConfigArgs
+		return ret
+	}).(OCIBootConfigArgsOutput)
+}
+
+// Boot volume size in GB. Example: 100.
+func (o OCIBootConfigArgsPtrOutput) BootVolumeSizeInGbs() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *OCIBootConfigArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.BootVolumeSizeInGbs
+	}).(pulumi.IntPtrOutput)
+}
+
+// Boot volume performance units per GB. Example: 10.
+func (o OCIBootConfigArgsPtrOutput) BootVolumeVpusPerGb() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *OCIBootConfigArgs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.BootVolumeVpusPerGb
+	}).(pulumi.IntPtrOutput)
+}
+
+type OCIImageSelectorTermArgs struct {
+	// OCID of the compartment containing the image. Example: 'ocid1.compartment.oc1..aaaaaaaa'.
+	CompartmentId *string `pulumi:"compartmentId"`
+	// Explicit OCI image OCID. Example: 'ocid1.image.oc1..aaaaaaaa'.
+	Id *string `pulumi:"id"`
+	// OCI image display name filter. Example: 'Oracle-Linux-8.9'.
+	Name *string `pulumi:"name"`
+}
+
+// OCIImageSelectorTermArgsInput is an input type that accepts OCIImageSelectorTermArgsArgs and OCIImageSelectorTermArgsOutput values.
+// You can construct a concrete instance of `OCIImageSelectorTermArgsInput` via:
+//
+//	OCIImageSelectorTermArgsArgs{...}
+type OCIImageSelectorTermArgsInput interface {
+	pulumi.Input
+
+	ToOCIImageSelectorTermArgsOutput() OCIImageSelectorTermArgsOutput
+	ToOCIImageSelectorTermArgsOutputWithContext(context.Context) OCIImageSelectorTermArgsOutput
+}
+
+type OCIImageSelectorTermArgsArgs struct {
+	// OCID of the compartment containing the image. Example: 'ocid1.compartment.oc1..aaaaaaaa'.
+	CompartmentId pulumi.StringPtrInput `pulumi:"compartmentId"`
+	// Explicit OCI image OCID. Example: 'ocid1.image.oc1..aaaaaaaa'.
+	Id pulumi.StringPtrInput `pulumi:"id"`
+	// OCI image display name filter. Example: 'Oracle-Linux-8.9'.
+	Name pulumi.StringPtrInput `pulumi:"name"`
+}
+
+func (OCIImageSelectorTermArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*OCIImageSelectorTermArgs)(nil)).Elem()
+}
+
+func (i OCIImageSelectorTermArgsArgs) ToOCIImageSelectorTermArgsOutput() OCIImageSelectorTermArgsOutput {
+	return i.ToOCIImageSelectorTermArgsOutputWithContext(context.Background())
+}
+
+func (i OCIImageSelectorTermArgsArgs) ToOCIImageSelectorTermArgsOutputWithContext(ctx context.Context) OCIImageSelectorTermArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OCIImageSelectorTermArgsOutput)
+}
+
+// OCIImageSelectorTermArgsArrayInput is an input type that accepts OCIImageSelectorTermArgsArray and OCIImageSelectorTermArgsArrayOutput values.
+// You can construct a concrete instance of `OCIImageSelectorTermArgsArrayInput` via:
+//
+//	OCIImageSelectorTermArgsArray{ OCIImageSelectorTermArgsArgs{...} }
+type OCIImageSelectorTermArgsArrayInput interface {
+	pulumi.Input
+
+	ToOCIImageSelectorTermArgsArrayOutput() OCIImageSelectorTermArgsArrayOutput
+	ToOCIImageSelectorTermArgsArrayOutputWithContext(context.Context) OCIImageSelectorTermArgsArrayOutput
+}
+
+type OCIImageSelectorTermArgsArray []OCIImageSelectorTermArgsInput
+
+func (OCIImageSelectorTermArgsArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]OCIImageSelectorTermArgs)(nil)).Elem()
+}
+
+func (i OCIImageSelectorTermArgsArray) ToOCIImageSelectorTermArgsArrayOutput() OCIImageSelectorTermArgsArrayOutput {
+	return i.ToOCIImageSelectorTermArgsArrayOutputWithContext(context.Background())
+}
+
+func (i OCIImageSelectorTermArgsArray) ToOCIImageSelectorTermArgsArrayOutputWithContext(ctx context.Context) OCIImageSelectorTermArgsArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OCIImageSelectorTermArgsArrayOutput)
+}
+
+type OCIImageSelectorTermArgsOutput struct{ *pulumi.OutputState }
+
+func (OCIImageSelectorTermArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*OCIImageSelectorTermArgs)(nil)).Elem()
+}
+
+func (o OCIImageSelectorTermArgsOutput) ToOCIImageSelectorTermArgsOutput() OCIImageSelectorTermArgsOutput {
+	return o
+}
+
+func (o OCIImageSelectorTermArgsOutput) ToOCIImageSelectorTermArgsOutputWithContext(ctx context.Context) OCIImageSelectorTermArgsOutput {
+	return o
+}
+
+// OCID of the compartment containing the image. Example: 'ocid1.compartment.oc1..aaaaaaaa'.
+func (o OCIImageSelectorTermArgsOutput) CompartmentId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OCIImageSelectorTermArgs) *string { return v.CompartmentId }).(pulumi.StringPtrOutput)
+}
+
+// Explicit OCI image OCID. Example: 'ocid1.image.oc1..aaaaaaaa'.
+func (o OCIImageSelectorTermArgsOutput) Id() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OCIImageSelectorTermArgs) *string { return v.Id }).(pulumi.StringPtrOutput)
+}
+
+// OCI image display name filter. Example: 'Oracle-Linux-8.9'.
+func (o OCIImageSelectorTermArgsOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OCIImageSelectorTermArgs) *string { return v.Name }).(pulumi.StringPtrOutput)
+}
+
+type OCIImageSelectorTermArgsArrayOutput struct{ *pulumi.OutputState }
+
+func (OCIImageSelectorTermArgsArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]OCIImageSelectorTermArgs)(nil)).Elem()
+}
+
+func (o OCIImageSelectorTermArgsArrayOutput) ToOCIImageSelectorTermArgsArrayOutput() OCIImageSelectorTermArgsArrayOutput {
+	return o
+}
+
+func (o OCIImageSelectorTermArgsArrayOutput) ToOCIImageSelectorTermArgsArrayOutputWithContext(ctx context.Context) OCIImageSelectorTermArgsArrayOutput {
+	return o
+}
+
+func (o OCIImageSelectorTermArgsArrayOutput) Index(i pulumi.IntInput) OCIImageSelectorTermArgsOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) OCIImageSelectorTermArgs {
+		return vs[0].([]OCIImageSelectorTermArgs)[vs[1].(int)]
+	}).(OCIImageSelectorTermArgsOutput)
+}
+
+type OCILaunchOptionsArgs struct {
+	// Emulation type for the boot volume. Example: 'PARAVIRTUALIZED'.
+	BootVolumeType *string `pulumi:"bootVolumeType"`
+	// Firmware used to boot the instance. Example: 'UEFI_64'.
+	Firmware *string `pulumi:"firmware"`
+	// Whether consistent volume naming is enabled for the instance. Example: true.
+	IsConsistentVolumeNamingEnabled *bool `pulumi:"isConsistentVolumeNamingEnabled"`
+	// Emulation type for the network interface. Example: 'PARAVIRTUALIZED'.
+	NetworkType *string `pulumi:"networkType"`
+	// Emulation type for remote data volumes. Example: 'PARAVIRTUALIZED'.
+	RemoteDataVolumeType *string `pulumi:"remoteDataVolumeType"`
+}
+
+// OCILaunchOptionsArgsInput is an input type that accepts OCILaunchOptionsArgsArgs and OCILaunchOptionsArgsOutput values.
+// You can construct a concrete instance of `OCILaunchOptionsArgsInput` via:
+//
+//	OCILaunchOptionsArgsArgs{...}
+type OCILaunchOptionsArgsInput interface {
+	pulumi.Input
+
+	ToOCILaunchOptionsArgsOutput() OCILaunchOptionsArgsOutput
+	ToOCILaunchOptionsArgsOutputWithContext(context.Context) OCILaunchOptionsArgsOutput
+}
+
+type OCILaunchOptionsArgsArgs struct {
+	// Emulation type for the boot volume. Example: 'PARAVIRTUALIZED'.
+	BootVolumeType pulumi.StringPtrInput `pulumi:"bootVolumeType"`
+	// Firmware used to boot the instance. Example: 'UEFI_64'.
+	Firmware pulumi.StringPtrInput `pulumi:"firmware"`
+	// Whether consistent volume naming is enabled for the instance. Example: true.
+	IsConsistentVolumeNamingEnabled pulumi.BoolPtrInput `pulumi:"isConsistentVolumeNamingEnabled"`
+	// Emulation type for the network interface. Example: 'PARAVIRTUALIZED'.
+	NetworkType pulumi.StringPtrInput `pulumi:"networkType"`
+	// Emulation type for remote data volumes. Example: 'PARAVIRTUALIZED'.
+	RemoteDataVolumeType pulumi.StringPtrInput `pulumi:"remoteDataVolumeType"`
+}
+
+func (OCILaunchOptionsArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*OCILaunchOptionsArgs)(nil)).Elem()
+}
+
+func (i OCILaunchOptionsArgsArgs) ToOCILaunchOptionsArgsOutput() OCILaunchOptionsArgsOutput {
+	return i.ToOCILaunchOptionsArgsOutputWithContext(context.Background())
+}
+
+func (i OCILaunchOptionsArgsArgs) ToOCILaunchOptionsArgsOutputWithContext(ctx context.Context) OCILaunchOptionsArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OCILaunchOptionsArgsOutput)
+}
+
+func (i OCILaunchOptionsArgsArgs) ToOCILaunchOptionsArgsPtrOutput() OCILaunchOptionsArgsPtrOutput {
+	return i.ToOCILaunchOptionsArgsPtrOutputWithContext(context.Background())
+}
+
+func (i OCILaunchOptionsArgsArgs) ToOCILaunchOptionsArgsPtrOutputWithContext(ctx context.Context) OCILaunchOptionsArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OCILaunchOptionsArgsOutput).ToOCILaunchOptionsArgsPtrOutputWithContext(ctx)
+}
+
+// OCILaunchOptionsArgsPtrInput is an input type that accepts OCILaunchOptionsArgsArgs, OCILaunchOptionsArgsPtr and OCILaunchOptionsArgsPtrOutput values.
+// You can construct a concrete instance of `OCILaunchOptionsArgsPtrInput` via:
+//
+//	        OCILaunchOptionsArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type OCILaunchOptionsArgsPtrInput interface {
+	pulumi.Input
+
+	ToOCILaunchOptionsArgsPtrOutput() OCILaunchOptionsArgsPtrOutput
+	ToOCILaunchOptionsArgsPtrOutputWithContext(context.Context) OCILaunchOptionsArgsPtrOutput
+}
+
+type ocilaunchOptionsArgsPtrType OCILaunchOptionsArgsArgs
+
+func OCILaunchOptionsArgsPtr(v *OCILaunchOptionsArgsArgs) OCILaunchOptionsArgsPtrInput {
+	return (*ocilaunchOptionsArgsPtrType)(v)
+}
+
+func (*ocilaunchOptionsArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**OCILaunchOptionsArgs)(nil)).Elem()
+}
+
+func (i *ocilaunchOptionsArgsPtrType) ToOCILaunchOptionsArgsPtrOutput() OCILaunchOptionsArgsPtrOutput {
+	return i.ToOCILaunchOptionsArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *ocilaunchOptionsArgsPtrType) ToOCILaunchOptionsArgsPtrOutputWithContext(ctx context.Context) OCILaunchOptionsArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OCILaunchOptionsArgsPtrOutput)
+}
+
+type OCILaunchOptionsArgsOutput struct{ *pulumi.OutputState }
+
+func (OCILaunchOptionsArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*OCILaunchOptionsArgs)(nil)).Elem()
+}
+
+func (o OCILaunchOptionsArgsOutput) ToOCILaunchOptionsArgsOutput() OCILaunchOptionsArgsOutput {
+	return o
+}
+
+func (o OCILaunchOptionsArgsOutput) ToOCILaunchOptionsArgsOutputWithContext(ctx context.Context) OCILaunchOptionsArgsOutput {
+	return o
+}
+
+func (o OCILaunchOptionsArgsOutput) ToOCILaunchOptionsArgsPtrOutput() OCILaunchOptionsArgsPtrOutput {
+	return o.ToOCILaunchOptionsArgsPtrOutputWithContext(context.Background())
+}
+
+func (o OCILaunchOptionsArgsOutput) ToOCILaunchOptionsArgsPtrOutputWithContext(ctx context.Context) OCILaunchOptionsArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v OCILaunchOptionsArgs) *OCILaunchOptionsArgs {
+		return &v
+	}).(OCILaunchOptionsArgsPtrOutput)
+}
+
+// Emulation type for the boot volume. Example: 'PARAVIRTUALIZED'.
+func (o OCILaunchOptionsArgsOutput) BootVolumeType() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OCILaunchOptionsArgs) *string { return v.BootVolumeType }).(pulumi.StringPtrOutput)
+}
+
+// Firmware used to boot the instance. Example: 'UEFI_64'.
+func (o OCILaunchOptionsArgsOutput) Firmware() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OCILaunchOptionsArgs) *string { return v.Firmware }).(pulumi.StringPtrOutput)
+}
+
+// Whether consistent volume naming is enabled for the instance. Example: true.
+func (o OCILaunchOptionsArgsOutput) IsConsistentVolumeNamingEnabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v OCILaunchOptionsArgs) *bool { return v.IsConsistentVolumeNamingEnabled }).(pulumi.BoolPtrOutput)
+}
+
+// Emulation type for the network interface. Example: 'PARAVIRTUALIZED'.
+func (o OCILaunchOptionsArgsOutput) NetworkType() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OCILaunchOptionsArgs) *string { return v.NetworkType }).(pulumi.StringPtrOutput)
+}
+
+// Emulation type for remote data volumes. Example: 'PARAVIRTUALIZED'.
+func (o OCILaunchOptionsArgsOutput) RemoteDataVolumeType() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OCILaunchOptionsArgs) *string { return v.RemoteDataVolumeType }).(pulumi.StringPtrOutput)
+}
+
+type OCILaunchOptionsArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (OCILaunchOptionsArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**OCILaunchOptionsArgs)(nil)).Elem()
+}
+
+func (o OCILaunchOptionsArgsPtrOutput) ToOCILaunchOptionsArgsPtrOutput() OCILaunchOptionsArgsPtrOutput {
+	return o
+}
+
+func (o OCILaunchOptionsArgsPtrOutput) ToOCILaunchOptionsArgsPtrOutputWithContext(ctx context.Context) OCILaunchOptionsArgsPtrOutput {
+	return o
+}
+
+func (o OCILaunchOptionsArgsPtrOutput) Elem() OCILaunchOptionsArgsOutput {
+	return o.ApplyT(func(v *OCILaunchOptionsArgs) OCILaunchOptionsArgs {
+		if v != nil {
+			return *v
+		}
+		var ret OCILaunchOptionsArgs
+		return ret
+	}).(OCILaunchOptionsArgsOutput)
+}
+
+// Emulation type for the boot volume. Example: 'PARAVIRTUALIZED'.
+func (o OCILaunchOptionsArgsPtrOutput) BootVolumeType() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *OCILaunchOptionsArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.BootVolumeType
+	}).(pulumi.StringPtrOutput)
+}
+
+// Firmware used to boot the instance. Example: 'UEFI_64'.
+func (o OCILaunchOptionsArgsPtrOutput) Firmware() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *OCILaunchOptionsArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Firmware
+	}).(pulumi.StringPtrOutput)
+}
+
+// Whether consistent volume naming is enabled for the instance. Example: true.
+func (o OCILaunchOptionsArgsPtrOutput) IsConsistentVolumeNamingEnabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *OCILaunchOptionsArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.IsConsistentVolumeNamingEnabled
+	}).(pulumi.BoolPtrOutput)
+}
+
+// Emulation type for the network interface. Example: 'PARAVIRTUALIZED'.
+func (o OCILaunchOptionsArgsPtrOutput) NetworkType() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *OCILaunchOptionsArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.NetworkType
+	}).(pulumi.StringPtrOutput)
+}
+
+// Emulation type for remote data volumes. Example: 'PARAVIRTUALIZED'.
+func (o OCILaunchOptionsArgsPtrOutput) RemoteDataVolumeType() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *OCILaunchOptionsArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.RemoteDataVolumeType
+	}).(pulumi.StringPtrOutput)
+}
+
+type OCINodeClassSpecArgs struct {
+	// OCI compute instance agent plugins to enable. Example: ["Compute Instance Monitoring"].
+	AgentList []string `pulumi:"agentList"`
+	// Additional block volumes attached to provisioned nodes.
+	BlockDevices []OCIVolumeAttributesArgs `pulumi:"blockDevices"`
+	// Boot volume configuration for provisioned nodes.
+	BootConfig *OCIBootConfigArgs `pulumi:"bootConfig"`
+	// OCI free-form tags applied to all resources created by this node class. Example: {"environment": "production"}.
+	FreeFormTags map[string]string `pulumi:"freeFormTags"`
+	// OCI node image family shorthand used when no imageSelector is specified. Example: 'Oracle-Linux-8'.
+	ImageFamily *string `pulumi:"imageFamily"`
+	// Selectors for the images used to launch nodes. Example: [{name: "Oracle-Linux-8.9"}].
+	ImageSelector []OCIImageSelectorTermArgs `pulumi:"imageSelector"`
+	// Instance launch options controlling firmware and network/volume emulation type.
+	LaunchOptions *OCILaunchOptionsArgs `pulumi:"launchOptions"`
+	// OCI instance metadata applied to provisioned nodes. Example: {"ssh_authorized_keys": "ssh-rsa ..."}.
+	MetaData map[string]string `pulumi:"metaData"`
+	// Script executed before node bootstrap. Example: '#!/bin/bash\necho pre-install'.
+	PreInstallScript *string `pulumi:"preInstallScript"`
+	// Selectors for network security groups attached to provisioned nodes.
+	SecurityGroupSelector []OCISecurityGroupSelectorTermArgs `pulumi:"securityGroupSelector"`
+	// Selectors for the subnets nodes will be launched into.
+	SubnetSelector []OCISubnetSelectorTermArgs `pulumi:"subnetSelector"`
+	// OCI defined tags applied to all resources created by this node class.
+	Tags map[string]string `pulumi:"tags"`
+	// Custom cloud-init user data merged into the node launch config (base64 or plain text). Example: '#!/bin/bash\necho hello'.
+	UserData *string `pulumi:"userData"`
+	// OCID of the VCN nodes will be launched into. Example: 'ocid1.vcn.oc1..aaaaaaaa'.
+	VcnId *string `pulumi:"vcnId"`
+}
+
+// OCINodeClassSpecArgsInput is an input type that accepts OCINodeClassSpecArgsArgs and OCINodeClassSpecArgsOutput values.
+// You can construct a concrete instance of `OCINodeClassSpecArgsInput` via:
+//
+//	OCINodeClassSpecArgsArgs{...}
+type OCINodeClassSpecArgsInput interface {
+	pulumi.Input
+
+	ToOCINodeClassSpecArgsOutput() OCINodeClassSpecArgsOutput
+	ToOCINodeClassSpecArgsOutputWithContext(context.Context) OCINodeClassSpecArgsOutput
+}
+
+type OCINodeClassSpecArgsArgs struct {
+	// OCI compute instance agent plugins to enable. Example: ["Compute Instance Monitoring"].
+	AgentList pulumi.StringArrayInput `pulumi:"agentList"`
+	// Additional block volumes attached to provisioned nodes.
+	BlockDevices OCIVolumeAttributesArgsArrayInput `pulumi:"blockDevices"`
+	// Boot volume configuration for provisioned nodes.
+	BootConfig OCIBootConfigArgsPtrInput `pulumi:"bootConfig"`
+	// OCI free-form tags applied to all resources created by this node class. Example: {"environment": "production"}.
+	FreeFormTags pulumi.StringMapInput `pulumi:"freeFormTags"`
+	// OCI node image family shorthand used when no imageSelector is specified. Example: 'Oracle-Linux-8'.
+	ImageFamily pulumi.StringPtrInput `pulumi:"imageFamily"`
+	// Selectors for the images used to launch nodes. Example: [{name: "Oracle-Linux-8.9"}].
+	ImageSelector OCIImageSelectorTermArgsArrayInput `pulumi:"imageSelector"`
+	// Instance launch options controlling firmware and network/volume emulation type.
+	LaunchOptions OCILaunchOptionsArgsPtrInput `pulumi:"launchOptions"`
+	// OCI instance metadata applied to provisioned nodes. Example: {"ssh_authorized_keys": "ssh-rsa ..."}.
+	MetaData pulumi.StringMapInput `pulumi:"metaData"`
+	// Script executed before node bootstrap. Example: '#!/bin/bash\necho pre-install'.
+	PreInstallScript pulumi.StringPtrInput `pulumi:"preInstallScript"`
+	// Selectors for network security groups attached to provisioned nodes.
+	SecurityGroupSelector OCISecurityGroupSelectorTermArgsArrayInput `pulumi:"securityGroupSelector"`
+	// Selectors for the subnets nodes will be launched into.
+	SubnetSelector OCISubnetSelectorTermArgsArrayInput `pulumi:"subnetSelector"`
+	// OCI defined tags applied to all resources created by this node class.
+	Tags pulumi.StringMapInput `pulumi:"tags"`
+	// Custom cloud-init user data merged into the node launch config (base64 or plain text). Example: '#!/bin/bash\necho hello'.
+	UserData pulumi.StringPtrInput `pulumi:"userData"`
+	// OCID of the VCN nodes will be launched into. Example: 'ocid1.vcn.oc1..aaaaaaaa'.
+	VcnId pulumi.StringPtrInput `pulumi:"vcnId"`
+}
+
+func (OCINodeClassSpecArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*OCINodeClassSpecArgs)(nil)).Elem()
+}
+
+func (i OCINodeClassSpecArgsArgs) ToOCINodeClassSpecArgsOutput() OCINodeClassSpecArgsOutput {
+	return i.ToOCINodeClassSpecArgsOutputWithContext(context.Background())
+}
+
+func (i OCINodeClassSpecArgsArgs) ToOCINodeClassSpecArgsOutputWithContext(ctx context.Context) OCINodeClassSpecArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OCINodeClassSpecArgsOutput)
+}
+
+func (i OCINodeClassSpecArgsArgs) ToOCINodeClassSpecArgsPtrOutput() OCINodeClassSpecArgsPtrOutput {
+	return i.ToOCINodeClassSpecArgsPtrOutputWithContext(context.Background())
+}
+
+func (i OCINodeClassSpecArgsArgs) ToOCINodeClassSpecArgsPtrOutputWithContext(ctx context.Context) OCINodeClassSpecArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OCINodeClassSpecArgsOutput).ToOCINodeClassSpecArgsPtrOutputWithContext(ctx)
+}
+
+// OCINodeClassSpecArgsPtrInput is an input type that accepts OCINodeClassSpecArgsArgs, OCINodeClassSpecArgsPtr and OCINodeClassSpecArgsPtrOutput values.
+// You can construct a concrete instance of `OCINodeClassSpecArgsPtrInput` via:
+//
+//	        OCINodeClassSpecArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type OCINodeClassSpecArgsPtrInput interface {
+	pulumi.Input
+
+	ToOCINodeClassSpecArgsPtrOutput() OCINodeClassSpecArgsPtrOutput
+	ToOCINodeClassSpecArgsPtrOutputWithContext(context.Context) OCINodeClassSpecArgsPtrOutput
+}
+
+type ocinodeClassSpecArgsPtrType OCINodeClassSpecArgsArgs
+
+func OCINodeClassSpecArgsPtr(v *OCINodeClassSpecArgsArgs) OCINodeClassSpecArgsPtrInput {
+	return (*ocinodeClassSpecArgsPtrType)(v)
+}
+
+func (*ocinodeClassSpecArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**OCINodeClassSpecArgs)(nil)).Elem()
+}
+
+func (i *ocinodeClassSpecArgsPtrType) ToOCINodeClassSpecArgsPtrOutput() OCINodeClassSpecArgsPtrOutput {
+	return i.ToOCINodeClassSpecArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *ocinodeClassSpecArgsPtrType) ToOCINodeClassSpecArgsPtrOutputWithContext(ctx context.Context) OCINodeClassSpecArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OCINodeClassSpecArgsPtrOutput)
+}
+
+type OCINodeClassSpecArgsOutput struct{ *pulumi.OutputState }
+
+func (OCINodeClassSpecArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*OCINodeClassSpecArgs)(nil)).Elem()
+}
+
+func (o OCINodeClassSpecArgsOutput) ToOCINodeClassSpecArgsOutput() OCINodeClassSpecArgsOutput {
+	return o
+}
+
+func (o OCINodeClassSpecArgsOutput) ToOCINodeClassSpecArgsOutputWithContext(ctx context.Context) OCINodeClassSpecArgsOutput {
+	return o
+}
+
+func (o OCINodeClassSpecArgsOutput) ToOCINodeClassSpecArgsPtrOutput() OCINodeClassSpecArgsPtrOutput {
+	return o.ToOCINodeClassSpecArgsPtrOutputWithContext(context.Background())
+}
+
+func (o OCINodeClassSpecArgsOutput) ToOCINodeClassSpecArgsPtrOutputWithContext(ctx context.Context) OCINodeClassSpecArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v OCINodeClassSpecArgs) *OCINodeClassSpecArgs {
+		return &v
+	}).(OCINodeClassSpecArgsPtrOutput)
+}
+
+// OCI compute instance agent plugins to enable. Example: ["Compute Instance Monitoring"].
+func (o OCINodeClassSpecArgsOutput) AgentList() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v OCINodeClassSpecArgs) []string { return v.AgentList }).(pulumi.StringArrayOutput)
+}
+
+// Additional block volumes attached to provisioned nodes.
+func (o OCINodeClassSpecArgsOutput) BlockDevices() OCIVolumeAttributesArgsArrayOutput {
+	return o.ApplyT(func(v OCINodeClassSpecArgs) []OCIVolumeAttributesArgs { return v.BlockDevices }).(OCIVolumeAttributesArgsArrayOutput)
+}
+
+// Boot volume configuration for provisioned nodes.
+func (o OCINodeClassSpecArgsOutput) BootConfig() OCIBootConfigArgsPtrOutput {
+	return o.ApplyT(func(v OCINodeClassSpecArgs) *OCIBootConfigArgs { return v.BootConfig }).(OCIBootConfigArgsPtrOutput)
+}
+
+// OCI free-form tags applied to all resources created by this node class. Example: {"environment": "production"}.
+func (o OCINodeClassSpecArgsOutput) FreeFormTags() pulumi.StringMapOutput {
+	return o.ApplyT(func(v OCINodeClassSpecArgs) map[string]string { return v.FreeFormTags }).(pulumi.StringMapOutput)
+}
+
+// OCI node image family shorthand used when no imageSelector is specified. Example: 'Oracle-Linux-8'.
+func (o OCINodeClassSpecArgsOutput) ImageFamily() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OCINodeClassSpecArgs) *string { return v.ImageFamily }).(pulumi.StringPtrOutput)
+}
+
+// Selectors for the images used to launch nodes. Example: [{name: "Oracle-Linux-8.9"}].
+func (o OCINodeClassSpecArgsOutput) ImageSelector() OCIImageSelectorTermArgsArrayOutput {
+	return o.ApplyT(func(v OCINodeClassSpecArgs) []OCIImageSelectorTermArgs { return v.ImageSelector }).(OCIImageSelectorTermArgsArrayOutput)
+}
+
+// Instance launch options controlling firmware and network/volume emulation type.
+func (o OCINodeClassSpecArgsOutput) LaunchOptions() OCILaunchOptionsArgsPtrOutput {
+	return o.ApplyT(func(v OCINodeClassSpecArgs) *OCILaunchOptionsArgs { return v.LaunchOptions }).(OCILaunchOptionsArgsPtrOutput)
+}
+
+// OCI instance metadata applied to provisioned nodes. Example: {"ssh_authorized_keys": "ssh-rsa ..."}.
+func (o OCINodeClassSpecArgsOutput) MetaData() pulumi.StringMapOutput {
+	return o.ApplyT(func(v OCINodeClassSpecArgs) map[string]string { return v.MetaData }).(pulumi.StringMapOutput)
+}
+
+// Script executed before node bootstrap. Example: '#!/bin/bash\necho pre-install'.
+func (o OCINodeClassSpecArgsOutput) PreInstallScript() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OCINodeClassSpecArgs) *string { return v.PreInstallScript }).(pulumi.StringPtrOutput)
+}
+
+// Selectors for network security groups attached to provisioned nodes.
+func (o OCINodeClassSpecArgsOutput) SecurityGroupSelector() OCISecurityGroupSelectorTermArgsArrayOutput {
+	return o.ApplyT(func(v OCINodeClassSpecArgs) []OCISecurityGroupSelectorTermArgs { return v.SecurityGroupSelector }).(OCISecurityGroupSelectorTermArgsArrayOutput)
+}
+
+// Selectors for the subnets nodes will be launched into.
+func (o OCINodeClassSpecArgsOutput) SubnetSelector() OCISubnetSelectorTermArgsArrayOutput {
+	return o.ApplyT(func(v OCINodeClassSpecArgs) []OCISubnetSelectorTermArgs { return v.SubnetSelector }).(OCISubnetSelectorTermArgsArrayOutput)
+}
+
+// OCI defined tags applied to all resources created by this node class.
+func (o OCINodeClassSpecArgsOutput) Tags() pulumi.StringMapOutput {
+	return o.ApplyT(func(v OCINodeClassSpecArgs) map[string]string { return v.Tags }).(pulumi.StringMapOutput)
+}
+
+// Custom cloud-init user data merged into the node launch config (base64 or plain text). Example: '#!/bin/bash\necho hello'.
+func (o OCINodeClassSpecArgsOutput) UserData() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OCINodeClassSpecArgs) *string { return v.UserData }).(pulumi.StringPtrOutput)
+}
+
+// OCID of the VCN nodes will be launched into. Example: 'ocid1.vcn.oc1..aaaaaaaa'.
+func (o OCINodeClassSpecArgsOutput) VcnId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OCINodeClassSpecArgs) *string { return v.VcnId }).(pulumi.StringPtrOutput)
+}
+
+type OCINodeClassSpecArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (OCINodeClassSpecArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**OCINodeClassSpecArgs)(nil)).Elem()
+}
+
+func (o OCINodeClassSpecArgsPtrOutput) ToOCINodeClassSpecArgsPtrOutput() OCINodeClassSpecArgsPtrOutput {
+	return o
+}
+
+func (o OCINodeClassSpecArgsPtrOutput) ToOCINodeClassSpecArgsPtrOutputWithContext(ctx context.Context) OCINodeClassSpecArgsPtrOutput {
+	return o
+}
+
+func (o OCINodeClassSpecArgsPtrOutput) Elem() OCINodeClassSpecArgsOutput {
+	return o.ApplyT(func(v *OCINodeClassSpecArgs) OCINodeClassSpecArgs {
+		if v != nil {
+			return *v
+		}
+		var ret OCINodeClassSpecArgs
+		return ret
+	}).(OCINodeClassSpecArgsOutput)
+}
+
+// OCI compute instance agent plugins to enable. Example: ["Compute Instance Monitoring"].
+func (o OCINodeClassSpecArgsPtrOutput) AgentList() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *OCINodeClassSpecArgs) []string {
+		if v == nil {
+			return nil
+		}
+		return v.AgentList
+	}).(pulumi.StringArrayOutput)
+}
+
+// Additional block volumes attached to provisioned nodes.
+func (o OCINodeClassSpecArgsPtrOutput) BlockDevices() OCIVolumeAttributesArgsArrayOutput {
+	return o.ApplyT(func(v *OCINodeClassSpecArgs) []OCIVolumeAttributesArgs {
+		if v == nil {
+			return nil
+		}
+		return v.BlockDevices
+	}).(OCIVolumeAttributesArgsArrayOutput)
+}
+
+// Boot volume configuration for provisioned nodes.
+func (o OCINodeClassSpecArgsPtrOutput) BootConfig() OCIBootConfigArgsPtrOutput {
+	return o.ApplyT(func(v *OCINodeClassSpecArgs) *OCIBootConfigArgs {
+		if v == nil {
+			return nil
+		}
+		return v.BootConfig
+	}).(OCIBootConfigArgsPtrOutput)
+}
+
+// OCI free-form tags applied to all resources created by this node class. Example: {"environment": "production"}.
+func (o OCINodeClassSpecArgsPtrOutput) FreeFormTags() pulumi.StringMapOutput {
+	return o.ApplyT(func(v *OCINodeClassSpecArgs) map[string]string {
+		if v == nil {
+			return nil
+		}
+		return v.FreeFormTags
+	}).(pulumi.StringMapOutput)
+}
+
+// OCI node image family shorthand used when no imageSelector is specified. Example: 'Oracle-Linux-8'.
+func (o OCINodeClassSpecArgsPtrOutput) ImageFamily() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *OCINodeClassSpecArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.ImageFamily
+	}).(pulumi.StringPtrOutput)
+}
+
+// Selectors for the images used to launch nodes. Example: [{name: "Oracle-Linux-8.9"}].
+func (o OCINodeClassSpecArgsPtrOutput) ImageSelector() OCIImageSelectorTermArgsArrayOutput {
+	return o.ApplyT(func(v *OCINodeClassSpecArgs) []OCIImageSelectorTermArgs {
+		if v == nil {
+			return nil
+		}
+		return v.ImageSelector
+	}).(OCIImageSelectorTermArgsArrayOutput)
+}
+
+// Instance launch options controlling firmware and network/volume emulation type.
+func (o OCINodeClassSpecArgsPtrOutput) LaunchOptions() OCILaunchOptionsArgsPtrOutput {
+	return o.ApplyT(func(v *OCINodeClassSpecArgs) *OCILaunchOptionsArgs {
+		if v == nil {
+			return nil
+		}
+		return v.LaunchOptions
+	}).(OCILaunchOptionsArgsPtrOutput)
+}
+
+// OCI instance metadata applied to provisioned nodes. Example: {"ssh_authorized_keys": "ssh-rsa ..."}.
+func (o OCINodeClassSpecArgsPtrOutput) MetaData() pulumi.StringMapOutput {
+	return o.ApplyT(func(v *OCINodeClassSpecArgs) map[string]string {
+		if v == nil {
+			return nil
+		}
+		return v.MetaData
+	}).(pulumi.StringMapOutput)
+}
+
+// Script executed before node bootstrap. Example: '#!/bin/bash\necho pre-install'.
+func (o OCINodeClassSpecArgsPtrOutput) PreInstallScript() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *OCINodeClassSpecArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.PreInstallScript
+	}).(pulumi.StringPtrOutput)
+}
+
+// Selectors for network security groups attached to provisioned nodes.
+func (o OCINodeClassSpecArgsPtrOutput) SecurityGroupSelector() OCISecurityGroupSelectorTermArgsArrayOutput {
+	return o.ApplyT(func(v *OCINodeClassSpecArgs) []OCISecurityGroupSelectorTermArgs {
+		if v == nil {
+			return nil
+		}
+		return v.SecurityGroupSelector
+	}).(OCISecurityGroupSelectorTermArgsArrayOutput)
+}
+
+// Selectors for the subnets nodes will be launched into.
+func (o OCINodeClassSpecArgsPtrOutput) SubnetSelector() OCISubnetSelectorTermArgsArrayOutput {
+	return o.ApplyT(func(v *OCINodeClassSpecArgs) []OCISubnetSelectorTermArgs {
+		if v == nil {
+			return nil
+		}
+		return v.SubnetSelector
+	}).(OCISubnetSelectorTermArgsArrayOutput)
+}
+
+// OCI defined tags applied to all resources created by this node class.
+func (o OCINodeClassSpecArgsPtrOutput) Tags() pulumi.StringMapOutput {
+	return o.ApplyT(func(v *OCINodeClassSpecArgs) map[string]string {
+		if v == nil {
+			return nil
+		}
+		return v.Tags
+	}).(pulumi.StringMapOutput)
+}
+
+// Custom cloud-init user data merged into the node launch config (base64 or plain text). Example: '#!/bin/bash\necho hello'.
+func (o OCINodeClassSpecArgsPtrOutput) UserData() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *OCINodeClassSpecArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.UserData
+	}).(pulumi.StringPtrOutput)
+}
+
+// OCID of the VCN nodes will be launched into. Example: 'ocid1.vcn.oc1..aaaaaaaa'.
+func (o OCINodeClassSpecArgsPtrOutput) VcnId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *OCINodeClassSpecArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.VcnId
+	}).(pulumi.StringPtrOutput)
+}
+
+type OCISecurityGroupSelectorTermArgs struct {
+	// Explicit OCI network security group OCID. Example: 'ocid1.networksecuritygroup.oc1..aaaaaaaa'.
+	Id *string `pulumi:"id"`
+	// OCI network security group display name filter. Example: 'node-nsg'.
+	Name *string `pulumi:"name"`
+}
+
+// OCISecurityGroupSelectorTermArgsInput is an input type that accepts OCISecurityGroupSelectorTermArgsArgs and OCISecurityGroupSelectorTermArgsOutput values.
+// You can construct a concrete instance of `OCISecurityGroupSelectorTermArgsInput` via:
+//
+//	OCISecurityGroupSelectorTermArgsArgs{...}
+type OCISecurityGroupSelectorTermArgsInput interface {
+	pulumi.Input
+
+	ToOCISecurityGroupSelectorTermArgsOutput() OCISecurityGroupSelectorTermArgsOutput
+	ToOCISecurityGroupSelectorTermArgsOutputWithContext(context.Context) OCISecurityGroupSelectorTermArgsOutput
+}
+
+type OCISecurityGroupSelectorTermArgsArgs struct {
+	// Explicit OCI network security group OCID. Example: 'ocid1.networksecuritygroup.oc1..aaaaaaaa'.
+	Id pulumi.StringPtrInput `pulumi:"id"`
+	// OCI network security group display name filter. Example: 'node-nsg'.
+	Name pulumi.StringPtrInput `pulumi:"name"`
+}
+
+func (OCISecurityGroupSelectorTermArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*OCISecurityGroupSelectorTermArgs)(nil)).Elem()
+}
+
+func (i OCISecurityGroupSelectorTermArgsArgs) ToOCISecurityGroupSelectorTermArgsOutput() OCISecurityGroupSelectorTermArgsOutput {
+	return i.ToOCISecurityGroupSelectorTermArgsOutputWithContext(context.Background())
+}
+
+func (i OCISecurityGroupSelectorTermArgsArgs) ToOCISecurityGroupSelectorTermArgsOutputWithContext(ctx context.Context) OCISecurityGroupSelectorTermArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OCISecurityGroupSelectorTermArgsOutput)
+}
+
+// OCISecurityGroupSelectorTermArgsArrayInput is an input type that accepts OCISecurityGroupSelectorTermArgsArray and OCISecurityGroupSelectorTermArgsArrayOutput values.
+// You can construct a concrete instance of `OCISecurityGroupSelectorTermArgsArrayInput` via:
+//
+//	OCISecurityGroupSelectorTermArgsArray{ OCISecurityGroupSelectorTermArgsArgs{...} }
+type OCISecurityGroupSelectorTermArgsArrayInput interface {
+	pulumi.Input
+
+	ToOCISecurityGroupSelectorTermArgsArrayOutput() OCISecurityGroupSelectorTermArgsArrayOutput
+	ToOCISecurityGroupSelectorTermArgsArrayOutputWithContext(context.Context) OCISecurityGroupSelectorTermArgsArrayOutput
+}
+
+type OCISecurityGroupSelectorTermArgsArray []OCISecurityGroupSelectorTermArgsInput
+
+func (OCISecurityGroupSelectorTermArgsArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]OCISecurityGroupSelectorTermArgs)(nil)).Elem()
+}
+
+func (i OCISecurityGroupSelectorTermArgsArray) ToOCISecurityGroupSelectorTermArgsArrayOutput() OCISecurityGroupSelectorTermArgsArrayOutput {
+	return i.ToOCISecurityGroupSelectorTermArgsArrayOutputWithContext(context.Background())
+}
+
+func (i OCISecurityGroupSelectorTermArgsArray) ToOCISecurityGroupSelectorTermArgsArrayOutputWithContext(ctx context.Context) OCISecurityGroupSelectorTermArgsArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OCISecurityGroupSelectorTermArgsArrayOutput)
+}
+
+type OCISecurityGroupSelectorTermArgsOutput struct{ *pulumi.OutputState }
+
+func (OCISecurityGroupSelectorTermArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*OCISecurityGroupSelectorTermArgs)(nil)).Elem()
+}
+
+func (o OCISecurityGroupSelectorTermArgsOutput) ToOCISecurityGroupSelectorTermArgsOutput() OCISecurityGroupSelectorTermArgsOutput {
+	return o
+}
+
+func (o OCISecurityGroupSelectorTermArgsOutput) ToOCISecurityGroupSelectorTermArgsOutputWithContext(ctx context.Context) OCISecurityGroupSelectorTermArgsOutput {
+	return o
+}
+
+// Explicit OCI network security group OCID. Example: 'ocid1.networksecuritygroup.oc1..aaaaaaaa'.
+func (o OCISecurityGroupSelectorTermArgsOutput) Id() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OCISecurityGroupSelectorTermArgs) *string { return v.Id }).(pulumi.StringPtrOutput)
+}
+
+// OCI network security group display name filter. Example: 'node-nsg'.
+func (o OCISecurityGroupSelectorTermArgsOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OCISecurityGroupSelectorTermArgs) *string { return v.Name }).(pulumi.StringPtrOutput)
+}
+
+type OCISecurityGroupSelectorTermArgsArrayOutput struct{ *pulumi.OutputState }
+
+func (OCISecurityGroupSelectorTermArgsArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]OCISecurityGroupSelectorTermArgs)(nil)).Elem()
+}
+
+func (o OCISecurityGroupSelectorTermArgsArrayOutput) ToOCISecurityGroupSelectorTermArgsArrayOutput() OCISecurityGroupSelectorTermArgsArrayOutput {
+	return o
+}
+
+func (o OCISecurityGroupSelectorTermArgsArrayOutput) ToOCISecurityGroupSelectorTermArgsArrayOutputWithContext(ctx context.Context) OCISecurityGroupSelectorTermArgsArrayOutput {
+	return o
+}
+
+func (o OCISecurityGroupSelectorTermArgsArrayOutput) Index(i pulumi.IntInput) OCISecurityGroupSelectorTermArgsOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) OCISecurityGroupSelectorTermArgs {
+		return vs[0].([]OCISecurityGroupSelectorTermArgs)[vs[1].(int)]
+	}).(OCISecurityGroupSelectorTermArgsOutput)
+}
+
+type OCISubnetSelectorTermArgs struct {
+	// Explicit OCI subnet OCID. Example: 'ocid1.subnet.oc1..aaaaaaaa'.
+	Id *string `pulumi:"id"`
+	// OCI subnet display name filter. Example: 'node-subnet'.
+	Name *string `pulumi:"name"`
+}
+
+// OCISubnetSelectorTermArgsInput is an input type that accepts OCISubnetSelectorTermArgsArgs and OCISubnetSelectorTermArgsOutput values.
+// You can construct a concrete instance of `OCISubnetSelectorTermArgsInput` via:
+//
+//	OCISubnetSelectorTermArgsArgs{...}
+type OCISubnetSelectorTermArgsInput interface {
+	pulumi.Input
+
+	ToOCISubnetSelectorTermArgsOutput() OCISubnetSelectorTermArgsOutput
+	ToOCISubnetSelectorTermArgsOutputWithContext(context.Context) OCISubnetSelectorTermArgsOutput
+}
+
+type OCISubnetSelectorTermArgsArgs struct {
+	// Explicit OCI subnet OCID. Example: 'ocid1.subnet.oc1..aaaaaaaa'.
+	Id pulumi.StringPtrInput `pulumi:"id"`
+	// OCI subnet display name filter. Example: 'node-subnet'.
+	Name pulumi.StringPtrInput `pulumi:"name"`
+}
+
+func (OCISubnetSelectorTermArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*OCISubnetSelectorTermArgs)(nil)).Elem()
+}
+
+func (i OCISubnetSelectorTermArgsArgs) ToOCISubnetSelectorTermArgsOutput() OCISubnetSelectorTermArgsOutput {
+	return i.ToOCISubnetSelectorTermArgsOutputWithContext(context.Background())
+}
+
+func (i OCISubnetSelectorTermArgsArgs) ToOCISubnetSelectorTermArgsOutputWithContext(ctx context.Context) OCISubnetSelectorTermArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OCISubnetSelectorTermArgsOutput)
+}
+
+// OCISubnetSelectorTermArgsArrayInput is an input type that accepts OCISubnetSelectorTermArgsArray and OCISubnetSelectorTermArgsArrayOutput values.
+// You can construct a concrete instance of `OCISubnetSelectorTermArgsArrayInput` via:
+//
+//	OCISubnetSelectorTermArgsArray{ OCISubnetSelectorTermArgsArgs{...} }
+type OCISubnetSelectorTermArgsArrayInput interface {
+	pulumi.Input
+
+	ToOCISubnetSelectorTermArgsArrayOutput() OCISubnetSelectorTermArgsArrayOutput
+	ToOCISubnetSelectorTermArgsArrayOutputWithContext(context.Context) OCISubnetSelectorTermArgsArrayOutput
+}
+
+type OCISubnetSelectorTermArgsArray []OCISubnetSelectorTermArgsInput
+
+func (OCISubnetSelectorTermArgsArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]OCISubnetSelectorTermArgs)(nil)).Elem()
+}
+
+func (i OCISubnetSelectorTermArgsArray) ToOCISubnetSelectorTermArgsArrayOutput() OCISubnetSelectorTermArgsArrayOutput {
+	return i.ToOCISubnetSelectorTermArgsArrayOutputWithContext(context.Background())
+}
+
+func (i OCISubnetSelectorTermArgsArray) ToOCISubnetSelectorTermArgsArrayOutputWithContext(ctx context.Context) OCISubnetSelectorTermArgsArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OCISubnetSelectorTermArgsArrayOutput)
+}
+
+type OCISubnetSelectorTermArgsOutput struct{ *pulumi.OutputState }
+
+func (OCISubnetSelectorTermArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*OCISubnetSelectorTermArgs)(nil)).Elem()
+}
+
+func (o OCISubnetSelectorTermArgsOutput) ToOCISubnetSelectorTermArgsOutput() OCISubnetSelectorTermArgsOutput {
+	return o
+}
+
+func (o OCISubnetSelectorTermArgsOutput) ToOCISubnetSelectorTermArgsOutputWithContext(ctx context.Context) OCISubnetSelectorTermArgsOutput {
+	return o
+}
+
+// Explicit OCI subnet OCID. Example: 'ocid1.subnet.oc1..aaaaaaaa'.
+func (o OCISubnetSelectorTermArgsOutput) Id() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OCISubnetSelectorTermArgs) *string { return v.Id }).(pulumi.StringPtrOutput)
+}
+
+// OCI subnet display name filter. Example: 'node-subnet'.
+func (o OCISubnetSelectorTermArgsOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OCISubnetSelectorTermArgs) *string { return v.Name }).(pulumi.StringPtrOutput)
+}
+
+type OCISubnetSelectorTermArgsArrayOutput struct{ *pulumi.OutputState }
+
+func (OCISubnetSelectorTermArgsArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]OCISubnetSelectorTermArgs)(nil)).Elem()
+}
+
+func (o OCISubnetSelectorTermArgsArrayOutput) ToOCISubnetSelectorTermArgsArrayOutput() OCISubnetSelectorTermArgsArrayOutput {
+	return o
+}
+
+func (o OCISubnetSelectorTermArgsArrayOutput) ToOCISubnetSelectorTermArgsArrayOutputWithContext(ctx context.Context) OCISubnetSelectorTermArgsArrayOutput {
+	return o
+}
+
+func (o OCISubnetSelectorTermArgsArrayOutput) Index(i pulumi.IntInput) OCISubnetSelectorTermArgsOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) OCISubnetSelectorTermArgs {
+		return vs[0].([]OCISubnetSelectorTermArgs)[vs[1].(int)]
+	}).(OCISubnetSelectorTermArgsOutput)
+}
+
+type OCIVolumeAttributesArgs struct {
+	// Block volume size in GB. Example: 50.
+	SizeInGbs *int `pulumi:"sizeInGbs"`
+	// Block volume performance units per GB. Example: 10.
+	VpusPerGb *int `pulumi:"vpusPerGb"`
+}
+
+// OCIVolumeAttributesArgsInput is an input type that accepts OCIVolumeAttributesArgsArgs and OCIVolumeAttributesArgsOutput values.
+// You can construct a concrete instance of `OCIVolumeAttributesArgsInput` via:
+//
+//	OCIVolumeAttributesArgsArgs{...}
+type OCIVolumeAttributesArgsInput interface {
+	pulumi.Input
+
+	ToOCIVolumeAttributesArgsOutput() OCIVolumeAttributesArgsOutput
+	ToOCIVolumeAttributesArgsOutputWithContext(context.Context) OCIVolumeAttributesArgsOutput
+}
+
+type OCIVolumeAttributesArgsArgs struct {
+	// Block volume size in GB. Example: 50.
+	SizeInGbs pulumi.IntPtrInput `pulumi:"sizeInGbs"`
+	// Block volume performance units per GB. Example: 10.
+	VpusPerGb pulumi.IntPtrInput `pulumi:"vpusPerGb"`
+}
+
+func (OCIVolumeAttributesArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*OCIVolumeAttributesArgs)(nil)).Elem()
+}
+
+func (i OCIVolumeAttributesArgsArgs) ToOCIVolumeAttributesArgsOutput() OCIVolumeAttributesArgsOutput {
+	return i.ToOCIVolumeAttributesArgsOutputWithContext(context.Background())
+}
+
+func (i OCIVolumeAttributesArgsArgs) ToOCIVolumeAttributesArgsOutputWithContext(ctx context.Context) OCIVolumeAttributesArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OCIVolumeAttributesArgsOutput)
+}
+
+// OCIVolumeAttributesArgsArrayInput is an input type that accepts OCIVolumeAttributesArgsArray and OCIVolumeAttributesArgsArrayOutput values.
+// You can construct a concrete instance of `OCIVolumeAttributesArgsArrayInput` via:
+//
+//	OCIVolumeAttributesArgsArray{ OCIVolumeAttributesArgsArgs{...} }
+type OCIVolumeAttributesArgsArrayInput interface {
+	pulumi.Input
+
+	ToOCIVolumeAttributesArgsArrayOutput() OCIVolumeAttributesArgsArrayOutput
+	ToOCIVolumeAttributesArgsArrayOutputWithContext(context.Context) OCIVolumeAttributesArgsArrayOutput
+}
+
+type OCIVolumeAttributesArgsArray []OCIVolumeAttributesArgsInput
+
+func (OCIVolumeAttributesArgsArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]OCIVolumeAttributesArgs)(nil)).Elem()
+}
+
+func (i OCIVolumeAttributesArgsArray) ToOCIVolumeAttributesArgsArrayOutput() OCIVolumeAttributesArgsArrayOutput {
+	return i.ToOCIVolumeAttributesArgsArrayOutputWithContext(context.Background())
+}
+
+func (i OCIVolumeAttributesArgsArray) ToOCIVolumeAttributesArgsArrayOutputWithContext(ctx context.Context) OCIVolumeAttributesArgsArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OCIVolumeAttributesArgsArrayOutput)
+}
+
+type OCIVolumeAttributesArgsOutput struct{ *pulumi.OutputState }
+
+func (OCIVolumeAttributesArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*OCIVolumeAttributesArgs)(nil)).Elem()
+}
+
+func (o OCIVolumeAttributesArgsOutput) ToOCIVolumeAttributesArgsOutput() OCIVolumeAttributesArgsOutput {
+	return o
+}
+
+func (o OCIVolumeAttributesArgsOutput) ToOCIVolumeAttributesArgsOutputWithContext(ctx context.Context) OCIVolumeAttributesArgsOutput {
+	return o
+}
+
+// Block volume size in GB. Example: 50.
+func (o OCIVolumeAttributesArgsOutput) SizeInGbs() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v OCIVolumeAttributesArgs) *int { return v.SizeInGbs }).(pulumi.IntPtrOutput)
+}
+
+// Block volume performance units per GB. Example: 10.
+func (o OCIVolumeAttributesArgsOutput) VpusPerGb() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v OCIVolumeAttributesArgs) *int { return v.VpusPerGb }).(pulumi.IntPtrOutput)
+}
+
+type OCIVolumeAttributesArgsArrayOutput struct{ *pulumi.OutputState }
+
+func (OCIVolumeAttributesArgsArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]OCIVolumeAttributesArgs)(nil)).Elem()
+}
+
+func (o OCIVolumeAttributesArgsArrayOutput) ToOCIVolumeAttributesArgsArrayOutput() OCIVolumeAttributesArgsArrayOutput {
+	return o
+}
+
+func (o OCIVolumeAttributesArgsArrayOutput) ToOCIVolumeAttributesArgsArrayOutputWithContext(ctx context.Context) OCIVolumeAttributesArgsArrayOutput {
+	return o
+}
+
+func (o OCIVolumeAttributesArgsArrayOutput) Index(i pulumi.IntInput) OCIVolumeAttributesArgsOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) OCIVolumeAttributesArgs {
+		return vs[0].([]OCIVolumeAttributesArgs)[vs[1].(int)]
+	}).(OCIVolumeAttributesArgsOutput)
 }
 
 type RawKarpenterSpecArgs struct {
@@ -6355,6 +9238,12 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*DisruptionPolicyArgsPtrInput)(nil)).Elem(), DisruptionPolicyArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*EmergencyResponseConfigArgsInput)(nil)).Elem(), EmergencyResponseConfigArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*EmergencyResponseConfigArgsPtrInput)(nil)).Elem(), EmergencyResponseConfigArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GCPDiskArgsInput)(nil)).Elem(), GCPDiskArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GCPDiskArgsArrayInput)(nil)).Elem(), GCPDiskArgsArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GCPImageSelectorTermArgsInput)(nil)).Elem(), GCPImageSelectorTermArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GCPImageSelectorTermArgsArrayInput)(nil)).Elem(), GCPImageSelectorTermArgsArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GCPNodeClassSpecArgsInput)(nil)).Elem(), GCPNodeClassSpecArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GCPNodeClassSpecArgsPtrInput)(nil)).Elem(), GCPNodeClassSpecArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HPABehaviorArgsInput)(nil)).Elem(), HPABehaviorArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HPABehaviorArgsPtrInput)(nil)).Elem(), HPABehaviorArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HPAFallbackArgsInput)(nil)).Elem(), HPAFallbackArgsArgs{})
@@ -6369,6 +9258,18 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*HPAScalingRulesArgsPtrInput)(nil)).Elem(), HPAScalingRulesArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HorizontalScalingArgsInput)(nil)).Elem(), HorizontalScalingArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HorizontalScalingArgsPtrInput)(nil)).Elem(), HorizontalScalingArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*JvmHeapRuleConfigArgsInput)(nil)).Elem(), JvmHeapRuleConfigArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*JvmHeapRuleConfigArgsPtrInput)(nil)).Elem(), JvmHeapRuleConfigArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*KedaAdvancedArgsInput)(nil)).Elem(), KedaAdvancedArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*KedaAdvancedArgsPtrInput)(nil)).Elem(), KedaAdvancedArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*KedaAuthenticationRefArgsInput)(nil)).Elem(), KedaAuthenticationRefArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*KedaAuthenticationRefArgsPtrInput)(nil)).Elem(), KedaAuthenticationRefArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*KedaFallbackArgsInput)(nil)).Elem(), KedaFallbackArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*KedaFallbackArgsPtrInput)(nil)).Elem(), KedaFallbackArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*KedaScaledObjectArgsInput)(nil)).Elem(), KedaScaledObjectArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*KedaScaledObjectArgsPtrInput)(nil)).Elem(), KedaScaledObjectArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*KedaTriggerArgsInput)(nil)).Elem(), KedaTriggerArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*KedaTriggerArgsArrayInput)(nil)).Elem(), KedaTriggerArgsArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*KubeletConfigurationArgsInput)(nil)).Elem(), KubeletConfigurationArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*KubeletConfigurationArgsPtrInput)(nil)).Elem(), KubeletConfigurationArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LabelSelectorArgsInput)(nil)).Elem(), LabelSelectorArgsArgs{})
@@ -6379,6 +9280,20 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*MetadataOptionsArgsPtrInput)(nil)).Elem(), MetadataOptionsArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*NamePatternArgsInput)(nil)).Elem(), NamePatternArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*NamePatternArgsPtrInput)(nil)).Elem(), NamePatternArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OCIBootConfigArgsInput)(nil)).Elem(), OCIBootConfigArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OCIBootConfigArgsPtrInput)(nil)).Elem(), OCIBootConfigArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OCIImageSelectorTermArgsInput)(nil)).Elem(), OCIImageSelectorTermArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OCIImageSelectorTermArgsArrayInput)(nil)).Elem(), OCIImageSelectorTermArgsArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OCILaunchOptionsArgsInput)(nil)).Elem(), OCILaunchOptionsArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OCILaunchOptionsArgsPtrInput)(nil)).Elem(), OCILaunchOptionsArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OCINodeClassSpecArgsInput)(nil)).Elem(), OCINodeClassSpecArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OCINodeClassSpecArgsPtrInput)(nil)).Elem(), OCINodeClassSpecArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OCISecurityGroupSelectorTermArgsInput)(nil)).Elem(), OCISecurityGroupSelectorTermArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OCISecurityGroupSelectorTermArgsArrayInput)(nil)).Elem(), OCISecurityGroupSelectorTermArgsArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OCISubnetSelectorTermArgsInput)(nil)).Elem(), OCISubnetSelectorTermArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OCISubnetSelectorTermArgsArrayInput)(nil)).Elem(), OCISubnetSelectorTermArgsArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OCIVolumeAttributesArgsInput)(nil)).Elem(), OCIVolumeAttributesArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OCIVolumeAttributesArgsArrayInput)(nil)).Elem(), OCIVolumeAttributesArgsArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*RawKarpenterSpecArgsInput)(nil)).Elem(), RawKarpenterSpecArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*RawKarpenterSpecArgsArrayInput)(nil)).Elem(), RawKarpenterSpecArgsArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*ResourceLimitsArgsInput)(nil)).Elem(), ResourceLimitsArgsArgs{})
@@ -6417,6 +9332,12 @@ func init() {
 	pulumi.RegisterOutputType(DisruptionPolicyArgsPtrOutput{})
 	pulumi.RegisterOutputType(EmergencyResponseConfigArgsOutput{})
 	pulumi.RegisterOutputType(EmergencyResponseConfigArgsPtrOutput{})
+	pulumi.RegisterOutputType(GCPDiskArgsOutput{})
+	pulumi.RegisterOutputType(GCPDiskArgsArrayOutput{})
+	pulumi.RegisterOutputType(GCPImageSelectorTermArgsOutput{})
+	pulumi.RegisterOutputType(GCPImageSelectorTermArgsArrayOutput{})
+	pulumi.RegisterOutputType(GCPNodeClassSpecArgsOutput{})
+	pulumi.RegisterOutputType(GCPNodeClassSpecArgsPtrOutput{})
 	pulumi.RegisterOutputType(HPABehaviorArgsOutput{})
 	pulumi.RegisterOutputType(HPABehaviorArgsPtrOutput{})
 	pulumi.RegisterOutputType(HPAFallbackArgsOutput{})
@@ -6431,6 +9352,18 @@ func init() {
 	pulumi.RegisterOutputType(HPAScalingRulesArgsPtrOutput{})
 	pulumi.RegisterOutputType(HorizontalScalingArgsOutput{})
 	pulumi.RegisterOutputType(HorizontalScalingArgsPtrOutput{})
+	pulumi.RegisterOutputType(JvmHeapRuleConfigArgsOutput{})
+	pulumi.RegisterOutputType(JvmHeapRuleConfigArgsPtrOutput{})
+	pulumi.RegisterOutputType(KedaAdvancedArgsOutput{})
+	pulumi.RegisterOutputType(KedaAdvancedArgsPtrOutput{})
+	pulumi.RegisterOutputType(KedaAuthenticationRefArgsOutput{})
+	pulumi.RegisterOutputType(KedaAuthenticationRefArgsPtrOutput{})
+	pulumi.RegisterOutputType(KedaFallbackArgsOutput{})
+	pulumi.RegisterOutputType(KedaFallbackArgsPtrOutput{})
+	pulumi.RegisterOutputType(KedaScaledObjectArgsOutput{})
+	pulumi.RegisterOutputType(KedaScaledObjectArgsPtrOutput{})
+	pulumi.RegisterOutputType(KedaTriggerArgsOutput{})
+	pulumi.RegisterOutputType(KedaTriggerArgsArrayOutput{})
 	pulumi.RegisterOutputType(KubeletConfigurationArgsOutput{})
 	pulumi.RegisterOutputType(KubeletConfigurationArgsPtrOutput{})
 	pulumi.RegisterOutputType(LabelSelectorArgsOutput{})
@@ -6441,6 +9374,20 @@ func init() {
 	pulumi.RegisterOutputType(MetadataOptionsArgsPtrOutput{})
 	pulumi.RegisterOutputType(NamePatternArgsOutput{})
 	pulumi.RegisterOutputType(NamePatternArgsPtrOutput{})
+	pulumi.RegisterOutputType(OCIBootConfigArgsOutput{})
+	pulumi.RegisterOutputType(OCIBootConfigArgsPtrOutput{})
+	pulumi.RegisterOutputType(OCIImageSelectorTermArgsOutput{})
+	pulumi.RegisterOutputType(OCIImageSelectorTermArgsArrayOutput{})
+	pulumi.RegisterOutputType(OCILaunchOptionsArgsOutput{})
+	pulumi.RegisterOutputType(OCILaunchOptionsArgsPtrOutput{})
+	pulumi.RegisterOutputType(OCINodeClassSpecArgsOutput{})
+	pulumi.RegisterOutputType(OCINodeClassSpecArgsPtrOutput{})
+	pulumi.RegisterOutputType(OCISecurityGroupSelectorTermArgsOutput{})
+	pulumi.RegisterOutputType(OCISecurityGroupSelectorTermArgsArrayOutput{})
+	pulumi.RegisterOutputType(OCISubnetSelectorTermArgsOutput{})
+	pulumi.RegisterOutputType(OCISubnetSelectorTermArgsArrayOutput{})
+	pulumi.RegisterOutputType(OCIVolumeAttributesArgsOutput{})
+	pulumi.RegisterOutputType(OCIVolumeAttributesArgsArrayOutput{})
 	pulumi.RegisterOutputType(RawKarpenterSpecArgsOutput{})
 	pulumi.RegisterOutputType(RawKarpenterSpecArgsArrayOutput{})
 	pulumi.RegisterOutputType(ResourceLimitsArgsOutput{})

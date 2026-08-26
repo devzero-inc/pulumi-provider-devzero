@@ -67,6 +67,10 @@ export class WorkloadPolicy extends pulumi.CustomResource {
      * Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
      */
     declare public readonly driftDeltaPercent: pulumi.Output<number | undefined>;
+    /**
+     * Emergency response configuration for OOM and CPU throttle events.
+     */
+    declare public readonly emergencyResponse: pulumi.Output<outputs.resources.EmergencyResponseConfigArgs | undefined>;
     declare public readonly enableInPlaceVerticalScaling: pulumi.Output<boolean | undefined>;
     /**
      * Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.
@@ -168,6 +172,7 @@ export class WorkloadPolicy extends pulumi.CustomResource {
             resourceInputs["description"] = args?.description;
             resourceInputs["detectionTriggers"] = args?.detectionTriggers;
             resourceInputs["driftDeltaPercent"] = args?.driftDeltaPercent;
+            resourceInputs["emergencyResponse"] = args?.emergencyResponse;
             resourceInputs["enableInPlaceVerticalScaling"] = args?.enableInPlaceVerticalScaling;
             resourceInputs["enablePmaxProtection"] = args?.enablePmaxProtection;
             resourceInputs["gpuVerticalScaling"] = args ? (args.gpuVerticalScaling ? pulumi.output(args.gpuVerticalScaling).apply(inputs.resources.verticalScalingArgsArgsProvideDefaults) : undefined) : undefined;
@@ -213,6 +218,7 @@ export class WorkloadPolicy extends pulumi.CustomResource {
             resourceInputs["description"] = undefined /*out*/;
             resourceInputs["detectionTriggers"] = undefined /*out*/;
             resourceInputs["driftDeltaPercent"] = undefined /*out*/;
+            resourceInputs["emergencyResponse"] = undefined /*out*/;
             resourceInputs["enableInPlaceVerticalScaling"] = undefined /*out*/;
             resourceInputs["enablePmaxProtection"] = undefined /*out*/;
             resourceInputs["gpuVerticalScaling"] = undefined /*out*/;
@@ -288,6 +294,10 @@ export interface WorkloadPolicyArgs {
      * Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
      */
     driftDeltaPercent?: pulumi.Input<number>;
+    /**
+     * Emergency response configuration for OOM and CPU throttle events.
+     */
+    emergencyResponse?: pulumi.Input<inputs.resources.EmergencyResponseConfigArgsArgs>;
     enableInPlaceVerticalScaling?: pulumi.Input<boolean>;
     /**
      * Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.

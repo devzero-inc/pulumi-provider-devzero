@@ -38,6 +38,10 @@ export class WorkloadRule extends pulumi.CustomResource {
      */
     declare public readonly actionTriggers: pulumi.Output<string[] | undefined>;
     /**
+     * Allow in-place vertical scaling to decrease the memory limit (normally only requests shrink; limits only grow). Example: false.
+     */
+    declare public readonly allowInPlaceMemoryLimitDecrease: pulumi.Output<boolean | undefined>;
+    /**
      * When true the engine generates all rule fields automatically; manual field overrides are ignored. Example: false.
      */
     declare public readonly autoGenerate: pulumi.Output<boolean | undefined>;
@@ -82,6 +86,18 @@ export class WorkloadRule extends pulumi.CustomResource {
      * Horizontal (replica) scaling rule configuration.
      */
     declare public readonly hpaRule: pulumi.Output<outputs.resources.HPARuleConfigArgs | undefined>;
+    /**
+     * Minimum CPU request in millicores during JVM startup, to avoid slow JIT warmup on undersized CPU. Example: 500.
+     */
+    declare public readonly jvmCpuStartupFloorMillicores: pulumi.Output<number | undefined>;
+    /**
+     * JVM heap sizing overrides applied to detected Java containers.
+     */
+    declare public readonly jvmHeapRule: pulumi.Output<outputs.resources.JvmHeapRuleConfigArgs | undefined>;
+    /**
+     * KEDA ScaledObject configuration managed alongside this workload.
+     */
+    declare public readonly kedaScaledObject: pulumi.Output<outputs.resources.KedaScaledObjectArgs | undefined>;
     /**
      * Kubernetes workload kind. One of: 'Deployment', 'StatefulSet', 'DaemonSet', 'CronJob', 'Job'. Example: 'Deployment'.
      */
@@ -140,6 +156,7 @@ export class WorkloadRule extends pulumi.CustomResource {
                 throw new Error("Missing required property 'namespace'");
             }
             resourceInputs["actionTriggers"] = args?.actionTriggers;
+            resourceInputs["allowInPlaceMemoryLimitDecrease"] = args?.allowInPlaceMemoryLimitDecrease;
             resourceInputs["autoGenerate"] = args?.autoGenerate;
             resourceInputs["clusterId"] = args?.clusterId;
             resourceInputs["containers"] = args?.containers;
@@ -152,6 +169,9 @@ export class WorkloadRule extends pulumi.CustomResource {
             resourceInputs["emergencyResponse"] = args?.emergencyResponse;
             resourceInputs["gpuRule"] = args?.gpuRule;
             resourceInputs["hpaRule"] = args?.hpaRule;
+            resourceInputs["jvmCpuStartupFloorMillicores"] = args?.jvmCpuStartupFloorMillicores;
+            resourceInputs["jvmHeapRule"] = args?.jvmHeapRule;
+            resourceInputs["kedaScaledObject"] = args?.kedaScaledObject;
             resourceInputs["kind"] = args?.kind;
             resourceInputs["liveMigrationEnabled"] = args?.liveMigrationEnabled;
             resourceInputs["lookbackPeriodSeconds"] = args?.lookbackPeriodSeconds;
@@ -163,6 +183,7 @@ export class WorkloadRule extends pulumi.CustomResource {
             resourceInputs["useInPlaceVerticalScaling"] = args?.useInPlaceVerticalScaling;
         } else {
             resourceInputs["actionTriggers"] = undefined /*out*/;
+            resourceInputs["allowInPlaceMemoryLimitDecrease"] = undefined /*out*/;
             resourceInputs["autoGenerate"] = undefined /*out*/;
             resourceInputs["clusterId"] = undefined /*out*/;
             resourceInputs["containers"] = undefined /*out*/;
@@ -175,6 +196,9 @@ export class WorkloadRule extends pulumi.CustomResource {
             resourceInputs["emergencyResponse"] = undefined /*out*/;
             resourceInputs["gpuRule"] = undefined /*out*/;
             resourceInputs["hpaRule"] = undefined /*out*/;
+            resourceInputs["jvmCpuStartupFloorMillicores"] = undefined /*out*/;
+            resourceInputs["jvmHeapRule"] = undefined /*out*/;
+            resourceInputs["kedaScaledObject"] = undefined /*out*/;
             resourceInputs["kind"] = undefined /*out*/;
             resourceInputs["liveMigrationEnabled"] = undefined /*out*/;
             resourceInputs["lookbackPeriodSeconds"] = undefined /*out*/;
@@ -198,6 +222,10 @@ export interface WorkloadRuleArgs {
      * When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: ["on_detection"].
      */
     actionTriggers?: pulumi.Input<pulumi.Input<string>[]>;
+    /**
+     * Allow in-place vertical scaling to decrease the memory limit (normally only requests shrink; limits only grow). Example: false.
+     */
+    allowInPlaceMemoryLimitDecrease?: pulumi.Input<boolean>;
     /**
      * When true the engine generates all rule fields automatically; manual field overrides are ignored. Example: false.
      */
@@ -243,6 +271,18 @@ export interface WorkloadRuleArgs {
      * Horizontal (replica) scaling rule configuration.
      */
     hpaRule?: pulumi.Input<inputs.resources.HPARuleConfigArgsArgs>;
+    /**
+     * Minimum CPU request in millicores during JVM startup, to avoid slow JIT warmup on undersized CPU. Example: 500.
+     */
+    jvmCpuStartupFloorMillicores?: pulumi.Input<number>;
+    /**
+     * JVM heap sizing overrides applied to detected Java containers.
+     */
+    jvmHeapRule?: pulumi.Input<inputs.resources.JvmHeapRuleConfigArgsArgs>;
+    /**
+     * KEDA ScaledObject configuration managed alongside this workload.
+     */
+    kedaScaledObject?: pulumi.Input<inputs.resources.KedaScaledObjectArgsArgs>;
     /**
      * Kubernetes workload kind. One of: 'Deployment', 'StatefulSet', 'DaemonSet', 'CronJob', 'Job'. Example: 'Deployment'.
      */

@@ -59,6 +59,10 @@ export class NodePolicy extends pulumi.CustomResource {
      */
     declare public readonly disruption: pulumi.Output<outputs.resources.DisruptionPolicyArgs | undefined>;
     /**
+     * GCP-specific GCENodeClass configuration (service account, images, disks, etc.).
+     */
+    declare public readonly gcp: pulumi.Output<outputs.resources.GCPNodeClassSpecArgs | undefined>;
+    /**
      * Filter instances by category letter (cloud-specific). Example: {in: ["m", "c", "r"]} for AWS, {in: ["D", "E"]} for Azure.
      */
     declare public readonly instanceCategories: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
@@ -79,6 +83,18 @@ export class NodePolicy extends pulumi.CustomResource {
      */
     declare public readonly instanceHypervisors: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
     declare public readonly instanceLocalNvme: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
+    /**
+     * UI tooltip text shown alongside the instanceLocalNvme selector.
+     */
+    declare public readonly instanceLocalNvmeTip: pulumi.Output<string | undefined>;
+    /**
+     * GCP-only: filter by standard/highcpu/highmem custom shape token. Example: {in: ["standard", "highmem"]}.
+     */
+    declare public readonly instanceShapes: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
+    /**
+     * UI tooltip text shown alongside the instanceShapes selector.
+     */
+    declare public readonly instanceShapesTip: pulumi.Output<string | undefined>;
     /**
      * Filter instances by size label. Example: {in: ["large", "xlarge", "2xlarge"]}.
      */
@@ -109,6 +125,10 @@ export class NodePolicy extends pulumi.CustomResource {
      */
     declare public readonly nodePoolName: pulumi.Output<string | undefined>;
     /**
+     * OCI-specific NodeClass configuration (VCN, subnets, images, block volumes, etc.).
+     */
+    declare public readonly oci: pulumi.Output<outputs.resources.OCINodeClassSpecArgs | undefined>;
+    /**
      * Operating systems for nodes. Example: {in: ["linux"]}.
      */
     declare public readonly operatingSystems: pulumi.Output<outputs.resources.LabelSelectorArgs | undefined>;
@@ -117,6 +137,10 @@ export class NodePolicy extends pulumi.CustomResource {
      */
     declare public readonly raw: pulumi.Output<outputs.resources.RawKarpenterSpecArgs[] | undefined>;
     declare public readonly startupTaints: pulumi.Output<outputs.resources.TaintArgs[] | undefined>;
+    /**
+     * UI tooltip text shown alongside startupTaints.
+     */
+    declare public readonly startupTaintsTip: pulumi.Output<string | undefined>;
     /**
      * Taints applied to provisioned nodes to control pod scheduling. Example: [{key: "dedicated", value: "gpu", effect: "NoSchedule"}].
      */
@@ -152,12 +176,16 @@ export class NodePolicy extends pulumi.CustomResource {
             resourceInputs["cloudProviderId"] = args?.cloudProviderId;
             resourceInputs["description"] = args?.description;
             resourceInputs["disruption"] = args?.disruption;
+            resourceInputs["gcp"] = args?.gcp;
             resourceInputs["instanceCategories"] = args?.instanceCategories;
             resourceInputs["instanceCpus"] = args?.instanceCpus;
             resourceInputs["instanceFamilies"] = args?.instanceFamilies;
             resourceInputs["instanceGenerations"] = args?.instanceGenerations;
             resourceInputs["instanceHypervisors"] = args?.instanceHypervisors;
             resourceInputs["instanceLocalNvme"] = args?.instanceLocalNvme;
+            resourceInputs["instanceLocalNvmeTip"] = args?.instanceLocalNvmeTip;
+            resourceInputs["instanceShapes"] = args?.instanceShapes;
+            resourceInputs["instanceShapesTip"] = args?.instanceShapesTip;
             resourceInputs["instanceSizes"] = args?.instanceSizes;
             resourceInputs["instanceTypes"] = args?.instanceTypes;
             resourceInputs["labels"] = args?.labels;
@@ -166,9 +194,11 @@ export class NodePolicy extends pulumi.CustomResource {
             resourceInputs["name"] = args?.name;
             resourceInputs["nodeClassName"] = args?.nodeClassName;
             resourceInputs["nodePoolName"] = args?.nodePoolName;
+            resourceInputs["oci"] = args?.oci;
             resourceInputs["operatingSystems"] = args?.operatingSystems;
             resourceInputs["raw"] = args?.raw;
             resourceInputs["startupTaints"] = args?.startupTaints;
+            resourceInputs["startupTaintsTip"] = args?.startupTaintsTip;
             resourceInputs["taints"] = args?.taints;
             resourceInputs["weight"] = args?.weight;
             resourceInputs["zonalShift"] = args?.zonalShift;
@@ -181,12 +211,16 @@ export class NodePolicy extends pulumi.CustomResource {
             resourceInputs["cloudProviderId"] = undefined /*out*/;
             resourceInputs["description"] = undefined /*out*/;
             resourceInputs["disruption"] = undefined /*out*/;
+            resourceInputs["gcp"] = undefined /*out*/;
             resourceInputs["instanceCategories"] = undefined /*out*/;
             resourceInputs["instanceCpus"] = undefined /*out*/;
             resourceInputs["instanceFamilies"] = undefined /*out*/;
             resourceInputs["instanceGenerations"] = undefined /*out*/;
             resourceInputs["instanceHypervisors"] = undefined /*out*/;
             resourceInputs["instanceLocalNvme"] = undefined /*out*/;
+            resourceInputs["instanceLocalNvmeTip"] = undefined /*out*/;
+            resourceInputs["instanceShapes"] = undefined /*out*/;
+            resourceInputs["instanceShapesTip"] = undefined /*out*/;
             resourceInputs["instanceSizes"] = undefined /*out*/;
             resourceInputs["instanceTypes"] = undefined /*out*/;
             resourceInputs["labels"] = undefined /*out*/;
@@ -195,9 +229,11 @@ export class NodePolicy extends pulumi.CustomResource {
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["nodeClassName"] = undefined /*out*/;
             resourceInputs["nodePoolName"] = undefined /*out*/;
+            resourceInputs["oci"] = undefined /*out*/;
             resourceInputs["operatingSystems"] = undefined /*out*/;
             resourceInputs["raw"] = undefined /*out*/;
             resourceInputs["startupTaints"] = undefined /*out*/;
+            resourceInputs["startupTaintsTip"] = undefined /*out*/;
             resourceInputs["taints"] = undefined /*out*/;
             resourceInputs["weight"] = undefined /*out*/;
             resourceInputs["zonalShift"] = undefined /*out*/;
@@ -219,12 +255,16 @@ export interface NodePolicyArgs {
     cloudProviderId?: pulumi.Input<number>;
     description?: pulumi.Input<string>;
     disruption?: pulumi.Input<inputs.resources.DisruptionPolicyArgsArgs>;
+    gcp?: pulumi.Input<inputs.resources.GCPNodeClassSpecArgsArgs>;
     instanceCategories?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
     instanceCpus?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
     instanceFamilies?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
     instanceGenerations?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
     instanceHypervisors?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
     instanceLocalNvme?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
+    instanceLocalNvmeTip?: pulumi.Input<string>;
+    instanceShapes?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
+    instanceShapesTip?: pulumi.Input<string>;
     instanceSizes?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
     instanceTypes?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
     labels?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
@@ -233,9 +273,11 @@ export interface NodePolicyArgs {
     name: pulumi.Input<string>;
     nodeClassName?: pulumi.Input<string>;
     nodePoolName?: pulumi.Input<string>;
+    oci?: pulumi.Input<inputs.resources.OCINodeClassSpecArgsArgs>;
     operatingSystems?: pulumi.Input<inputs.resources.LabelSelectorArgsArgs>;
     raw?: pulumi.Input<pulumi.Input<inputs.resources.RawKarpenterSpecArgsArgs>[]>;
     startupTaints?: pulumi.Input<pulumi.Input<inputs.resources.TaintArgsArgs>[]>;
+    startupTaintsTip?: pulumi.Input<string>;
     taints?: pulumi.Input<pulumi.Input<inputs.resources.TaintArgsArgs>[]>;
     weight?: pulumi.Input<number>;
     zonalShift?: pulumi.Input<inputs.resources.ZonalShiftConfigArgsArgs>;

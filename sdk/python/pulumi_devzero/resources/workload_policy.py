@@ -35,6 +35,7 @@ class WorkloadPolicyArgs:
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  detection_triggers: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  drift_delta_percent: Optional[pulumi.Input[_builtins.float]] = None,
+                 emergency_response: Optional[pulumi.Input['EmergencyResponseConfigArgsArgs']] = None,
                  enable_in_place_vertical_scaling: Optional[pulumi.Input[_builtins.bool]] = None,
                  enable_pmax_protection: Optional[pulumi.Input[_builtins.bool]] = None,
                  gpu_vertical_scaling: Optional[pulumi.Input['VerticalScalingArgsArgs']] = None,
@@ -76,6 +77,7 @@ class WorkloadPolicyArgs:
         :param pulumi.Input[_builtins.str] description: Free-form description of the policy. Example: 'VPA policy for production workloads'.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] detection_triggers: Events that trigger a new recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: ["pod_creation", "pod_reschedule"].
         :param pulumi.Input[_builtins.float] drift_delta_percent: Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
+        :param pulumi.Input['EmergencyResponseConfigArgsArgs'] emergency_response: Emergency response configuration for OOM and CPU throttle events.
         :param pulumi.Input[_builtins.bool] enable_pmax_protection: Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.
         :param pulumi.Input['VerticalScalingArgsArgs'] gpu_vertical_scaling: Vertical scaling configuration for GPU cores. Uses the same fields as cpuVerticalScaling; units are GPU cores (millicores).
         :param pulumi.Input['VerticalScalingArgsArgs'] gpu_vram_vertical_scaling: Vertical scaling configuration for GPU VRAM. Uses the same fields as cpuVerticalScaling; units are bytes.
@@ -119,6 +121,8 @@ class WorkloadPolicyArgs:
             pulumi.set(__self__, "detection_triggers", detection_triggers)
         if drift_delta_percent is not None:
             pulumi.set(__self__, "drift_delta_percent", drift_delta_percent)
+        if emergency_response is not None:
+            pulumi.set(__self__, "emergency_response", emergency_response)
         if enable_in_place_vertical_scaling is not None:
             pulumi.set(__self__, "enable_in_place_vertical_scaling", enable_in_place_vertical_scaling)
         if enable_pmax_protection is not None:
@@ -339,6 +343,18 @@ class WorkloadPolicyArgs:
     @drift_delta_percent.setter
     def drift_delta_percent(self, value: Optional[pulumi.Input[_builtins.float]]):
         pulumi.set(self, "drift_delta_percent", value)
+
+    @_builtins.property
+    @pulumi.getter(name="emergencyResponse")
+    def emergency_response(self) -> Optional[pulumi.Input['EmergencyResponseConfigArgsArgs']]:
+        """
+        Emergency response configuration for OOM and CPU throttle events.
+        """
+        return pulumi.get(self, "emergency_response")
+
+    @emergency_response.setter
+    def emergency_response(self, value: Optional[pulumi.Input['EmergencyResponseConfigArgsArgs']]):
+        pulumi.set(self, "emergency_response", value)
 
     @_builtins.property
     @pulumi.getter(name="enableInPlaceVerticalScaling")
@@ -669,6 +685,7 @@ class WorkloadPolicy(pulumi.CustomResource):
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  detection_triggers: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  drift_delta_percent: Optional[pulumi.Input[_builtins.float]] = None,
+                 emergency_response: Optional[pulumi.Input[Union['EmergencyResponseConfigArgsArgs', 'EmergencyResponseConfigArgsArgsDict']]] = None,
                  enable_in_place_vertical_scaling: Optional[pulumi.Input[_builtins.bool]] = None,
                  enable_pmax_protection: Optional[pulumi.Input[_builtins.bool]] = None,
                  gpu_vertical_scaling: Optional[pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']]] = None,
@@ -713,6 +730,7 @@ class WorkloadPolicy(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] description: Free-form description of the policy. Example: 'VPA policy for production workloads'.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] detection_triggers: Events that trigger a new recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: ["pod_creation", "pod_reschedule"].
         :param pulumi.Input[_builtins.float] drift_delta_percent: Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
+        :param pulumi.Input[Union['EmergencyResponseConfigArgsArgs', 'EmergencyResponseConfigArgsArgsDict']] emergency_response: Emergency response configuration for OOM and CPU throttle events.
         :param pulumi.Input[_builtins.bool] enable_pmax_protection: Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.
         :param pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']] gpu_vertical_scaling: Vertical scaling configuration for GPU cores. Uses the same fields as cpuVerticalScaling; units are GPU cores (millicores).
         :param pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']] gpu_vram_vertical_scaling: Vertical scaling configuration for GPU VRAM. Uses the same fields as cpuVerticalScaling; units are bytes.
@@ -765,6 +783,7 @@ class WorkloadPolicy(pulumi.CustomResource):
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  detection_triggers: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  drift_delta_percent: Optional[pulumi.Input[_builtins.float]] = None,
+                 emergency_response: Optional[pulumi.Input[Union['EmergencyResponseConfigArgsArgs', 'EmergencyResponseConfigArgsArgsDict']]] = None,
                  enable_in_place_vertical_scaling: Optional[pulumi.Input[_builtins.bool]] = None,
                  enable_pmax_protection: Optional[pulumi.Input[_builtins.bool]] = None,
                  gpu_vertical_scaling: Optional[pulumi.Input[Union['VerticalScalingArgsArgs', 'VerticalScalingArgsArgsDict']]] = None,
@@ -820,6 +839,7 @@ class WorkloadPolicy(pulumi.CustomResource):
             __props__.__dict__["description"] = description
             __props__.__dict__["detection_triggers"] = detection_triggers
             __props__.__dict__["drift_delta_percent"] = drift_delta_percent
+            __props__.__dict__["emergency_response"] = emergency_response
             __props__.__dict__["enable_in_place_vertical_scaling"] = enable_in_place_vertical_scaling
             __props__.__dict__["enable_pmax_protection"] = enable_pmax_protection
             __props__.__dict__["gpu_vertical_scaling"] = gpu_vertical_scaling
@@ -898,6 +918,7 @@ class WorkloadPolicy(pulumi.CustomResource):
         __props__.__dict__["description"] = None
         __props__.__dict__["detection_triggers"] = None
         __props__.__dict__["drift_delta_percent"] = None
+        __props__.__dict__["emergency_response"] = None
         __props__.__dict__["enable_in_place_vertical_scaling"] = None
         __props__.__dict__["enable_pmax_protection"] = None
         __props__.__dict__["gpu_vertical_scaling"] = None
@@ -1016,6 +1037,14 @@ class WorkloadPolicy(pulumi.CustomResource):
         Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
         """
         return pulumi.get(self, "drift_delta_percent")
+
+    @_builtins.property
+    @pulumi.getter(name="emergencyResponse")
+    def emergency_response(self) -> pulumi.Output[Optional['outputs.EmergencyResponseConfigArgs']]:
+        """
+        Emergency response configuration for OOM and CPU throttle events.
+        """
+        return pulumi.get(self, "emergency_response")
 
     @_builtins.property
     @pulumi.getter(name="enableInPlaceVerticalScaling")

@@ -17,6 +17,8 @@ type WorkloadRule struct {
 
 	// When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: ["on_detection"].
 	ActionTriggers pulumi.StringArrayOutput `pulumi:"actionTriggers"`
+	// Allow in-place vertical scaling to decrease the memory limit (normally only requests shrink; limits only grow). Example: false.
+	AllowInPlaceMemoryLimitDecrease pulumi.BoolPtrOutput `pulumi:"allowInPlaceMemoryLimitDecrease"`
 	// When true the engine generates all rule fields automatically; manual field overrides are ignored. Example: false.
 	AutoGenerate pulumi.BoolPtrOutput `pulumi:"autoGenerate"`
 	// ID of the cluster this rule targets. Example: 'cluster-abc123'.
@@ -40,6 +42,12 @@ type WorkloadRule struct {
 	GpuRule ResourceRuleConfigArgsPtrOutput `pulumi:"gpuRule"`
 	// Horizontal (replica) scaling rule configuration.
 	HpaRule HPARuleConfigArgsPtrOutput `pulumi:"hpaRule"`
+	// Minimum CPU request in millicores during JVM startup, to avoid slow JIT warmup on undersized CPU. Example: 500.
+	JvmCpuStartupFloorMillicores pulumi.IntPtrOutput `pulumi:"jvmCpuStartupFloorMillicores"`
+	// JVM heap sizing overrides applied to detected Java containers.
+	JvmHeapRule JvmHeapRuleConfigArgsPtrOutput `pulumi:"jvmHeapRule"`
+	// KEDA ScaledObject configuration managed alongside this workload.
+	KedaScaledObject KedaScaledObjectArgsPtrOutput `pulumi:"kedaScaledObject"`
 	// Kubernetes workload kind. One of: 'Deployment', 'StatefulSet', 'DaemonSet', 'CronJob', 'Job'. Example: 'Deployment'.
 	Kind pulumi.StringOutput `pulumi:"kind"`
 	// Allow live pod migration when applying recommendations. Example: false.
@@ -113,6 +121,8 @@ func (WorkloadRuleState) ElementType() reflect.Type {
 type workloadRuleArgs struct {
 	// When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: ["on_detection"].
 	ActionTriggers []string `pulumi:"actionTriggers"`
+	// Allow in-place vertical scaling to decrease the memory limit (normally only requests shrink; limits only grow). Example: false.
+	AllowInPlaceMemoryLimitDecrease *bool `pulumi:"allowInPlaceMemoryLimitDecrease"`
 	// When true the engine generates all rule fields automatically; manual field overrides are ignored. Example: false.
 	AutoGenerate *bool `pulumi:"autoGenerate"`
 	// ID of the cluster this rule targets. Example: 'cluster-abc123'.
@@ -136,6 +146,12 @@ type workloadRuleArgs struct {
 	GpuRule *ResourceRuleConfigArgs `pulumi:"gpuRule"`
 	// Horizontal (replica) scaling rule configuration.
 	HpaRule *HPARuleConfigArgs `pulumi:"hpaRule"`
+	// Minimum CPU request in millicores during JVM startup, to avoid slow JIT warmup on undersized CPU. Example: 500.
+	JvmCpuStartupFloorMillicores *int `pulumi:"jvmCpuStartupFloorMillicores"`
+	// JVM heap sizing overrides applied to detected Java containers.
+	JvmHeapRule *JvmHeapRuleConfigArgs `pulumi:"jvmHeapRule"`
+	// KEDA ScaledObject configuration managed alongside this workload.
+	KedaScaledObject *KedaScaledObjectArgs `pulumi:"kedaScaledObject"`
 	// Kubernetes workload kind. One of: 'Deployment', 'StatefulSet', 'DaemonSet', 'CronJob', 'Job'. Example: 'Deployment'.
 	Kind string `pulumi:"kind"`
 	// Allow live pod migration when applying recommendations. Example: false.
@@ -159,6 +175,8 @@ type workloadRuleArgs struct {
 type WorkloadRuleArgs struct {
 	// When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: ["on_detection"].
 	ActionTriggers pulumi.StringArrayInput
+	// Allow in-place vertical scaling to decrease the memory limit (normally only requests shrink; limits only grow). Example: false.
+	AllowInPlaceMemoryLimitDecrease pulumi.BoolPtrInput
 	// When true the engine generates all rule fields automatically; manual field overrides are ignored. Example: false.
 	AutoGenerate pulumi.BoolPtrInput
 	// ID of the cluster this rule targets. Example: 'cluster-abc123'.
@@ -182,6 +200,12 @@ type WorkloadRuleArgs struct {
 	GpuRule ResourceRuleConfigArgsPtrInput
 	// Horizontal (replica) scaling rule configuration.
 	HpaRule HPARuleConfigArgsPtrInput
+	// Minimum CPU request in millicores during JVM startup, to avoid slow JIT warmup on undersized CPU. Example: 500.
+	JvmCpuStartupFloorMillicores pulumi.IntPtrInput
+	// JVM heap sizing overrides applied to detected Java containers.
+	JvmHeapRule JvmHeapRuleConfigArgsPtrInput
+	// KEDA ScaledObject configuration managed alongside this workload.
+	KedaScaledObject KedaScaledObjectArgsPtrInput
 	// Kubernetes workload kind. One of: 'Deployment', 'StatefulSet', 'DaemonSet', 'CronJob', 'Job'. Example: 'Deployment'.
 	Kind pulumi.StringInput
 	// Allow live pod migration when applying recommendations. Example: false.
@@ -293,6 +317,11 @@ func (o WorkloadRuleOutput) ActionTriggers() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *WorkloadRule) pulumi.StringArrayOutput { return v.ActionTriggers }).(pulumi.StringArrayOutput)
 }
 
+// Allow in-place vertical scaling to decrease the memory limit (normally only requests shrink; limits only grow). Example: false.
+func (o WorkloadRuleOutput) AllowInPlaceMemoryLimitDecrease() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *WorkloadRule) pulumi.BoolPtrOutput { return v.AllowInPlaceMemoryLimitDecrease }).(pulumi.BoolPtrOutput)
+}
+
 // When true the engine generates all rule fields automatically; manual field overrides are ignored. Example: false.
 func (o WorkloadRuleOutput) AutoGenerate() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *WorkloadRule) pulumi.BoolPtrOutput { return v.AutoGenerate }).(pulumi.BoolPtrOutput)
@@ -350,6 +379,21 @@ func (o WorkloadRuleOutput) GpuRule() ResourceRuleConfigArgsPtrOutput {
 // Horizontal (replica) scaling rule configuration.
 func (o WorkloadRuleOutput) HpaRule() HPARuleConfigArgsPtrOutput {
 	return o.ApplyT(func(v *WorkloadRule) HPARuleConfigArgsPtrOutput { return v.HpaRule }).(HPARuleConfigArgsPtrOutput)
+}
+
+// Minimum CPU request in millicores during JVM startup, to avoid slow JIT warmup on undersized CPU. Example: 500.
+func (o WorkloadRuleOutput) JvmCpuStartupFloorMillicores() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *WorkloadRule) pulumi.IntPtrOutput { return v.JvmCpuStartupFloorMillicores }).(pulumi.IntPtrOutput)
+}
+
+// JVM heap sizing overrides applied to detected Java containers.
+func (o WorkloadRuleOutput) JvmHeapRule() JvmHeapRuleConfigArgsPtrOutput {
+	return o.ApplyT(func(v *WorkloadRule) JvmHeapRuleConfigArgsPtrOutput { return v.JvmHeapRule }).(JvmHeapRuleConfigArgsPtrOutput)
+}
+
+// KEDA ScaledObject configuration managed alongside this workload.
+func (o WorkloadRuleOutput) KedaScaledObject() KedaScaledObjectArgsPtrOutput {
+	return o.ApplyT(func(v *WorkloadRule) KedaScaledObjectArgsPtrOutput { return v.KedaScaledObject }).(KedaScaledObjectArgsPtrOutput)
 }
 
 // Kubernetes workload kind. One of: 'Deployment', 'StatefulSet', 'DaemonSet', 'CronJob', 'Job'. Example: 'Deployment'.
