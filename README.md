@@ -10,7 +10,7 @@ The official [Pulumi](https://www.pulumi.com/) provider for [DevZero](https://de
 | `WorkloadPolicy` | Configure vertical/horizontal scaling policies for workloads |
 | `WorkloadPolicyTarget` | Apply a workload policy to one or more clusters with filters |
 | `WorkloadRule` | Pin explicit resource rules to a specific workload (MPA v3) |
-| `NodePolicy` | Configure node provisioning and pooling (AWS / Azure) |
+| `NodePolicy` | Configure node provisioning and pooling (AWS / Azure / GCP / OCI) |
 | `NodePolicyTarget` | Apply a node policy to one or more clusters |
 
 ## Prerequisites
@@ -735,6 +735,7 @@ ctx.Export("existingClusterId", pulumi.String(existing.ClusterId))
 | `gpuVerticalScaling` | `VerticalScalingArgs` | GPU core vertical scaling configuration (units: GPU millicores) |
 | `gpuVramVerticalScaling` | `VerticalScalingArgs` | GPU VRAM vertical scaling configuration (units: bytes) |
 | `horizontalScaling` | `HorizontalScalingArgs` | Horizontal (replica) scaling configuration |
+| `emergencyResponse` | `EmergencyResponseConfigArgs` | Immediate OOM / CPU-throttling reaction configuration (see [EmergencyResponseConfigArgs](#emergencyresponseconfigargs)) |
 | `actionTriggers` | string[] | When to apply recommendations: `on_detection` \| `on_schedule`. Both can be used together. |
 | `cronSchedule` | string | 5-field UTC cron expression for scheduled application. Required when `actionTriggers` includes `on_schedule`. Example: `0 2 * * *` |
 | `detectionTriggers` | string[] | Events that trigger a recommendation: `pod_creation` \| `pod_update` \| `pod_reschedule` |
@@ -753,7 +754,7 @@ ctx.Export("existingClusterId", pulumi.String(existing.ClusterId))
 | `minVpaWindowDataPoints` | int | Minimum data points in VPA analysis window. Default: `30` |
 | `cooldownMinutes` | int | Minutes to wait between applying recommendations. Default: `300` (5 h) |
 
-Python uses snake_case for all fields (e.g. `cpu_vertical_scaling`, `action_triggers`, `cron_schedule`, `detection_triggers`, `enable_pmax_protection`, `loopback_period_seconds`, `min_data_points`, `min_change_percent`, `cooldown_minutes`). Go uses PascalCase equivalents.
+Python uses snake_case for all fields (e.g. `cpu_vertical_scaling`, `emergency_response`, `action_triggers`, `cron_schedule`, `detection_triggers`, `enable_pmax_protection`, `loopback_period_seconds`, `min_data_points`, `min_change_percent`, `cooldown_minutes`). Go uses PascalCase equivalents.
 
 ### VerticalScalingArgs
 
@@ -840,6 +841,7 @@ Python: `policy_id`, `cluster_ids`, `kind_filter`, `workload_names`, `node_group
 | `architectures` | `LabelSelectorArgs` | CPU architectures (e.g. `amd64`, `arm64`) |
 | `operatingSystems` | `LabelSelectorArgs` | OS filter (e.g. `linux`, `windows`) |
 | `labels` | map[string]string | Labels applied to provisioned nodes |
+| `instanceShapes` | `LabelSelectorArgs` | GCP-only: filter by standard/highcpu/highmem custom shape token. Example: `{in: ["standard", "highmem"]}` |
 | `taints` | `TaintArgs[]` | Taints applied to provisioned nodes |
 | `disruption` | `DisruptionPolicyArgs` | Node disruption and consolidation settings |
 | `limits` | `ResourceLimitsArgs` | Max total CPU/memory this policy may provision |
@@ -847,9 +849,14 @@ Python: `policy_id`, `cluster_ids`, `kind_filter`, `workload_names`, `node_group
 | `nodeClassName` | string | Override name for the generated dzkarp NodeClass CR |
 | `aws` | `AWSNodeClassSpecArgs` | AWS-specific configuration (AMI, subnets, IAM role, EBS, etc.) |
 | `azure` | `AzureNodeClassSpecArgs` | Azure-specific configuration (subnet, image family, disk, etc.) |
+| `gcp` | `GCPNodeClassSpecArgs` | GCP-specific GCENodeClass configuration (service account, images, disks, etc.) |
+| `oci` | `OCINodeClassSpecArgs` | OCI-specific NodeClass configuration (VCN, subnets, images, block volumes, etc.) |
 | `raw` | `RawKarpenterSpecArgs[]` | Raw Karpenter NodePool/NodeClass YAML (escape hatch) |
+| `instanceShapesTip` | string | UI tooltip text shown alongside the `instanceShapes` selector |
+| `startupTaintsTip` | string | UI tooltip text shown alongside `startupTaints` |
+| `instanceLocalNvmeTip` | string | UI tooltip text shown alongside the instance-local-NVMe selector |
 
-Python uses snake_case (e.g. `capacity_types`, `instance_categories`, `instance_families`, `instance_cpus`, `instance_sizes`, `instance_types`, `operating_systems`, `node_pool_name`, `node_class_name`). Go uses PascalCase equivalents.
+Python uses snake_case (e.g. `capacity_types`, `instance_categories`, `instance_families`, `instance_cpus`, `instance_sizes`, `instance_types`, `instance_shapes`, `operating_systems`, `node_pool_name`, `node_class_name`, `instance_shapes_tip`, `startup_taints_tip`, `instance_local_nvme_tip`). Go uses PascalCase equivalents.
 
 ### DisruptionPolicyArgs
 
@@ -907,6 +914,102 @@ Python: `ami_family`, `instance_profile`, `subnet_selector_terms`, `security_gro
 | `kubelet` | `AzureKubeletConfigurationArgs` | Kubelet overrides for Azure nodes |
 
 Python: `vnet_subnet_id`, `image_family`, `os_disk_size_gb`, `fips_mode`, `max_pods`. Go uses PascalCase equivalents.
+
+### GCPNodeClassSpecArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `serviceAccount` | string | GCP service account email attached to provisioned nodes |
+| `imageFamily` | string | GCE image family. Example: `cos` |
+| `imageSelectorTerms` | `GCPImageSelectorTermArgs[]` | Image selectors (by alias or ID) |
+| `disks` | `GCPDiskArgs[]` | Boot and secondary disk configuration |
+| `kubelet` | `KubeletConfigurationArgs` | Kubelet overrides (maxPods, eviction thresholds, etc.) |
+| `labels` | map[string]string | GCP labels applied to provisioned nodes |
+| `metadata` | map[string]string | GCE instance metadata key/value pairs |
+| `networkTags` | string[] | GCP network tags applied to provisioned instances |
+
+Python: `service_account`, `image_family`, `image_selector_terms`, `network_tags`. Go uses PascalCase equivalents.
+
+#### GCPImageSelectorTermArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `alias` | string | Image alias. Example: `cos@latest` |
+| `id` | string | Explicit GCE image ID |
+
+#### GCPDiskArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `boot` | bool | Whether this disk is the boot disk. Example: `true` |
+| `category` | string | GCP disk type. Example: `pd-ssd` |
+| `sizeGib` | int | Disk size in GiB. Example: `100` |
+| `secondaryBootImage` | string | Secondary boot image used for container-image fast boot |
+| `secondaryBootMode` | string | Secondary boot mode. Example: `CONTAINER_IMAGE_CACHE` |
+
+Python: `size_gib`, `secondary_boot_image`, `secondary_boot_mode`. Go uses PascalCase equivalents.
+
+### OCINodeClassSpecArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `vcnId` | string | OCI VCN OCID nodes are provisioned into |
+| `imageFamily` | string | OCI image family. Example: `Oracle-Linux-8` |
+| `imageSelector` | `OCIImageSelectorTermArgs[]` | Image selectors (by name, ID, or compartment) |
+| `subnetSelector` | `OCISubnetSelectorTermArgs[]` | Subnet selectors (by name or ID) |
+| `securityGroupSelector` | `OCISecurityGroupSelectorTermArgs[]` | Network security group selectors |
+| `bootConfig` | `OCIBootConfigArgs` | Boot volume size and performance configuration |
+| `blockDevices` | `OCIVolumeAttributesArgs[]` | Additional block volume configuration |
+| `launchOptions` | `OCILaunchOptionsArgs` | Instance launch options (firmware, network type, etc.) |
+| `agentList` | string[] | OCI Compute Instance Agent plugins to enable. Example: `Compute Instance Monitoring` |
+| `freeFormTags` | map[string]string | OCI free-form tags applied to provisioned resources |
+| `tags` | map[string]string | Defined tags applied to provisioned resources |
+| `metaData` | map[string]string | Instance metadata key/value pairs |
+| `userData` | string | Custom cloud-init user data |
+| `preInstallScript` | string | Script executed before dzkarp bootstrap runs |
+
+Python: `vcn_id`, `image_family`, `image_selector`, `subnet_selector`, `security_group_selector`, `boot_config`, `block_devices`, `launch_options`, `agent_list`, `free_form_tags`, `meta_data`, `user_data`, `pre_install_script`. Go uses PascalCase equivalents.
+
+#### OCIImageSelectorTermArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `name` | string | Image display name |
+| `id` | string | Explicit image OCID |
+| `compartmentId` | string | Compartment OCID to search for the image in |
+
+#### OCISubnetSelectorTermArgs / OCISecurityGroupSelectorTermArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `name` | string | Resource display name |
+| `id` | string | Explicit OCID |
+
+#### OCIBootConfigArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `bootVolumeSizeInGbs` | int | Boot volume size in GB |
+| `bootVolumeVpusPerGb` | int | Boot volume performance units per GB |
+
+#### OCIVolumeAttributesArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `sizeInGbs` | int | Block volume size in GB |
+| `vpusPerGb` | int | Block volume performance units per GB |
+
+#### OCILaunchOptionsArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `firmware` | string | Firmware type. Example: `UEFI_64` |
+| `bootVolumeType` | string | Boot volume attachment type. Example: `PARAVIRTUALIZED` |
+| `networkType` | string | Network attachment type. Example: `PARAVIRTUALIZED` |
+| `remoteDataVolumeType` | string | Remote data volume attachment type |
+| `isConsistentVolumeNamingEnabled` | bool | Enable consistent device naming for volumes |
+
+Python: `boot_volume_type`, `network_type`, `remote_data_volume_type`, `is_consistent_volume_naming_enabled`. Go uses PascalCase equivalents.
 
 ### RawKarpenterSpecArgs
 
@@ -1171,7 +1274,13 @@ ctx.Export("ruleId", rule.ID())
 | `defragmentationSchedule` | string | Cron expression for node defragmentation |
 | `liveMigrationEnabled` | bool | Allow live pod migration when applying recommendations without restart |
 | `useInPlaceVerticalScaling` | bool | Use in-place pod vertical scaling instead of pod restarts |
+| `allowInPlaceMemoryLimitDecrease` | bool | Allow in-place scaling to decrease the memory limit (normally only increases are applied in-place) |
+| `jvmHeapRule` | `JvmHeapRuleConfigArgs` | JVM heap-aware sizing rule (see [JvmHeapRuleConfigArgs](#jvmheapruleconfigargs)) |
+| `jvmCpuStartupFloorMillicores` | int | Minimum CPU (millicores) reserved during JVM startup/warmup |
+| `kedaScaledObject` | `KedaScaledObjectArgs` | KEDA `ScaledObject` configuration for event-driven autoscaling (see [KedaScaledObjectArgs](#kedascaledobjectargs)) |
 | `containers` | `ContainerResourceRuleConfigArgs[]` | Per-container resource overrides. When empty, workload-level rules apply to all containers |
+
+Python uses snake_case (e.g. `cluster_id`, `auto_generate`, `cpu_rule`, `hpa_rule`, `emergency_response`, `action_triggers`, `cron_schedule`, `detection_triggers`, `startup_period_seconds`, `use_in_place_vertical_scaling`, `allow_in_place_memory_limit_decrease`, `jvm_heap_rule`, `jvm_cpu_startup_floor_millicores`, `keda_scaled_object`). Go uses PascalCase equivalents.
 
 ### ResourceRuleConfigArgs
 
@@ -1423,6 +1532,80 @@ Python: `stabilization_window_seconds`, `select_policy`, `period_seconds`. Go us
 | `cpuRule` | `ResourceRuleConfigArgs` | CPU rule for this container |
 | `memoryRule` | `ResourceRuleConfigArgs` | Memory rule for this container |
 | `gpuRule` | `ResourceRuleConfigArgs` | GPU rule for this container |
+
+### JvmHeapRuleConfigArgs
+
+JVM heap-aware sizing rule used by `jvmHeapRule` — sizes container memory based on observed JVM heap usage rather than raw process RSS.
+
+| Field | Type | Description |
+|---|---|---|
+| `enabled` | bool | Enable JVM heap-aware sizing for this workload |
+| `minHeapBytes` | int | Minimum heap size in bytes |
+| `maxHeapBytes` | int | Maximum heap size in bytes |
+| `targetPercentile` | float | Percentile of observed heap usage to target. Example: `0.95` |
+| `headroomMultiplier` | float | Multiplier applied on top of the target percentile for safety headroom. Example: `1.3` |
+| `nonHeapOverheadPercent` | float | Additional non-heap memory overhead as a percentage. Example: `0.2` |
+| `nonHeapOverheadBytes` | int | Additional non-heap memory overhead as a fixed byte amount |
+| `preferContainerSupport` | bool | Prefer the JVM's container-aware ergonomics (`-XX:+UseContainerSupport`) over manual heap flags |
+
+Python: `min_heap_bytes`, `max_heap_bytes`, `target_percentile`, `headroom_multiplier`, `non_heap_overhead_percent`, `non_heap_overhead_bytes`, `prefer_container_support`. Go uses PascalCase equivalents.
+
+### KedaScaledObjectArgs
+
+KEDA `ScaledObject` configuration used by `kedaScaledObject` for event-driven horizontal autoscaling.
+
+| Field | Type | Description |
+|---|---|---|
+| `minReplicaCount` | int | Minimum replica count |
+| `maxReplicaCount` | int | Maximum replica count |
+| `idleReplicaCount` | int | Replica count to scale to when idle (must be less than `minReplicaCount`) |
+| `pollingInterval` | int | Seconds between trigger metric evaluations |
+| `cooldownPeriod` | int | Seconds to wait after the last active trigger before scaling back down |
+| `initialCooldownPeriod` | int | Seconds after ScaledObject creation before the cooldown period starts counting |
+| `triggers` | `KedaTriggerArgs[]` | Event source triggers (Prometheus, Kafka, etc.) |
+| `fallback` | `KedaFallbackArgs` | Replica count to fall back to when triggers can't be evaluated |
+| `advanced` | `KedaAdvancedArgs` | Advanced HPA behavior passthrough |
+
+Python: `min_replica_count`, `max_replica_count`, `idle_replica_count`, `polling_interval`, `cooldown_period`, `initial_cooldown_period`. Go uses PascalCase equivalents.
+
+#### KedaTriggerArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `type` | string | **Required.** Trigger type. Example: `prometheus`, `kafka` |
+| `name` | string | Trigger name |
+| `metricType` | string | Metric type: `Value` \| `AverageValue` \| `Utilization` |
+| `metadata` | map[string]string | Trigger-specific metadata (e.g. `serverAddress`, `query` for Prometheus) |
+| `authenticationRef` | `KedaAuthenticationRefArgs` | Reference to a KEDA `TriggerAuthentication`/`ClusterTriggerAuthentication` |
+| `useCachedMetrics` | bool | Use KEDA's cached metrics instead of querying the source on every poll |
+
+Python: `metric_type`, `authentication_ref`, `use_cached_metrics`. Go uses PascalCase equivalents.
+
+#### KedaFallbackArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `failureThreshold` | int | **Required.** Number of consecutive trigger evaluation failures before fallback activates |
+| `replicas` | int | **Required.** Replica count to use while in fallback |
+| `behavior` | string | Fallback behavior. Example: `static` |
+
+Python: `failure_threshold`. Go uses PascalCase equivalents.
+
+#### KedaAdvancedArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `restoreToOriginalReplicaCount` | bool | Restore the pre-KEDA replica count when the ScaledObject is deleted |
+| `advancedBehaviorJson` | string | Raw JSON-encoded `HorizontalPodAutoscalerBehavior` passthrough (scale-up/down stabilization windows and policies) |
+
+Python: `restore_to_original_replica_count`, `advanced_behavior_json`. Go uses PascalCase equivalents.
+
+#### KedaAuthenticationRefArgs
+
+| Field | Type | Description |
+|---|---|---|
+| `name` | string | **Required.** Name of the `TriggerAuthentication`/`ClusterTriggerAuthentication` resource |
+| `kind` | string | `TriggerAuthentication` \| `ClusterTriggerAuthentication` |
 
 ## NodePolicyTarget — Key Fields
 

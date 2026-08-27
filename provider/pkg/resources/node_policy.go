@@ -313,6 +313,176 @@ func (a *AzureNodeClassSpecArgs) Annotate(ann infer.Annotator) {
 	ann.Describe(&a.MaxPods, "Maximum pods per node, overrides the AKS cluster default. Example: 110.")
 }
 
+// GCPImageSelectorTermArgs selects a GCP node image.
+type GCPImageSelectorTermArgs struct {
+	Alias string `pulumi:"alias,optional"`
+	Id    string `pulumi:"id,optional"`
+}
+
+// Annotate provides SDK documentation for GCPImageSelectorTermArgs fields.
+func (g *GCPImageSelectorTermArgs) Annotate(a infer.Annotator) {
+	a.Describe(&g.Alias, "Well-known alias for the GCP node image family. Example: 'cos@latest'.")
+	a.Describe(&g.Id, "Explicit GCP image ID. Example: 'projects/cos-cloud/global/images/cos-105-17412-156-59'.")
+}
+
+// GCPDiskArgs configures a disk attached to a GCP node.
+type GCPDiskArgs struct {
+	SizeGib            int    `pulumi:"sizeGib,optional"`
+	Category           string `pulumi:"category,optional"`
+	Boot               bool   `pulumi:"boot,optional"`
+	SecondaryBootImage string `pulumi:"secondaryBootImage,optional"`
+	SecondaryBootMode  string `pulumi:"secondaryBootMode,optional"`
+}
+
+// Annotate provides SDK documentation for GCPDiskArgs fields.
+func (g *GCPDiskArgs) Annotate(a infer.Annotator) {
+	a.Describe(&g.SizeGib, "Disk size in GiB. Example: 100.")
+	a.Describe(&g.Category, "GCP disk type. Example: 'pd-ssd'.")
+	a.Describe(&g.Boot, "Whether this disk is the boot disk. Example: true.")
+	a.Describe(&g.SecondaryBootImage, "Secondary boot image used for container-image fast boot. Example: 'projects/my-project/global/images/my-cache-image'.")
+	a.Describe(&g.SecondaryBootMode, "Secondary boot mode. Example: 'CONTAINER_IMAGE_CACHE'.")
+}
+
+// GCPNodeClassSpecArgs holds GCP-specific node class configuration.
+type GCPNodeClassSpecArgs struct {
+	ServiceAccount     string                     `pulumi:"serviceAccount,optional"`
+	ImageSelectorTerms []GCPImageSelectorTermArgs `pulumi:"imageSelectorTerms,optional"`
+	ImageFamily        *string                    `pulumi:"imageFamily,optional"`
+	Kubelet            *KubeletConfigurationArgs  `pulumi:"kubelet,optional"`
+	Labels             map[string]string          `pulumi:"labels,optional"`
+	Metadata           map[string]string          `pulumi:"metadata,optional"`
+	NetworkTags        []string                   `pulumi:"networkTags,optional"`
+	Disks              []GCPDiskArgs              `pulumi:"disks,optional"`
+}
+
+// Annotate provides SDK documentation for GCPNodeClassSpecArgs fields.
+func (g *GCPNodeClassSpecArgs) Annotate(a infer.Annotator) {
+	a.Describe(&g.ServiceAccount, "GCP service account email attached to provisioned nodes. Example: 'karpenter@my-project.iam.gserviceaccount.com'.")
+	a.Describe(&g.ImageSelectorTerms, "Selectors for the node images used to launch nodes. Example: [{alias: \"cos@latest\"}].")
+	a.Describe(&g.ImageFamily, "GCP node image family shorthand used when no imageSelectorTerms are specified. Example: 'cos'.")
+	a.Describe(&g.Kubelet, "Kubelet configuration overrides applied to all nodes in this class.")
+	a.Describe(&g.Labels, "GCP labels applied to all resources created by this node class. Example: {\"environment\": \"production\"}.")
+	a.Describe(&g.Metadata, "GCE instance metadata applied to provisioned nodes. Example: {\"disable-legacy-endpoints\": \"true\"}.")
+	a.Describe(&g.NetworkTags, "GCP network tags applied to provisioned nodes for firewall targeting. Example: [\"karpenter-node\"].")
+	a.Describe(&g.Disks, "Disks attached to provisioned nodes. Example: [{sizeGib: 100, category: \"pd-ssd\", boot: true}].")
+}
+
+// OCIImageSelectorTermArgs selects an OCI node image.
+type OCIImageSelectorTermArgs struct {
+	Id            string `pulumi:"id,optional"`
+	Name          string `pulumi:"name,optional"`
+	CompartmentId string `pulumi:"compartmentId,optional"`
+}
+
+// Annotate provides SDK documentation for OCIImageSelectorTermArgs fields.
+func (o *OCIImageSelectorTermArgs) Annotate(a infer.Annotator) {
+	a.Describe(&o.Id, "Explicit OCI image OCID. Example: 'ocid1.image.oc1..aaaaaaaa'.")
+	a.Describe(&o.Name, "OCI image display name filter. Example: 'Oracle-Linux-8.9'.")
+	a.Describe(&o.CompartmentId, "OCID of the compartment containing the image. Example: 'ocid1.compartment.oc1..aaaaaaaa'.")
+}
+
+// OCISubnetSelectorTermArgs selects an OCI subnet.
+type OCISubnetSelectorTermArgs struct {
+	Id   string `pulumi:"id,optional"`
+	Name string `pulumi:"name,optional"`
+}
+
+// Annotate provides SDK documentation for OCISubnetSelectorTermArgs fields.
+func (o *OCISubnetSelectorTermArgs) Annotate(a infer.Annotator) {
+	a.Describe(&o.Id, "Explicit OCI subnet OCID. Example: 'ocid1.subnet.oc1..aaaaaaaa'.")
+	a.Describe(&o.Name, "OCI subnet display name filter. Example: 'node-subnet'.")
+}
+
+// OCISecurityGroupSelectorTermArgs selects an OCI network security group.
+type OCISecurityGroupSelectorTermArgs struct {
+	Id   string `pulumi:"id,optional"`
+	Name string `pulumi:"name,optional"`
+}
+
+// Annotate provides SDK documentation for OCISecurityGroupSelectorTermArgs fields.
+func (o *OCISecurityGroupSelectorTermArgs) Annotate(a infer.Annotator) {
+	a.Describe(&o.Id, "Explicit OCI network security group OCID. Example: 'ocid1.networksecuritygroup.oc1..aaaaaaaa'.")
+	a.Describe(&o.Name, "OCI network security group display name filter. Example: 'node-nsg'.")
+}
+
+// OCIBootConfigArgs configures the OCI boot volume.
+type OCIBootConfigArgs struct {
+	BootVolumeSizeInGbs int `pulumi:"bootVolumeSizeInGbs,optional"`
+	BootVolumeVpusPerGb int `pulumi:"bootVolumeVpusPerGb,optional"`
+}
+
+// Annotate provides SDK documentation for OCIBootConfigArgs fields.
+func (o *OCIBootConfigArgs) Annotate(a infer.Annotator) {
+	a.Describe(&o.BootVolumeSizeInGbs, "Boot volume size in GB. Example: 100.")
+	a.Describe(&o.BootVolumeVpusPerGb, "Boot volume performance units per GB. Example: 10.")
+}
+
+// OCILaunchOptionsArgs configures OCI instance launch options.
+type OCILaunchOptionsArgs struct {
+	BootVolumeType                  *string `pulumi:"bootVolumeType,optional"`
+	Firmware                        *string `pulumi:"firmware,optional"`
+	NetworkType                     *string `pulumi:"networkType,optional"`
+	RemoteDataVolumeType            *string `pulumi:"remoteDataVolumeType,optional"`
+	IsConsistentVolumeNamingEnabled *bool   `pulumi:"isConsistentVolumeNamingEnabled,optional"`
+}
+
+// Annotate provides SDK documentation for OCILaunchOptionsArgs fields.
+func (o *OCILaunchOptionsArgs) Annotate(a infer.Annotator) {
+	a.Describe(&o.BootVolumeType, "Emulation type for the boot volume. Example: 'PARAVIRTUALIZED'.")
+	a.Describe(&o.Firmware, "Firmware used to boot the instance. Example: 'UEFI_64'.")
+	a.Describe(&o.NetworkType, "Emulation type for the network interface. Example: 'PARAVIRTUALIZED'.")
+	a.Describe(&o.RemoteDataVolumeType, "Emulation type for remote data volumes. Example: 'PARAVIRTUALIZED'.")
+	a.Describe(&o.IsConsistentVolumeNamingEnabled, "Whether consistent volume naming is enabled for the instance. Example: true.")
+}
+
+// OCIVolumeAttributesArgs configures an OCI block volume.
+type OCIVolumeAttributesArgs struct {
+	SizeInGbs int `pulumi:"sizeInGbs,optional"`
+	VpusPerGb int `pulumi:"vpusPerGb,optional"`
+}
+
+// Annotate provides SDK documentation for OCIVolumeAttributesArgs fields.
+func (o *OCIVolumeAttributesArgs) Annotate(a infer.Annotator) {
+	a.Describe(&o.SizeInGbs, "Block volume size in GB. Example: 50.")
+	a.Describe(&o.VpusPerGb, "Block volume performance units per GB. Example: 10.")
+}
+
+// OCINodeClassSpecArgs holds OCI-specific node class configuration.
+type OCINodeClassSpecArgs struct {
+	VcnId                 string                             `pulumi:"vcnId,optional"`
+	ImageSelector         []OCIImageSelectorTermArgs         `pulumi:"imageSelector,optional"`
+	SubnetSelector        []OCISubnetSelectorTermArgs        `pulumi:"subnetSelector,optional"`
+	SecurityGroupSelector []OCISecurityGroupSelectorTermArgs `pulumi:"securityGroupSelector,optional"`
+	UserData              *string                            `pulumi:"userData,optional"`
+	PreInstallScript      *string                            `pulumi:"preInstallScript,optional"`
+	MetaData              map[string]string                  `pulumi:"metaData,optional"`
+	ImageFamily           string                             `pulumi:"imageFamily,optional"`
+	Tags                  map[string]string                  `pulumi:"tags,optional"`
+	FreeFormTags          map[string]string                  `pulumi:"freeFormTags,optional"`
+	BootConfig            *OCIBootConfigArgs                 `pulumi:"bootConfig,optional"`
+	LaunchOptions         *OCILaunchOptionsArgs              `pulumi:"launchOptions,optional"`
+	BlockDevices          []OCIVolumeAttributesArgs          `pulumi:"blockDevices,optional"`
+	AgentList             []string                           `pulumi:"agentList,optional"`
+}
+
+// Annotate provides SDK documentation for OCINodeClassSpecArgs fields.
+func (o *OCINodeClassSpecArgs) Annotate(a infer.Annotator) {
+	a.Describe(&o.VcnId, "OCID of the VCN nodes will be launched into. Example: 'ocid1.vcn.oc1..aaaaaaaa'.")
+	a.Describe(&o.ImageSelector, "Selectors for the images used to launch nodes. Example: [{name: \"Oracle-Linux-8.9\"}].")
+	a.Describe(&o.SubnetSelector, "Selectors for the subnets nodes will be launched into.")
+	a.Describe(&o.SecurityGroupSelector, "Selectors for network security groups attached to provisioned nodes.")
+	a.Describe(&o.UserData, "Custom cloud-init user data merged into the node launch config (base64 or plain text). Example: '#!/bin/bash\\necho hello'.")
+	a.Describe(&o.PreInstallScript, "Script executed before node bootstrap. Example: '#!/bin/bash\\necho pre-install'.")
+	a.Describe(&o.MetaData, "OCI instance metadata applied to provisioned nodes. Example: {\"ssh_authorized_keys\": \"ssh-rsa ...\"}.")
+	a.Describe(&o.ImageFamily, "OCI node image family shorthand used when no imageSelector is specified. Example: 'Oracle-Linux-8'.")
+	a.Describe(&o.Tags, "OCI defined tags applied to all resources created by this node class.")
+	a.Describe(&o.FreeFormTags, "OCI free-form tags applied to all resources created by this node class. Example: {\"environment\": \"production\"}.")
+	a.Describe(&o.BootConfig, "Boot volume configuration for provisioned nodes.")
+	a.Describe(&o.LaunchOptions, "Instance launch options controlling firmware and network/volume emulation type.")
+	a.Describe(&o.BlockDevices, "Additional block volumes attached to provisioned nodes.")
+	a.Describe(&o.AgentList, "OCI compute instance agent plugins to enable. Example: [\"Compute Instance Monitoring\"].")
+}
+
 // RawKarpenterSpecArgs provides raw YAML for a custom Karpenter node pool / node class.
 type RawKarpenterSpecArgs struct {
 	NodepoolYaml  string `pulumi:"nodepoolYaml,optional"`
@@ -338,7 +508,11 @@ type NodePolicyArgs struct {
 	InstanceHypervisors *LabelSelectorArgs `pulumi:"instanceHypervisors,optional"`
 	InstanceGenerations *LabelSelectorArgs `pulumi:"instanceGenerations,optional"`
 	InstanceSizes       *LabelSelectorArgs `pulumi:"instanceSizes,optional"`
-	InstanceTypes       *LabelSelectorArgs `pulumi:"instanceTypes,optional"`
+	// GCP-only: standard/highcpu/highmem shape token.
+	InstanceShapes *LabelSelectorArgs `pulumi:"instanceShapes,optional"`
+	// UI tooltip text for the instanceShapes selector.
+	InstanceShapesTip *string            `pulumi:"instanceShapesTip,optional"`
+	InstanceTypes     *LabelSelectorArgs `pulumi:"instanceTypes,optional"`
 
 	// Node attribute selectors
 	Zones            *LabelSelectorArgs `pulumi:"zones,optional"`
@@ -350,6 +524,8 @@ type NodePolicyArgs struct {
 	Labels        map[string]string `pulumi:"labels,optional"`
 	Taints        []TaintArgs       `pulumi:"taints,optional"`
 	StartupTaints []TaintArgs       `pulumi:"startupTaints,optional"`
+	// UI tooltip text for startupTaints.
+	StartupTaintsTip *string `pulumi:"startupTaintsTip,optional"`
 
 	// Policy configuration
 	Disruption *DisruptionPolicyArgs `pulumi:"disruption,optional"`
@@ -362,11 +538,15 @@ type NodePolicyArgs struct {
 	// Cloud-specific configuration
 	Aws   *AWSNodeClassSpecArgs   `pulumi:"aws,optional"`
 	Azure *AzureNodeClassSpecArgs `pulumi:"azure,optional"`
+	Gcp   *GCPNodeClassSpecArgs   `pulumi:"gcp,optional"`
+	Oci   *OCINodeClassSpecArgs   `pulumi:"oci,optional"`
 
 	// AWS-only: behavior during an ARC zonal shift.
 	ZonalShift *ZonalShiftConfigArgs `pulumi:"zonalShift,optional"`
 	// AWS-only: ephemeral NVMe storage per node in GiB (karpenter.k8s.aws/instance-local-nvme).
 	InstanceLocalNvme *LabelSelectorArgs `pulumi:"instanceLocalNvme,optional"`
+	// UI tooltip text for the instanceLocalNvme selector.
+	InstanceLocalNvmeTip *string `pulumi:"instanceLocalNvmeTip,optional"`
 	// Informational: 1 = AWS, 2 = Azure, 3 = GCP, 4 = OCI. Compilation always uses the target cluster's provider.
 	CloudProviderId *int `pulumi:"cloudProviderId,optional"`
 	// AWS fallback for aws.role when neither role nor instanceProfile is set.
@@ -392,6 +572,8 @@ func (s *NodePolicyState) Annotate(a infer.Annotator) {
 	a.Describe(&s.InstanceHypervisors, "Filter instances by hypervisor type. Example: {in: [\"nitro\"]}.")
 	a.Describe(&s.InstanceGenerations, "Filter instances by generation number. Example: {in: [\"2\", \"3\"]}.")
 	a.Describe(&s.InstanceSizes, "Filter instances by size label. Example: {in: [\"large\", \"xlarge\", \"2xlarge\"]}.")
+	a.Describe(&s.InstanceShapes, "GCP-only: filter by standard/highcpu/highmem custom shape token. Example: {in: [\"standard\", \"highmem\"]}.")
+	a.Describe(&s.InstanceShapesTip, "UI tooltip text shown alongside the instanceShapes selector.")
 	a.Describe(&s.InstanceTypes, "Explicitly allow specific instance types. Example: {in: [\"m5.large\", \"c6i.large\"]}.")
 	a.Describe(&s.Zones, "Availability zones where nodes may be provisioned. Example: {in: [\"us-east-1a\", \"us-east-1b\"]}.")
 	a.Describe(&s.Architectures, "CPU architectures for nodes. Example: {in: [\"amd64\"]}.")
@@ -399,12 +581,16 @@ func (s *NodePolicyState) Annotate(a infer.Annotator) {
 	a.Describe(&s.OperatingSystems, "Operating systems for nodes. Example: {in: [\"linux\"]}.")
 	a.Describe(&s.Labels, "Labels applied to all provisioned nodes. Example: {\"team\": \"backend\", \"env\": \"prod\"}.")
 	a.Describe(&s.Taints, "Taints applied to provisioned nodes to control pod scheduling. Example: [{key: \"dedicated\", value: \"gpu\", effect: \"NoSchedule\"}].")
+	a.Describe(&s.StartupTaintsTip, "UI tooltip text shown alongside startupTaints.")
 	a.Describe(&s.Disruption, "Karpenter disruption policy controlling consolidation, expiry, and budgets.")
 	a.Describe(&s.Limits, "Resource limits on total capacity managed by this policy. Example: {cpu: \"1000\", memory: \"1000Gi\"}.")
 	a.Describe(&s.NodePoolName, "Override name for the generated Karpenter NodePool resource. Example: 'prod-spot-nodepool'.")
 	a.Describe(&s.NodeClassName, "Override name for the generated Karpenter NodeClass resource. Example: 'prod-aws-nodeclass'.")
 	a.Describe(&s.Aws, "AWS-specific EC2NodeClass configuration (subnets, AMIs, IAM role, EBS, etc.).")
 	a.Describe(&s.Azure, "Azure-specific AKSNodeClass configuration (VNet subnet, OS disk, image family, etc.).")
+	a.Describe(&s.Gcp, "GCP-specific GCENodeClass configuration (service account, images, disks, etc.).")
+	a.Describe(&s.Oci, "OCI-specific NodeClass configuration (VCN, subnets, images, block volumes, etc.).")
+	a.Describe(&s.InstanceLocalNvmeTip, "UI tooltip text shown alongside the instanceLocalNvme selector.")
 	a.Describe(&s.Raw, "Raw Karpenter YAML for full NodePool/NodeClass customization — use only when structured fields are insufficient.")
 }
 
@@ -551,8 +737,11 @@ func nodePolicyArgsToProto(teamID, id string, a NodePolicyArgs) *apiv1.NodePolic
 		Limits:              resourceLimitsToProto(a.Limits),
 		Aws:                 awsNodeClassSpecToProto(a.Aws),
 		Azure:               azureNodeClassSpecToProto(a.Azure),
+		Gcp:                 gcpNodeClassSpecToProto(a.Gcp),
+		Oci:                 ociNodeClassSpecToProto(a.Oci),
 		Raw:                 rawKarpenterSpecsToProto(a.Raw),
 		InstanceLocalNvme:   labelSelectorToProto(a.InstanceLocalNvme),
+		InstanceShapes:      labelSelectorToProto(a.InstanceShapes),
 	}
 	if a.Description != nil {
 		p.Description = *a.Description
@@ -570,6 +759,15 @@ func nodePolicyArgsToProto(teamID, id string, a NodePolicyArgs) *apiv1.NodePolic
 	}
 	if a.MasterOverrideRoleName != nil {
 		p.MasterOverrideRoleName = *a.MasterOverrideRoleName
+	}
+	if a.InstanceShapesTip != nil {
+		p.InstanceShapesTip = a.InstanceShapesTip
+	}
+	if a.StartupTaintsTip != nil {
+		p.StartupTaintsTip = a.StartupTaintsTip
+	}
+	if a.InstanceLocalNvmeTip != nil {
+		p.InstanceLocalNvmeTip = a.InstanceLocalNvmeTip
 	}
 	return p
 }
@@ -598,8 +796,11 @@ func nodePolicyProtoToArgs(p *apiv1.NodePolicy) NodePolicyArgs {
 		Limits:              resourceLimitsFromProto(p.Limits),
 		Aws:                 awsNodeClassSpecFromProto(p.Aws),
 		Azure:               azureNodeClassSpecFromProto(p.Azure),
+		Gcp:                 gcpNodeClassSpecFromProto(p.Gcp),
+		Oci:                 ociNodeClassSpecFromProto(p.Oci),
 		Raw:                 rawKarpenterSpecsFromProto(p.Raw),
 		InstanceLocalNvme:   labelSelectorFromProto(p.InstanceLocalNvme),
+		InstanceShapes:      labelSelectorFromProto(p.InstanceShapes),
 	}
 	if p.Description != "" {
 		a.Description = &p.Description
@@ -615,6 +816,9 @@ func nodePolicyProtoToArgs(p *apiv1.NodePolicy) NodePolicyArgs {
 	if p.MasterOverrideRoleName != "" {
 		a.MasterOverrideRoleName = &p.MasterOverrideRoleName
 	}
+	a.InstanceShapesTip = p.InstanceShapesTip
+	a.StartupTaintsTip = p.StartupTaintsTip
+	a.InstanceLocalNvmeTip = p.InstanceLocalNvmeTip
 	return a
 }
 
@@ -1221,4 +1425,194 @@ func azureKubeletConfigFromProto(cfg *apiv1.AzureKubeletConfiguration) *AzureKub
 		k.PodPidsLimit = &v
 	}
 	return k
+}
+
+// ---------- GCP NodeClass helpers ----------
+
+func gcpNodeClassSpecToProto(g *GCPNodeClassSpecArgs) *apiv1.GCPNodeClassSpec {
+	if g == nil {
+		return nil
+	}
+	spec := &apiv1.GCPNodeClassSpec{
+		ServiceAccount:       g.ServiceAccount,
+		KubeletConfiguration: kubeletConfigToProto(g.Kubelet),
+		Labels:               g.Labels,
+		Metadata:             g.Metadata,
+		NetworkTags:          g.NetworkTags,
+	}
+	if g.ImageFamily != nil {
+		spec.ImageFamily = g.ImageFamily
+	}
+	for _, t := range g.ImageSelectorTerms {
+		spec.ImageSelectorTerms = append(spec.ImageSelectorTerms, &apiv1.GCPImageSelectorTerm{
+			Alias: t.Alias,
+			Id:    t.Id,
+		})
+	}
+	for _, d := range g.Disks {
+		spec.Disks = append(spec.Disks, &apiv1.GCPDisk{
+			SizeGib:            int32(d.SizeGib),
+			Category:           d.Category,
+			Boot:               d.Boot,
+			SecondaryBootImage: d.SecondaryBootImage,
+			SecondaryBootMode:  d.SecondaryBootMode,
+		})
+	}
+	return spec
+}
+
+func gcpNodeClassSpecFromProto(spec *apiv1.GCPNodeClassSpec) *GCPNodeClassSpecArgs {
+	if spec == nil {
+		return nil
+	}
+	g := &GCPNodeClassSpecArgs{
+		ServiceAccount: spec.ServiceAccount,
+		Kubelet:        kubeletConfigFromProto(spec.KubeletConfiguration),
+		Labels:         spec.Labels,
+		Metadata:       spec.Metadata,
+		NetworkTags:    spec.NetworkTags,
+	}
+	if spec.ImageFamily != nil {
+		g.ImageFamily = spec.ImageFamily
+	}
+	for _, t := range spec.ImageSelectorTerms {
+		g.ImageSelectorTerms = append(g.ImageSelectorTerms, GCPImageSelectorTermArgs{
+			Alias: t.Alias,
+			Id:    t.Id,
+		})
+	}
+	for _, d := range spec.Disks {
+		g.Disks = append(g.Disks, GCPDiskArgs{
+			SizeGib:            int(d.SizeGib),
+			Category:           d.Category,
+			Boot:               d.Boot,
+			SecondaryBootImage: d.SecondaryBootImage,
+			SecondaryBootMode:  d.SecondaryBootMode,
+		})
+	}
+	return g
+}
+
+// ---------- OCI NodeClass helpers ----------
+
+func ociNodeClassSpecToProto(o *OCINodeClassSpecArgs) *apiv1.OCINodeClassSpec {
+	if o == nil {
+		return nil
+	}
+	spec := &apiv1.OCINodeClassSpec{
+		VcnId:        o.VcnId,
+		MetaData:     o.MetaData,
+		ImageFamily:  o.ImageFamily,
+		Tags:         o.Tags,
+		FreeFormTags: o.FreeFormTags,
+		AgentList:    o.AgentList,
+	}
+	if o.UserData != nil {
+		spec.UserData = o.UserData
+	}
+	if o.PreInstallScript != nil {
+		spec.PreInstallScript = o.PreInstallScript
+	}
+	for _, t := range o.ImageSelector {
+		spec.ImageSelector = append(spec.ImageSelector, &apiv1.OCIImageSelectorTerm{
+			Id:            t.Id,
+			Name:          t.Name,
+			CompartmentId: t.CompartmentId,
+		})
+	}
+	for _, t := range o.SubnetSelector {
+		spec.SubnetSelector = append(spec.SubnetSelector, &apiv1.OCISubnetSelectorTerm{
+			Id:   t.Id,
+			Name: t.Name,
+		})
+	}
+	for _, t := range o.SecurityGroupSelector {
+		spec.SecurityGroupSelector = append(spec.SecurityGroupSelector, &apiv1.OCISecurityGroupSelectorTerm{
+			Id:   t.Id,
+			Name: t.Name,
+		})
+	}
+	if o.BootConfig != nil {
+		spec.BootConfig = &apiv1.OCIBootConfig{
+			BootVolumeSizeInGbs: int64(o.BootConfig.BootVolumeSizeInGbs),
+			BootVolumeVpusPerGb: int64(o.BootConfig.BootVolumeVpusPerGb),
+		}
+	}
+	if o.LaunchOptions != nil {
+		spec.LaunchOptions = &apiv1.OCILaunchOptions{
+			BootVolumeType:                  o.LaunchOptions.BootVolumeType,
+			Firmware:                        o.LaunchOptions.Firmware,
+			NetworkType:                     o.LaunchOptions.NetworkType,
+			RemoteDataVolumeType:            o.LaunchOptions.RemoteDataVolumeType,
+			IsConsistentVolumeNamingEnabled: o.LaunchOptions.IsConsistentVolumeNamingEnabled,
+		}
+	}
+	for _, b := range o.BlockDevices {
+		spec.BlockDevices = append(spec.BlockDevices, &apiv1.OCIVolumeAttributes{
+			SizeInGbs: int64(b.SizeInGbs),
+			VpusPerGb: int64(b.VpusPerGb),
+		})
+	}
+	return spec
+}
+
+func ociNodeClassSpecFromProto(spec *apiv1.OCINodeClassSpec) *OCINodeClassSpecArgs {
+	if spec == nil {
+		return nil
+	}
+	o := &OCINodeClassSpecArgs{
+		VcnId:        spec.VcnId,
+		MetaData:     spec.MetaData,
+		ImageFamily:  spec.ImageFamily,
+		Tags:         spec.Tags,
+		FreeFormTags: spec.FreeFormTags,
+		AgentList:    spec.AgentList,
+	}
+	if spec.UserData != nil {
+		o.UserData = spec.UserData
+	}
+	if spec.PreInstallScript != nil {
+		o.PreInstallScript = spec.PreInstallScript
+	}
+	for _, t := range spec.ImageSelector {
+		o.ImageSelector = append(o.ImageSelector, OCIImageSelectorTermArgs{
+			Id:            t.Id,
+			Name:          t.Name,
+			CompartmentId: t.CompartmentId,
+		})
+	}
+	for _, t := range spec.SubnetSelector {
+		o.SubnetSelector = append(o.SubnetSelector, OCISubnetSelectorTermArgs{
+			Id:   t.Id,
+			Name: t.Name,
+		})
+	}
+	for _, t := range spec.SecurityGroupSelector {
+		o.SecurityGroupSelector = append(o.SecurityGroupSelector, OCISecurityGroupSelectorTermArgs{
+			Id:   t.Id,
+			Name: t.Name,
+		})
+	}
+	if spec.BootConfig != nil {
+		o.BootConfig = &OCIBootConfigArgs{
+			BootVolumeSizeInGbs: int(spec.BootConfig.BootVolumeSizeInGbs),
+			BootVolumeVpusPerGb: int(spec.BootConfig.BootVolumeVpusPerGb),
+		}
+	}
+	if spec.LaunchOptions != nil {
+		o.LaunchOptions = &OCILaunchOptionsArgs{
+			BootVolumeType:                  spec.LaunchOptions.BootVolumeType,
+			Firmware:                        spec.LaunchOptions.Firmware,
+			NetworkType:                     spec.LaunchOptions.NetworkType,
+			RemoteDataVolumeType:            spec.LaunchOptions.RemoteDataVolumeType,
+			IsConsistentVolumeNamingEnabled: spec.LaunchOptions.IsConsistentVolumeNamingEnabled,
+		}
+	}
+	for _, b := range spec.BlockDevices {
+		o.BlockDevices = append(o.BlockDevices, OCIVolumeAttributesArgs{
+			SizeInGbs: int(b.SizeInGbs),
+			VpusPerGb: int(b.VpusPerGb),
+		})
+	}
+	return o
 }

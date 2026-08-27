@@ -342,6 +342,75 @@ export namespace resources {
         oomMemoryMultiplier?: pulumi.Input<number>;
     }
 
+    export interface GCPDiskArgsArgs {
+        /**
+         * Whether this disk is the boot disk. Example: true.
+         */
+        boot?: pulumi.Input<boolean>;
+        /**
+         * GCP disk type. Example: 'pd-ssd'.
+         */
+        category?: pulumi.Input<string>;
+        /**
+         * Secondary boot image used for container-image fast boot. Example: 'projects/my-project/global/images/my-cache-image'.
+         */
+        secondaryBootImage?: pulumi.Input<string>;
+        /**
+         * Secondary boot mode. Example: 'CONTAINER_IMAGE_CACHE'.
+         */
+        secondaryBootMode?: pulumi.Input<string>;
+        /**
+         * Disk size in GiB. Example: 100.
+         */
+        sizeGib?: pulumi.Input<number>;
+    }
+
+    export interface GCPImageSelectorTermArgsArgs {
+        /**
+         * Well-known alias for the GCP node image family. Example: 'cos@latest'.
+         */
+        alias?: pulumi.Input<string>;
+        /**
+         * Explicit GCP image ID. Example: 'projects/cos-cloud/global/images/cos-105-17412-156-59'.
+         */
+        id?: pulumi.Input<string>;
+    }
+
+    export interface GCPNodeClassSpecArgsArgs {
+        /**
+         * Disks attached to provisioned nodes. Example: [{sizeGib: 100, category: "pd-ssd", boot: true}].
+         */
+        disks?: pulumi.Input<pulumi.Input<inputs.resources.GCPDiskArgsArgs>[]>;
+        /**
+         * GCP node image family shorthand used when no imageSelectorTerms are specified. Example: 'cos'.
+         */
+        imageFamily?: pulumi.Input<string>;
+        /**
+         * Selectors for the node images used to launch nodes. Example: [{alias: "cos@latest"}].
+         */
+        imageSelectorTerms?: pulumi.Input<pulumi.Input<inputs.resources.GCPImageSelectorTermArgsArgs>[]>;
+        /**
+         * Kubelet configuration overrides applied to all nodes in this class.
+         */
+        kubelet?: pulumi.Input<inputs.resources.KubeletConfigurationArgsArgs>;
+        /**
+         * GCP labels applied to all resources created by this node class. Example: {"environment": "production"}.
+         */
+        labels?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+        /**
+         * GCE instance metadata applied to provisioned nodes. Example: {"disable-legacy-endpoints": "true"}.
+         */
+        metadata?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+        /**
+         * GCP network tags applied to provisioned nodes for firewall targeting. Example: ["karpenter-node"].
+         */
+        networkTags?: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * GCP service account email attached to provisioned nodes. Example: 'karpenter@my-project.iam.gserviceaccount.com'.
+         */
+        serviceAccount?: pulumi.Input<string>;
+    }
+
     export interface HPABehaviorArgsArgs {
         /**
          * Scale-down behavior rules.
@@ -504,6 +573,144 @@ export namespace resources {
         targetUtilization?: pulumi.Input<number>;
     }
 
+    export interface JvmHeapRuleConfigArgsArgs {
+        /**
+         * Enable JVM heap sizing overrides. Example: true.
+         */
+        enabled?: pulumi.Input<boolean>;
+        /**
+         * Multiplier applied above the target usage to derive the heap size. Example: 1.3.
+         */
+        headroomMultiplier?: pulumi.Input<number>;
+        /**
+         * Maximum JVM heap size in bytes. Example: 2147483648.
+         */
+        maxHeapBytes?: pulumi.Input<number>;
+        /**
+         * Minimum JVM heap size in bytes. Example: 134217728.
+         */
+        minHeapBytes?: pulumi.Input<number>;
+        /**
+         * Non-heap memory overhead in bytes. Takes precedence over nonHeapOverheadPercent when set. Example: 268435456.
+         */
+        nonHeapOverheadBytes?: pulumi.Input<number>;
+        /**
+         * Non-heap memory overhead as a percentage of container memory (0-1). Example: 0.2.
+         */
+        nonHeapOverheadPercent?: pulumi.Input<number>;
+        /**
+         * Prefer the JVM's native container-aware heap sizing (-XX:+UseContainerSupport) over explicit -Xmx/-Xms flags. Example: false.
+         */
+        preferContainerSupport?: pulumi.Input<boolean>;
+        /**
+         * Percentile of usage data used as the heap sizing target (0-1). Example: 0.95.
+         */
+        targetPercentile?: pulumi.Input<number>;
+    }
+
+    export interface KedaAdvancedArgsArgs {
+        /**
+         * Kubernetes HorizontalPodAutoscalerBehavior encoded as a JSON string, applied to the generated HPA. Example: '{"scaleDown":{"stabilizationWindowSeconds":300}}'.
+         */
+        advancedBehaviorJson?: pulumi.Input<string>;
+        /**
+         * Restore the original replica count when the ScaledObject is deleted. Example: false.
+         */
+        restoreToOriginalReplicaCount?: pulumi.Input<boolean>;
+    }
+
+    export interface KedaAuthenticationRefArgsArgs {
+        /**
+         * Kind of the referenced resource. One of: 'TriggerAuthentication', 'ClusterTriggerAuthentication'. Example: 'TriggerAuthentication'.
+         */
+        kind?: pulumi.Input<string>;
+        /**
+         * Name of the referenced TriggerAuthentication/ClusterTriggerAuthentication resource. Example: 'prometheus-auth'.
+         */
+        name: pulumi.Input<string>;
+    }
+
+    export interface KedaFallbackArgsArgs {
+        /**
+         * Fallback strategy. Example: 'static'.
+         */
+        behavior?: pulumi.Input<string>;
+        /**
+         * Number of consecutive metric failures before activating fallback. Example: 3.
+         */
+        failureThreshold: pulumi.Input<number>;
+        /**
+         * Number of replicas to fall back to when metrics are unavailable. Example: 2.
+         */
+        replicas: pulumi.Input<number>;
+    }
+
+    export interface KedaScaledObjectArgsArgs {
+        /**
+         * Advanced ScaledObject behavior configuration.
+         */
+        advanced?: pulumi.Input<inputs.resources.KedaAdvancedArgsArgs>;
+        /**
+         * Seconds to wait after the last trigger reports active=false before scaling to minReplicaCount. Example: 300.
+         */
+        cooldownPeriod?: pulumi.Input<number>;
+        /**
+         * Replica fallback configuration when KEDA metrics are unavailable.
+         */
+        fallback?: pulumi.Input<inputs.resources.KedaFallbackArgsArgs>;
+        /**
+         * Replica count to scale to when idle. Must be less than minReplicaCount. Example: 0.
+         */
+        idleReplicaCount?: pulumi.Input<number>;
+        /**
+         * Cooldown period applied only during the initial scaling of the ScaledObject. Example: 0.
+         */
+        initialCooldownPeriod?: pulumi.Input<number>;
+        /**
+         * Maximum number of replicas. Example: 10.
+         */
+        maxReplicaCount?: pulumi.Input<number>;
+        /**
+         * Minimum number of replicas. Example: 0.
+         */
+        minReplicaCount?: pulumi.Input<number>;
+        /**
+         * Seconds between checks of trigger metrics. Example: 30.
+         */
+        pollingInterval?: pulumi.Input<number>;
+        /**
+         * KEDA scaler triggers driving this ScaledObject.
+         */
+        triggers?: pulumi.Input<pulumi.Input<inputs.resources.KedaTriggerArgsArgs>[]>;
+    }
+
+    export interface KedaTriggerArgsArgs {
+        /**
+         * Reference to a TriggerAuthentication or ClusterTriggerAuthentication for this trigger.
+         */
+        authenticationRef?: pulumi.Input<inputs.resources.KedaAuthenticationRefArgsArgs>;
+        /**
+         * Scaler-specific configuration key-value pairs. Example: {"serverAddress": "http://prometheus:9090", "query": "sum(rate(http_requests_total[2m]))"}.
+         */
+        metadata?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+        /**
+         * Metric target type. One of: 'Value', 'AverageValue', 'Utilization'. Example: 'AverageValue'.
+         */
+        metricType?: pulumi.Input<string>;
+        /**
+         * Optional trigger name, used to disambiguate multiple triggers of the same type. Example: 'requests-per-second'.
+         */
+        name?: pulumi.Input<string>;
+        /**
+         * KEDA scaler type. Example: 'prometheus'.
+         */
+        type: pulumi.Input<string>;
+        /**
+         * Use KEDA's metric caching for this trigger. Example: false.
+         */
+        useCachedMetrics?: pulumi.Input<boolean>;
+    }
+
     export interface KubeletConfigurationArgsArgs {
         /**
          * DNS server IP addresses passed to kubelet. Example: ["10.96.0.10"].
@@ -609,6 +816,147 @@ export namespace resources {
          * Regular expression pattern to match workload names.
          */
         pattern?: pulumi.Input<string>;
+    }
+
+    export interface OCIBootConfigArgsArgs {
+        /**
+         * Boot volume size in GB. Example: 100.
+         */
+        bootVolumeSizeInGbs?: pulumi.Input<number>;
+        /**
+         * Boot volume performance units per GB. Example: 10.
+         */
+        bootVolumeVpusPerGb?: pulumi.Input<number>;
+    }
+
+    export interface OCIImageSelectorTermArgsArgs {
+        /**
+         * OCID of the compartment containing the image. Example: 'ocid1.compartment.oc1..aaaaaaaa'.
+         */
+        compartmentId?: pulumi.Input<string>;
+        /**
+         * Explicit OCI image OCID. Example: 'ocid1.image.oc1..aaaaaaaa'.
+         */
+        id?: pulumi.Input<string>;
+        /**
+         * OCI image display name filter. Example: 'Oracle-Linux-8.9'.
+         */
+        name?: pulumi.Input<string>;
+    }
+
+    export interface OCILaunchOptionsArgsArgs {
+        /**
+         * Emulation type for the boot volume. Example: 'PARAVIRTUALIZED'.
+         */
+        bootVolumeType?: pulumi.Input<string>;
+        /**
+         * Firmware used to boot the instance. Example: 'UEFI_64'.
+         */
+        firmware?: pulumi.Input<string>;
+        /**
+         * Whether consistent volume naming is enabled for the instance. Example: true.
+         */
+        isConsistentVolumeNamingEnabled?: pulumi.Input<boolean>;
+        /**
+         * Emulation type for the network interface. Example: 'PARAVIRTUALIZED'.
+         */
+        networkType?: pulumi.Input<string>;
+        /**
+         * Emulation type for remote data volumes. Example: 'PARAVIRTUALIZED'.
+         */
+        remoteDataVolumeType?: pulumi.Input<string>;
+    }
+
+    export interface OCINodeClassSpecArgsArgs {
+        /**
+         * OCI compute instance agent plugins to enable. Example: ["Compute Instance Monitoring"].
+         */
+        agentList?: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * Additional block volumes attached to provisioned nodes.
+         */
+        blockDevices?: pulumi.Input<pulumi.Input<inputs.resources.OCIVolumeAttributesArgsArgs>[]>;
+        /**
+         * Boot volume configuration for provisioned nodes.
+         */
+        bootConfig?: pulumi.Input<inputs.resources.OCIBootConfigArgsArgs>;
+        /**
+         * OCI free-form tags applied to all resources created by this node class. Example: {"environment": "production"}.
+         */
+        freeFormTags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+        /**
+         * OCI node image family shorthand used when no imageSelector is specified. Example: 'Oracle-Linux-8'.
+         */
+        imageFamily?: pulumi.Input<string>;
+        /**
+         * Selectors for the images used to launch nodes. Example: [{name: "Oracle-Linux-8.9"}].
+         */
+        imageSelector?: pulumi.Input<pulumi.Input<inputs.resources.OCIImageSelectorTermArgsArgs>[]>;
+        /**
+         * Instance launch options controlling firmware and network/volume emulation type.
+         */
+        launchOptions?: pulumi.Input<inputs.resources.OCILaunchOptionsArgsArgs>;
+        /**
+         * OCI instance metadata applied to provisioned nodes. Example: {"ssh_authorized_keys": "ssh-rsa ..."}.
+         */
+        metaData?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+        /**
+         * Script executed before node bootstrap. Example: '#!/bin/bash\necho pre-install'.
+         */
+        preInstallScript?: pulumi.Input<string>;
+        /**
+         * Selectors for network security groups attached to provisioned nodes.
+         */
+        securityGroupSelector?: pulumi.Input<pulumi.Input<inputs.resources.OCISecurityGroupSelectorTermArgsArgs>[]>;
+        /**
+         * Selectors for the subnets nodes will be launched into.
+         */
+        subnetSelector?: pulumi.Input<pulumi.Input<inputs.resources.OCISubnetSelectorTermArgsArgs>[]>;
+        /**
+         * OCI defined tags applied to all resources created by this node class.
+         */
+        tags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+        /**
+         * Custom cloud-init user data merged into the node launch config (base64 or plain text). Example: '#!/bin/bash\necho hello'.
+         */
+        userData?: pulumi.Input<string>;
+        /**
+         * OCID of the VCN nodes will be launched into. Example: 'ocid1.vcn.oc1..aaaaaaaa'.
+         */
+        vcnId?: pulumi.Input<string>;
+    }
+
+    export interface OCISecurityGroupSelectorTermArgsArgs {
+        /**
+         * Explicit OCI network security group OCID. Example: 'ocid1.networksecuritygroup.oc1..aaaaaaaa'.
+         */
+        id?: pulumi.Input<string>;
+        /**
+         * OCI network security group display name filter. Example: 'node-nsg'.
+         */
+        name?: pulumi.Input<string>;
+    }
+
+    export interface OCISubnetSelectorTermArgsArgs {
+        /**
+         * Explicit OCI subnet OCID. Example: 'ocid1.subnet.oc1..aaaaaaaa'.
+         */
+        id?: pulumi.Input<string>;
+        /**
+         * OCI subnet display name filter. Example: 'node-subnet'.
+         */
+        name?: pulumi.Input<string>;
+    }
+
+    export interface OCIVolumeAttributesArgsArgs {
+        /**
+         * Block volume size in GB. Example: 50.
+         */
+        sizeInGbs?: pulumi.Input<number>;
+        /**
+         * Block volume performance units per GB. Example: 10.
+         */
+        vpusPerGb?: pulumi.Input<number>;
     }
 
     export interface RawKarpenterSpecArgsArgs {

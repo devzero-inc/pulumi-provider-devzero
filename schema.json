@@ -501,6 +501,96 @@
             },
             "type": "object"
         },
+        "devzero:resources:GCPDiskArgs": {
+            "properties": {
+                "boot": {
+                    "type": "boolean",
+                    "description": "Whether this disk is the boot disk. Example: true."
+                },
+                "category": {
+                    "type": "string",
+                    "description": "GCP disk type. Example: 'pd-ssd'."
+                },
+                "secondaryBootImage": {
+                    "type": "string",
+                    "description": "Secondary boot image used for container-image fast boot. Example: 'projects/my-project/global/images/my-cache-image'."
+                },
+                "secondaryBootMode": {
+                    "type": "string",
+                    "description": "Secondary boot mode. Example: 'CONTAINER_IMAGE_CACHE'."
+                },
+                "sizeGib": {
+                    "type": "integer",
+                    "description": "Disk size in GiB. Example: 100."
+                }
+            },
+            "type": "object"
+        },
+        "devzero:resources:GCPImageSelectorTermArgs": {
+            "properties": {
+                "alias": {
+                    "type": "string",
+                    "description": "Well-known alias for the GCP node image family. Example: 'cos@latest'."
+                },
+                "id": {
+                    "type": "string",
+                    "description": "Explicit GCP image ID. Example: 'projects/cos-cloud/global/images/cos-105-17412-156-59'."
+                }
+            },
+            "type": "object"
+        },
+        "devzero:resources:GCPNodeClassSpecArgs": {
+            "properties": {
+                "disks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/types/devzero:resources:GCPDiskArgs"
+                    },
+                    "description": "Disks attached to provisioned nodes. Example: [{sizeGib: 100, category: \"pd-ssd\", boot: true}]."
+                },
+                "imageFamily": {
+                    "type": "string",
+                    "description": "GCP node image family shorthand used when no imageSelectorTerms are specified. Example: 'cos'."
+                },
+                "imageSelectorTerms": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/types/devzero:resources:GCPImageSelectorTermArgs"
+                    },
+                    "description": "Selectors for the node images used to launch nodes. Example: [{alias: \"cos@latest\"}]."
+                },
+                "kubelet": {
+                    "$ref": "#/types/devzero:resources:KubeletConfigurationArgs",
+                    "description": "Kubelet configuration overrides applied to all nodes in this class."
+                },
+                "labels": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "GCP labels applied to all resources created by this node class. Example: {\"environment\": \"production\"}."
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "GCE instance metadata applied to provisioned nodes. Example: {\"disable-legacy-endpoints\": \"true\"}."
+                },
+                "networkTags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "GCP network tags applied to provisioned nodes for firewall targeting. Example: [\"karpenter-node\"]."
+                },
+                "serviceAccount": {
+                    "type": "string",
+                    "description": "GCP service account email attached to provisioned nodes. Example: 'karpenter@my-project.iam.gserviceaccount.com'."
+                }
+            },
+            "type": "object"
+        },
         "devzero:resources:HPABehaviorArgs": {
             "properties": {
                 "scaleDown": {
@@ -714,6 +804,172 @@
             },
             "type": "object"
         },
+        "devzero:resources:JvmHeapRuleConfigArgs": {
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable JVM heap sizing overrides. Example: true."
+                },
+                "headroomMultiplier": {
+                    "type": "number",
+                    "description": "Multiplier applied above the target usage to derive the heap size. Example: 1.3."
+                },
+                "maxHeapBytes": {
+                    "type": "integer",
+                    "description": "Maximum JVM heap size in bytes. Example: 2147483648."
+                },
+                "minHeapBytes": {
+                    "type": "integer",
+                    "description": "Minimum JVM heap size in bytes. Example: 134217728."
+                },
+                "nonHeapOverheadBytes": {
+                    "type": "integer",
+                    "description": "Non-heap memory overhead in bytes. Takes precedence over nonHeapOverheadPercent when set. Example: 268435456."
+                },
+                "nonHeapOverheadPercent": {
+                    "type": "number",
+                    "description": "Non-heap memory overhead as a percentage of container memory (0-1). Example: 0.2."
+                },
+                "preferContainerSupport": {
+                    "type": "boolean",
+                    "description": "Prefer the JVM's native container-aware heap sizing (-XX:+UseContainerSupport) over explicit -Xmx/-Xms flags. Example: false."
+                },
+                "targetPercentile": {
+                    "type": "number",
+                    "description": "Percentile of usage data used as the heap sizing target (0-1). Example: 0.95."
+                }
+            },
+            "type": "object"
+        },
+        "devzero:resources:KedaAdvancedArgs": {
+            "properties": {
+                "advancedBehaviorJson": {
+                    "type": "string",
+                    "description": "Kubernetes HorizontalPodAutoscalerBehavior encoded as a JSON string, applied to the generated HPA. Example: '{\"scaleDown\":{\"stabilizationWindowSeconds\":300}}'."
+                },
+                "restoreToOriginalReplicaCount": {
+                    "type": "boolean",
+                    "description": "Restore the original replica count when the ScaledObject is deleted. Example: false."
+                }
+            },
+            "type": "object"
+        },
+        "devzero:resources:KedaAuthenticationRefArgs": {
+            "properties": {
+                "kind": {
+                    "type": "string",
+                    "description": "Kind of the referenced resource. One of: 'TriggerAuthentication', 'ClusterTriggerAuthentication'. Example: 'TriggerAuthentication'."
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Name of the referenced TriggerAuthentication/ClusterTriggerAuthentication resource. Example: 'prometheus-auth'."
+                }
+            },
+            "type": "object",
+            "required": [
+                "name"
+            ]
+        },
+        "devzero:resources:KedaFallbackArgs": {
+            "properties": {
+                "behavior": {
+                    "type": "string",
+                    "description": "Fallback strategy. Example: 'static'."
+                },
+                "failureThreshold": {
+                    "type": "integer",
+                    "description": "Number of consecutive metric failures before activating fallback. Example: 3."
+                },
+                "replicas": {
+                    "type": "integer",
+                    "description": "Number of replicas to fall back to when metrics are unavailable. Example: 2."
+                }
+            },
+            "type": "object",
+            "required": [
+                "failureThreshold",
+                "replicas"
+            ]
+        },
+        "devzero:resources:KedaScaledObjectArgs": {
+            "properties": {
+                "advanced": {
+                    "$ref": "#/types/devzero:resources:KedaAdvancedArgs",
+                    "description": "Advanced ScaledObject behavior configuration."
+                },
+                "cooldownPeriod": {
+                    "type": "integer",
+                    "description": "Seconds to wait after the last trigger reports active=false before scaling to minReplicaCount. Example: 300."
+                },
+                "fallback": {
+                    "$ref": "#/types/devzero:resources:KedaFallbackArgs",
+                    "description": "Replica fallback configuration when KEDA metrics are unavailable."
+                },
+                "idleReplicaCount": {
+                    "type": "integer",
+                    "description": "Replica count to scale to when idle. Must be less than minReplicaCount. Example: 0."
+                },
+                "initialCooldownPeriod": {
+                    "type": "integer",
+                    "description": "Cooldown period applied only during the initial scaling of the ScaledObject. Example: 0."
+                },
+                "maxReplicaCount": {
+                    "type": "integer",
+                    "description": "Maximum number of replicas. Example: 10."
+                },
+                "minReplicaCount": {
+                    "type": "integer",
+                    "description": "Minimum number of replicas. Example: 0."
+                },
+                "pollingInterval": {
+                    "type": "integer",
+                    "description": "Seconds between checks of trigger metrics. Example: 30."
+                },
+                "triggers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/types/devzero:resources:KedaTriggerArgs"
+                    },
+                    "description": "KEDA scaler triggers driving this ScaledObject."
+                }
+            },
+            "type": "object"
+        },
+        "devzero:resources:KedaTriggerArgs": {
+            "properties": {
+                "authenticationRef": {
+                    "$ref": "#/types/devzero:resources:KedaAuthenticationRefArgs",
+                    "description": "Reference to a TriggerAuthentication or ClusterTriggerAuthentication for this trigger."
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Scaler-specific configuration key-value pairs. Example: {\"serverAddress\": \"http://prometheus:9090\", \"query\": \"sum(rate(http_requests_total[2m]))\"}."
+                },
+                "metricType": {
+                    "type": "string",
+                    "description": "Metric target type. One of: 'Value', 'AverageValue', 'Utilization'. Example: 'AverageValue'."
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Optional trigger name, used to disambiguate multiple triggers of the same type. Example: 'requests-per-second'."
+                },
+                "type": {
+                    "type": "string",
+                    "description": "KEDA scaler type. Example: 'prometheus'."
+                },
+                "useCachedMetrics": {
+                    "type": "boolean",
+                    "description": "Use KEDA's metric caching for this trigger. Example: false."
+                }
+            },
+            "type": "object",
+            "required": [
+                "type"
+            ]
+        },
         "devzero:resources:KubeletConfigurationArgs": {
             "properties": {
                 "clusterDns": {
@@ -860,6 +1116,185 @@
                 "pattern": {
                     "type": "string",
                     "description": "Regular expression pattern to match workload names."
+                }
+            },
+            "type": "object"
+        },
+        "devzero:resources:OCIBootConfigArgs": {
+            "properties": {
+                "bootVolumeSizeInGbs": {
+                    "type": "integer",
+                    "description": "Boot volume size in GB. Example: 100."
+                },
+                "bootVolumeVpusPerGb": {
+                    "type": "integer",
+                    "description": "Boot volume performance units per GB. Example: 10."
+                }
+            },
+            "type": "object"
+        },
+        "devzero:resources:OCIImageSelectorTermArgs": {
+            "properties": {
+                "compartmentId": {
+                    "type": "string",
+                    "description": "OCID of the compartment containing the image. Example: 'ocid1.compartment.oc1..aaaaaaaa'."
+                },
+                "id": {
+                    "type": "string",
+                    "description": "Explicit OCI image OCID. Example: 'ocid1.image.oc1..aaaaaaaa'."
+                },
+                "name": {
+                    "type": "string",
+                    "description": "OCI image display name filter. Example: 'Oracle-Linux-8.9'."
+                }
+            },
+            "type": "object"
+        },
+        "devzero:resources:OCILaunchOptionsArgs": {
+            "properties": {
+                "bootVolumeType": {
+                    "type": "string",
+                    "description": "Emulation type for the boot volume. Example: 'PARAVIRTUALIZED'."
+                },
+                "firmware": {
+                    "type": "string",
+                    "description": "Firmware used to boot the instance. Example: 'UEFI_64'."
+                },
+                "isConsistentVolumeNamingEnabled": {
+                    "type": "boolean",
+                    "description": "Whether consistent volume naming is enabled for the instance. Example: true."
+                },
+                "networkType": {
+                    "type": "string",
+                    "description": "Emulation type for the network interface. Example: 'PARAVIRTUALIZED'."
+                },
+                "remoteDataVolumeType": {
+                    "type": "string",
+                    "description": "Emulation type for remote data volumes. Example: 'PARAVIRTUALIZED'."
+                }
+            },
+            "type": "object"
+        },
+        "devzero:resources:OCINodeClassSpecArgs": {
+            "properties": {
+                "agentList": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "OCI compute instance agent plugins to enable. Example: [\"Compute Instance Monitoring\"]."
+                },
+                "blockDevices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/types/devzero:resources:OCIVolumeAttributesArgs"
+                    },
+                    "description": "Additional block volumes attached to provisioned nodes."
+                },
+                "bootConfig": {
+                    "$ref": "#/types/devzero:resources:OCIBootConfigArgs",
+                    "description": "Boot volume configuration for provisioned nodes."
+                },
+                "freeFormTags": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "OCI free-form tags applied to all resources created by this node class. Example: {\"environment\": \"production\"}."
+                },
+                "imageFamily": {
+                    "type": "string",
+                    "description": "OCI node image family shorthand used when no imageSelector is specified. Example: 'Oracle-Linux-8'."
+                },
+                "imageSelector": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/types/devzero:resources:OCIImageSelectorTermArgs"
+                    },
+                    "description": "Selectors for the images used to launch nodes. Example: [{name: \"Oracle-Linux-8.9\"}]."
+                },
+                "launchOptions": {
+                    "$ref": "#/types/devzero:resources:OCILaunchOptionsArgs",
+                    "description": "Instance launch options controlling firmware and network/volume emulation type."
+                },
+                "metaData": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "OCI instance metadata applied to provisioned nodes. Example: {\"ssh_authorized_keys\": \"ssh-rsa ...\"}."
+                },
+                "preInstallScript": {
+                    "type": "string",
+                    "description": "Script executed before node bootstrap. Example: '#!/bin/bash\\necho pre-install'."
+                },
+                "securityGroupSelector": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/types/devzero:resources:OCISecurityGroupSelectorTermArgs"
+                    },
+                    "description": "Selectors for network security groups attached to provisioned nodes."
+                },
+                "subnetSelector": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/types/devzero:resources:OCISubnetSelectorTermArgs"
+                    },
+                    "description": "Selectors for the subnets nodes will be launched into."
+                },
+                "tags": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "OCI defined tags applied to all resources created by this node class."
+                },
+                "userData": {
+                    "type": "string",
+                    "description": "Custom cloud-init user data merged into the node launch config (base64 or plain text). Example: '#!/bin/bash\\necho hello'."
+                },
+                "vcnId": {
+                    "type": "string",
+                    "description": "OCID of the VCN nodes will be launched into. Example: 'ocid1.vcn.oc1..aaaaaaaa'."
+                }
+            },
+            "type": "object"
+        },
+        "devzero:resources:OCISecurityGroupSelectorTermArgs": {
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Explicit OCI network security group OCID. Example: 'ocid1.networksecuritygroup.oc1..aaaaaaaa'."
+                },
+                "name": {
+                    "type": "string",
+                    "description": "OCI network security group display name filter. Example: 'node-nsg'."
+                }
+            },
+            "type": "object"
+        },
+        "devzero:resources:OCISubnetSelectorTermArgs": {
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Explicit OCI subnet OCID. Example: 'ocid1.subnet.oc1..aaaaaaaa'."
+                },
+                "name": {
+                    "type": "string",
+                    "description": "OCI subnet display name filter. Example: 'node-subnet'."
+                }
+            },
+            "type": "object"
+        },
+        "devzero:resources:OCIVolumeAttributesArgs": {
+            "properties": {
+                "sizeInGbs": {
+                    "type": "integer",
+                    "description": "Block volume size in GB. Example: 50."
+                },
+                "vpusPerGb": {
+                    "type": "integer",
+                    "description": "Block volume performance units per GB. Example: 10."
                 }
             },
             "type": "object"
@@ -1103,7 +1538,7 @@
                 },
                 "token": {
                     "type": "string",
-                    "description": "Authentication token for the cluster. Rotated automatically if empty on update (e.g. after import).",
+                    "description": "Bearer token minted for the cluster at creation. Not retrievable afterwards; imported clusters have an empty token (rotate it deliberately from the DevZero UI if you need it in state).",
                     "secret": true
                 }
             },
@@ -1149,6 +1584,10 @@
                     "$ref": "#/types/devzero:resources:DisruptionPolicyArgs",
                     "description": "Karpenter disruption policy controlling consolidation, expiry, and budgets."
                 },
+                "gcp": {
+                    "$ref": "#/types/devzero:resources:GCPNodeClassSpecArgs",
+                    "description": "GCP-specific GCENodeClass configuration (service account, images, disks, etc.)."
+                },
                 "instanceCategories": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
                     "description": "Filter instances by category letter (cloud-specific). Example: {in: [\"m\", \"c\", \"r\"]} for AWS, {in: [\"D\", \"E\"]} for Azure."
@@ -1171,6 +1610,18 @@
                 },
                 "instanceLocalNvme": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs"
+                },
+                "instanceLocalNvmeTip": {
+                    "type": "string",
+                    "description": "UI tooltip text shown alongside the instanceLocalNvme selector."
+                },
+                "instanceShapes": {
+                    "$ref": "#/types/devzero:resources:LabelSelectorArgs",
+                    "description": "GCP-only: filter by standard/highcpu/highmem custom shape token. Example: {in: [\"standard\", \"highmem\"]}."
+                },
+                "instanceShapesTip": {
+                    "type": "string",
+                    "description": "UI tooltip text shown alongside the instanceShapes selector."
                 },
                 "instanceSizes": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
@@ -1206,6 +1657,10 @@
                     "type": "string",
                     "description": "Override name for the generated Karpenter NodePool resource. Example: 'prod-spot-nodepool'."
                 },
+                "oci": {
+                    "$ref": "#/types/devzero:resources:OCINodeClassSpecArgs",
+                    "description": "OCI-specific NodeClass configuration (VCN, subnets, images, block volumes, etc.)."
+                },
                 "operatingSystems": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs",
                     "description": "Operating systems for nodes. Example: {in: [\"linux\"]}."
@@ -1222,6 +1677,10 @@
                     "items": {
                         "$ref": "#/types/devzero:resources:TaintArgs"
                     }
+                },
+                "startupTaintsTip": {
+                    "type": "string",
+                    "description": "UI tooltip text shown alongside startupTaints."
                 },
                 "taints": {
                     "type": "array",
@@ -1267,6 +1726,9 @@
                 "disruption": {
                     "$ref": "#/types/devzero:resources:DisruptionPolicyArgs"
                 },
+                "gcp": {
+                    "$ref": "#/types/devzero:resources:GCPNodeClassSpecArgs"
+                },
                 "instanceCategories": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs"
                 },
@@ -1284,6 +1746,15 @@
                 },
                 "instanceLocalNvme": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs"
+                },
+                "instanceLocalNvmeTip": {
+                    "type": "string"
+                },
+                "instanceShapes": {
+                    "$ref": "#/types/devzero:resources:LabelSelectorArgs"
+                },
+                "instanceShapesTip": {
+                    "type": "string"
                 },
                 "instanceSizes": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs"
@@ -1312,6 +1783,9 @@
                 "nodePoolName": {
                     "type": "string"
                 },
+                "oci": {
+                    "$ref": "#/types/devzero:resources:OCINodeClassSpecArgs"
+                },
                 "operatingSystems": {
                     "$ref": "#/types/devzero:resources:LabelSelectorArgs"
                 },
@@ -1326,6 +1800,9 @@
                     "items": {
                         "$ref": "#/types/devzero:resources:TaintArgs"
                     }
+                },
+                "startupTaintsTip": {
+                    "type": "string"
                 },
                 "taints": {
                     "type": "array",
@@ -1459,6 +1936,10 @@
                 "driftDeltaPercent": {
                     "type": "number",
                     "description": "Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0."
+                },
+                "emergencyResponse": {
+                    "$ref": "#/types/devzero:resources:EmergencyResponseConfigArgs",
+                    "description": "Emergency response configuration for OOM and CPU throttle events."
                 },
                 "enableInPlaceVerticalScaling": {
                     "type": "boolean"
@@ -1641,6 +2122,10 @@
                 "driftDeltaPercent": {
                     "type": "number",
                     "description": "Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0."
+                },
+                "emergencyResponse": {
+                    "$ref": "#/types/devzero:resources:EmergencyResponseConfigArgs",
+                    "description": "Emergency response configuration for OOM and CPU throttle events."
                 },
                 "enableInPlaceVerticalScaling": {
                     "type": "boolean"
@@ -1948,6 +2433,10 @@
                     },
                     "description": "When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: [\"on_detection\"]."
                 },
+                "allowInPlaceMemoryLimitDecrease": {
+                    "type": "boolean",
+                    "description": "Allow in-place vertical scaling to decrease the memory limit (normally only requests shrink; limits only grow). Example: false."
+                },
                 "autoGenerate": {
                     "type": "boolean",
                     "description": "When true the engine generates all rule fields automatically; manual field overrides are ignored. Example: false."
@@ -2000,6 +2489,18 @@
                 "hpaRule": {
                     "$ref": "#/types/devzero:resources:HPARuleConfigArgs",
                     "description": "Horizontal (replica) scaling rule configuration."
+                },
+                "jvmCpuStartupFloorMillicores": {
+                    "type": "integer",
+                    "description": "Minimum CPU request in millicores during JVM startup, to avoid slow JIT warmup on undersized CPU. Example: 500."
+                },
+                "jvmHeapRule": {
+                    "$ref": "#/types/devzero:resources:JvmHeapRuleConfigArgs",
+                    "description": "JVM heap sizing overrides applied to detected Java containers."
+                },
+                "kedaScaledObject": {
+                    "$ref": "#/types/devzero:resources:KedaScaledObjectArgs",
+                    "description": "KEDA ScaledObject configuration managed alongside this workload."
                 },
                 "kind": {
                     "type": "string",
@@ -2054,6 +2555,10 @@
                     },
                     "description": "When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: [\"on_detection\"]."
                 },
+                "allowInPlaceMemoryLimitDecrease": {
+                    "type": "boolean",
+                    "description": "Allow in-place vertical scaling to decrease the memory limit (normally only requests shrink; limits only grow). Example: false."
+                },
                 "autoGenerate": {
                     "type": "boolean",
                     "description": "When true the engine generates all rule fields automatically; manual field overrides are ignored. Example: false."
@@ -2106,6 +2611,18 @@
                 "hpaRule": {
                     "$ref": "#/types/devzero:resources:HPARuleConfigArgs",
                     "description": "Horizontal (replica) scaling rule configuration."
+                },
+                "jvmCpuStartupFloorMillicores": {
+                    "type": "integer",
+                    "description": "Minimum CPU request in millicores during JVM startup, to avoid slow JIT warmup on undersized CPU. Example: 500."
+                },
+                "jvmHeapRule": {
+                    "$ref": "#/types/devzero:resources:JvmHeapRuleConfigArgs",
+                    "description": "JVM heap sizing overrides applied to detected Java containers."
+                },
+                "kedaScaledObject": {
+                    "$ref": "#/types/devzero:resources:KedaScaledObjectArgs",
+                    "description": "KEDA ScaledObject configuration managed alongside this workload."
                 },
                 "kind": {
                     "type": "string",

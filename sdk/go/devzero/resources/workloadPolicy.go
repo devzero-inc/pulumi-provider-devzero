@@ -34,8 +34,10 @@ type WorkloadPolicy struct {
 	// Events that trigger a new recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: ["pod_creation", "pod_reschedule"].
 	DetectionTriggers pulumi.StringArrayOutput `pulumi:"detectionTriggers"`
 	// Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
-	DriftDeltaPercent            pulumi.Float64PtrOutput `pulumi:"driftDeltaPercent"`
-	EnableInPlaceVerticalScaling pulumi.BoolPtrOutput    `pulumi:"enableInPlaceVerticalScaling"`
+	DriftDeltaPercent pulumi.Float64PtrOutput `pulumi:"driftDeltaPercent"`
+	// Emergency response configuration for OOM and CPU throttle events.
+	EmergencyResponse            EmergencyResponseConfigArgsPtrOutput `pulumi:"emergencyResponse"`
+	EnableInPlaceVerticalScaling pulumi.BoolPtrOutput                 `pulumi:"enableInPlaceVerticalScaling"`
 	// Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.
 	EnablePmaxProtection pulumi.BoolPtrOutput `pulumi:"enablePmaxProtection"`
 	// Vertical scaling configuration for GPU cores. Uses the same fields as cpuVerticalScaling; units are GPU cores (millicores).
@@ -174,8 +176,10 @@ type workloadPolicyArgs struct {
 	// Events that trigger a new recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: ["pod_creation", "pod_reschedule"].
 	DetectionTriggers []string `pulumi:"detectionTriggers"`
 	// Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
-	DriftDeltaPercent            *float64 `pulumi:"driftDeltaPercent"`
-	EnableInPlaceVerticalScaling *bool    `pulumi:"enableInPlaceVerticalScaling"`
+	DriftDeltaPercent *float64 `pulumi:"driftDeltaPercent"`
+	// Emergency response configuration for OOM and CPU throttle events.
+	EmergencyResponse            *EmergencyResponseConfigArgs `pulumi:"emergencyResponse"`
+	EnableInPlaceVerticalScaling *bool                        `pulumi:"enableInPlaceVerticalScaling"`
 	// Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.
 	EnablePmaxProtection *bool `pulumi:"enablePmaxProtection"`
 	// Vertical scaling configuration for GPU cores. Uses the same fields as cpuVerticalScaling; units are GPU cores (millicores).
@@ -243,7 +247,9 @@ type WorkloadPolicyArgs struct {
 	// Events that trigger a new recommendation. Valid values: 'pod_creation', 'pod_update', 'pod_reschedule'. Example: ["pod_creation", "pod_reschedule"].
 	DetectionTriggers pulumi.StringArrayInput
 	// Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
-	DriftDeltaPercent            pulumi.Float64PtrInput
+	DriftDeltaPercent pulumi.Float64PtrInput
+	// Emergency response configuration for OOM and CPU throttle events.
+	EmergencyResponse            EmergencyResponseConfigArgsPtrInput
 	EnableInPlaceVerticalScaling pulumi.BoolPtrInput
 	// Raise requests to cover observed peak usage when the peak/recommendation ratio exceeds pmaxRatioThreshold. Default: false.
 	EnablePmaxProtection pulumi.BoolPtrInput
@@ -435,6 +441,11 @@ func (o WorkloadPolicyOutput) DetectionTriggers() pulumi.StringArrayOutput {
 // Percentage change from the baseline recommendation that triggers a VPA refresh. Example: 20.0.
 func (o WorkloadPolicyOutput) DriftDeltaPercent() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v *WorkloadPolicy) pulumi.Float64PtrOutput { return v.DriftDeltaPercent }).(pulumi.Float64PtrOutput)
+}
+
+// Emergency response configuration for OOM and CPU throttle events.
+func (o WorkloadPolicyOutput) EmergencyResponse() EmergencyResponseConfigArgsPtrOutput {
+	return o.ApplyT(func(v *WorkloadPolicy) EmergencyResponseConfigArgsPtrOutput { return v.EmergencyResponse }).(EmergencyResponseConfigArgsPtrOutput)
 }
 
 func (o WorkloadPolicyOutput) EnableInPlaceVerticalScaling() pulumi.BoolPtrOutput {

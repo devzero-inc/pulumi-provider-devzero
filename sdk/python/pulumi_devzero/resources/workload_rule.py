@@ -26,6 +26,7 @@ class WorkloadRuleArgs:
                  name: pulumi.Input[_builtins.str],
                  namespace: pulumi.Input[_builtins.str],
                  action_triggers: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 allow_in_place_memory_limit_decrease: Optional[pulumi.Input[_builtins.bool]] = None,
                  auto_generate: Optional[pulumi.Input[_builtins.bool]] = None,
                  containers: Optional[pulumi.Input[Sequence[pulumi.Input['ContainerResourceRuleConfigArgsArgs']]]] = None,
                  cooldown_minutes: Optional[pulumi.Input[_builtins.int]] = None,
@@ -37,6 +38,9 @@ class WorkloadRuleArgs:
                  emergency_response: Optional[pulumi.Input['EmergencyResponseConfigArgsArgs']] = None,
                  gpu_rule: Optional[pulumi.Input['ResourceRuleConfigArgsArgs']] = None,
                  hpa_rule: Optional[pulumi.Input['HPARuleConfigArgsArgs']] = None,
+                 jvm_cpu_startup_floor_millicores: Optional[pulumi.Input[_builtins.int]] = None,
+                 jvm_heap_rule: Optional[pulumi.Input['JvmHeapRuleConfigArgsArgs']] = None,
+                 keda_scaled_object: Optional[pulumi.Input['KedaScaledObjectArgsArgs']] = None,
                  live_migration_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
                  lookback_period_seconds: Optional[pulumi.Input[_builtins.int]] = None,
                  memory_rule: Optional[pulumi.Input['ResourceRuleConfigArgsArgs']] = None,
@@ -51,6 +55,7 @@ class WorkloadRuleArgs:
         :param pulumi.Input[_builtins.str] name: Name of the Kubernetes workload. Example: 'my-api'.
         :param pulumi.Input[_builtins.str] namespace: Kubernetes namespace of the workload. Example: 'production'.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] action_triggers: When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: ["on_detection"].
+        :param pulumi.Input[_builtins.bool] allow_in_place_memory_limit_decrease: Allow in-place vertical scaling to decrease the memory limit (normally only requests shrink; limits only grow). Example: false.
         :param pulumi.Input[_builtins.bool] auto_generate: When true the engine generates all rule fields automatically; manual field overrides are ignored. Example: false.
         :param pulumi.Input[Sequence[pulumi.Input['ContainerResourceRuleConfigArgsArgs']]] containers: Per-container resource rule configurations. When empty, workload-level rules apply to all containers.
         :param pulumi.Input[_builtins.int] cooldown_minutes: Minimum minutes between consecutive recommendation applications. Example: 60.
@@ -61,6 +66,9 @@ class WorkloadRuleArgs:
         :param pulumi.Input['EmergencyResponseConfigArgsArgs'] emergency_response: Emergency response configuration for OOM and CPU throttle events.
         :param pulumi.Input['ResourceRuleConfigArgsArgs'] gpu_rule: GPU vertical scaling rule configuration.
         :param pulumi.Input['HPARuleConfigArgsArgs'] hpa_rule: Horizontal (replica) scaling rule configuration.
+        :param pulumi.Input[_builtins.int] jvm_cpu_startup_floor_millicores: Minimum CPU request in millicores during JVM startup, to avoid slow JIT warmup on undersized CPU. Example: 500.
+        :param pulumi.Input['JvmHeapRuleConfigArgsArgs'] jvm_heap_rule: JVM heap sizing overrides applied to detected Java containers.
+        :param pulumi.Input['KedaScaledObjectArgsArgs'] keda_scaled_object: KEDA ScaledObject configuration managed alongside this workload.
         :param pulumi.Input[_builtins.bool] live_migration_enabled: Allow live pod migration when applying recommendations. Example: false.
         :param pulumi.Input['ResourceRuleConfigArgsArgs'] memory_rule: Memory vertical scaling rule configuration.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] scheduler_plugins: Kubernetes scheduler plugins to activate. Example: ["binpacking"].
@@ -73,6 +81,8 @@ class WorkloadRuleArgs:
         pulumi.set(__self__, "namespace", namespace)
         if action_triggers is not None:
             pulumi.set(__self__, "action_triggers", action_triggers)
+        if allow_in_place_memory_limit_decrease is not None:
+            pulumi.set(__self__, "allow_in_place_memory_limit_decrease", allow_in_place_memory_limit_decrease)
         if auto_generate is not None:
             pulumi.set(__self__, "auto_generate", auto_generate)
         if containers is not None:
@@ -95,6 +105,12 @@ class WorkloadRuleArgs:
             pulumi.set(__self__, "gpu_rule", gpu_rule)
         if hpa_rule is not None:
             pulumi.set(__self__, "hpa_rule", hpa_rule)
+        if jvm_cpu_startup_floor_millicores is not None:
+            pulumi.set(__self__, "jvm_cpu_startup_floor_millicores", jvm_cpu_startup_floor_millicores)
+        if jvm_heap_rule is not None:
+            pulumi.set(__self__, "jvm_heap_rule", jvm_heap_rule)
+        if keda_scaled_object is not None:
+            pulumi.set(__self__, "keda_scaled_object", keda_scaled_object)
         if live_migration_enabled is not None:
             pulumi.set(__self__, "live_migration_enabled", live_migration_enabled)
         if lookback_period_seconds is not None:
@@ -167,6 +183,18 @@ class WorkloadRuleArgs:
     @action_triggers.setter
     def action_triggers(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "action_triggers", value)
+
+    @_builtins.property
+    @pulumi.getter(name="allowInPlaceMemoryLimitDecrease")
+    def allow_in_place_memory_limit_decrease(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Allow in-place vertical scaling to decrease the memory limit (normally only requests shrink; limits only grow). Example: false.
+        """
+        return pulumi.get(self, "allow_in_place_memory_limit_decrease")
+
+    @allow_in_place_memory_limit_decrease.setter
+    def allow_in_place_memory_limit_decrease(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "allow_in_place_memory_limit_decrease", value)
 
     @_builtins.property
     @pulumi.getter(name="autoGenerate")
@@ -298,6 +326,42 @@ class WorkloadRuleArgs:
         pulumi.set(self, "hpa_rule", value)
 
     @_builtins.property
+    @pulumi.getter(name="jvmCpuStartupFloorMillicores")
+    def jvm_cpu_startup_floor_millicores(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Minimum CPU request in millicores during JVM startup, to avoid slow JIT warmup on undersized CPU. Example: 500.
+        """
+        return pulumi.get(self, "jvm_cpu_startup_floor_millicores")
+
+    @jvm_cpu_startup_floor_millicores.setter
+    def jvm_cpu_startup_floor_millicores(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "jvm_cpu_startup_floor_millicores", value)
+
+    @_builtins.property
+    @pulumi.getter(name="jvmHeapRule")
+    def jvm_heap_rule(self) -> Optional[pulumi.Input['JvmHeapRuleConfigArgsArgs']]:
+        """
+        JVM heap sizing overrides applied to detected Java containers.
+        """
+        return pulumi.get(self, "jvm_heap_rule")
+
+    @jvm_heap_rule.setter
+    def jvm_heap_rule(self, value: Optional[pulumi.Input['JvmHeapRuleConfigArgsArgs']]):
+        pulumi.set(self, "jvm_heap_rule", value)
+
+    @_builtins.property
+    @pulumi.getter(name="kedaScaledObject")
+    def keda_scaled_object(self) -> Optional[pulumi.Input['KedaScaledObjectArgsArgs']]:
+        """
+        KEDA ScaledObject configuration managed alongside this workload.
+        """
+        return pulumi.get(self, "keda_scaled_object")
+
+    @keda_scaled_object.setter
+    def keda_scaled_object(self, value: Optional[pulumi.Input['KedaScaledObjectArgsArgs']]):
+        pulumi.set(self, "keda_scaled_object", value)
+
+    @_builtins.property
     @pulumi.getter(name="liveMigrationEnabled")
     def live_migration_enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
@@ -374,6 +438,7 @@ class WorkloadRule(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  action_triggers: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 allow_in_place_memory_limit_decrease: Optional[pulumi.Input[_builtins.bool]] = None,
                  auto_generate: Optional[pulumi.Input[_builtins.bool]] = None,
                  cluster_id: Optional[pulumi.Input[_builtins.str]] = None,
                  containers: Optional[pulumi.Input[Sequence[pulumi.Input[Union['ContainerResourceRuleConfigArgsArgs', 'ContainerResourceRuleConfigArgsArgsDict']]]]] = None,
@@ -386,6 +451,9 @@ class WorkloadRule(pulumi.CustomResource):
                  emergency_response: Optional[pulumi.Input[Union['EmergencyResponseConfigArgsArgs', 'EmergencyResponseConfigArgsArgsDict']]] = None,
                  gpu_rule: Optional[pulumi.Input[Union['ResourceRuleConfigArgsArgs', 'ResourceRuleConfigArgsArgsDict']]] = None,
                  hpa_rule: Optional[pulumi.Input[Union['HPARuleConfigArgsArgs', 'HPARuleConfigArgsArgsDict']]] = None,
+                 jvm_cpu_startup_floor_millicores: Optional[pulumi.Input[_builtins.int]] = None,
+                 jvm_heap_rule: Optional[pulumi.Input[Union['JvmHeapRuleConfigArgsArgs', 'JvmHeapRuleConfigArgsArgsDict']]] = None,
+                 keda_scaled_object: Optional[pulumi.Input[Union['KedaScaledObjectArgsArgs', 'KedaScaledObjectArgsArgsDict']]] = None,
                  kind: Optional[pulumi.Input[_builtins.str]] = None,
                  live_migration_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
                  lookback_period_seconds: Optional[pulumi.Input[_builtins.int]] = None,
@@ -402,6 +470,7 @@ class WorkloadRule(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] action_triggers: When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: ["on_detection"].
+        :param pulumi.Input[_builtins.bool] allow_in_place_memory_limit_decrease: Allow in-place vertical scaling to decrease the memory limit (normally only requests shrink; limits only grow). Example: false.
         :param pulumi.Input[_builtins.bool] auto_generate: When true the engine generates all rule fields automatically; manual field overrides are ignored. Example: false.
         :param pulumi.Input[_builtins.str] cluster_id: ID of the cluster this rule targets. Example: 'cluster-abc123'.
         :param pulumi.Input[Sequence[pulumi.Input[Union['ContainerResourceRuleConfigArgsArgs', 'ContainerResourceRuleConfigArgsArgsDict']]]] containers: Per-container resource rule configurations. When empty, workload-level rules apply to all containers.
@@ -413,6 +482,9 @@ class WorkloadRule(pulumi.CustomResource):
         :param pulumi.Input[Union['EmergencyResponseConfigArgsArgs', 'EmergencyResponseConfigArgsArgsDict']] emergency_response: Emergency response configuration for OOM and CPU throttle events.
         :param pulumi.Input[Union['ResourceRuleConfigArgsArgs', 'ResourceRuleConfigArgsArgsDict']] gpu_rule: GPU vertical scaling rule configuration.
         :param pulumi.Input[Union['HPARuleConfigArgsArgs', 'HPARuleConfigArgsArgsDict']] hpa_rule: Horizontal (replica) scaling rule configuration.
+        :param pulumi.Input[_builtins.int] jvm_cpu_startup_floor_millicores: Minimum CPU request in millicores during JVM startup, to avoid slow JIT warmup on undersized CPU. Example: 500.
+        :param pulumi.Input[Union['JvmHeapRuleConfigArgsArgs', 'JvmHeapRuleConfigArgsArgsDict']] jvm_heap_rule: JVM heap sizing overrides applied to detected Java containers.
+        :param pulumi.Input[Union['KedaScaledObjectArgsArgs', 'KedaScaledObjectArgsArgsDict']] keda_scaled_object: KEDA ScaledObject configuration managed alongside this workload.
         :param pulumi.Input[_builtins.str] kind: Kubernetes workload kind. One of: 'Deployment', 'StatefulSet', 'DaemonSet', 'CronJob', 'Job'. Example: 'Deployment'.
         :param pulumi.Input[_builtins.bool] live_migration_enabled: Allow live pod migration when applying recommendations. Example: false.
         :param pulumi.Input[Union['ResourceRuleConfigArgsArgs', 'ResourceRuleConfigArgsArgsDict']] memory_rule: Memory vertical scaling rule configuration.
@@ -447,6 +519,7 @@ class WorkloadRule(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  action_triggers: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 allow_in_place_memory_limit_decrease: Optional[pulumi.Input[_builtins.bool]] = None,
                  auto_generate: Optional[pulumi.Input[_builtins.bool]] = None,
                  cluster_id: Optional[pulumi.Input[_builtins.str]] = None,
                  containers: Optional[pulumi.Input[Sequence[pulumi.Input[Union['ContainerResourceRuleConfigArgsArgs', 'ContainerResourceRuleConfigArgsArgsDict']]]]] = None,
@@ -459,6 +532,9 @@ class WorkloadRule(pulumi.CustomResource):
                  emergency_response: Optional[pulumi.Input[Union['EmergencyResponseConfigArgsArgs', 'EmergencyResponseConfigArgsArgsDict']]] = None,
                  gpu_rule: Optional[pulumi.Input[Union['ResourceRuleConfigArgsArgs', 'ResourceRuleConfigArgsArgsDict']]] = None,
                  hpa_rule: Optional[pulumi.Input[Union['HPARuleConfigArgsArgs', 'HPARuleConfigArgsArgsDict']]] = None,
+                 jvm_cpu_startup_floor_millicores: Optional[pulumi.Input[_builtins.int]] = None,
+                 jvm_heap_rule: Optional[pulumi.Input[Union['JvmHeapRuleConfigArgsArgs', 'JvmHeapRuleConfigArgsArgsDict']]] = None,
+                 keda_scaled_object: Optional[pulumi.Input[Union['KedaScaledObjectArgsArgs', 'KedaScaledObjectArgsArgsDict']]] = None,
                  kind: Optional[pulumi.Input[_builtins.str]] = None,
                  live_migration_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
                  lookback_period_seconds: Optional[pulumi.Input[_builtins.int]] = None,
@@ -478,6 +554,7 @@ class WorkloadRule(pulumi.CustomResource):
             __props__ = WorkloadRuleArgs.__new__(WorkloadRuleArgs)
 
             __props__.__dict__["action_triggers"] = action_triggers
+            __props__.__dict__["allow_in_place_memory_limit_decrease"] = allow_in_place_memory_limit_decrease
             __props__.__dict__["auto_generate"] = auto_generate
             if cluster_id is None and not opts.urn:
                 raise TypeError("Missing required property 'cluster_id'")
@@ -492,6 +569,9 @@ class WorkloadRule(pulumi.CustomResource):
             __props__.__dict__["emergency_response"] = emergency_response
             __props__.__dict__["gpu_rule"] = gpu_rule
             __props__.__dict__["hpa_rule"] = hpa_rule
+            __props__.__dict__["jvm_cpu_startup_floor_millicores"] = jvm_cpu_startup_floor_millicores
+            __props__.__dict__["jvm_heap_rule"] = jvm_heap_rule
+            __props__.__dict__["keda_scaled_object"] = keda_scaled_object
             if kind is None and not opts.urn:
                 raise TypeError("Missing required property 'kind'")
             __props__.__dict__["kind"] = kind
@@ -530,6 +610,7 @@ class WorkloadRule(pulumi.CustomResource):
         __props__ = WorkloadRuleArgs.__new__(WorkloadRuleArgs)
 
         __props__.__dict__["action_triggers"] = None
+        __props__.__dict__["allow_in_place_memory_limit_decrease"] = None
         __props__.__dict__["auto_generate"] = None
         __props__.__dict__["cluster_id"] = None
         __props__.__dict__["containers"] = None
@@ -542,6 +623,9 @@ class WorkloadRule(pulumi.CustomResource):
         __props__.__dict__["emergency_response"] = None
         __props__.__dict__["gpu_rule"] = None
         __props__.__dict__["hpa_rule"] = None
+        __props__.__dict__["jvm_cpu_startup_floor_millicores"] = None
+        __props__.__dict__["jvm_heap_rule"] = None
+        __props__.__dict__["keda_scaled_object"] = None
         __props__.__dict__["kind"] = None
         __props__.__dict__["live_migration_enabled"] = None
         __props__.__dict__["lookback_period_seconds"] = None
@@ -560,6 +644,14 @@ class WorkloadRule(pulumi.CustomResource):
         When to apply recommendations. Valid values: 'on_detection', 'on_schedule'. Example: ["on_detection"].
         """
         return pulumi.get(self, "action_triggers")
+
+    @_builtins.property
+    @pulumi.getter(name="allowInPlaceMemoryLimitDecrease")
+    def allow_in_place_memory_limit_decrease(self) -> pulumi.Output[Optional[_builtins.bool]]:
+        """
+        Allow in-place vertical scaling to decrease the memory limit (normally only requests shrink; limits only grow). Example: false.
+        """
+        return pulumi.get(self, "allow_in_place_memory_limit_decrease")
 
     @_builtins.property
     @pulumi.getter(name="autoGenerate")
@@ -653,6 +745,30 @@ class WorkloadRule(pulumi.CustomResource):
         Horizontal (replica) scaling rule configuration.
         """
         return pulumi.get(self, "hpa_rule")
+
+    @_builtins.property
+    @pulumi.getter(name="jvmCpuStartupFloorMillicores")
+    def jvm_cpu_startup_floor_millicores(self) -> pulumi.Output[Optional[_builtins.int]]:
+        """
+        Minimum CPU request in millicores during JVM startup, to avoid slow JIT warmup on undersized CPU. Example: 500.
+        """
+        return pulumi.get(self, "jvm_cpu_startup_floor_millicores")
+
+    @_builtins.property
+    @pulumi.getter(name="jvmHeapRule")
+    def jvm_heap_rule(self) -> pulumi.Output[Optional['outputs.JvmHeapRuleConfigArgs']]:
+        """
+        JVM heap sizing overrides applied to detected Java containers.
+        """
+        return pulumi.get(self, "jvm_heap_rule")
+
+    @_builtins.property
+    @pulumi.getter(name="kedaScaledObject")
+    def keda_scaled_object(self) -> pulumi.Output[Optional['outputs.KedaScaledObjectArgs']]:
+        """
+        KEDA ScaledObject configuration managed alongside this workload.
+        """
+        return pulumi.get(self, "keda_scaled_object")
 
     @_builtins.property
     @pulumi.getter

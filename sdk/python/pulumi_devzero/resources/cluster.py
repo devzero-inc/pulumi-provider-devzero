@@ -127,7 +127,7 @@ class Cluster(pulumi.CustomResource):
     @pulumi.getter
     def token(self) -> pulumi.Output[_builtins.str]:
         """
-        Authentication token for the cluster. Rotated automatically if empty on update (e.g. after import).
+        Bearer token minted for the cluster at creation. Not retrievable afterwards; imported clusters have an empty token (rotate it deliberately from the DevZero UI if you need it in state).
         """
         return pulumi.get(self, "token")
 

@@ -37,6 +37,12 @@ __all__ = [
     'DisruptionPolicyArgsArgsDict',
     'EmergencyResponseConfigArgsArgs',
     'EmergencyResponseConfigArgsArgsDict',
+    'GCPDiskArgsArgs',
+    'GCPDiskArgsArgsDict',
+    'GCPImageSelectorTermArgsArgs',
+    'GCPImageSelectorTermArgsArgsDict',
+    'GCPNodeClassSpecArgsArgs',
+    'GCPNodeClassSpecArgsArgsDict',
     'HPABehaviorArgsArgs',
     'HPABehaviorArgsArgsDict',
     'HPAFallbackArgsArgs',
@@ -51,6 +57,18 @@ __all__ = [
     'HPAScalingRulesArgsArgsDict',
     'HorizontalScalingArgsArgs',
     'HorizontalScalingArgsArgsDict',
+    'JvmHeapRuleConfigArgsArgs',
+    'JvmHeapRuleConfigArgsArgsDict',
+    'KedaAdvancedArgsArgs',
+    'KedaAdvancedArgsArgsDict',
+    'KedaAuthenticationRefArgsArgs',
+    'KedaAuthenticationRefArgsArgsDict',
+    'KedaFallbackArgsArgs',
+    'KedaFallbackArgsArgsDict',
+    'KedaScaledObjectArgsArgs',
+    'KedaScaledObjectArgsArgsDict',
+    'KedaTriggerArgsArgs',
+    'KedaTriggerArgsArgsDict',
     'KubeletConfigurationArgsArgs',
     'KubeletConfigurationArgsArgsDict',
     'LabelSelectorArgsArgs',
@@ -61,6 +79,20 @@ __all__ = [
     'MetadataOptionsArgsArgsDict',
     'NamePatternArgsArgs',
     'NamePatternArgsArgsDict',
+    'OCIBootConfigArgsArgs',
+    'OCIBootConfigArgsArgsDict',
+    'OCIImageSelectorTermArgsArgs',
+    'OCIImageSelectorTermArgsArgsDict',
+    'OCILaunchOptionsArgsArgs',
+    'OCILaunchOptionsArgsArgsDict',
+    'OCINodeClassSpecArgsArgs',
+    'OCINodeClassSpecArgsArgsDict',
+    'OCISecurityGroupSelectorTermArgsArgs',
+    'OCISecurityGroupSelectorTermArgsArgsDict',
+    'OCISubnetSelectorTermArgsArgs',
+    'OCISubnetSelectorTermArgsArgsDict',
+    'OCIVolumeAttributesArgsArgs',
+    'OCIVolumeAttributesArgsArgsDict',
     'RawKarpenterSpecArgsArgs',
     'RawKarpenterSpecArgsArgsDict',
     'ResourceLimitsArgsArgs',
@@ -1690,6 +1722,333 @@ class EmergencyResponseConfigArgsArgs:
         pulumi.set(self, "oom_memory_multiplier", value)
 
 
+class GCPDiskArgsArgsDict(TypedDict):
+    boot: NotRequired[pulumi.Input[_builtins.bool]]
+    """
+    Whether this disk is the boot disk. Example: true.
+    """
+    category: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    GCP disk type. Example: 'pd-ssd'.
+    """
+    secondary_boot_image: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Secondary boot image used for container-image fast boot. Example: 'projects/my-project/global/images/my-cache-image'.
+    """
+    secondary_boot_mode: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Secondary boot mode. Example: 'CONTAINER_IMAGE_CACHE'.
+    """
+    size_gib: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Disk size in GiB. Example: 100.
+    """
+
+@pulumi.input_type
+class GCPDiskArgsArgs:
+    def __init__(__self__, *,
+                 boot: Optional[pulumi.Input[_builtins.bool]] = None,
+                 category: Optional[pulumi.Input[_builtins.str]] = None,
+                 secondary_boot_image: Optional[pulumi.Input[_builtins.str]] = None,
+                 secondary_boot_mode: Optional[pulumi.Input[_builtins.str]] = None,
+                 size_gib: Optional[pulumi.Input[_builtins.int]] = None):
+        """
+        :param pulumi.Input[_builtins.bool] boot: Whether this disk is the boot disk. Example: true.
+        :param pulumi.Input[_builtins.str] category: GCP disk type. Example: 'pd-ssd'.
+        :param pulumi.Input[_builtins.str] secondary_boot_image: Secondary boot image used for container-image fast boot. Example: 'projects/my-project/global/images/my-cache-image'.
+        :param pulumi.Input[_builtins.str] secondary_boot_mode: Secondary boot mode. Example: 'CONTAINER_IMAGE_CACHE'.
+        :param pulumi.Input[_builtins.int] size_gib: Disk size in GiB. Example: 100.
+        """
+        if boot is not None:
+            pulumi.set(__self__, "boot", boot)
+        if category is not None:
+            pulumi.set(__self__, "category", category)
+        if secondary_boot_image is not None:
+            pulumi.set(__self__, "secondary_boot_image", secondary_boot_image)
+        if secondary_boot_mode is not None:
+            pulumi.set(__self__, "secondary_boot_mode", secondary_boot_mode)
+        if size_gib is not None:
+            pulumi.set(__self__, "size_gib", size_gib)
+
+    @_builtins.property
+    @pulumi.getter
+    def boot(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Whether this disk is the boot disk. Example: true.
+        """
+        return pulumi.get(self, "boot")
+
+    @boot.setter
+    def boot(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "boot", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def category(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        GCP disk type. Example: 'pd-ssd'.
+        """
+        return pulumi.get(self, "category")
+
+    @category.setter
+    def category(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "category", value)
+
+    @_builtins.property
+    @pulumi.getter(name="secondaryBootImage")
+    def secondary_boot_image(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Secondary boot image used for container-image fast boot. Example: 'projects/my-project/global/images/my-cache-image'.
+        """
+        return pulumi.get(self, "secondary_boot_image")
+
+    @secondary_boot_image.setter
+    def secondary_boot_image(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "secondary_boot_image", value)
+
+    @_builtins.property
+    @pulumi.getter(name="secondaryBootMode")
+    def secondary_boot_mode(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Secondary boot mode. Example: 'CONTAINER_IMAGE_CACHE'.
+        """
+        return pulumi.get(self, "secondary_boot_mode")
+
+    @secondary_boot_mode.setter
+    def secondary_boot_mode(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "secondary_boot_mode", value)
+
+    @_builtins.property
+    @pulumi.getter(name="sizeGib")
+    def size_gib(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Disk size in GiB. Example: 100.
+        """
+        return pulumi.get(self, "size_gib")
+
+    @size_gib.setter
+    def size_gib(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "size_gib", value)
+
+
+class GCPImageSelectorTermArgsArgsDict(TypedDict):
+    alias: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Well-known alias for the GCP node image family. Example: 'cos@latest'.
+    """
+    id: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Explicit GCP image ID. Example: 'projects/cos-cloud/global/images/cos-105-17412-156-59'.
+    """
+
+@pulumi.input_type
+class GCPImageSelectorTermArgsArgs:
+    def __init__(__self__, *,
+                 alias: Optional[pulumi.Input[_builtins.str]] = None,
+                 id: Optional[pulumi.Input[_builtins.str]] = None):
+        """
+        :param pulumi.Input[_builtins.str] alias: Well-known alias for the GCP node image family. Example: 'cos@latest'.
+        :param pulumi.Input[_builtins.str] id: Explicit GCP image ID. Example: 'projects/cos-cloud/global/images/cos-105-17412-156-59'.
+        """
+        if alias is not None:
+            pulumi.set(__self__, "alias", alias)
+        if id is not None:
+            pulumi.set(__self__, "id", id)
+
+    @_builtins.property
+    @pulumi.getter
+    def alias(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Well-known alias for the GCP node image family. Example: 'cos@latest'.
+        """
+        return pulumi.get(self, "alias")
+
+    @alias.setter
+    def alias(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "alias", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Explicit GCP image ID. Example: 'projects/cos-cloud/global/images/cos-105-17412-156-59'.
+        """
+        return pulumi.get(self, "id")
+
+    @id.setter
+    def id(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "id", value)
+
+
+class GCPNodeClassSpecArgsArgsDict(TypedDict):
+    disks: NotRequired[pulumi.Input[Sequence[pulumi.Input['GCPDiskArgsArgsDict']]]]
+    """
+    Disks attached to provisioned nodes. Example: [{sizeGib: 100, category: "pd-ssd", boot: true}].
+    """
+    image_family: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    GCP node image family shorthand used when no imageSelectorTerms are specified. Example: 'cos'.
+    """
+    image_selector_terms: NotRequired[pulumi.Input[Sequence[pulumi.Input['GCPImageSelectorTermArgsArgsDict']]]]
+    """
+    Selectors for the node images used to launch nodes. Example: [{alias: "cos@latest"}].
+    """
+    kubelet: NotRequired[pulumi.Input['KubeletConfigurationArgsArgsDict']]
+    """
+    Kubelet configuration overrides applied to all nodes in this class.
+    """
+    labels: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
+    """
+    GCP labels applied to all resources created by this node class. Example: {"environment": "production"}.
+    """
+    metadata: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
+    """
+    GCE instance metadata applied to provisioned nodes. Example: {"disable-legacy-endpoints": "true"}.
+    """
+    network_tags: NotRequired[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]
+    """
+    GCP network tags applied to provisioned nodes for firewall targeting. Example: ["karpenter-node"].
+    """
+    service_account: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    GCP service account email attached to provisioned nodes. Example: 'karpenter@my-project.iam.gserviceaccount.com'.
+    """
+
+@pulumi.input_type
+class GCPNodeClassSpecArgsArgs:
+    def __init__(__self__, *,
+                 disks: Optional[pulumi.Input[Sequence[pulumi.Input['GCPDiskArgsArgs']]]] = None,
+                 image_family: Optional[pulumi.Input[_builtins.str]] = None,
+                 image_selector_terms: Optional[pulumi.Input[Sequence[pulumi.Input['GCPImageSelectorTermArgsArgs']]]] = None,
+                 kubelet: Optional[pulumi.Input['KubeletConfigurationArgsArgs']] = None,
+                 labels: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 metadata: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 network_tags: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 service_account: Optional[pulumi.Input[_builtins.str]] = None):
+        """
+        :param pulumi.Input[Sequence[pulumi.Input['GCPDiskArgsArgs']]] disks: Disks attached to provisioned nodes. Example: [{sizeGib: 100, category: "pd-ssd", boot: true}].
+        :param pulumi.Input[_builtins.str] image_family: GCP node image family shorthand used when no imageSelectorTerms are specified. Example: 'cos'.
+        :param pulumi.Input[Sequence[pulumi.Input['GCPImageSelectorTermArgsArgs']]] image_selector_terms: Selectors for the node images used to launch nodes. Example: [{alias: "cos@latest"}].
+        :param pulumi.Input['KubeletConfigurationArgsArgs'] kubelet: Kubelet configuration overrides applied to all nodes in this class.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] labels: GCP labels applied to all resources created by this node class. Example: {"environment": "production"}.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] metadata: GCE instance metadata applied to provisioned nodes. Example: {"disable-legacy-endpoints": "true"}.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] network_tags: GCP network tags applied to provisioned nodes for firewall targeting. Example: ["karpenter-node"].
+        :param pulumi.Input[_builtins.str] service_account: GCP service account email attached to provisioned nodes. Example: 'karpenter@my-project.iam.gserviceaccount.com'.
+        """
+        if disks is not None:
+            pulumi.set(__self__, "disks", disks)
+        if image_family is not None:
+            pulumi.set(__self__, "image_family", image_family)
+        if image_selector_terms is not None:
+            pulumi.set(__self__, "image_selector_terms", image_selector_terms)
+        if kubelet is not None:
+            pulumi.set(__self__, "kubelet", kubelet)
+        if labels is not None:
+            pulumi.set(__self__, "labels", labels)
+        if metadata is not None:
+            pulumi.set(__self__, "metadata", metadata)
+        if network_tags is not None:
+            pulumi.set(__self__, "network_tags", network_tags)
+        if service_account is not None:
+            pulumi.set(__self__, "service_account", service_account)
+
+    @_builtins.property
+    @pulumi.getter
+    def disks(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['GCPDiskArgsArgs']]]]:
+        """
+        Disks attached to provisioned nodes. Example: [{sizeGib: 100, category: "pd-ssd", boot: true}].
+        """
+        return pulumi.get(self, "disks")
+
+    @disks.setter
+    def disks(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['GCPDiskArgsArgs']]]]):
+        pulumi.set(self, "disks", value)
+
+    @_builtins.property
+    @pulumi.getter(name="imageFamily")
+    def image_family(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        GCP node image family shorthand used when no imageSelectorTerms are specified. Example: 'cos'.
+        """
+        return pulumi.get(self, "image_family")
+
+    @image_family.setter
+    def image_family(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "image_family", value)
+
+    @_builtins.property
+    @pulumi.getter(name="imageSelectorTerms")
+    def image_selector_terms(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['GCPImageSelectorTermArgsArgs']]]]:
+        """
+        Selectors for the node images used to launch nodes. Example: [{alias: "cos@latest"}].
+        """
+        return pulumi.get(self, "image_selector_terms")
+
+    @image_selector_terms.setter
+    def image_selector_terms(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['GCPImageSelectorTermArgsArgs']]]]):
+        pulumi.set(self, "image_selector_terms", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def kubelet(self) -> Optional[pulumi.Input['KubeletConfigurationArgsArgs']]:
+        """
+        Kubelet configuration overrides applied to all nodes in this class.
+        """
+        return pulumi.get(self, "kubelet")
+
+    @kubelet.setter
+    def kubelet(self, value: Optional[pulumi.Input['KubeletConfigurationArgsArgs']]):
+        pulumi.set(self, "kubelet", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def labels(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
+        """
+        GCP labels applied to all resources created by this node class. Example: {"environment": "production"}.
+        """
+        return pulumi.get(self, "labels")
+
+    @labels.setter
+    def labels(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "labels", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def metadata(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
+        """
+        GCE instance metadata applied to provisioned nodes. Example: {"disable-legacy-endpoints": "true"}.
+        """
+        return pulumi.get(self, "metadata")
+
+    @metadata.setter
+    def metadata(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "metadata", value)
+
+    @_builtins.property
+    @pulumi.getter(name="networkTags")
+    def network_tags(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+        """
+        GCP network tags applied to provisioned nodes for firewall targeting. Example: ["karpenter-node"].
+        """
+        return pulumi.get(self, "network_tags")
+
+    @network_tags.setter
+    def network_tags(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "network_tags", value)
+
+    @_builtins.property
+    @pulumi.getter(name="serviceAccount")
+    def service_account(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        GCP service account email attached to provisioned nodes. Example: 'karpenter@my-project.iam.gserviceaccount.com'.
+        """
+        return pulumi.get(self, "service_account")
+
+    @service_account.setter
+    def service_account(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "service_account", value)
+
+
 class HPABehaviorArgsArgsDict(TypedDict):
     scale_down: NotRequired[pulumi.Input['HPAScalingRulesArgsArgsDict']]
     """
@@ -2493,6 +2852,656 @@ class HorizontalScalingArgsArgs:
         pulumi.set(self, "target_utilization", value)
 
 
+class JvmHeapRuleConfigArgsArgsDict(TypedDict):
+    enabled: NotRequired[pulumi.Input[_builtins.bool]]
+    """
+    Enable JVM heap sizing overrides. Example: true.
+    """
+    headroom_multiplier: NotRequired[pulumi.Input[_builtins.float]]
+    """
+    Multiplier applied above the target usage to derive the heap size. Example: 1.3.
+    """
+    max_heap_bytes: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Maximum JVM heap size in bytes. Example: 2147483648.
+    """
+    min_heap_bytes: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Minimum JVM heap size in bytes. Example: 134217728.
+    """
+    non_heap_overhead_bytes: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Non-heap memory overhead in bytes. Takes precedence over nonHeapOverheadPercent when set. Example: 268435456.
+    """
+    non_heap_overhead_percent: NotRequired[pulumi.Input[_builtins.float]]
+    """
+    Non-heap memory overhead as a percentage of container memory (0-1). Example: 0.2.
+    """
+    prefer_container_support: NotRequired[pulumi.Input[_builtins.bool]]
+    """
+    Prefer the JVM's native container-aware heap sizing (-XX:+UseContainerSupport) over explicit -Xmx/-Xms flags. Example: false.
+    """
+    target_percentile: NotRequired[pulumi.Input[_builtins.float]]
+    """
+    Percentile of usage data used as the heap sizing target (0-1). Example: 0.95.
+    """
+
+@pulumi.input_type
+class JvmHeapRuleConfigArgsArgs:
+    def __init__(__self__, *,
+                 enabled: Optional[pulumi.Input[_builtins.bool]] = None,
+                 headroom_multiplier: Optional[pulumi.Input[_builtins.float]] = None,
+                 max_heap_bytes: Optional[pulumi.Input[_builtins.int]] = None,
+                 min_heap_bytes: Optional[pulumi.Input[_builtins.int]] = None,
+                 non_heap_overhead_bytes: Optional[pulumi.Input[_builtins.int]] = None,
+                 non_heap_overhead_percent: Optional[pulumi.Input[_builtins.float]] = None,
+                 prefer_container_support: Optional[pulumi.Input[_builtins.bool]] = None,
+                 target_percentile: Optional[pulumi.Input[_builtins.float]] = None):
+        """
+        :param pulumi.Input[_builtins.bool] enabled: Enable JVM heap sizing overrides. Example: true.
+        :param pulumi.Input[_builtins.float] headroom_multiplier: Multiplier applied above the target usage to derive the heap size. Example: 1.3.
+        :param pulumi.Input[_builtins.int] max_heap_bytes: Maximum JVM heap size in bytes. Example: 2147483648.
+        :param pulumi.Input[_builtins.int] min_heap_bytes: Minimum JVM heap size in bytes. Example: 134217728.
+        :param pulumi.Input[_builtins.int] non_heap_overhead_bytes: Non-heap memory overhead in bytes. Takes precedence over nonHeapOverheadPercent when set. Example: 268435456.
+        :param pulumi.Input[_builtins.float] non_heap_overhead_percent: Non-heap memory overhead as a percentage of container memory (0-1). Example: 0.2.
+        :param pulumi.Input[_builtins.bool] prefer_container_support: Prefer the JVM's native container-aware heap sizing (-XX:+UseContainerSupport) over explicit -Xmx/-Xms flags. Example: false.
+        :param pulumi.Input[_builtins.float] target_percentile: Percentile of usage data used as the heap sizing target (0-1). Example: 0.95.
+        """
+        if enabled is not None:
+            pulumi.set(__self__, "enabled", enabled)
+        if headroom_multiplier is not None:
+            pulumi.set(__self__, "headroom_multiplier", headroom_multiplier)
+        if max_heap_bytes is not None:
+            pulumi.set(__self__, "max_heap_bytes", max_heap_bytes)
+        if min_heap_bytes is not None:
+            pulumi.set(__self__, "min_heap_bytes", min_heap_bytes)
+        if non_heap_overhead_bytes is not None:
+            pulumi.set(__self__, "non_heap_overhead_bytes", non_heap_overhead_bytes)
+        if non_heap_overhead_percent is not None:
+            pulumi.set(__self__, "non_heap_overhead_percent", non_heap_overhead_percent)
+        if prefer_container_support is not None:
+            pulumi.set(__self__, "prefer_container_support", prefer_container_support)
+        if target_percentile is not None:
+            pulumi.set(__self__, "target_percentile", target_percentile)
+
+    @_builtins.property
+    @pulumi.getter
+    def enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Enable JVM heap sizing overrides. Example: true.
+        """
+        return pulumi.get(self, "enabled")
+
+    @enabled.setter
+    def enabled(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "enabled", value)
+
+    @_builtins.property
+    @pulumi.getter(name="headroomMultiplier")
+    def headroom_multiplier(self) -> Optional[pulumi.Input[_builtins.float]]:
+        """
+        Multiplier applied above the target usage to derive the heap size. Example: 1.3.
+        """
+        return pulumi.get(self, "headroom_multiplier")
+
+    @headroom_multiplier.setter
+    def headroom_multiplier(self, value: Optional[pulumi.Input[_builtins.float]]):
+        pulumi.set(self, "headroom_multiplier", value)
+
+    @_builtins.property
+    @pulumi.getter(name="maxHeapBytes")
+    def max_heap_bytes(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Maximum JVM heap size in bytes. Example: 2147483648.
+        """
+        return pulumi.get(self, "max_heap_bytes")
+
+    @max_heap_bytes.setter
+    def max_heap_bytes(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "max_heap_bytes", value)
+
+    @_builtins.property
+    @pulumi.getter(name="minHeapBytes")
+    def min_heap_bytes(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Minimum JVM heap size in bytes. Example: 134217728.
+        """
+        return pulumi.get(self, "min_heap_bytes")
+
+    @min_heap_bytes.setter
+    def min_heap_bytes(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "min_heap_bytes", value)
+
+    @_builtins.property
+    @pulumi.getter(name="nonHeapOverheadBytes")
+    def non_heap_overhead_bytes(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Non-heap memory overhead in bytes. Takes precedence over nonHeapOverheadPercent when set. Example: 268435456.
+        """
+        return pulumi.get(self, "non_heap_overhead_bytes")
+
+    @non_heap_overhead_bytes.setter
+    def non_heap_overhead_bytes(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "non_heap_overhead_bytes", value)
+
+    @_builtins.property
+    @pulumi.getter(name="nonHeapOverheadPercent")
+    def non_heap_overhead_percent(self) -> Optional[pulumi.Input[_builtins.float]]:
+        """
+        Non-heap memory overhead as a percentage of container memory (0-1). Example: 0.2.
+        """
+        return pulumi.get(self, "non_heap_overhead_percent")
+
+    @non_heap_overhead_percent.setter
+    def non_heap_overhead_percent(self, value: Optional[pulumi.Input[_builtins.float]]):
+        pulumi.set(self, "non_heap_overhead_percent", value)
+
+    @_builtins.property
+    @pulumi.getter(name="preferContainerSupport")
+    def prefer_container_support(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Prefer the JVM's native container-aware heap sizing (-XX:+UseContainerSupport) over explicit -Xmx/-Xms flags. Example: false.
+        """
+        return pulumi.get(self, "prefer_container_support")
+
+    @prefer_container_support.setter
+    def prefer_container_support(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "prefer_container_support", value)
+
+    @_builtins.property
+    @pulumi.getter(name="targetPercentile")
+    def target_percentile(self) -> Optional[pulumi.Input[_builtins.float]]:
+        """
+        Percentile of usage data used as the heap sizing target (0-1). Example: 0.95.
+        """
+        return pulumi.get(self, "target_percentile")
+
+    @target_percentile.setter
+    def target_percentile(self, value: Optional[pulumi.Input[_builtins.float]]):
+        pulumi.set(self, "target_percentile", value)
+
+
+class KedaAdvancedArgsArgsDict(TypedDict):
+    advanced_behavior_json: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Kubernetes HorizontalPodAutoscalerBehavior encoded as a JSON string, applied to the generated HPA. Example: '{"scaleDown":{"stabilizationWindowSeconds":300}}'.
+    """
+    restore_to_original_replica_count: NotRequired[pulumi.Input[_builtins.bool]]
+    """
+    Restore the original replica count when the ScaledObject is deleted. Example: false.
+    """
+
+@pulumi.input_type
+class KedaAdvancedArgsArgs:
+    def __init__(__self__, *,
+                 advanced_behavior_json: Optional[pulumi.Input[_builtins.str]] = None,
+                 restore_to_original_replica_count: Optional[pulumi.Input[_builtins.bool]] = None):
+        """
+        :param pulumi.Input[_builtins.str] advanced_behavior_json: Kubernetes HorizontalPodAutoscalerBehavior encoded as a JSON string, applied to the generated HPA. Example: '{"scaleDown":{"stabilizationWindowSeconds":300}}'.
+        :param pulumi.Input[_builtins.bool] restore_to_original_replica_count: Restore the original replica count when the ScaledObject is deleted. Example: false.
+        """
+        if advanced_behavior_json is not None:
+            pulumi.set(__self__, "advanced_behavior_json", advanced_behavior_json)
+        if restore_to_original_replica_count is not None:
+            pulumi.set(__self__, "restore_to_original_replica_count", restore_to_original_replica_count)
+
+    @_builtins.property
+    @pulumi.getter(name="advancedBehaviorJson")
+    def advanced_behavior_json(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Kubernetes HorizontalPodAutoscalerBehavior encoded as a JSON string, applied to the generated HPA. Example: '{"scaleDown":{"stabilizationWindowSeconds":300}}'.
+        """
+        return pulumi.get(self, "advanced_behavior_json")
+
+    @advanced_behavior_json.setter
+    def advanced_behavior_json(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "advanced_behavior_json", value)
+
+    @_builtins.property
+    @pulumi.getter(name="restoreToOriginalReplicaCount")
+    def restore_to_original_replica_count(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Restore the original replica count when the ScaledObject is deleted. Example: false.
+        """
+        return pulumi.get(self, "restore_to_original_replica_count")
+
+    @restore_to_original_replica_count.setter
+    def restore_to_original_replica_count(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "restore_to_original_replica_count", value)
+
+
+class KedaAuthenticationRefArgsArgsDict(TypedDict):
+    name: pulumi.Input[_builtins.str]
+    """
+    Name of the referenced TriggerAuthentication/ClusterTriggerAuthentication resource. Example: 'prometheus-auth'.
+    """
+    kind: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Kind of the referenced resource. One of: 'TriggerAuthentication', 'ClusterTriggerAuthentication'. Example: 'TriggerAuthentication'.
+    """
+
+@pulumi.input_type
+class KedaAuthenticationRefArgsArgs:
+    def __init__(__self__, *,
+                 name: pulumi.Input[_builtins.str],
+                 kind: Optional[pulumi.Input[_builtins.str]] = None):
+        """
+        :param pulumi.Input[_builtins.str] name: Name of the referenced TriggerAuthentication/ClusterTriggerAuthentication resource. Example: 'prometheus-auth'.
+        :param pulumi.Input[_builtins.str] kind: Kind of the referenced resource. One of: 'TriggerAuthentication', 'ClusterTriggerAuthentication'. Example: 'TriggerAuthentication'.
+        """
+        pulumi.set(__self__, "name", name)
+        if kind is not None:
+            pulumi.set(__self__, "kind", kind)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> pulumi.Input[_builtins.str]:
+        """
+        Name of the referenced TriggerAuthentication/ClusterTriggerAuthentication resource. Example: 'prometheus-auth'.
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "name", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def kind(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Kind of the referenced resource. One of: 'TriggerAuthentication', 'ClusterTriggerAuthentication'. Example: 'TriggerAuthentication'.
+        """
+        return pulumi.get(self, "kind")
+
+    @kind.setter
+    def kind(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "kind", value)
+
+
+class KedaFallbackArgsArgsDict(TypedDict):
+    failure_threshold: pulumi.Input[_builtins.int]
+    """
+    Number of consecutive metric failures before activating fallback. Example: 3.
+    """
+    replicas: pulumi.Input[_builtins.int]
+    """
+    Number of replicas to fall back to when metrics are unavailable. Example: 2.
+    """
+    behavior: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Fallback strategy. Example: 'static'.
+    """
+
+@pulumi.input_type
+class KedaFallbackArgsArgs:
+    def __init__(__self__, *,
+                 failure_threshold: pulumi.Input[_builtins.int],
+                 replicas: pulumi.Input[_builtins.int],
+                 behavior: Optional[pulumi.Input[_builtins.str]] = None):
+        """
+        :param pulumi.Input[_builtins.int] failure_threshold: Number of consecutive metric failures before activating fallback. Example: 3.
+        :param pulumi.Input[_builtins.int] replicas: Number of replicas to fall back to when metrics are unavailable. Example: 2.
+        :param pulumi.Input[_builtins.str] behavior: Fallback strategy. Example: 'static'.
+        """
+        pulumi.set(__self__, "failure_threshold", failure_threshold)
+        pulumi.set(__self__, "replicas", replicas)
+        if behavior is not None:
+            pulumi.set(__self__, "behavior", behavior)
+
+    @_builtins.property
+    @pulumi.getter(name="failureThreshold")
+    def failure_threshold(self) -> pulumi.Input[_builtins.int]:
+        """
+        Number of consecutive metric failures before activating fallback. Example: 3.
+        """
+        return pulumi.get(self, "failure_threshold")
+
+    @failure_threshold.setter
+    def failure_threshold(self, value: pulumi.Input[_builtins.int]):
+        pulumi.set(self, "failure_threshold", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def replicas(self) -> pulumi.Input[_builtins.int]:
+        """
+        Number of replicas to fall back to when metrics are unavailable. Example: 2.
+        """
+        return pulumi.get(self, "replicas")
+
+    @replicas.setter
+    def replicas(self, value: pulumi.Input[_builtins.int]):
+        pulumi.set(self, "replicas", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def behavior(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Fallback strategy. Example: 'static'.
+        """
+        return pulumi.get(self, "behavior")
+
+    @behavior.setter
+    def behavior(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "behavior", value)
+
+
+class KedaScaledObjectArgsArgsDict(TypedDict):
+    advanced: NotRequired[pulumi.Input['KedaAdvancedArgsArgsDict']]
+    """
+    Advanced ScaledObject behavior configuration.
+    """
+    cooldown_period: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Seconds to wait after the last trigger reports active=false before scaling to minReplicaCount. Example: 300.
+    """
+    fallback: NotRequired[pulumi.Input['KedaFallbackArgsArgsDict']]
+    """
+    Replica fallback configuration when KEDA metrics are unavailable.
+    """
+    idle_replica_count: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Replica count to scale to when idle. Must be less than minReplicaCount. Example: 0.
+    """
+    initial_cooldown_period: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Cooldown period applied only during the initial scaling of the ScaledObject. Example: 0.
+    """
+    max_replica_count: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Maximum number of replicas. Example: 10.
+    """
+    min_replica_count: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Minimum number of replicas. Example: 0.
+    """
+    polling_interval: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Seconds between checks of trigger metrics. Example: 30.
+    """
+    triggers: NotRequired[pulumi.Input[Sequence[pulumi.Input['KedaTriggerArgsArgsDict']]]]
+    """
+    KEDA scaler triggers driving this ScaledObject.
+    """
+
+@pulumi.input_type
+class KedaScaledObjectArgsArgs:
+    def __init__(__self__, *,
+                 advanced: Optional[pulumi.Input['KedaAdvancedArgsArgs']] = None,
+                 cooldown_period: Optional[pulumi.Input[_builtins.int]] = None,
+                 fallback: Optional[pulumi.Input['KedaFallbackArgsArgs']] = None,
+                 idle_replica_count: Optional[pulumi.Input[_builtins.int]] = None,
+                 initial_cooldown_period: Optional[pulumi.Input[_builtins.int]] = None,
+                 max_replica_count: Optional[pulumi.Input[_builtins.int]] = None,
+                 min_replica_count: Optional[pulumi.Input[_builtins.int]] = None,
+                 polling_interval: Optional[pulumi.Input[_builtins.int]] = None,
+                 triggers: Optional[pulumi.Input[Sequence[pulumi.Input['KedaTriggerArgsArgs']]]] = None):
+        """
+        :param pulumi.Input['KedaAdvancedArgsArgs'] advanced: Advanced ScaledObject behavior configuration.
+        :param pulumi.Input[_builtins.int] cooldown_period: Seconds to wait after the last trigger reports active=false before scaling to minReplicaCount. Example: 300.
+        :param pulumi.Input['KedaFallbackArgsArgs'] fallback: Replica fallback configuration when KEDA metrics are unavailable.
+        :param pulumi.Input[_builtins.int] idle_replica_count: Replica count to scale to when idle. Must be less than minReplicaCount. Example: 0.
+        :param pulumi.Input[_builtins.int] initial_cooldown_period: Cooldown period applied only during the initial scaling of the ScaledObject. Example: 0.
+        :param pulumi.Input[_builtins.int] max_replica_count: Maximum number of replicas. Example: 10.
+        :param pulumi.Input[_builtins.int] min_replica_count: Minimum number of replicas. Example: 0.
+        :param pulumi.Input[_builtins.int] polling_interval: Seconds between checks of trigger metrics. Example: 30.
+        :param pulumi.Input[Sequence[pulumi.Input['KedaTriggerArgsArgs']]] triggers: KEDA scaler triggers driving this ScaledObject.
+        """
+        if advanced is not None:
+            pulumi.set(__self__, "advanced", advanced)
+        if cooldown_period is not None:
+            pulumi.set(__self__, "cooldown_period", cooldown_period)
+        if fallback is not None:
+            pulumi.set(__self__, "fallback", fallback)
+        if idle_replica_count is not None:
+            pulumi.set(__self__, "idle_replica_count", idle_replica_count)
+        if initial_cooldown_period is not None:
+            pulumi.set(__self__, "initial_cooldown_period", initial_cooldown_period)
+        if max_replica_count is not None:
+            pulumi.set(__self__, "max_replica_count", max_replica_count)
+        if min_replica_count is not None:
+            pulumi.set(__self__, "min_replica_count", min_replica_count)
+        if polling_interval is not None:
+            pulumi.set(__self__, "polling_interval", polling_interval)
+        if triggers is not None:
+            pulumi.set(__self__, "triggers", triggers)
+
+    @_builtins.property
+    @pulumi.getter
+    def advanced(self) -> Optional[pulumi.Input['KedaAdvancedArgsArgs']]:
+        """
+        Advanced ScaledObject behavior configuration.
+        """
+        return pulumi.get(self, "advanced")
+
+    @advanced.setter
+    def advanced(self, value: Optional[pulumi.Input['KedaAdvancedArgsArgs']]):
+        pulumi.set(self, "advanced", value)
+
+    @_builtins.property
+    @pulumi.getter(name="cooldownPeriod")
+    def cooldown_period(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Seconds to wait after the last trigger reports active=false before scaling to minReplicaCount. Example: 300.
+        """
+        return pulumi.get(self, "cooldown_period")
+
+    @cooldown_period.setter
+    def cooldown_period(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "cooldown_period", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def fallback(self) -> Optional[pulumi.Input['KedaFallbackArgsArgs']]:
+        """
+        Replica fallback configuration when KEDA metrics are unavailable.
+        """
+        return pulumi.get(self, "fallback")
+
+    @fallback.setter
+    def fallback(self, value: Optional[pulumi.Input['KedaFallbackArgsArgs']]):
+        pulumi.set(self, "fallback", value)
+
+    @_builtins.property
+    @pulumi.getter(name="idleReplicaCount")
+    def idle_replica_count(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Replica count to scale to when idle. Must be less than minReplicaCount. Example: 0.
+        """
+        return pulumi.get(self, "idle_replica_count")
+
+    @idle_replica_count.setter
+    def idle_replica_count(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "idle_replica_count", value)
+
+    @_builtins.property
+    @pulumi.getter(name="initialCooldownPeriod")
+    def initial_cooldown_period(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Cooldown period applied only during the initial scaling of the ScaledObject. Example: 0.
+        """
+        return pulumi.get(self, "initial_cooldown_period")
+
+    @initial_cooldown_period.setter
+    def initial_cooldown_period(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "initial_cooldown_period", value)
+
+    @_builtins.property
+    @pulumi.getter(name="maxReplicaCount")
+    def max_replica_count(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Maximum number of replicas. Example: 10.
+        """
+        return pulumi.get(self, "max_replica_count")
+
+    @max_replica_count.setter
+    def max_replica_count(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "max_replica_count", value)
+
+    @_builtins.property
+    @pulumi.getter(name="minReplicaCount")
+    def min_replica_count(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Minimum number of replicas. Example: 0.
+        """
+        return pulumi.get(self, "min_replica_count")
+
+    @min_replica_count.setter
+    def min_replica_count(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "min_replica_count", value)
+
+    @_builtins.property
+    @pulumi.getter(name="pollingInterval")
+    def polling_interval(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Seconds between checks of trigger metrics. Example: 30.
+        """
+        return pulumi.get(self, "polling_interval")
+
+    @polling_interval.setter
+    def polling_interval(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "polling_interval", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def triggers(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['KedaTriggerArgsArgs']]]]:
+        """
+        KEDA scaler triggers driving this ScaledObject.
+        """
+        return pulumi.get(self, "triggers")
+
+    @triggers.setter
+    def triggers(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['KedaTriggerArgsArgs']]]]):
+        pulumi.set(self, "triggers", value)
+
+
+class KedaTriggerArgsArgsDict(TypedDict):
+    type: pulumi.Input[_builtins.str]
+    """
+    KEDA scaler type. Example: 'prometheus'.
+    """
+    authentication_ref: NotRequired[pulumi.Input['KedaAuthenticationRefArgsArgsDict']]
+    """
+    Reference to a TriggerAuthentication or ClusterTriggerAuthentication for this trigger.
+    """
+    metadata: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
+    """
+    Scaler-specific configuration key-value pairs. Example: {"serverAddress": "http://prometheus:9090", "query": "sum(rate(http_requests_total[2m]))"}.
+    """
+    metric_type: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Metric target type. One of: 'Value', 'AverageValue', 'Utilization'. Example: 'AverageValue'.
+    """
+    name: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Optional trigger name, used to disambiguate multiple triggers of the same type. Example: 'requests-per-second'.
+    """
+    use_cached_metrics: NotRequired[pulumi.Input[_builtins.bool]]
+    """
+    Use KEDA's metric caching for this trigger. Example: false.
+    """
+
+@pulumi.input_type
+class KedaTriggerArgsArgs:
+    def __init__(__self__, *,
+                 type: pulumi.Input[_builtins.str],
+                 authentication_ref: Optional[pulumi.Input['KedaAuthenticationRefArgsArgs']] = None,
+                 metadata: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 metric_type: Optional[pulumi.Input[_builtins.str]] = None,
+                 name: Optional[pulumi.Input[_builtins.str]] = None,
+                 use_cached_metrics: Optional[pulumi.Input[_builtins.bool]] = None):
+        """
+        :param pulumi.Input[_builtins.str] type: KEDA scaler type. Example: 'prometheus'.
+        :param pulumi.Input['KedaAuthenticationRefArgsArgs'] authentication_ref: Reference to a TriggerAuthentication or ClusterTriggerAuthentication for this trigger.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] metadata: Scaler-specific configuration key-value pairs. Example: {"serverAddress": "http://prometheus:9090", "query": "sum(rate(http_requests_total[2m]))"}.
+        :param pulumi.Input[_builtins.str] metric_type: Metric target type. One of: 'Value', 'AverageValue', 'Utilization'. Example: 'AverageValue'.
+        :param pulumi.Input[_builtins.str] name: Optional trigger name, used to disambiguate multiple triggers of the same type. Example: 'requests-per-second'.
+        :param pulumi.Input[_builtins.bool] use_cached_metrics: Use KEDA's metric caching for this trigger. Example: false.
+        """
+        pulumi.set(__self__, "type", type)
+        if authentication_ref is not None:
+            pulumi.set(__self__, "authentication_ref", authentication_ref)
+        if metadata is not None:
+            pulumi.set(__self__, "metadata", metadata)
+        if metric_type is not None:
+            pulumi.set(__self__, "metric_type", metric_type)
+        if name is not None:
+            pulumi.set(__self__, "name", name)
+        if use_cached_metrics is not None:
+            pulumi.set(__self__, "use_cached_metrics", use_cached_metrics)
+
+    @_builtins.property
+    @pulumi.getter
+    def type(self) -> pulumi.Input[_builtins.str]:
+        """
+        KEDA scaler type. Example: 'prometheus'.
+        """
+        return pulumi.get(self, "type")
+
+    @type.setter
+    def type(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "type", value)
+
+    @_builtins.property
+    @pulumi.getter(name="authenticationRef")
+    def authentication_ref(self) -> Optional[pulumi.Input['KedaAuthenticationRefArgsArgs']]:
+        """
+        Reference to a TriggerAuthentication or ClusterTriggerAuthentication for this trigger.
+        """
+        return pulumi.get(self, "authentication_ref")
+
+    @authentication_ref.setter
+    def authentication_ref(self, value: Optional[pulumi.Input['KedaAuthenticationRefArgsArgs']]):
+        pulumi.set(self, "authentication_ref", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def metadata(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
+        """
+        Scaler-specific configuration key-value pairs. Example: {"serverAddress": "http://prometheus:9090", "query": "sum(rate(http_requests_total[2m]))"}.
+        """
+        return pulumi.get(self, "metadata")
+
+    @metadata.setter
+    def metadata(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "metadata", value)
+
+    @_builtins.property
+    @pulumi.getter(name="metricType")
+    def metric_type(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Metric target type. One of: 'Value', 'AverageValue', 'Utilization'. Example: 'AverageValue'.
+        """
+        return pulumi.get(self, "metric_type")
+
+    @metric_type.setter
+    def metric_type(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "metric_type", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Optional trigger name, used to disambiguate multiple triggers of the same type. Example: 'requests-per-second'.
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "name", value)
+
+    @_builtins.property
+    @pulumi.getter(name="useCachedMetrics")
+    def use_cached_metrics(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Use KEDA's metric caching for this trigger. Example: false.
+        """
+        return pulumi.get(self, "use_cached_metrics")
+
+    @use_cached_metrics.setter
+    def use_cached_metrics(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "use_cached_metrics", value)
+
+
 class KubeletConfigurationArgsArgsDict(TypedDict):
     cluster_dns: NotRequired[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]
     """
@@ -2996,6 +4005,669 @@ class NamePatternArgsArgs:
     @pattern.setter
     def pattern(self, value: Optional[pulumi.Input[_builtins.str]]):
         pulumi.set(self, "pattern", value)
+
+
+class OCIBootConfigArgsArgsDict(TypedDict):
+    boot_volume_size_in_gbs: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Boot volume size in GB. Example: 100.
+    """
+    boot_volume_vpus_per_gb: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Boot volume performance units per GB. Example: 10.
+    """
+
+@pulumi.input_type
+class OCIBootConfigArgsArgs:
+    def __init__(__self__, *,
+                 boot_volume_size_in_gbs: Optional[pulumi.Input[_builtins.int]] = None,
+                 boot_volume_vpus_per_gb: Optional[pulumi.Input[_builtins.int]] = None):
+        """
+        :param pulumi.Input[_builtins.int] boot_volume_size_in_gbs: Boot volume size in GB. Example: 100.
+        :param pulumi.Input[_builtins.int] boot_volume_vpus_per_gb: Boot volume performance units per GB. Example: 10.
+        """
+        if boot_volume_size_in_gbs is not None:
+            pulumi.set(__self__, "boot_volume_size_in_gbs", boot_volume_size_in_gbs)
+        if boot_volume_vpus_per_gb is not None:
+            pulumi.set(__self__, "boot_volume_vpus_per_gb", boot_volume_vpus_per_gb)
+
+    @_builtins.property
+    @pulumi.getter(name="bootVolumeSizeInGbs")
+    def boot_volume_size_in_gbs(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Boot volume size in GB. Example: 100.
+        """
+        return pulumi.get(self, "boot_volume_size_in_gbs")
+
+    @boot_volume_size_in_gbs.setter
+    def boot_volume_size_in_gbs(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "boot_volume_size_in_gbs", value)
+
+    @_builtins.property
+    @pulumi.getter(name="bootVolumeVpusPerGb")
+    def boot_volume_vpus_per_gb(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Boot volume performance units per GB. Example: 10.
+        """
+        return pulumi.get(self, "boot_volume_vpus_per_gb")
+
+    @boot_volume_vpus_per_gb.setter
+    def boot_volume_vpus_per_gb(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "boot_volume_vpus_per_gb", value)
+
+
+class OCIImageSelectorTermArgsArgsDict(TypedDict):
+    compartment_id: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    OCID of the compartment containing the image. Example: 'ocid1.compartment.oc1..aaaaaaaa'.
+    """
+    id: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Explicit OCI image OCID. Example: 'ocid1.image.oc1..aaaaaaaa'.
+    """
+    name: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    OCI image display name filter. Example: 'Oracle-Linux-8.9'.
+    """
+
+@pulumi.input_type
+class OCIImageSelectorTermArgsArgs:
+    def __init__(__self__, *,
+                 compartment_id: Optional[pulumi.Input[_builtins.str]] = None,
+                 id: Optional[pulumi.Input[_builtins.str]] = None,
+                 name: Optional[pulumi.Input[_builtins.str]] = None):
+        """
+        :param pulumi.Input[_builtins.str] compartment_id: OCID of the compartment containing the image. Example: 'ocid1.compartment.oc1..aaaaaaaa'.
+        :param pulumi.Input[_builtins.str] id: Explicit OCI image OCID. Example: 'ocid1.image.oc1..aaaaaaaa'.
+        :param pulumi.Input[_builtins.str] name: OCI image display name filter. Example: 'Oracle-Linux-8.9'.
+        """
+        if compartment_id is not None:
+            pulumi.set(__self__, "compartment_id", compartment_id)
+        if id is not None:
+            pulumi.set(__self__, "id", id)
+        if name is not None:
+            pulumi.set(__self__, "name", name)
+
+    @_builtins.property
+    @pulumi.getter(name="compartmentId")
+    def compartment_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        OCID of the compartment containing the image. Example: 'ocid1.compartment.oc1..aaaaaaaa'.
+        """
+        return pulumi.get(self, "compartment_id")
+
+    @compartment_id.setter
+    def compartment_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "compartment_id", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Explicit OCI image OCID. Example: 'ocid1.image.oc1..aaaaaaaa'.
+        """
+        return pulumi.get(self, "id")
+
+    @id.setter
+    def id(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "id", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        OCI image display name filter. Example: 'Oracle-Linux-8.9'.
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "name", value)
+
+
+class OCILaunchOptionsArgsArgsDict(TypedDict):
+    boot_volume_type: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Emulation type for the boot volume. Example: 'PARAVIRTUALIZED'.
+    """
+    firmware: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Firmware used to boot the instance. Example: 'UEFI_64'.
+    """
+    is_consistent_volume_naming_enabled: NotRequired[pulumi.Input[_builtins.bool]]
+    """
+    Whether consistent volume naming is enabled for the instance. Example: true.
+    """
+    network_type: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Emulation type for the network interface. Example: 'PARAVIRTUALIZED'.
+    """
+    remote_data_volume_type: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Emulation type for remote data volumes. Example: 'PARAVIRTUALIZED'.
+    """
+
+@pulumi.input_type
+class OCILaunchOptionsArgsArgs:
+    def __init__(__self__, *,
+                 boot_volume_type: Optional[pulumi.Input[_builtins.str]] = None,
+                 firmware: Optional[pulumi.Input[_builtins.str]] = None,
+                 is_consistent_volume_naming_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
+                 network_type: Optional[pulumi.Input[_builtins.str]] = None,
+                 remote_data_volume_type: Optional[pulumi.Input[_builtins.str]] = None):
+        """
+        :param pulumi.Input[_builtins.str] boot_volume_type: Emulation type for the boot volume. Example: 'PARAVIRTUALIZED'.
+        :param pulumi.Input[_builtins.str] firmware: Firmware used to boot the instance. Example: 'UEFI_64'.
+        :param pulumi.Input[_builtins.bool] is_consistent_volume_naming_enabled: Whether consistent volume naming is enabled for the instance. Example: true.
+        :param pulumi.Input[_builtins.str] network_type: Emulation type for the network interface. Example: 'PARAVIRTUALIZED'.
+        :param pulumi.Input[_builtins.str] remote_data_volume_type: Emulation type for remote data volumes. Example: 'PARAVIRTUALIZED'.
+        """
+        if boot_volume_type is not None:
+            pulumi.set(__self__, "boot_volume_type", boot_volume_type)
+        if firmware is not None:
+            pulumi.set(__self__, "firmware", firmware)
+        if is_consistent_volume_naming_enabled is not None:
+            pulumi.set(__self__, "is_consistent_volume_naming_enabled", is_consistent_volume_naming_enabled)
+        if network_type is not None:
+            pulumi.set(__self__, "network_type", network_type)
+        if remote_data_volume_type is not None:
+            pulumi.set(__self__, "remote_data_volume_type", remote_data_volume_type)
+
+    @_builtins.property
+    @pulumi.getter(name="bootVolumeType")
+    def boot_volume_type(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Emulation type for the boot volume. Example: 'PARAVIRTUALIZED'.
+        """
+        return pulumi.get(self, "boot_volume_type")
+
+    @boot_volume_type.setter
+    def boot_volume_type(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "boot_volume_type", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def firmware(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Firmware used to boot the instance. Example: 'UEFI_64'.
+        """
+        return pulumi.get(self, "firmware")
+
+    @firmware.setter
+    def firmware(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "firmware", value)
+
+    @_builtins.property
+    @pulumi.getter(name="isConsistentVolumeNamingEnabled")
+    def is_consistent_volume_naming_enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Whether consistent volume naming is enabled for the instance. Example: true.
+        """
+        return pulumi.get(self, "is_consistent_volume_naming_enabled")
+
+    @is_consistent_volume_naming_enabled.setter
+    def is_consistent_volume_naming_enabled(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "is_consistent_volume_naming_enabled", value)
+
+    @_builtins.property
+    @pulumi.getter(name="networkType")
+    def network_type(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Emulation type for the network interface. Example: 'PARAVIRTUALIZED'.
+        """
+        return pulumi.get(self, "network_type")
+
+    @network_type.setter
+    def network_type(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "network_type", value)
+
+    @_builtins.property
+    @pulumi.getter(name="remoteDataVolumeType")
+    def remote_data_volume_type(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Emulation type for remote data volumes. Example: 'PARAVIRTUALIZED'.
+        """
+        return pulumi.get(self, "remote_data_volume_type")
+
+    @remote_data_volume_type.setter
+    def remote_data_volume_type(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "remote_data_volume_type", value)
+
+
+class OCINodeClassSpecArgsArgsDict(TypedDict):
+    agent_list: NotRequired[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]
+    """
+    OCI compute instance agent plugins to enable. Example: ["Compute Instance Monitoring"].
+    """
+    block_devices: NotRequired[pulumi.Input[Sequence[pulumi.Input['OCIVolumeAttributesArgsArgsDict']]]]
+    """
+    Additional block volumes attached to provisioned nodes.
+    """
+    boot_config: NotRequired[pulumi.Input['OCIBootConfigArgsArgsDict']]
+    """
+    Boot volume configuration for provisioned nodes.
+    """
+    free_form_tags: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
+    """
+    OCI free-form tags applied to all resources created by this node class. Example: {"environment": "production"}.
+    """
+    image_family: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    OCI node image family shorthand used when no imageSelector is specified. Example: 'Oracle-Linux-8'.
+    """
+    image_selector: NotRequired[pulumi.Input[Sequence[pulumi.Input['OCIImageSelectorTermArgsArgsDict']]]]
+    """
+    Selectors for the images used to launch nodes. Example: [{name: "Oracle-Linux-8.9"}].
+    """
+    launch_options: NotRequired[pulumi.Input['OCILaunchOptionsArgsArgsDict']]
+    """
+    Instance launch options controlling firmware and network/volume emulation type.
+    """
+    meta_data: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
+    """
+    OCI instance metadata applied to provisioned nodes. Example: {"ssh_authorized_keys": "ssh-rsa ..."}.
+    """
+    pre_install_script: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Script executed before node bootstrap. Example: '#!/bin/bash\\necho pre-install'.
+    """
+    security_group_selector: NotRequired[pulumi.Input[Sequence[pulumi.Input['OCISecurityGroupSelectorTermArgsArgsDict']]]]
+    """
+    Selectors for network security groups attached to provisioned nodes.
+    """
+    subnet_selector: NotRequired[pulumi.Input[Sequence[pulumi.Input['OCISubnetSelectorTermArgsArgsDict']]]]
+    """
+    Selectors for the subnets nodes will be launched into.
+    """
+    tags: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
+    """
+    OCI defined tags applied to all resources created by this node class.
+    """
+    user_data: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Custom cloud-init user data merged into the node launch config (base64 or plain text). Example: '#!/bin/bash\\necho hello'.
+    """
+    vcn_id: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    OCID of the VCN nodes will be launched into. Example: 'ocid1.vcn.oc1..aaaaaaaa'.
+    """
+
+@pulumi.input_type
+class OCINodeClassSpecArgsArgs:
+    def __init__(__self__, *,
+                 agent_list: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 block_devices: Optional[pulumi.Input[Sequence[pulumi.Input['OCIVolumeAttributesArgsArgs']]]] = None,
+                 boot_config: Optional[pulumi.Input['OCIBootConfigArgsArgs']] = None,
+                 free_form_tags: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 image_family: Optional[pulumi.Input[_builtins.str]] = None,
+                 image_selector: Optional[pulumi.Input[Sequence[pulumi.Input['OCIImageSelectorTermArgsArgs']]]] = None,
+                 launch_options: Optional[pulumi.Input['OCILaunchOptionsArgsArgs']] = None,
+                 meta_data: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 pre_install_script: Optional[pulumi.Input[_builtins.str]] = None,
+                 security_group_selector: Optional[pulumi.Input[Sequence[pulumi.Input['OCISecurityGroupSelectorTermArgsArgs']]]] = None,
+                 subnet_selector: Optional[pulumi.Input[Sequence[pulumi.Input['OCISubnetSelectorTermArgsArgs']]]] = None,
+                 tags: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 user_data: Optional[pulumi.Input[_builtins.str]] = None,
+                 vcn_id: Optional[pulumi.Input[_builtins.str]] = None):
+        """
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] agent_list: OCI compute instance agent plugins to enable. Example: ["Compute Instance Monitoring"].
+        :param pulumi.Input[Sequence[pulumi.Input['OCIVolumeAttributesArgsArgs']]] block_devices: Additional block volumes attached to provisioned nodes.
+        :param pulumi.Input['OCIBootConfigArgsArgs'] boot_config: Boot volume configuration for provisioned nodes.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] free_form_tags: OCI free-form tags applied to all resources created by this node class. Example: {"environment": "production"}.
+        :param pulumi.Input[_builtins.str] image_family: OCI node image family shorthand used when no imageSelector is specified. Example: 'Oracle-Linux-8'.
+        :param pulumi.Input[Sequence[pulumi.Input['OCIImageSelectorTermArgsArgs']]] image_selector: Selectors for the images used to launch nodes. Example: [{name: "Oracle-Linux-8.9"}].
+        :param pulumi.Input['OCILaunchOptionsArgsArgs'] launch_options: Instance launch options controlling firmware and network/volume emulation type.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] meta_data: OCI instance metadata applied to provisioned nodes. Example: {"ssh_authorized_keys": "ssh-rsa ..."}.
+        :param pulumi.Input[_builtins.str] pre_install_script: Script executed before node bootstrap. Example: '#!/bin/bash\\necho pre-install'.
+        :param pulumi.Input[Sequence[pulumi.Input['OCISecurityGroupSelectorTermArgsArgs']]] security_group_selector: Selectors for network security groups attached to provisioned nodes.
+        :param pulumi.Input[Sequence[pulumi.Input['OCISubnetSelectorTermArgsArgs']]] subnet_selector: Selectors for the subnets nodes will be launched into.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] tags: OCI defined tags applied to all resources created by this node class.
+        :param pulumi.Input[_builtins.str] user_data: Custom cloud-init user data merged into the node launch config (base64 or plain text). Example: '#!/bin/bash\\necho hello'.
+        :param pulumi.Input[_builtins.str] vcn_id: OCID of the VCN nodes will be launched into. Example: 'ocid1.vcn.oc1..aaaaaaaa'.
+        """
+        if agent_list is not None:
+            pulumi.set(__self__, "agent_list", agent_list)
+        if block_devices is not None:
+            pulumi.set(__self__, "block_devices", block_devices)
+        if boot_config is not None:
+            pulumi.set(__self__, "boot_config", boot_config)
+        if free_form_tags is not None:
+            pulumi.set(__self__, "free_form_tags", free_form_tags)
+        if image_family is not None:
+            pulumi.set(__self__, "image_family", image_family)
+        if image_selector is not None:
+            pulumi.set(__self__, "image_selector", image_selector)
+        if launch_options is not None:
+            pulumi.set(__self__, "launch_options", launch_options)
+        if meta_data is not None:
+            pulumi.set(__self__, "meta_data", meta_data)
+        if pre_install_script is not None:
+            pulumi.set(__self__, "pre_install_script", pre_install_script)
+        if security_group_selector is not None:
+            pulumi.set(__self__, "security_group_selector", security_group_selector)
+        if subnet_selector is not None:
+            pulumi.set(__self__, "subnet_selector", subnet_selector)
+        if tags is not None:
+            pulumi.set(__self__, "tags", tags)
+        if user_data is not None:
+            pulumi.set(__self__, "user_data", user_data)
+        if vcn_id is not None:
+            pulumi.set(__self__, "vcn_id", vcn_id)
+
+    @_builtins.property
+    @pulumi.getter(name="agentList")
+    def agent_list(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+        """
+        OCI compute instance agent plugins to enable. Example: ["Compute Instance Monitoring"].
+        """
+        return pulumi.get(self, "agent_list")
+
+    @agent_list.setter
+    def agent_list(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "agent_list", value)
+
+    @_builtins.property
+    @pulumi.getter(name="blockDevices")
+    def block_devices(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['OCIVolumeAttributesArgsArgs']]]]:
+        """
+        Additional block volumes attached to provisioned nodes.
+        """
+        return pulumi.get(self, "block_devices")
+
+    @block_devices.setter
+    def block_devices(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['OCIVolumeAttributesArgsArgs']]]]):
+        pulumi.set(self, "block_devices", value)
+
+    @_builtins.property
+    @pulumi.getter(name="bootConfig")
+    def boot_config(self) -> Optional[pulumi.Input['OCIBootConfigArgsArgs']]:
+        """
+        Boot volume configuration for provisioned nodes.
+        """
+        return pulumi.get(self, "boot_config")
+
+    @boot_config.setter
+    def boot_config(self, value: Optional[pulumi.Input['OCIBootConfigArgsArgs']]):
+        pulumi.set(self, "boot_config", value)
+
+    @_builtins.property
+    @pulumi.getter(name="freeFormTags")
+    def free_form_tags(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
+        """
+        OCI free-form tags applied to all resources created by this node class. Example: {"environment": "production"}.
+        """
+        return pulumi.get(self, "free_form_tags")
+
+    @free_form_tags.setter
+    def free_form_tags(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "free_form_tags", value)
+
+    @_builtins.property
+    @pulumi.getter(name="imageFamily")
+    def image_family(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        OCI node image family shorthand used when no imageSelector is specified. Example: 'Oracle-Linux-8'.
+        """
+        return pulumi.get(self, "image_family")
+
+    @image_family.setter
+    def image_family(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "image_family", value)
+
+    @_builtins.property
+    @pulumi.getter(name="imageSelector")
+    def image_selector(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['OCIImageSelectorTermArgsArgs']]]]:
+        """
+        Selectors for the images used to launch nodes. Example: [{name: "Oracle-Linux-8.9"}].
+        """
+        return pulumi.get(self, "image_selector")
+
+    @image_selector.setter
+    def image_selector(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['OCIImageSelectorTermArgsArgs']]]]):
+        pulumi.set(self, "image_selector", value)
+
+    @_builtins.property
+    @pulumi.getter(name="launchOptions")
+    def launch_options(self) -> Optional[pulumi.Input['OCILaunchOptionsArgsArgs']]:
+        """
+        Instance launch options controlling firmware and network/volume emulation type.
+        """
+        return pulumi.get(self, "launch_options")
+
+    @launch_options.setter
+    def launch_options(self, value: Optional[pulumi.Input['OCILaunchOptionsArgsArgs']]):
+        pulumi.set(self, "launch_options", value)
+
+    @_builtins.property
+    @pulumi.getter(name="metaData")
+    def meta_data(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
+        """
+        OCI instance metadata applied to provisioned nodes. Example: {"ssh_authorized_keys": "ssh-rsa ..."}.
+        """
+        return pulumi.get(self, "meta_data")
+
+    @meta_data.setter
+    def meta_data(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "meta_data", value)
+
+    @_builtins.property
+    @pulumi.getter(name="preInstallScript")
+    def pre_install_script(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Script executed before node bootstrap. Example: '#!/bin/bash\\necho pre-install'.
+        """
+        return pulumi.get(self, "pre_install_script")
+
+    @pre_install_script.setter
+    def pre_install_script(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "pre_install_script", value)
+
+    @_builtins.property
+    @pulumi.getter(name="securityGroupSelector")
+    def security_group_selector(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['OCISecurityGroupSelectorTermArgsArgs']]]]:
+        """
+        Selectors for network security groups attached to provisioned nodes.
+        """
+        return pulumi.get(self, "security_group_selector")
+
+    @security_group_selector.setter
+    def security_group_selector(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['OCISecurityGroupSelectorTermArgsArgs']]]]):
+        pulumi.set(self, "security_group_selector", value)
+
+    @_builtins.property
+    @pulumi.getter(name="subnetSelector")
+    def subnet_selector(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['OCISubnetSelectorTermArgsArgs']]]]:
+        """
+        Selectors for the subnets nodes will be launched into.
+        """
+        return pulumi.get(self, "subnet_selector")
+
+    @subnet_selector.setter
+    def subnet_selector(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['OCISubnetSelectorTermArgsArgs']]]]):
+        pulumi.set(self, "subnet_selector", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def tags(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
+        """
+        OCI defined tags applied to all resources created by this node class.
+        """
+        return pulumi.get(self, "tags")
+
+    @tags.setter
+    def tags(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "tags", value)
+
+    @_builtins.property
+    @pulumi.getter(name="userData")
+    def user_data(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Custom cloud-init user data merged into the node launch config (base64 or plain text). Example: '#!/bin/bash\\necho hello'.
+        """
+        return pulumi.get(self, "user_data")
+
+    @user_data.setter
+    def user_data(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "user_data", value)
+
+    @_builtins.property
+    @pulumi.getter(name="vcnId")
+    def vcn_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        OCID of the VCN nodes will be launched into. Example: 'ocid1.vcn.oc1..aaaaaaaa'.
+        """
+        return pulumi.get(self, "vcn_id")
+
+    @vcn_id.setter
+    def vcn_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "vcn_id", value)
+
+
+class OCISecurityGroupSelectorTermArgsArgsDict(TypedDict):
+    id: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Explicit OCI network security group OCID. Example: 'ocid1.networksecuritygroup.oc1..aaaaaaaa'.
+    """
+    name: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    OCI network security group display name filter. Example: 'node-nsg'.
+    """
+
+@pulumi.input_type
+class OCISecurityGroupSelectorTermArgsArgs:
+    def __init__(__self__, *,
+                 id: Optional[pulumi.Input[_builtins.str]] = None,
+                 name: Optional[pulumi.Input[_builtins.str]] = None):
+        """
+        :param pulumi.Input[_builtins.str] id: Explicit OCI network security group OCID. Example: 'ocid1.networksecuritygroup.oc1..aaaaaaaa'.
+        :param pulumi.Input[_builtins.str] name: OCI network security group display name filter. Example: 'node-nsg'.
+        """
+        if id is not None:
+            pulumi.set(__self__, "id", id)
+        if name is not None:
+            pulumi.set(__self__, "name", name)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Explicit OCI network security group OCID. Example: 'ocid1.networksecuritygroup.oc1..aaaaaaaa'.
+        """
+        return pulumi.get(self, "id")
+
+    @id.setter
+    def id(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "id", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        OCI network security group display name filter. Example: 'node-nsg'.
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "name", value)
+
+
+class OCISubnetSelectorTermArgsArgsDict(TypedDict):
+    id: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Explicit OCI subnet OCID. Example: 'ocid1.subnet.oc1..aaaaaaaa'.
+    """
+    name: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    OCI subnet display name filter. Example: 'node-subnet'.
+    """
+
+@pulumi.input_type
+class OCISubnetSelectorTermArgsArgs:
+    def __init__(__self__, *,
+                 id: Optional[pulumi.Input[_builtins.str]] = None,
+                 name: Optional[pulumi.Input[_builtins.str]] = None):
+        """
+        :param pulumi.Input[_builtins.str] id: Explicit OCI subnet OCID. Example: 'ocid1.subnet.oc1..aaaaaaaa'.
+        :param pulumi.Input[_builtins.str] name: OCI subnet display name filter. Example: 'node-subnet'.
+        """
+        if id is not None:
+            pulumi.set(__self__, "id", id)
+        if name is not None:
+            pulumi.set(__self__, "name", name)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Explicit OCI subnet OCID. Example: 'ocid1.subnet.oc1..aaaaaaaa'.
+        """
+        return pulumi.get(self, "id")
+
+    @id.setter
+    def id(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "id", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        OCI subnet display name filter. Example: 'node-subnet'.
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "name", value)
+
+
+class OCIVolumeAttributesArgsArgsDict(TypedDict):
+    size_in_gbs: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Block volume size in GB. Example: 50.
+    """
+    vpus_per_gb: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Block volume performance units per GB. Example: 10.
+    """
+
+@pulumi.input_type
+class OCIVolumeAttributesArgsArgs:
+    def __init__(__self__, *,
+                 size_in_gbs: Optional[pulumi.Input[_builtins.int]] = None,
+                 vpus_per_gb: Optional[pulumi.Input[_builtins.int]] = None):
+        """
+        :param pulumi.Input[_builtins.int] size_in_gbs: Block volume size in GB. Example: 50.
+        :param pulumi.Input[_builtins.int] vpus_per_gb: Block volume performance units per GB. Example: 10.
+        """
+        if size_in_gbs is not None:
+            pulumi.set(__self__, "size_in_gbs", size_in_gbs)
+        if vpus_per_gb is not None:
+            pulumi.set(__self__, "vpus_per_gb", vpus_per_gb)
+
+    @_builtins.property
+    @pulumi.getter(name="sizeInGbs")
+    def size_in_gbs(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Block volume size in GB. Example: 50.
+        """
+        return pulumi.get(self, "size_in_gbs")
+
+    @size_in_gbs.setter
+    def size_in_gbs(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "size_in_gbs", value)
+
+    @_builtins.property
+    @pulumi.getter(name="vpusPerGb")
+    def vpus_per_gb(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Block volume performance units per GB. Example: 10.
+        """
+        return pulumi.get(self, "vpus_per_gb")
+
+    @vpus_per_gb.setter
+    def vpus_per_gb(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "vpus_per_gb", value)
 
 
 class RawKarpenterSpecArgsArgsDict(TypedDict):
