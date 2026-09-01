@@ -172,6 +172,20 @@ func (f *fakeBackend) GetWorkloadRecommendationPolicy(_ context.Context, req *co
 	return connect.NewResponse(&apiv1.GetWorkloadRecommendationPolicyResponse{Policy: p}), nil
 }
 
+func (f *fakeBackend) UpdateWorkloadRecommendationPolicy(_ context.Context, req *connect.Request[apiv1.UpdateWorkloadRecommendationPolicyRequest]) (*connect.Response[apiv1.UpdateWorkloadRecommendationPolicyResponse], error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	p := req.Msg.Policy
+	if p == nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("policy required"))
+	}
+	if _, ok := f.wp[p.PolicyId]; !ok {
+		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("workload policy not found"))
+	}
+	f.wp[p.PolicyId] = p
+	return connect.NewResponse(&apiv1.UpdateWorkloadRecommendationPolicyResponse{Policy: p}), nil
+}
+
 func (f *fakeBackend) DeleteWorkloadRecommendationPolicy(_ context.Context, req *connect.Request[apiv1.DeleteWorkloadRecommendationPolicyRequest]) (*connect.Response[apiv1.DeleteWorkloadRecommendationPolicyResponse], error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()

@@ -74,20 +74,20 @@ const euWest = new devzero.Cluster("eu-west", { name: "production-eu-west-1" });
 | Name    | Type   | Description                                                                               |
 |---------|--------|-------------------------------------------------------------------------------------------|
 | `id`    | string | Unique identifier of the cluster. Managed by the provider.                                |
-| `token` | string | **(Secret)** Authentication token for the cluster agent. Stored encrypted in Pulumi state. Automatically rotated when the resource is imported and then updated. |
+| `token` | string | **(Secret)** Authentication token for the cluster agent. Stored encrypted in Pulumi state. Not retrievable via `Read`/import — see the Import note below. |
 
 ## Import
 
 An existing cluster can be imported using its cluster ID:
 
 ```shell
-pulumi import devzero:index/cluster:Cluster my-cluster <cluster-id>
+pulumi import devzero:resources:Cluster my-cluster <cluster-id>
 
 # Example
-pulumi import devzero:index/cluster:Cluster production "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+pulumi import devzero:resources:Cluster production "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
 ```
 
-> **Note:** After importing, the `token` field will be empty in state. The next `pulumi up` will automatically call `ResetClusterToken` to obtain a fresh token.
+> **Note:** After importing, the `token` field will be empty in state and stays that way — the provider does not rotate it automatically on update (doing so used to silently invalidate the credential the running in-cluster agent was using whenever an unrelated field changed). If you need the token in state, rotate it deliberately from the DevZero UI, or recreate the resource.
 
 ## Notes
 

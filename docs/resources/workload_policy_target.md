@@ -124,5 +124,5 @@ target = devzero.WorkloadPolicyTarget("production-target",
 ## Import
 
 ```shell
-pulumi import devzero:index/workloadPolicyTarget:WorkloadPolicyTarget my-target <target-id>
+pulumi import devzero:resources:WorkloadPolicyTarget my-target <target-id>
 ```
