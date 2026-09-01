@@ -127,10 +127,10 @@ func main() {
 An existing node policy target can be imported using its target ID:
 
 ```shell
-pulumi import devzero:index/nodePolicyTarget:NodePolicyTarget my-target <target-id>
+pulumi import devzero:resources:NodePolicyTarget my-target <target-id>
 
 # Example
-pulumi import devzero:index/nodePolicyTarget:NodePolicyTarget production "c84ccd96-d3f6-439d-9976-360577123fe0"
+pulumi import devzero:resources:NodePolicyTarget production "c84ccd96-d3f6-439d-9976-360577123fe0"
 ```
 
 ## Notes

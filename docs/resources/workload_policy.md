@@ -162,5 +162,5 @@ Each of `cpuVerticalScaling`, `memoryVerticalScaling`, `gpuVerticalScaling`, and
 ## Import
 
 ```shell
-pulumi import devzero:index/workloadPolicy:WorkloadPolicy my-policy <policy-id>
+pulumi import devzero:resources:WorkloadPolicy my-policy <policy-id>
 ```

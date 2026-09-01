@@ -313,7 +313,7 @@ Used by all instance/zone/architecture selectors:
 ## Import
 
 ```shell
-pulumi import devzero:index/nodePolicy:NodePolicy my-policy <policy-id>
+pulumi import devzero:resources:NodePolicy my-policy <policy-id>
 ```
 
 > **Note:** Because there is no delete API, `pulumi destroy` only removes the resource from Pulumi state. The policy continues to exist on the DevZero platform.
